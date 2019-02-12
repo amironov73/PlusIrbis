@@ -3,10 +3,15 @@
 
 #pragma once
 
+#include <cwchar>
+#include <cwctype>
+#include <algorithm>
 #include <string>
 #include <ios>
-#include <istream>
 #include <list>
+
+#define NAMESPACE_IRBIS_BEGIN namespace irbis {
+#define NAMESPACE_IRBIS_END }
 
 #ifdef PLUSIRBIS_LIBRARY
 #define PLUSIRBIS_EXPORTS __declspec(dllexport)
@@ -16,10 +21,10 @@
 
 //=========================================================
 
-namespace irbis
-{
+NAMESPACE_IRBIS_BEGIN
 
 class BaseException;
+class Format;
 class MarcRecord;
 class NetworkException;
 class RecordField;
@@ -35,16 +40,23 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS MarcRecord
+class PLUSIRBIS_EXPORTS Format final
 {
 public:
-    std::wstring database;
-    int mfn;
-    int status;
-    int version;
-    std::list<RecordField> fields;
+    static std::wstring removeComments(const std::wstring &text);
+    static std::wstring prepareFormat(const std::wstring &text);
+};
 
-    MarcRecord();
+//=========================================================
+
+class PLUSIRBIS_EXPORTS MarcRecord final
+{
+public:
+    int mfn = 0;
+    int status = 0;
+    int version = 0;
+    std::list<RecordField> fields;
+    std::wstring database;
 
     bool deleted() const;
     bool verify(bool throwOnError) const;
@@ -61,32 +73,28 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RawRecord
+class PLUSIRBIS_EXPORTS RawRecord final
 {
 public:
-    std::wstring database;
-    int mfn;
-    int status;
-    int version;
+    int mfn = 0;
+    int status = 0;
+    int version = 0;
     std::list<std::wstring> fields;
-
-    RawRecord();
+    std::wstring database;
 
     friend std::wostream& operator << (std::wostream &stream, const RawRecord &record);
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RecordField
+class PLUSIRBIS_EXPORTS RecordField final
 {
 public:
     const static int NoTag;
 
-    int tag;
+    int tag = 0;
     std::wstring value;
     std::list<SubField> subfields;
-
-    RecordField(int tag = NoTag, const std::wstring &value = L"");
 
     RecordField& add(wchar_t code, const std::wstring &value = L"");
     RecordField& clear();
@@ -112,15 +120,13 @@ enum RecordStatus
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS SubField
+class PLUSIRBIS_EXPORTS SubField final
 {
 public:
     const static wchar_t NoCode;
 
-    wchar_t code;
+    wchar_t code = L'\0';
     std::wstring value;
-
-    SubField(wchar_t code = NoCode, const std::wstring &value = L"");
 
     bool empty() const;
     bool verify(bool throwOnError) const;
@@ -131,11 +137,23 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS VerificationException : public BaseException
+class PLUSIRBIS_EXPORTS VerificationException final
+    : public BaseException
 {
 public:
 };
 
+//=========================================================
 
-}
+// Utilities
 
+bool PLUSIRBIS_EXPORTS sameChar(wchar_t first, wchar_t second);
+bool PLUSIRBIS_EXPORTS sameString(const std::wstring &first, const std::wstring &second);
+
+bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fragment);
+
+int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
+int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
+int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, int length);
+
+NAMESPACE_IRBIS_END

@@ -156,6 +156,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="FormatTest.cpp" />
     <ClCompile Include="MarcRecordTest.cpp" />
     <ClCompile Include="RecordFieldTest.cpp" />
     <ClCompile Include="stdafx.cpp">

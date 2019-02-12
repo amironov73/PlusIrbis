@@ -3,13 +3,7 @@
 
 #include "stdafx.h"
 
-namespace irbis
-{
-
-MarcRecord::MarcRecord()
-    : mfn(0), status(0), version(0)
-{
-}
+NAMESPACE_IRBIS_BEGIN
 
 bool MarcRecord::deleted() const
 {
@@ -44,5 +38,4 @@ std::wostream& operator << (std::wostream &stream, const MarcRecord &record)
     return stream;
 }
 
-}
-
+NAMESPACE_IRBIS_END

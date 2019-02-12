@@ -3,15 +3,9 @@
 
 #include "stdafx.h"
 
-namespace irbis
-{
+NAMESPACE_IRBIS_BEGIN
 
 const wchar_t SubField::NoCode = '\0';
-
-SubField::SubField(wchar_t code, const std::wstring &value)
-    : code(code), value(value)
-{
-}
 
 bool SubField::empty() const
 {
@@ -35,10 +29,8 @@ bool SubField::verify(bool throwOnError) const
 
 std::wostream& operator << (std::wostream &stream, const SubField &subfield)
 {
-    stream << std::wstring(L"^") << subfield.code << subfield.value;
-
-    return stream;
+    return stream << std::wstring(L"^") << subfield.code << subfield.value;
 }
 
-}
+NAMESPACE_IRBIS_END
 

@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Format.cpp" />
     <ClCompile Include="MarcRecord.cpp" />
     <ClCompile Include="PlusIrbis.cpp" />
     <ClCompile Include="RawRecord.cpp" />

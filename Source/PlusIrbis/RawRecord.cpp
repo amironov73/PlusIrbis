@@ -3,13 +3,8 @@
 
 #include "stdafx.h"
 
-namespace irbis
-{
+NAMESPACE_IRBIS_BEGIN
 
-RawRecord::RawRecord()
-    : mfn(0), status(0), version(0)
-{
-}
 
 std::wostream& operator << (std::wostream &stream, const RawRecord &record)
 {
@@ -23,5 +18,4 @@ std::wostream& operator << (std::wostream &stream, const RawRecord &record)
     return stream;
 }
 
-}
-
+NAMESPACE_IRBIS_END

@@ -19,7 +19,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_2)
         {
-            RecordField field(100);
+            RecordField field{100};
             Assert::IsTrue(field.empty());
             Assert::IsTrue(field.subfields.empty());
             Assert::IsTrue(field.tag == 100);
@@ -27,7 +27,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_3)
         {
-            RecordField field(100, L"Field100");
+            RecordField field{100, L"Field100"};
             Assert::IsFalse(field.empty());
             Assert::IsTrue(field.tag == 100);
             Assert::IsTrue(field.value == L"Field100");
@@ -37,7 +37,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_4)
         {
-            RecordField field(100);
+            RecordField field{100};
             field.add('a', L"SubA").add('b', L"SubB");
             Assert::IsFalse(field.empty());
             Assert::IsTrue(field.value.empty());
@@ -53,19 +53,19 @@ namespace OfflineTests
 
         TEST_METHOD(verify_2)
         {
-            RecordField field(100);
+            RecordField field{100};
             Assert::IsFalse(field.verify(false));
         }
 
         TEST_METHOD(verify_3)
         {
-            RecordField field(100, L"Field100");
+            RecordField field{100, L"Field100"};
             Assert::IsTrue(field.verify(false));
         }
 
         TEST_METHOD(verify_4)
         {
-            RecordField field(100);
+            RecordField field{100};
             field.add('a', L"SubA").add('b', L"SubB");
             Assert::IsTrue(field.verify(false));
         }

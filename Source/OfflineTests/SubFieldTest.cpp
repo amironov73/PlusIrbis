@@ -18,7 +18,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_2)
         {
-            SubField sub('a');
+            SubField sub{'a'};
             Assert::IsTrue(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.wstr() == L"^a");
@@ -26,7 +26,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_3)
         {
-            SubField sub('a', L"SubfieldA");
+            SubField sub{'a', L"SubfieldA"};
             Assert::IsFalse(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.value == L"SubfieldA");
@@ -41,13 +41,13 @@ namespace OfflineTests
 
         TEST_METHOD(verify_2)
         {
-            SubField sub('a');
+            SubField sub{'a'};
             Assert::IsFalse(sub.verify(false));
         }
 
         TEST_METHOD(verify_3)
         {
-            SubField sub('a', L"SubA");
+            SubField sub{'a', L"SubA"};
             Assert::IsTrue(sub.verify(false));
         }
 

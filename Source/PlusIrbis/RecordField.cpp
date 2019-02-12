@@ -3,18 +3,12 @@
 
 #include "stdafx.h"
 
-namespace irbis
-{
+NAMESPACE_IRBIS_BEGIN
 const int RecordField::NoTag = 0;
-
-RecordField::RecordField(int tag, const std::wstring& value)
-    : tag(tag), value(value)
-{
-}
 
 RecordField& RecordField::add(wchar_t code, const std::wstring &value)
 {
-    subfields.push_back(SubField(code, value));
+    subfields.push_back({code, value});
 
     return *this;
 }
@@ -80,5 +74,4 @@ std::wostream& operator << (std::wostream &stream, const RecordField &field)
     return stream;
 }
 
-}
-
+NAMESPACE_IRBIS_END
