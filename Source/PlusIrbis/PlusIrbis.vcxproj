@@ -90,6 +90,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;PLUSIRBIS_LIBRARY;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,6 +105,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;PLUSIRBIS_LIBRARY;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,6 +122,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;PLUSIRBIS_LIBRARY;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,6 +141,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;PLUSIRBIS_LIBRARY;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -152,12 +156,23 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChunkedBuffer.cpp" />
+    <ClCompile Include="ClientQuery.cpp" />
+    <ClCompile Include="CommandCode.cpp" />
+    <ClCompile Include="ConnectionFactory.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="FileSpecification.cpp" />
     <ClCompile Include="Format.cpp" />
     <ClCompile Include="MarcRecord.cpp" />
+    <ClCompile Include="MemoryChunk.cpp" />
+    <ClCompile Include="MenuEntry.cpp" />
+    <ClCompile Include="MenuFile.cpp" />
+    <ClCompile Include="NotImplementedException.cpp" />
     <ClCompile Include="PlusIrbis.cpp" />
     <ClCompile Include="RawRecord.cpp" />
     <ClCompile Include="RecordField.cpp" />
+    <ClCompile Include="AlphabetTable.cpp" />
+    <ClCompile Include="RecordSerializer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -165,6 +180,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SubField.cpp" />
+    <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

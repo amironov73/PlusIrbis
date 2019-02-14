@@ -9,33 +9,293 @@
 #include <string>
 #include <ios>
 #include <list>
+#include <set>
+#include <vector>
 
 #define NAMESPACE_IRBIS_BEGIN namespace irbis {
 #define NAMESPACE_IRBIS_END }
 
 #ifdef PLUSIRBIS_LIBRARY
 #define PLUSIRBIS_EXPORTS __declspec(dllexport)
+#define PLUSIRBIS_EXPIMP_TEMPLATE
 #else
 #define PLUSIRBIS_EXPORTS __declspec(dllimport)
+#define PLUSIRBIS_EXPIMP_TEMPLATE extern
 #endif
+
+//=========================================================
+
+#pragma warning(push)
+#pragma warning(disable: 4251)
+#pragma warning(disable: 4275)
 
 //=========================================================
 
 NAMESPACE_IRBIS_BEGIN
 
+class AlphabetTable;
 class BaseException;
+class ChunkedBuffer;
+class ClientInfo;
+class ClientQuery;
+class CommandCode;
+class Connection;
+class ConnectionFactory;
+class DatabaseInfo;
+class DirectAccess64;
+class EmbeddedField;
+class FileSpecification;
 class Format;
+class IlfEntry;
+class IlfFile;
+class IrbisDate;
+class Encoding;
 class MarcRecord;
+class MemoryChunk;
+class MenuEntry;
+class MenuFile;
+class MstControlRecord64;
+class MstdDictionaryEntry64;
+class MstFile64;
+class MstRecord64;
+class MstRecordLeader64;
 class NetworkException;
+class NotImplementedException;
+class NumberChunk;
+class NumberText;
+class PostingParameters;
+class ProcessInfo;
+class ProtocolText;
+class RawRecord;
 class RecordField;
+class RecordSerializer;
+class SearchParameters;
+class SearchScenario;
+class ServerResponse;
+class ServerStat;
+class StopWords;
 class SubField;
+class TermInfo;
+class TermParameters;
+class TermPosting;
+class TextNavigator;
+class UserInfo;
 class VerificationException;
+class Version;
+class XrfFile64;
+class XrfRecord64;
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS AlphabetTable final
+{
+public:
+    const static std::string FileName;
+    std::set<wchar_t> characters;
+
+    AlphabetTable(const std::vector<unsigned char> &bytes /* encoding*/);
+
+    static const AlphabetTable& instance();
+    bool isAlpha(const wchar_t &c) const;
+    static AlphabetTable parse(std::istream &stream);
+    static AlphabetTable readLocalFile(const std::string &fileName);
+    std::wstring trimText(const std::wstring &text) const;
+    std::vector<std::wstring> splitWords(const std::wstring &text) const;
+    bool verify(bool throwOnError) const;
+};
 
 //=========================================================
 
 class PLUSIRBIS_EXPORTS BaseException : public std::exception
 {
 public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS MemoryChunk final
+{
+public:
+    char *data;
+    MemoryChunk *next;
+
+    MemoryChunk(const size_t size);
+    MemoryChunk(const MemoryChunk &other) = delete;
+    MemoryChunk& operator = (const MemoryChunk &other) = delete;
+    ~MemoryChunk();
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ChunkedBuffer final
+{
+private:
+    MemoryChunk *_first, *_current, *_last;
+    size_t _chunkSize, _position, _read;
+
+    bool _advance();
+    void _appendChunk();
+
+public:
+    const static size_t DefaultChunkSize;
+
+    ChunkedBuffer(size_t chunkSize = DefaultChunkSize);
+    ChunkedBuffer(const ChunkedBuffer &other) = delete;
+    ChunkedBuffer operator= (const ChunkedBuffer &other) = delete;
+    ~ChunkedBuffer();
+    constexpr bool eof() const;
+    int peek();
+    size_t read(char *buffer, size_t offset, size_t count);
+    int readByte();
+    //std::wstring readLine(QTextCodec *codec);
+    void rewind();
+    void write(const char *buffer, size_t offset, size_t count);
+    //void write(const std::wstring &text, QTextCodec *codec);
+    void writeByte(char value);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ClientQuery final
+{
+private:
+    Connection *connection;
+    //QBuffer buffer;
+
+public:
+    ClientQuery(Connection *connection, const std::string &commandCode);
+
+    ClientQuery& add(int value);
+    ClientQuery& add(const FileSpecification &specification);
+    ClientQuery& add(const MarcRecord &record);
+    //ClientQuery& add(const RawRecord &record);
+    ClientQuery& addAnsi(const std::string &text);
+    ClientQuery& addAnsi(const std::wstring &text);
+    ClientQuery& addAnsiNoLf(const std::wstring &text);
+    ClientQuery& addLineFeed();
+    ClientQuery& addUtf(const std::wstring &text);
+    // QByteArray encode();
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS CommandCode final
+{
+public:
+    const static std::string ExclusizeDatabaseLock;
+    const static std::string RecordList;
+    const static std::string ServerInfo;
+    const static std::string DatabaseStat;
+    const static std::string FormatIsoGroup;
+    const static std::string UnknownCommand4;
+    const static std::string GlobalConnection;
+    const static std::string SaveRecordGroup;
+    const static std::string Print;
+    const static std::string UpdateIniFile;
+    const static std::string ImportIso;
+    const static std::string RegisterClient;
+    const static std::string UnregisterClient;
+    const static std::string ReadRecord;
+    const static std::string UpdateRecord;
+    const static std::string UnlockRecord;
+    const static std::string ActualizeRecord;
+    const static std::string FormatRecord;
+    const static std::string ReadTerms;
+    const static std::string ReadPostings;
+    const static std::string CorrectVirtualRecord;
+    const static std::string Search;
+    const static std::string ReadDocument;
+    const static std::string Backup;
+    const static std::string Nop;
+    const static std::string GetMaxMfn;
+    const static std::string ReadTermsReverse;
+    const static std::string UnlockRecords;
+    const static std::string FullTextSearch;
+    const static std::string EmptyDatabase;
+    const static std::string CreateDatabase;
+    const static std::string UnlockDatabase;
+    const static std::string GetRecordPostings;
+    const static std::string DeleteDatabase;
+    const static std::string ReloadMasterFile;
+    const static std::string ReloadDictionary;
+    const static std::string CreateDictionary;
+    const static std::string GetServerStat;
+    const static std::string UnknownCommandPlus2;
+    const static std::string GetProcessList;
+    const static std::string UnknownCommandPlus4;
+    const static std::string UnknownCommandPlus5;
+    const static std::string UnknownCommandPlus6;
+    const static std::string SetUserList;
+    const static std::string RestartServer;
+    const static std::string GetUserList;
+    const static std::string ListFiles;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS MenuEntry final
+{
+public:
+    std::wstring code;
+    std::wstring comment;
+
+    std::wstring to_wstring() const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS MenuFile final
+{
+public:
+    const static std::wstring StopMarker;
+    const static std::vector<wchar_t> Separators;
+
+    std::string fileName;
+    std::list<MenuEntry> entries;
+
+    MenuFile& add(const std::wstring &code, const std::wstring &comment);
+    MenuEntry* getEntry(const std::wstring &code) const;
+    MenuEntry* getEntrySensitive(const std::wstring &code) const;
+    std::wstring* getValue(const std::wstring &code) const;
+    std::wstring* getValueSensitive(const std::wstring &code) const;
+    const std::wstring& getValue(const std::wstring &code, const std::wstring &defaultValue) const;
+    const std::wstring& getValueSensitive(const std::wstring &code, const std::wstring &defaultValue) const;
+    static MenuFile parse(std::istream &stream);
+    static MenuFile parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS Version final
+{
+public:
+    std::wstring organization; // на кого приобретен
+    std::wstring version; // собственно версия, например, 64.2008.1
+    int maxClients { 0 }; // максимальное количество подключений
+    int connectedClients { 0 }; // текущее количество подключений
+
+    static Version parse(ServerResponse &response);
+    std::wstring to_wstring() const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS Connection final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ConnectionFactory
+{
+public:
+    ConnectionFactory() = default;
+    ConnectionFactory(const ConnectionFactory &other) = delete;
+    ConnectionFactory& operator=(const ConnectionFactory&) = delete;
+    virtual ~ConnectionFactory() = default;
+
+    virtual Connection* GetConnection();
 };
 
 //=========================================================
@@ -49,6 +309,43 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS SubField final
+{
+public:
+    constexpr static wchar_t NoCode = '\0';
+
+    wchar_t code = L'\0';
+    std::wstring value;
+
+    constexpr bool empty() const;
+    bool verify(bool throwOnError) const;
+    std::wstring wstr() const;
+
+    friend std::wostream& operator << (std::wostream &stream, const SubField &subfield);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS RecordField final
+{
+public:
+    constexpr static int NoTag = 0;
+
+    int tag = 0;
+    std::wstring value;
+    std::list<SubField> subfields;
+
+    RecordField& add(wchar_t code, const std::wstring &value = L"");
+    RecordField& clear();
+    constexpr bool empty() const;
+    bool verify(bool throwOnError) const;
+    std::wstring wstr() const;
+
+    friend std::wostream& operator << (std::wostream &stream, const RecordField &field);
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS MarcRecord final
 {
 public:
@@ -58,7 +355,8 @@ public:
     std::list<RecordField> fields;
     std::wstring database;
 
-    bool deleted() const;
+    MarcRecord& add(wchar_t code, const std::wstring &value);
+    constexpr bool deleted() const;
     bool verify(bool throwOnError) const;
 
     friend std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
@@ -66,9 +364,30 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS RecordSerializer {
+private:
+    std::wiostream &stream;
+
+public:
+    RecordSerializer(std::wiostream &stream);
+
+    MarcRecord deserialize();
+    void serialize(const MarcRecord &record);
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS NetworkException : public BaseException
 {
 public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS NotImplementedException : public BaseException
+{
+public:
+    char const* what() const override;
 };
 
 //=========================================================
@@ -87,26 +406,6 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RecordField final
-{
-public:
-    const static int NoTag;
-
-    int tag = 0;
-    std::wstring value;
-    std::list<SubField> subfields;
-
-    RecordField& add(wchar_t code, const std::wstring &value = L"");
-    RecordField& clear();
-    bool empty() const;
-    bool verify(bool throwOnError) const;
-    std::wstring wstr() const;
-
-    friend std::wostream& operator << (std::wostream &stream, const RecordField &field);
-};
-
-//=========================================================
-
 enum RecordStatus
 {
     LogicallyDeleted = 1,
@@ -116,23 +415,6 @@ enum RecordStatus
     NonActualized = 8,
     Last = 32,
     Locked = 64
-};
-
-//=========================================================
-
-class PLUSIRBIS_EXPORTS SubField final
-{
-public:
-    const static wchar_t NoCode;
-
-    wchar_t code = L'\0';
-    std::wstring value;
-
-    bool empty() const;
-    bool verify(bool throwOnError) const;
-    std::wstring wstr() const;
-
-    friend std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
 
 //=========================================================
@@ -157,3 +439,9 @@ int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, int length);
 
 NAMESPACE_IRBIS_END
+
+//=========================================================
+
+#pragma warning(pop)
+
+//=========================================================

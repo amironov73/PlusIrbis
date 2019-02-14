@@ -4,11 +4,10 @@
 #include "stdafx.h"
 
 NAMESPACE_IRBIS_BEGIN
-const int RecordField::NoTag = 0;
 
-RecordField& RecordField::add(wchar_t code, const std::wstring &value)
+RecordField& RecordField::add(wchar_t subFieldCode, const std::wstring &subFieldValue)
 {
-    subfields.push_back({code, value});
+    subfields.push_back({subFieldCode, subFieldValue});
 
     return *this;
 }
@@ -21,7 +20,7 @@ RecordField& RecordField::clear()
     return *this;
 }
 
-bool RecordField::empty() const
+constexpr bool RecordField::empty() const
 {
     return !tag || (value.empty() && subfields.empty());
 }

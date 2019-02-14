@@ -5,9 +5,7 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-const wchar_t SubField::NoCode = '\0';
-
-bool SubField::empty() const
+constexpr bool SubField::empty() const
 {
     return code == NoCode || value.empty();
 }

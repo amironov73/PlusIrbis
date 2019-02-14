@@ -5,7 +5,14 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-bool MarcRecord::deleted() const
+MarcRecord& MarcRecord::add(wchar_t code, const std::wstring &value)
+{
+    fields.push_back({code, value});
+
+    return *this;
+}
+
+constexpr bool MarcRecord::deleted() const
 {
     return (status & RecordStatus::Deleted) != 0;
 }

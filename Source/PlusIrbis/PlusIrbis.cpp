@@ -27,8 +27,8 @@ bool contains(const std::wstring &text, const std::wstring &fragment)
 int fastParse32(const std::wstring &text)
 {
     int result = 0;
-    const int length = text.length();
-    for (int offset = 0; offset < length; offset++) {
+    const size_t length = text.length();
+    for (size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
     }
 
