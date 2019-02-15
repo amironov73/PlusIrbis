@@ -5,9 +5,20 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-//char const* NotImplementedException::what() const
-//{
-//    return "Function not yet implemented";
-//}
+class RecordFieldListImpl
+{
+public:
+};
+
+RecordFieldList::RecordFieldList()
+    : _impl(new RecordFieldListImpl())
+{
+}
+
+RecordFieldList::~RecordFieldList()
+{
+    delete _impl;
+}
+
 
 NAMESPACE_IRBIS_END

@@ -51,6 +51,7 @@ class IlfFile;
 class IrbisDate;
 class Encoding;
 class MarcRecord;
+class MarcRecordList;
 class MemoryChunk;
 class MenuEntry;
 class MenuFile;
@@ -68,6 +69,8 @@ class ProcessInfo;
 class ProtocolText;
 class RawRecord;
 class RecordField;
+class RecordFieldList;
+class RecordFieldListImpl;
 class RecordSerializer;
 class SearchParameters;
 class SearchScenario;
@@ -75,6 +78,8 @@ class ServerResponse;
 class ServerStat;
 class StopWords;
 class SubField;
+class SubFieldList;
+class SubFieldListImpl;
 class TermInfo;
 class TermParameters;
 class TermPosting;
@@ -84,6 +89,87 @@ class VerificationException;
 class Version;
 class XrfFile64;
 class XrfRecord64;
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS NumberChunk final
+{
+private:
+    bool setUp(const std::wstring &str, const std::wstring &number);
+
+    friend class NumberText;
+
+public:
+    std::wstring prefix;
+    long long value{0};
+    int length{0};
+    bool haveValue{false};
+
+    NumberChunk() = default;
+    NumberChunk(const NumberChunk &other) = default;
+
+    int compareTo(const NumberChunk &other) const;
+    constexpr bool havePrefix() const;
+    std::wstring toString() const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS NumberText final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TextNavigator final
+{
+private:
+    size_t _column, _length, _line, _position;
+    const std::wstring &_text;
+
+public:
+    const static wchar_t EOT;
+
+    TextNavigator(const std::wstring &text);
+    TextNavigator(const TextNavigator &other);
+    TextNavigator& operator = (const TextNavigator &other) = delete;
+    ~TextNavigator() = default;
+
+    constexpr size_t column() const { return _column; }
+    constexpr size_t line() const { return _line; }
+    constexpr size_t length() const { return _length; }
+    constexpr size_t position() const { return _position; }
+    constexpr bool eot() const { return _position >= _length; }
+
+    wchar_t at(size_t position) const;
+    wchar_t front() const;
+    wchar_t back() const;
+    wchar_t lookAhead(ptrdiff_t distance = 1) const;
+    wchar_t lookBehind(ptrdiff_t distance = 1) const;
+    TextNavigator& move(ptrdiff_t distance);
+    wchar_t peekChar() const;
+    wchar_t readChar();
+    std::wstring peekString(size_t length);
+    std::wstring peekTo(wchar_t stopChar);
+    std::wstring peekUntil(wchar_t stopChar);
+    std::wstring readLine();
+    bool isControl() const;
+    bool isDigit() const;
+    bool isLetter() const;
+    bool isWhitespace() const;
+    std::wstring readInteger();
+    std::wstring readString(size_t length);
+    std::wstring readTo(wchar_t stopChar);
+    std::wstring readUntil(wchar_t stopChar);
+    std::wstring readWhile(wchar_t goodChar);
+    std::wstring readWord();
+    std::wstring recentText(ptrdiff_t length) const;
+    std::wstring remainingText() const;
+    TextNavigator& skipWhitespace();
+    TextNavigator& skipPunctuation();
+    std::wstring substr(size_t offset, size_t length) const;
+};
 
 //=========================================================
 
@@ -106,7 +192,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS BaseException : public std::exception
+class PLUSIRBIS_EXPORTS BaseException
 {
 public:
 };
@@ -119,9 +205,11 @@ public:
     char *data;
     MemoryChunk *next;
 
-    MemoryChunk(const size_t size);
+    MemoryChunk(size_t size);
     MemoryChunk(const MemoryChunk &other) = delete;
+    MemoryChunk(MemoryChunk &&other) = delete;
     MemoryChunk& operator = (const MemoryChunk &other) = delete;
+    MemoryChunk& operator = (MemoryChunk &&other) = delete;
     ~MemoryChunk();
 };
 
@@ -326,6 +414,22 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS SubFieldList final
+{
+private:
+    SubFieldListImpl *_impl;
+
+public:
+    SubFieldList();
+    SubFieldList(const SubFieldList &other) = delete;
+    SubFieldList(SubFieldList &&other) = delete;
+    SubFieldList& operator = (const SubFieldList &other) = delete;
+    SubFieldList& operator = (SubFieldList &&other) = delete;
+    ~SubFieldList();
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS RecordField final
 {
 public:
@@ -342,6 +446,22 @@ public:
     std::wstring wstr() const;
 
     friend std::wostream& operator << (std::wostream &stream, const RecordField &field);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS RecordFieldList final
+{
+private:
+    RecordFieldListImpl *_impl;
+
+public:
+    RecordFieldList();
+    RecordFieldList(const RecordFieldList &other) = delete;
+    RecordFieldList(RecordFieldList &&other) = delete;
+    RecordFieldList& operator = (const RecordFieldList &other) = delete;
+    RecordFieldList& operator = (RecordFieldList &&other) = delete;
+    ~RecordFieldList();
 };
 
 //=========================================================
@@ -387,7 +507,6 @@ public:
 class PLUSIRBIS_EXPORTS NotImplementedException : public BaseException
 {
 public:
-    char const* what() const override;
 };
 
 //=========================================================
@@ -437,6 +556,15 @@ bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fr
 int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, int length);
+
+PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2);
+PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2);
+PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3);
+PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3);
+
+PLUSIRBIS_EXPORTS std::wstring safeAt(const std::vector<std::wstring> &list, int index);
+
+PLUSIRBIS_EXPORTS std::vector<std::wstring> maxSplit(const std::wstring &text, wchar_t separator, int count);
 
 NAMESPACE_IRBIS_END
 

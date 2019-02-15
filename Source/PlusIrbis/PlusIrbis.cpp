@@ -4,6 +4,7 @@
 // PlusIrbis.cpp : Defines the exported functions for the DLL application.
 
 #include "stdafx.h"
+#include <iterator>
 
 NAMESPACE_IRBIS_BEGIN
 
@@ -57,6 +58,91 @@ int fastParse32(const wchar_t *text, int length)
     }
 
     return result;
+}
+
+const std::string& iif(const std::string& s1, const std::string &s2)
+{
+    if (!s1.empty())
+    {
+        return s1;
+    }
+
+    return s2;
+}
+
+const std::wstring& iif(const std::wstring& s1, const std::wstring &s2)
+{
+    if (!s1.empty())
+    {
+        return s1;
+    }
+
+    return s2;
+}
+
+const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3)
+{
+    if (!s1.empty())
+    {
+        return s1;
+    }
+
+    if (!s2.empty())
+    {
+        return s2;
+    }
+
+    return s3;
+}
+
+const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3)
+{
+    if (!s1.empty())
+    {
+        return s1;
+    }
+
+    if (!s2.empty())
+    {
+        return s2;
+    }
+
+    return s3;
+}
+
+std::wstring safeAt(const std::vector<std::wstring> &list, int index)
+{
+    if ((index < 0) || (index >= list.size()))
+    {
+        return std::wstring();
+    }
+
+    return list.at(index);
+}
+
+std::vector<std::wstring> maxSplit(const std::wstring &text, wchar_t separator, int count)
+{
+    std::vector<std::wstring> result;
+
+    size_t position = 0, length = text.length();
+    while ((count > 1) && (position < length)) {
+        size_t index = text.find(separator, position);
+        if (index != std::wstring::npos) {
+            result.push_back(text.substr(position, index - position));
+            position = index + 1;
+        } else {
+            result.push_back(text.substr(position));
+            break;
+        }
+        count--;
+    }
+
+    if (position < length) {
+        result.push_back(text.substr(position));
+    }
+
+    return result;
+
 }
 
 NAMESPACE_IRBIS_END

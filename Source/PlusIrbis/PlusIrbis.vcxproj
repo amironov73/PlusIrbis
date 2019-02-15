@@ -168,10 +168,12 @@
     <ClCompile Include="MenuEntry.cpp" />
     <ClCompile Include="MenuFile.cpp" />
     <ClCompile Include="NotImplementedException.cpp" />
+    <ClCompile Include="NumberChunk.cpp" />
     <ClCompile Include="PlusIrbis.cpp" />
     <ClCompile Include="RawRecord.cpp" />
     <ClCompile Include="RecordField.cpp" />
     <ClCompile Include="AlphabetTable.cpp" />
+    <ClCompile Include="RecordFieldList.cpp" />
     <ClCompile Include="RecordSerializer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -180,6 +182,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SubField.cpp" />
+    <ClCompile Include="SubFieldList.cpp" />
+    <ClCompile Include="TextNavigator.cpp" />
     <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

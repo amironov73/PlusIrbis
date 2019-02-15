@@ -5,9 +5,21 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-//char const* NotImplementedException::what() const
-//{
-//    return "Function not yet implemented";
-//}
+class SubFieldListImpl
+{
+public:
+    std::list<SubField> subfields;
+};
+
+SubFieldList::SubFieldList()
+    : _impl(new SubFieldListImpl())
+{
+}
+
+SubFieldList::~SubFieldList()
+{
+    delete _impl;
+}
+
 
 NAMESPACE_IRBIS_END

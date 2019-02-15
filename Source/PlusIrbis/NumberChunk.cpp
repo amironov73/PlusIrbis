@@ -5,9 +5,4 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-//char const* NotImplementedException::what() const
-//{
-//    return "Function not yet implemented";
-//}
-
 NAMESPACE_IRBIS_END
