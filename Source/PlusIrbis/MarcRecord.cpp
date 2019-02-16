@@ -35,8 +35,9 @@ bool MarcRecord::verify(bool throwOnError) const
 
 std::wostream& operator << (std::wostream &stream, const MarcRecord &record)
 {
-    stream << record.mfn << L"#" << record.status << std::endl;
-    stream << L"0#" << record.version << std::endl;
+    stream << std::to_wstring(record.mfn) << std::wstring(L"#")
+        << std::to_wstring(record.status) << std::endl;
+    stream << std::wstring(L"0#") << record.version << std::endl;
     for (const RecordField &field : record.fields)
     {
         stream << field << std::endl;

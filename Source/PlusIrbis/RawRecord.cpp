@@ -5,11 +5,12 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-
 std::wostream& operator << (std::wostream &stream, const RawRecord &record)
 {
-    stream << record.mfn << L"#" << record.status << std::endl;
-    stream << L"0#" << record.version << std::endl;
+    stream << std::to_wstring(record.mfn) << std::wstring(L"#")
+        << std::to_wstring(record.status) << std::endl;
+    stream << std::wstring(L"0#") << std::to_wstring(record.version)
+        << std::endl;
     for (const std::wstring &field : record.fields)
     {
         stream << field << std::endl;

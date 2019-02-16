@@ -4,6 +4,8 @@ ManagedClient ported to plain C++14. Currently supported:
 
 * 32- and 64-bit Windows;
 * MSVS 2017 Community Edition;
+* 32- and 64-bit Linux;
+* GCC 7;
 
 ### Links
 

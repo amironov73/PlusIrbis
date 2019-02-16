@@ -5,8 +5,10 @@
 
 #include <cwchar>
 #include <cwctype>
+#include <cstring>
 #include <algorithm>
 #include <string>
+#include <iostream>
 #include <ios>
 #include <list>
 #include <set>
@@ -15,19 +17,34 @@
 #define NAMESPACE_IRBIS_BEGIN namespace irbis {
 #define NAMESPACE_IRBIS_END }
 
-#ifdef PLUSIRBIS_LIBRARY
-#define PLUSIRBIS_EXPORTS __declspec(dllexport)
-#define PLUSIRBIS_EXPIMP_TEMPLATE
+#if defined(_MSC_VER)
+    // Microsoft
+    #define AM_EXPORT __declspec(dllexport)
+    #define AM_IMPORT __declspec(dllimport)
+#elif defined(__GNUC__)
+    //  GCC
+    #define AM_EXPORT __attribute__((visibility("default")))
+    #define AM_IMPORT
 #else
-#define PLUSIRBIS_EXPORTS __declspec(dllimport)
-#define PLUSIRBIS_EXPIMP_TEMPLATE extern
+    //  do nothing and hope for the best?
+    #define AM_EXPORT
+    #define AM_IMPORT
+    #pragma warning Unknown dynamic link import/export semantics.
+#endif
+
+#ifdef PLUSIRBIS_LIBRARY
+#define PLUSIRBIS_EXPORTS AM_EXPORT
+#else
+#define PLUSIRBIS_EXPORTS AM_IMPORT
 #endif
 
 //=========================================================
 
+#if defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable: 4251)
 #pragma warning(disable: 4275)
+#endif
 
 //=========================================================
 
@@ -426,6 +443,12 @@ public:
     SubFieldList& operator = (const SubFieldList &other) = delete;
     SubFieldList& operator = (SubFieldList &&other) = delete;
     ~SubFieldList();
+
+    void add(wchar_t code, const std::wstring &value);
+    SubField* begin() const;
+    void clear();
+    SubField* end() const;
+    size_t size() const;
 };
 
 //=========================================================
@@ -566,10 +589,16 @@ PLUSIRBIS_EXPORTS std::wstring safeAt(const std::vector<std::wstring> &list, int
 
 PLUSIRBIS_EXPORTS std::vector<std::wstring> maxSplit(const std::wstring &text, wchar_t separator, int count);
 
+PLUSIRBIS_EXPORTS std::wstring cp866_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS std::wstring cp1251_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
+
 NAMESPACE_IRBIS_END
 
 //=========================================================
 
+#if defined(_MSC_VER)
 #pragma warning(pop)
+#endif
 
 //=========================================================

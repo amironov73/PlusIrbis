@@ -27,7 +27,8 @@ bool SubField::verify(bool throwOnError) const
 
 std::wostream& operator << (std::wostream &stream, const SubField &subfield)
 {
-    return stream << std::wstring(L"^") << subfield.code << subfield.value;
+    return stream << std::wstring(L"^") << std::wstring(subfield.code, 1)
+        << subfield.value;
 }
 
 NAMESPACE_IRBIS_END

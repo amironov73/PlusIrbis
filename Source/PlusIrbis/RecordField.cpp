@@ -64,7 +64,7 @@ std::wstring RecordField::wstr() const
 
 std::wostream& operator << (std::wostream &stream, const RecordField &field)
 {
-    stream << std::to_wstring(field.tag) << L"#" << field.value;
+    stream << std::to_wstring(field.tag) << std::wstring(L"#") << field.value;
     for (const SubField &sub : field.subfields)
     {
         stream << sub;

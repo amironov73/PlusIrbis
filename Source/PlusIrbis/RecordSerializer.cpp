@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "stdafx.h"
@@ -11,18 +11,21 @@ RecordSerializer::RecordSerializer(std::wiostream &stream)
 
 MarcRecord RecordSerializer::deserialize()
 {
+    throw NotImplementedException();
+
+#if defined(NOTDEF)
     MarcRecord result;
-    unsigned short fieldCount;
+    int fieldCount;
     stream >> fieldCount;
-    for (unsigned short i = 0; i < fieldCount; ++i) {
+    for (int i = 0; i < fieldCount; ++i) {
         int tag;
         std::wstring value;
         stream >> tag >> value;
         result.add(tag, value);
         RecordField &field = result.fields.back();
-        unsigned short subfieldCount;
+        int subfieldCount;
         stream >> subfieldCount;
-        for (unsigned short j = 0; j < subfieldCount; ++j) {
+        for (int j = 0; j < subfieldCount; ++j) {
             wchar_t code;
             stream >> code >> value;
             field.add(code, value);
@@ -30,10 +33,16 @@ MarcRecord RecordSerializer::deserialize()
     }
 
     return result;
+
+#endif
 }
 
-void RecordSerializer::serialize(const MarcRecord &record) {
-    const auto fieldCount = static_cast<unsigned short> (record.fields.size()); //-V1029
+void RecordSerializer::serialize(const MarcRecord &record)
+{
+    throw NotImplementedException();
+
+#if defined(NOTDEF)
+    const auto fieldCount = static_cast<int> (record.fields.size());
     stream << fieldCount;
     for (const RecordField &field : record.fields) {
         stream << field.tag << field.value;
@@ -43,6 +52,7 @@ void RecordSerializer::serialize(const MarcRecord &record) {
             stream << subfield.code << subfield.value;
         }
     }
+#endif
 }
 
 NAMESPACE_IRBIS_END

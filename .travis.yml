@@ -1,0 +1,9 @@
+dist: xenial
+language: cpp
+compiler: gcc
+sudo: required
+
+script:
+ - cd Source/PlusIrbis
+ - cmake .
+ - nmake

@@ -1,7 +1,8 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "stdafx.h"
+#include <cstring>
 
 NAMESPACE_IRBIS_BEGIN
 
@@ -97,7 +98,7 @@ size_t ChunkedBuffer::read(char *buffer, size_t offset, size_t count) {
         }
 
         const size_t portion = std::min(count, static_cast<size_t>(remaining));
-        memcpy(buffer + offset, _current->data + _read, portion);
+        std::memcpy(buffer + offset, _current->data + _read, portion);
         _read += portion;
         count -= portion;
         total += portion;
@@ -146,7 +147,7 @@ void ChunkedBuffer::write(const char *buffer, size_t offset, size_t count) {
          }
 
          const size_t portion = std::min(count, free);
-         memcpy(_last->data + _position, buffer + offset, portion);
+         std::memcpy(_last->data + _position, buffer + offset, portion);
          _position += portion;
          count -= portion;
          offset += portion;

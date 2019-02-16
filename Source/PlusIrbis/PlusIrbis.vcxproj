@@ -160,7 +160,7 @@
     <ClCompile Include="ClientQuery.cpp" />
     <ClCompile Include="CommandCode.cpp" />
     <ClCompile Include="ConnectionFactory.cpp" />
-    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="FileSpecification.cpp" />
     <ClCompile Include="Format.cpp" />
     <ClCompile Include="MarcRecord.cpp" />
