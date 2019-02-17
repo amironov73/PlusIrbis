@@ -13,6 +13,12 @@ addons:
       - cmake
 
 script:
+ - export CC=gcc-7
+ - export CXX=g++-7
+ - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 60
+ - sudo update-alternatives --install /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-7 60
+ - sudo update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-7 60
+ - sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/x86_64-linux-gnu-gcc-7 60
  - cd Source/PlusIrbis
  - cmake .
  - make
