@@ -17,5 +17,12 @@ namespace OfflineTests
             Assert::AreEqual(std::wstring(L"У попа была собака"), destination);
         }
 
+        TEST_METHOD(cp1251_2)
+        {
+            const std::wstring source = L"У попа была собака";
+            const std::string destination = unicode_to_cp1251(source);
+            Assert::AreEqual(std::string("У попа была собака"), destination);
+        }
+
     };
 }

@@ -55,6 +55,7 @@ class BaseException;
 class ChunkedBuffer;
 class ClientInfo;
 class ClientQuery;
+class ClientSocket;
 class CommandCode;
 class Connection;
 class ConnectionFactory;
@@ -548,6 +549,40 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS ClientSocket // abstract
+{
+public:
+
+    virtual ~ClientSocket();
+
+    virtual void open();
+    virtual void close();
+    virtual void send(char *buffer, size_t size) = 0;
+    virtual size_t receive(char *buffer, size_t size) = 0;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS Tcp4Socket final : public ClientSocket
+{
+private:
+    void *_impl;
+
+public:
+    std::string host;
+    short port;
+
+    Tcp4Socket(const std::string& host="localhost", short port=6666);
+    ~Tcp4Socket();
+
+    void open() override;
+    void close() override;
+    void send(char* buffer, size_t size) override;
+    size_t receive(char* buffer, size_t size) override;
+};
+
+//=========================================================
+
 enum RecordStatus
 {
     LogicallyDeleted = 1,
@@ -592,6 +627,10 @@ PLUSIRBIS_EXPORTS std::vector<std::wstring> maxSplit(const std::wstring &text, w
 PLUSIRBIS_EXPORTS std::wstring cp866_to_unicode(const std::string &text);
 PLUSIRBIS_EXPORTS std::wstring cp1251_to_unicode(const std::string &text);
 PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
+
+PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
 
 NAMESPACE_IRBIS_END
 

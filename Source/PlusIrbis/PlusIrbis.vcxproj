@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="ChunkedBuffer.cpp" />
     <ClCompile Include="ClientQuery.cpp" />
+    <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="CommandCode.cpp" />
     <ClCompile Include="ConnectionFactory.cpp" />
     <ClCompile Include="Encoding.cpp" />
@@ -183,6 +184,7 @@
     </ClCompile>
     <ClCompile Include="SubField.cpp" />
     <ClCompile Include="SubFieldList.cpp" />
+    <ClCompile Include="Tcp4Socket.cpp" />
     <ClCompile Include="TextNavigator.cpp" />
     <ClCompile Include="Version.cpp" />
   </ItemGroup>
