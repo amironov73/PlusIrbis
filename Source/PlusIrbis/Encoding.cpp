@@ -266,4 +266,86 @@ std::string unicode_to_koi8r(const std::wstring &text)
     return result;
 }
 
+// Quick and dirty UTF-8 conversion
+
+BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
+{
+    while (length > 0)
+    {
+        unsigned int c = *src++;
+        if (c < (1 << 7))
+        {
+            *dst++ = static_cast<BYTE>(c);
+        }
+        else if (c < (1 << 11))
+        {
+            *dst++ = static_cast<BYTE>((c >> 6) | 0xC0);
+            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+        }
+        else if (c < (1 << 16))
+        {
+            *dst++ = static_cast<BYTE>((c >> 12) | 0xE0);
+            *dst++ = static_cast<BYTE>(((c >> 6) & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+        }
+        else if (c < (1 << 21))
+        {
+            *dst++ = static_cast<BYTE>((c >> 18) | 0xF0);
+            *dst++ = static_cast<BYTE>(((c >> 12) & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>(((c >> 6) & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+        }
+        else
+        {
+            return nullptr;
+        }
+        length--;
+    }
+
+    return dst;
+}
+
+wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
+{
+    const BYTE *stop = src + length;
+
+    while (src < stop)
+    {
+        unsigned int c = *src++;
+        if ((c & 0x80) == 0)
+        {
+            // 1-BYTE sequence: 000000000xxxxxxx = 0xxxxxxx
+            ;
+        }
+        else if ((c & 0xE0) == 0xC0)
+        {
+            // 2-BYTE sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
+            c = (c & 0x1F) << 6;
+            c |= (*src++ & 0x3F);
+        }
+        else if ((c & 0xF0) == 0xE0)
+        {
+            // 3-BYTE sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
+            c = (c & 0x0F) << 12;
+            c |= (*src++ & 0x3F) << 6;
+            c |= (*src++ & 0x3F);
+            if (c == 0xFEFF) { // bom at start
+                continue; // skip it
+            }
+        }
+        else if ((c & 0xF8) == 0xF0)
+        {
+            // 4-BYTE sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
+            c = (c & 0x07) << 18;
+            c |= (*src++ & 0x3F) << 12;
+            c |= (*src++ & 0x3F) << 6;
+            c |= (*src++ & 0x3F);
+        }
+        *dst++ = static_cast<wchar_t>(c);
+    }
+
+    return dst;
+}
+
+
 NAMESPACE_IRBIS_END

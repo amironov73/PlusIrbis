@@ -48,6 +48,12 @@
 
 //=========================================================
 
+#ifndef BYTE
+typedef unsigned char BYTE;
+#endif
+
+//=========================================================
+
 NAMESPACE_IRBIS_BEGIN
 
 class AlphabetTable;
@@ -631,6 +637,9 @@ PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
+
+PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length);
+PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length);
 
 NAMESPACE_IRBIS_END
 

@@ -24,5 +24,44 @@ namespace OfflineTests
             Assert::AreEqual(std::string("У попа была собака"), destination);
         }
 
+        TEST_METHOD(toUtf_1)
+        {
+            wchar_t text[] = L"Hello! У попа была собака";
+            BYTE buffer[1024], *ptr;
+            ptr = toUtf(buffer, text, wcslen(text));
+            int expected = 40;
+            int actual = static_cast<int>(ptr - buffer);
+            Assert::AreEqual(expected, actual);
+            BYTE goodBytes[40] {0x48, 0x65, 0x6C, 0x6C, 0x6F,
+                0x21, 0x20, 0xD0, 0xA3, 0x20, 0xD0, 0xBF, 0xD0,
+                0xBE, 0xD0, 0xBF, 0xD0, 0xB0, 0x20, 0xD0, 0xB1,
+                0xD1, 0x8B, 0xD0, 0xBB, 0xD0, 0xB0, 0x20, 0xD1,
+                0x81, 0xD0, 0xBE, 0xD0, 0xB1, 0xD0, 0xB0, 0xD0,
+                0xBA, 0xD0, 0xB0 };
+            for (int i = 0; i < 40; i++)
+            {
+                Assert::AreEqual(goodBytes[i], buffer[i]);
+            }
+        }
+
+        TEST_METHOD(fromUtf_1)
+        {
+            BYTE text[40] {0x48, 0x65, 0x6C, 0x6C, 0x6F,
+                0x21, 0x20, 0xD0, 0xA3, 0x20, 0xD0, 0xBF, 0xD0,
+                0xBE, 0xD0, 0xBF, 0xD0, 0xB0, 0x20, 0xD0, 0xB1,
+                0xD1, 0x8B, 0xD0, 0xBB, 0xD0, 0xB0, 0x20, 0xD1,
+                0x81, 0xD0, 0xBE, 0xD0, 0xB1, 0xD0, 0xB0, 0xD0,
+                0xBA, 0xD0, 0xB0 };
+            wchar_t buffer[1024], *ptr;
+            ptr = fromUtf(buffer, text, 40);
+            int expected = 25;
+            int actual = static_cast<int>(ptr - buffer);
+            Assert::AreEqual(expected, actual);
+            wchar_t goodChars[] = L"Hello! У попа была собака";
+            for (int i = 0; i < 25; i++)
+            {
+                Assert::AreEqual(goodChars[i], buffer[i]);
+            }
+        }
     };
 }
