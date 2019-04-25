@@ -12,21 +12,21 @@ namespace OfflineTests
 
         TEST_METHOD(cp1251_1)
         {
-            const std::string source = "У попа была собака";
+            const std::string source = "\xD3\x20\xEF\xEE\xEF\xE0\x20\xE1\xFB\xEB\xE0\x20\xF1\xEE\xE1\xE0\xEA\xE0";
             const std::wstring destination = cp1251_to_unicode(source);
-            Assert::AreEqual(std::wstring(L"У попа была собака"), destination);
+            Assert::AreEqual(std::wstring(L"\u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430"), destination);
         }
 
         TEST_METHOD(cp1251_2)
         {
-            const std::wstring source = L"У попа была собака";
+            const std::wstring source = L"\u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430";
             const std::string destination = unicode_to_cp1251(source);
-            Assert::AreEqual(std::string("У попа была собака"), destination);
+            Assert::AreEqual(std::string("\xD3\x20\xEF\xEE\xEF\xE0\x20\xE1\xFB\xEB\xE0\x20\xF1\xEE\xE1\xE0\xEA\xE0"), destination);
         }
 
         TEST_METHOD(toUtf_1)
         {
-            wchar_t text[] = L"Hello! У попа была собака";
+            wchar_t text[] = L"Hello! \u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430";
             BYTE buffer[1024], *ptr;
             ptr = toUtf(buffer, text, wcslen(text));
             int expected = 40;
@@ -57,7 +57,7 @@ namespace OfflineTests
             int expected = 25;
             int actual = static_cast<int>(ptr - buffer);
             Assert::AreEqual(expected, actual);
-            wchar_t goodChars[] = L"Hello! У попа была собака";
+            wchar_t goodChars[] = L"Hello! \u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430";
             for (int i = 0; i < 25; i++)
             {
                 Assert::AreEqual(goodChars[i], buffer[i]);
