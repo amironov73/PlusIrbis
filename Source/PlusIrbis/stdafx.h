@@ -16,4 +16,5 @@
 
 // reference additional headers your program requires here
 #include "PlusIrbis.h"
+#include "PlusIrbisPrivate.h"
 

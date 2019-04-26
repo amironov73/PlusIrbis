@@ -152,6 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="PlusIrbis.h" />
+    <ClInclude Include="PlusIrbisPrivate.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -160,6 +161,7 @@
     <ClCompile Include="ClientQuery.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
     <ClCompile Include="CommandCode.cpp" />
+    <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionFactory.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="FileSpecification.cpp" />
@@ -176,6 +178,7 @@
     <ClCompile Include="AlphabetTable.cpp" />
     <ClCompile Include="RecordFieldList.cpp" />
     <ClCompile Include="RecordSerializer.cpp" />
+    <ClCompile Include="ServerResponse.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

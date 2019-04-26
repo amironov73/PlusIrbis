@@ -271,22 +271,56 @@ public:
 class PLUSIRBIS_EXPORTS ClientQuery final
 {
 private:
-    Connection *connection;
-    //QBuffer buffer;
+    std::vector<BYTE> _content;
+
+    void _write(const BYTE *bytes, size_t size);
+    void _write(BYTE byte);
 
 public:
     ClientQuery(Connection *connection, const std::string &commandCode);
+    ClientQuery(ClientQuery &) = delete;
+    ClientQuery& operator=(ClientQuery &) = delete;
 
     ClientQuery& add(int value);
     ClientQuery& add(const FileSpecification &specification);
     ClientQuery& add(const MarcRecord &record);
-    //ClientQuery& add(const RawRecord &record);
     ClientQuery& addAnsi(const std::string &text);
     ClientQuery& addAnsi(const std::wstring &text);
-    ClientQuery& addAnsiNoLf(const std::wstring &text);
-    ClientQuery& addLineFeed();
     ClientQuery& addUtf(const std::wstring &text);
-    // QByteArray encode();
+    void dump(std::ostream &stream) const;
+    ClientQuery& newLine();
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ServerResponse final
+{
+private:
+    std::vector<BYTE> _content;
+    void _write(const BYTE *bytes, size_t size);
+
+public:
+    std::wstring command;
+    int clientId;
+    int queryId;
+    int answerSize;
+    int returnCode;
+    std::wstring serverVersion;
+
+    ServerResponse(Connection &connection);
+    ServerResponse(ServerResponse&) = delete;
+    ServerResponse& operator=(ServerResponse&) = delete;
+
+    bool checkReturnCode();
+    std::string getLine();
+    int getReturnCode();
+    std::wstring readAnsi();
+    int readInteger();
+    std::vector<std::wstring> readRemainingAnsiLines();
+    std::wstring readRemainingAnsiText();
+    std::vector<std::wstring> readRemainingUtfLines();
+    std::wstring readRemainingUtfText();
+    std::wstring readUtf();
 };
 
 //=========================================================
@@ -394,7 +428,31 @@ public:
 
 class PLUSIRBIS_EXPORTS Connection final
 {
+private:
+    bool _connected;
+
 public:
+    std::wstring host;
+    int port;
+    std::wstring username;
+    std::wstring password;
+    std::wstring database;
+    std::wstring workstation;
+    int clientId;
+    int queryId;
+    std::wstring serverVersion;
+
+    Connection();
+    Connection(const Connection&) = delete;
+    Connection& operator=(const Connection&) = delete;
+
+    bool connect();
+    bool connected() const { return _connected; }
+    void disconnect();
+    ServerResponse* execute(ClientQuery &query);
+    bool executeRelease(ClientQuery &query);
+    int getMaxMfn(const std::wstring &database);
+    bool noOp();
 };
 
 //=========================================================
@@ -636,10 +694,17 @@ PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
 
 PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
+PLUSIRBIS_EXPORTS void unicode_to_cp1251(BYTE *dst, const wchar_t *src, size_t size);
 PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
 
 PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length);
 PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length);
+PLUSIRBIS_EXPORTS int countUtf(const wchar_t *src, size_t length);
+PLUSIRBIS_EXPORTS int countUtf(const BYTE *src, size_t length);
+PLUSIRBIS_EXPORTS const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring &result);
+PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
+PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
+PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);
 
 NAMESPACE_IRBIS_END
 

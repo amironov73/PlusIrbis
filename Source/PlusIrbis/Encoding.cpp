@@ -236,6 +236,18 @@ std::string unicode_to_cp1251(const std::wstring &text)
     return result;
 }
 
+void unicode_to_cp1251(BYTE *dst, const wchar_t *src, size_t size)
+{
+    const wchar_t *first = &_cp1251_from_unicode[0], *last = first + 256;
+    for (int i = 0; i < size; i++)
+    {
+        wchar_t c = src[i];
+        const ptrdiff_t index = std::lower_bound(first, last, c) - first;
+        unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
+        *dst++ = _cp1251_xlat[sc];
+    }
+}
+
 std::wstring koi8r_to_unicode(const std::string &text)
 {
     std::wstring result;
@@ -268,11 +280,13 @@ std::string unicode_to_koi8r(const std::wstring &text)
 
 // Quick and dirty UTF-8 conversion
 
+// Преобразует UCS-16 в UTF-8
+// Возвращает указатель на место после последнего преобразованного символа
 BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
 {
     while (length > 0)
     {
-        unsigned int c = *src++;
+        const unsigned int c = *src++;
         if (c < (1 << 7))
         {
             *dst++ = static_cast<BYTE>(c);
@@ -305,6 +319,43 @@ BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
     return dst;
 }
 
+// Подсчитывает число байт, необходимых для размещения в UTF-8.
+int countUtf(const wchar_t *src, size_t length)
+{
+    int result = 0;
+
+    while (length > 0)
+    {
+        const unsigned int c = *src++;
+        if (c < (1 << 7))
+        {
+            result++;
+        }
+        else if (c < (1 << 11))
+        {
+            result++;
+            result++;
+        }
+        else if (c < (1 << 16))
+        {
+            result += 3;
+        }
+        else if (c < (1 << 21))
+        {
+            result +=4;
+        }
+        else
+        {
+            return 0;
+        }
+        length--;
+    }
+
+    return result;
+}
+
+// Преобразует UTF-8 в UCS-16
+// Возвращает указатель на место после последнего преобразованного символа
 wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
 {
     const BYTE *stop = src + length;
@@ -347,5 +398,117 @@ wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
     return dst;
 }
 
+// Подсчитывает число wchar_t, необходимых для размещения в UCS-16.
+int countUtf(const BYTE *src, size_t length)
+{
+    int result = 0;
+
+    const BYTE *stop = src + length;
+
+    while (src < stop)
+    {
+        unsigned int c = *src++;
+        if ((c & 0x80) == 0)
+        {
+        }
+        else if ((c & 0xE0) == 0xC0)
+        {
+            src++;
+        }
+        else if ((c & 0xF0) == 0xE0)
+        {
+            c = (c & 0x0F) << 12;
+            c |= (*src++ & 0x3F) << 6;
+            c |= (*src++ & 0x3F);
+            if (c == 0xFEFF) { // bom at start
+                continue; // skip it
+            }
+        }
+        else if ((c & 0xF8) == 0xF0)
+        {
+            src += 3;
+        }
+        result++;
+    }
+
+    return result;
+}
+
+// Считывает строку UTF-8 вплоть до разделителя
+const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring &result)
+{
+    const BYTE *end = src;
+    while (size && (*end != stop))
+    {
+        end++;
+        size--;
+    }
+    const size_t length = end - src;
+    if (length == 0)
+    {
+        result = L"";
+        return end;
+    }
+    auto dst = new wchar_t[length + 1];
+    memset(dst, 0, sizeof(wchar_t)*(length + 1));
+    if (!fromUtf(dst, src, length))
+    {
+        result = L"";
+        return end;
+    }
+    result = dst;
+    delete[] dst;
+    return end;
+}
+
+std::wstring fromUtf(const std::string &text)
+{
+    const auto srcSize = text.length();
+    if (!srcSize)
+    {
+        return std::wstring();
+    }
+
+    const auto *src = reinterpret_cast<const BYTE*>(text.c_str());
+    const auto dstSize = countUtf(src, srcSize);
+    auto *dst = new wchar_t[dstSize + 1];
+    memset(dst, 0, sizeof(wchar_t)*(dstSize+1));
+    if (!fromUtf(dst, src, srcSize))
+    {
+        return std::wstring();
+    }
+    std::wstring result(dst);
+    delete[] dst;
+    return result;
+}
+
+// Записывает строку в UTF-8
+BYTE* toUtf(BYTE *dst, const std::wstring &text)
+{
+    const size_t length = text.length();
+    const wchar_t *src = text.c_str();
+    return toUtf(dst, src, length);
+}
+
+std::string toUtf(const std::wstring &text)
+{
+    const auto srcSize = text.length();
+    if (!srcSize)
+    {
+        return std::string();
+    }
+
+    const auto *src = reinterpret_cast<const wchar_t*>(text.c_str());
+    const auto dstSize = countUtf(src, srcSize);
+    auto *dst = new BYTE[dstSize + 1];
+    memset(dst, 0, sizeof(BYTE)*(dstSize+1));
+    if (!toUtf(dst, src, srcSize))
+    {
+        return std::string();
+    }
+    std::string result(reinterpret_cast<const char*>(dst));
+    delete[] dst;
+    return result;
+}
 
 NAMESPACE_IRBIS_END
