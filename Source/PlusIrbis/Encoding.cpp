@@ -239,7 +239,7 @@ std::string unicode_to_cp1251(const std::wstring &text)
 void unicode_to_cp1251(BYTE *dst, const wchar_t *src, size_t size)
 {
     const wchar_t *first = &_cp1251_from_unicode[0], *last = first + 256;
-    for (int i = 0; i < size; i++)
+    for (size_t i = 0; i < size; i++)
     {
         wchar_t c = src[i];
         const ptrdiff_t index = std::lower_bound(first, last, c) - first;
@@ -320,9 +320,9 @@ BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
 }
 
 // Подсчитывает число байт, необходимых для размещения в UTF-8.
-int countUtf(const wchar_t *src, size_t length)
+size_t countUtf(const wchar_t *src, size_t length)
 {
-    int result = 0;
+    size_t result = 0;
 
     while (length > 0)
     {
@@ -399,9 +399,9 @@ wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
 }
 
 // Подсчитывает число wchar_t, необходимых для размещения в UCS-16.
-int countUtf(const BYTE *src, size_t length)
+size_t countUtf(const BYTE *src, size_t length)
 {
-    int result = 0;
+    size_t result = 0;
 
     const BYTE *stop = src + length;
 
@@ -446,14 +446,14 @@ const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring
     const size_t length = end - src;
     if (length == 0)
     {
-        result = L"";
+        result.clear();
         return end;
     }
     auto dst = new wchar_t[length + 1];
     memset(dst, 0, sizeof(wchar_t)*(length + 1));
     if (!fromUtf(dst, src, length))
     {
-        result = L"";
+        result.clear();
         return end;
     }
     result = dst;

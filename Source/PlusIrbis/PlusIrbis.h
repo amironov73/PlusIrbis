@@ -288,6 +288,7 @@ public:
     ClientQuery& addAnsi(const std::wstring &text);
     ClientQuery& addUtf(const std::wstring &text);
     void dump(std::ostream &stream) const;
+    std::vector<BYTE> encode() const;
     ClientQuery& newLine();
 };
 
@@ -296,6 +297,8 @@ public:
 class PLUSIRBIS_EXPORTS ServerResponse final
 {
 private:
+    bool _success;
+    size_t _position;
     std::vector<BYTE> _content;
     void _write(const BYTE *bytes, size_t size);
 
@@ -307,12 +310,15 @@ public:
     int returnCode;
     std::wstring serverVersion;
 
-    ServerResponse(Connection &connection);
+    ServerResponse(Connection &connection, ClientQuery &query);
     ServerResponse(ServerResponse&) = delete;
     ServerResponse& operator=(ServerResponse&) = delete;
 
-    bool checkReturnCode();
+    bool success() const { return _success; }
+
+    bool checkReturnCode(int nargs = 0, ...);
     std::string getLine();
+    std::string getRemaining();
     int getReturnCode();
     std::wstring readAnsi();
     int readInteger();
@@ -441,6 +447,7 @@ public:
     int clientId;
     int queryId;
     std::wstring serverVersion;
+    ClientSocket *socket;
 
     Connection();
     Connection(const Connection&) = delete;
@@ -449,9 +456,8 @@ public:
     bool connect();
     bool connected() const { return _connected; }
     void disconnect();
-    ServerResponse* execute(ClientQuery &query);
-    bool executeRelease(ClientQuery &query);
-    int getMaxMfn(const std::wstring &database);
+    bool execute(ClientQuery &query);
+    int getMaxMfn(const std::wstring &databaseName);
     bool noOp();
 };
 
@@ -616,13 +622,15 @@ public:
 class PLUSIRBIS_EXPORTS ClientSocket // abstract
 {
 public:
+    std::wstring host;
+    short port;
 
     virtual ~ClientSocket();
 
     virtual void open();
     virtual void close();
-    virtual void send(char *buffer, size_t size) = 0;
-    virtual size_t receive(char *buffer, size_t size) = 0;
+    virtual void send(BYTE *buffer, size_t size) = 0;
+    virtual size_t receive(BYTE *buffer, size_t size) = 0;
 };
 
 //=========================================================
@@ -633,16 +641,15 @@ private:
     void *_impl;
 
 public:
-    std::string host;
-    short port;
-
-    Tcp4Socket(const std::string& host="localhost", short port=6666);
+    Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
+    Tcp4Socket(const Tcp4Socket&) = delete;
+    Tcp4Socket& operator=(const Tcp4Socket&) = delete;
     ~Tcp4Socket();
 
     void open() override;
     void close() override;
-    void send(char* buffer, size_t size) override;
-    size_t receive(char* buffer, size_t size) override;
+    void send(BYTE *buffer, size_t size) override;
+    size_t receive(BYTE *buffer, size_t size) override;
 };
 
 //=========================================================
@@ -684,8 +691,12 @@ PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wst
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3);
 PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3);
 
-PLUSIRBIS_EXPORTS std::wstring safeAt(const std::vector<std::wstring> &list, int index);
+PLUSIRBIS_EXPORTS std::wstring safeAt(const std::vector<std::wstring> &list, size_t index);
 
+PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, char delimiter);
+PLUSIRBIS_EXPORTS std::vector<std::wstring> split(const std::wstring &text, wchar_t delimiter);
+PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, const std::string &delimiter);
+PLUSIRBIS_EXPORTS std::vector<std::wstring> split(const std::wstring &text, const std::wstring &delimiter);
 PLUSIRBIS_EXPORTS std::vector<std::wstring> maxSplit(const std::wstring &text, wchar_t separator, int count);
 
 PLUSIRBIS_EXPORTS std::wstring cp866_to_unicode(const std::string &text);
@@ -699,8 +710,8 @@ PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
 
 PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length);
 PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length);
-PLUSIRBIS_EXPORTS int countUtf(const wchar_t *src, size_t length);
-PLUSIRBIS_EXPORTS int countUtf(const BYTE *src, size_t length);
+PLUSIRBIS_EXPORTS size_t countUtf(const wchar_t *src, size_t length);
+PLUSIRBIS_EXPORTS size_t countUtf(const BYTE *src, size_t length);
 PLUSIRBIS_EXPORTS const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring &result);
 PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
 PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);

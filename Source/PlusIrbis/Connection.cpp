@@ -6,10 +6,17 @@
 NAMESPACE_IRBIS_BEGIN
 
 Connection::Connection()
-    : _connected(false), host(L"127.0.0.1"), port(6666),
-    username(L""), password(L""), database(L"IBIS"),
-    workstation(L"C"), clientId(0), queryId(0)
+    : _connected(false),
+    host(L"127.0.0.1"),
+    port(6666),
+    username(L""),
+    password(L""),
+    database(L"IBIS"),
+    workstation(L"C"),
+    clientId(0),
+    queryId(0)
 {
+    socket = new Tcp4Socket();
 }
 
 bool Connection::connect()
@@ -24,13 +31,12 @@ bool Connection::connect()
     ClientQuery query (this, CommandCode::RegisterClient);
     query.addAnsi(username).newLine();
     query.addAnsi(password).newLine();
-    auto response = execute(query);
-    if (!response)
+    ServerResponse response (*this, query);
+    if (!response.success())
     {
         return false;
     }
 
-    delete response;
     _connected = true;
 
     return true;
@@ -45,30 +51,17 @@ void Connection::disconnect()
 
     ClientQuery query(this, CommandCode::UnregisterClient);
     query.addAnsi(username).newLine();
-    executeRelease(query);
+    execute(query);
     _connected = false;
 }
 
-ServerResponse* Connection::execute(ClientQuery &query)
+bool Connection::execute(ClientQuery &query)
 {
-    // TODO implement
-    return new ServerResponse(*this);
+    ServerResponse response(*this, query);
+    return response.success();
 }
 
-bool Connection::executeRelease(ClientQuery &query)
-{
-    const auto response = execute(query);
-    if (!response)
-    {
-        return false;
-    }
-
-    delete response;
-
-    return true;
-}
-
-int Connection::getMaxMfn(const std::wstring &database)
+int Connection::getMaxMfn(const std::wstring &databaseName)
 {
     if (!connected())
     {
@@ -76,21 +69,19 @@ int Connection::getMaxMfn(const std::wstring &database)
     }
 
     ClientQuery query (this, CommandCode::GetMaxMfn);
-    query.addAnsi(database);
-    auto response = execute(query);
-    if (!response)
+    query.addAnsi(databaseName);
+    ServerResponse response(*this, query);
+    if (!response.success())
     {
         return 0;
     }
 
-    if (!response->checkReturnCode())
+    if (!response.checkReturnCode())
     {
-        delete response;
         return 0;
     }
 
-    const auto result = response->returnCode;
-    delete response;
+    const auto result = response.returnCode;
 
     return result;
 }
@@ -103,7 +94,7 @@ bool Connection::noOp()
     }
 
     ClientQuery query(this, CommandCode::Nop);
-    return executeRelease(query);
+    return execute(query);
 }
 
 NAMESPACE_IRBIS_END

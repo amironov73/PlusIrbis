@@ -87,7 +87,7 @@ ClientQuery& ClientQuery::addUtf(const std::wstring &text)
     }
 
     const wchar_t *src = text.c_str();
-    const int bufSize = countUtf(src, size);
+    const size_t bufSize = countUtf(src, size);
     BYTE *dst = new BYTE[bufSize];
     BYTE *end = toUtf(dst, src, size);
     _write(dst, end - dst);
@@ -101,6 +101,11 @@ void ClientQuery::dump(std::ostream &stream) const
     {
         stream << std::hex << std::setw(2) << value << " ";
     }
+}
+
+std::vector<BYTE> ClientQuery::encode() const
+{
+    return std::vector<BYTE>();
 }
 
 ClientQuery& ClientQuery::newLine()

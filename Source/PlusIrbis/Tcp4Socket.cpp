@@ -9,11 +9,11 @@ struct Socket
 {
 };
 
-Tcp4Socket::Tcp4Socket(const std::string& host, short port)
-    : _impl(new Socket),
-    host(host),
-    port(port)
+Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
+    : _impl(new Socket)
 {
+    host = host_;
+    port = port_;
 }
 
 Tcp4Socket::~Tcp4Socket()
@@ -29,11 +29,11 @@ void Tcp4Socket::close()
 {
 }
 
-void Tcp4Socket::send(char* buffer, size_t size)
+void Tcp4Socket::send(BYTE *buffer, size_t size)
 {
 }
 
-size_t Tcp4Socket::receive(char* buffer, size_t size)
+size_t Tcp4Socket::receive(BYTE *buffer, size_t size)
 {
     return 0;
 }

@@ -5,6 +5,7 @@
 
 #include "stdafx.h"
 #include <iterator>
+#include <sstream>
 
 NAMESPACE_IRBIS_BEGIN
 
@@ -110,9 +111,9 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const st
     return s3;
 }
 
-std::wstring safeAt(const std::vector<std::wstring> &list, int index)
+std::wstring safeAt(const std::vector<std::wstring> &list, size_t index)
 {
-    if ((index < 0) || (index >= list.size()))
+    if (index >= list.size())
     {
         return std::wstring();
     }
@@ -143,6 +144,74 @@ std::vector<std::wstring> maxSplit(const std::wstring &text, wchar_t separator, 
 
     return result;
 
+}
+
+std::vector<std::string> split(const std::string &text, char delimiter)
+{
+    std::vector<std::string> result;
+    std::string token;
+    std::istringstream stream(text);
+    while (std::getline(stream, token, delimiter))
+    {
+        result.push_back(token);
+    }
+
+    return result;
+}
+
+std::vector<std::wstring> split(const std::wstring &text, wchar_t delimiter)
+{
+    std::vector<std::wstring> result;
+    std::wstring token;
+    std::wistringstream stream(text);
+    while (std::getline(stream, token, delimiter))
+    {
+        result.push_back(token);
+    }
+
+    return result;
+}
+
+std::vector<std::string> split(const std::string &text, const std::string &delimiter)
+{
+    std::vector<std::string> result;
+    std::string token;
+    size_t start = 0, end;
+    while ((end = text.find(delimiter, start)) != std::string::npos)
+    {
+        token = text.substr(start, end - start);
+        result.push_back(token);
+        start = end + delimiter.length();
+    }
+
+    if (start < text.length())
+    {
+        token = text.substr(start, std::string::npos);
+        result.push_back(token);
+    }
+
+    return result;
+}
+
+std::vector<std::wstring> split(const std::wstring &text, const std::wstring &delimiter)
+{
+    std::vector<std::wstring> result;
+    std::wstring token;
+    size_t start = 0, end;
+    while ((end = text.find(delimiter, start)) != std::string::npos)
+    {
+        token = text.substr(start, end - start);
+        result.push_back(token);
+        start = end + delimiter.length();
+    }
+
+    if (start < text.length())
+    {
+        token = text.substr(start, std::string::npos);
+        result.push_back(token);
+    }
+
+    return result;
 }
 
 NAMESPACE_IRBIS_END
