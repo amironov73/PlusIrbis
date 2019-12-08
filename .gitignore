@@ -332,3 +332,11 @@ ASALocalRun/
 
 # CMake
 cmake-build-debug/
+compile_commands.json
+*.dylib
+Makefile
+CMakeCache.txt
+*.cbp
+cmake_install.cmake
+CMakeFiles/
+*.tasks
