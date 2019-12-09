@@ -45,6 +45,9 @@ ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
     readAnsi();
     readAnsi();
     readAnsi();
+
+    // set the success flag
+    _success = true;
 }
 
 bool ServerResponse::checkReturnCode(int nargs, ...)

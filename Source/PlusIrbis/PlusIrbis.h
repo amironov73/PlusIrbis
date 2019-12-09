@@ -217,6 +217,7 @@ public:
 //=========================================================
 
 class PLUSIRBIS_EXPORTS BaseException
+        : std::exception
 {
 public:
 };
@@ -229,7 +230,7 @@ public:
     char *data;
     MemoryChunk *next;
 
-    MemoryChunk(size_t size);
+    explicit MemoryChunk(size_t size);
     MemoryChunk(const MemoryChunk &other) = delete;
     MemoryChunk(MemoryChunk &&other) = delete;
     MemoryChunk& operator = (const MemoryChunk &other) = delete;
@@ -251,7 +252,7 @@ private:
 public:
     const static size_t DefaultChunkSize;
 
-    ChunkedBuffer(size_t chunkSize = DefaultChunkSize);
+    explicit ChunkedBuffer(size_t chunkSize = DefaultChunkSize);
     ChunkedBuffer(const ChunkedBuffer &other) = delete;
     ChunkedBuffer operator= (const ChunkedBuffer &other) = delete;
     ~ChunkedBuffer();
@@ -500,27 +501,6 @@ public:
     friend std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
 
-//=========================================================
-
-class PLUSIRBIS_EXPORTS SubFieldList final
-{
-private:
-    SubFieldListImpl *_impl;
-
-public:
-    SubFieldList();
-    SubFieldList(const SubFieldList &other) = delete;
-    SubFieldList(SubFieldList &&other) = delete;
-    SubFieldList& operator = (const SubFieldList &other) = delete;
-    SubFieldList& operator = (SubFieldList &&other) = delete;
-    ~SubFieldList();
-
-    void add(wchar_t code, const std::wstring &value);
-    SubField* begin() const;
-    void clear();
-    SubField* end() const;
-    size_t size() const;
-};
 
 //=========================================================
 
@@ -542,21 +522,6 @@ public:
     friend std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
 
-//=========================================================
-
-class PLUSIRBIS_EXPORTS RecordFieldList final
-{
-private:
-    RecordFieldListImpl *_impl;
-
-public:
-    RecordFieldList();
-    RecordFieldList(const RecordFieldList &other) = delete;
-    RecordFieldList(RecordFieldList &&other) = delete;
-    RecordFieldList& operator = (const RecordFieldList &other) = delete;
-    RecordFieldList& operator = (RecordFieldList &&other) = delete;
-    ~RecordFieldList();
-};
 
 //=========================================================
 
@@ -583,7 +548,7 @@ private:
     std::wiostream &stream;
 
 public:
-    RecordSerializer(std::wiostream &stream);
+    explicit RecordSerializer(std::wiostream &stream);
 
     MarcRecord deserialize();
     void serialize(const MarcRecord &record);
@@ -629,7 +594,7 @@ public:
 
     virtual void open();
     virtual void close();
-    virtual void send(BYTE *buffer, size_t size) = 0;
+    virtual void send(const BYTE *buffer, size_t size) = 0;
     virtual size_t receive(BYTE *buffer, size_t size) = 0;
 };
 
@@ -641,14 +606,14 @@ private:
     void *_impl;
 
 public:
-    Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
+    explicit Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
     Tcp4Socket(const Tcp4Socket&) = delete;
     Tcp4Socket& operator=(const Tcp4Socket&) = delete;
     ~Tcp4Socket();
 
     void open() override;
     void close() override;
-    void send(BYTE *buffer, size_t size) override;
+    void send(const BYTE *buffer, size_t size) override;
     size_t receive(BYTE *buffer, size_t size) override;
 };
 

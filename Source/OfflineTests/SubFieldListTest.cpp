@@ -12,10 +12,6 @@ namespace OfflineTests
 
         TEST_METHOD(add_1)
         {
-            SubFieldList list;
-            list.add('a', L"SubA");
-            list.add('b', L"SubB");
-            Assert::AreEqual(size_t(2), list.size());
             //std::wstring s;
             //for (const SubField &item : list)
             //{

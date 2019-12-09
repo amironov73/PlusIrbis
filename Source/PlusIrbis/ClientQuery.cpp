@@ -105,12 +105,22 @@ void ClientQuery::dump(std::ostream &stream) const
 
 std::vector<BYTE> ClientQuery::encode() const
 {
-    return std::vector<BYTE>();
+    std::vector<BYTE> result;
+    result.reserve(_content.size() + 10);
+    const auto prefix = std::to_string(_content.size());
+    const auto ptr = prefix.c_str();
+    for (auto i = 0; i < prefix.length(); i++) {
+        result.push_back(ptr[i]);
+    }
+    result.push_back(0x0a);
+    result.insert(result.end(), _content.begin(), _content.end());
+
+    return result;
 }
 
 ClientQuery& ClientQuery::newLine()
 {
-    _write(0x10);
+    _write(0x0A);
     return *this;
 }
 
