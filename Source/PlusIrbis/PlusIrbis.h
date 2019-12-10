@@ -17,6 +17,14 @@
 #define NAMESPACE_IRBIS_BEGIN namespace irbis {
 #define NAMESPACE_IRBIS_END }
 
+#if !defined(IRBIS_WINDOWS) && !defined (IRBIS_UNIX)
+#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(_WINDOWS)
+#define IRBIS_WINDOWS
+#else
+#define IRBIS_UNIX
+#endif
+#endif
+
 #if defined(_MSC_VER)
     // Microsoft
     #define AM_EXPORT __declspec(dllexport)
@@ -72,6 +80,7 @@ class FileSpecification;
 class Format;
 class IlfEntry;
 class IlfFile;
+class IniFile;
 class IrbisDate;
 class Encoding;
 class MarcRecord;
@@ -104,6 +113,7 @@ class StopWords;
 class SubField;
 class SubFieldList;
 class SubFieldListImpl;
+class TableDefinition;
 class TermInfo;
 class TermParameters;
 class TermPosting;
@@ -155,7 +165,7 @@ private:
 public:
     const static wchar_t EOT;
 
-    TextNavigator(const std::wstring &text);
+    explicit TextNavigator(const std::wstring &text);
     TextNavigator(const TextNavigator &other);
     TextNavigator& operator = (const TextNavigator &other) = delete;
     ~TextNavigator() = default;
@@ -203,7 +213,7 @@ public:
     const static std::string FileName;
     std::set<wchar_t> characters;
 
-    AlphabetTable(const std::vector<unsigned char> &bytes /* encoding*/);
+    explicit AlphabetTable(const std::vector<unsigned char> &bytes /* encoding*/);
 
     static const AlphabetTable& instance();
     bool isAlpha(const wchar_t &c) const;
@@ -265,6 +275,76 @@ public:
     void write(const char *buffer, size_t offset, size_t count);
     //void write(const std::wstring &text, QTextCodec *codec);
     void writeByte(char value);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS DatabaseInfo final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ServerStat final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS UserInfo final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IniFile final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ProcessInfo final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TableDefinition final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TermPosting final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS SearchScenario final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS SearchParameters final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TermInfo final
+{
+public:
 };
 
 //=========================================================
@@ -427,7 +507,7 @@ public:
     int maxClients { 0 }; // максимальное количество подключений
     int connectedClients { 0 }; // текущее количество подключений
 
-    static Version parse(ServerResponse &response);
+    void parse(ServerResponse &response);
     std::wstring to_wstring() const;
 };
 
@@ -454,12 +534,57 @@ public:
     Connection(const Connection&) = delete;
     Connection& operator=(const Connection&) = delete;
 
+    bool actualizeRecord(const std::wstring &database, int mfn);
     bool connect();
+    bool createDatabase(const std::wstring &databaseName, const std::wstring &description, bool readerAccess);
+    bool createDictionary(const std::wstring &databaseName);
+    bool deleteDatabase(const std::wstring &databaseName);
+    bool deleteRecord(int mfn);
     bool connected() const { return _connected; }
     void disconnect();
     bool execute(ClientQuery &query);
+    std::wstring formatRecord(const std::wstring &format, int mfn);
+    std::wstring formatRecord(const std::wstring &format, MarcRecord &record);
+    DatabaseInfo getDatabaseInfo(const std::wstring &databaseName);
     int getMaxMfn(const std::wstring &databaseName);
+    ServerStat getServerStat();
+    Version getServerVersion();
+    std::vector<UserInfo> getUserList();
+    std::vector<DatabaseInfo> listDatabases(const IniFile &iniFile, const std::string &defaultFileName);
+    std::vector<DatabaseInfo> listDatabases(const FileSpecification &specification);
+    std::vector<std::wstring> listFiles(const FileSpecification &specification);
+    std::vector<std::wstring> listFiles(const std::vector<FileSpecification> &specifications);
+    std::vector<ProcessInfo> listProcesses();
     bool noOp();
+    void parseConnectionString(const std::wstring &connectionString);
+    std::wstring popDatabase();
+    std::wstring printTable(const TableDefinition &definition);
+    std::wstring pushDatabase(const std::wstring &newDatabase);
+    std::vector<BYTE> readBinaryFile(const FileSpecification &specification);
+    IniFile readIniFile(const FileSpecification &specification);
+    MenuFile readMenuFile(const FileSpecification &specification);
+    std::vector<TermPosting> readPostings(const PostingParameters &parameters);
+    RawRecord readRawRecord(const std::wstring &databaseName, int mfn);
+    MarcRecord readRecord(int mfn);
+    MarcRecord readRecord(const std::wstring &databaseName, int mfn);
+    MarcRecord readRecord(const std::wstring &databaseName, int mfn, int version);
+    std::vector<SearchScenario> readSearchScenario(const FileSpecification &specification);
+    std::vector<TermInfo> readTerms(const TermParameters &parameters);
+    std::wstring readTextFile(const FileSpecification &specification);
+    std::vector<std::wstring> readTextFiles(std::vector<FileSpecification> specifications);
+    bool reloadDictionary(const std::wstring &databaseName);
+    bool reloadMasterFile(const std::wstring &databaseName);
+    bool restartServer();
+    std::wstring requireTextFile(const FileSpecification &specification);
+    std::vector<int> search(const std::wstring &expression);
+    std::vector<int> search(const SearchParameters &parameters);
+    std::wstring toConnectionString();
+    bool truncateDatabase(const std::wstring &databaseName);
+    bool unlockDatabase(const std::wstring &databaseName);
+    bool unlockRecords(const std::wstring &databaseName, const std::vector<int> &mfnList);
+    bool updateIniFile(std::vector<std::wstring> &lines);
+    int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
+    void writeTextFile(const FileSpecification &specification);
 };
 
 //=========================================================
@@ -535,7 +660,7 @@ public:
     std::wstring database;
 
     MarcRecord& add(wchar_t code, const std::wstring &value);
-    constexpr bool deleted() const;
+    bool deleted() const;
     bool verify(bool throwOnError) const;
 
     friend std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
@@ -609,7 +734,7 @@ public:
     explicit Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
     Tcp4Socket(const Tcp4Socket&) = delete;
     Tcp4Socket& operator=(const Tcp4Socket&) = delete;
-    ~Tcp4Socket();
+    ~Tcp4Socket() final;
 
     void open() override;
     void close() override;

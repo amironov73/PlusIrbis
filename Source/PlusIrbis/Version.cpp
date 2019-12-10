@@ -5,8 +5,7 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-// разбор ответа сервера
-Version Version::parse(ServerResponse &response)
+void Version::parse(ServerResponse &response)
 {
     throw NotImplementedException();
 }

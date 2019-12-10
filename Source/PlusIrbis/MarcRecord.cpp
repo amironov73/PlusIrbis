@@ -12,7 +12,7 @@ MarcRecord& MarcRecord::add(wchar_t code, const std::wstring &value)
     return *this;
 }
 
-constexpr bool MarcRecord::deleted() const
+bool MarcRecord::deleted() const
 {
     return (status & RecordStatus::Deleted) != 0;
 }

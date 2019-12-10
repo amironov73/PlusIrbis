@@ -3,19 +3,25 @@
 
 #include "stdafx.h"
 
-#if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(_WINDOWS)
-#define AM_WINDOWS
-#endif
-
-#ifdef  AM_WINDOWS
+#ifdef  IRBIS_WINDOWS
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <winsock2.h>
-//#include <ws2tcpip.h>
 #include <windows.h>
 
 #pragma comment (lib, "ws2_32.lib")
+
+#else
+
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <unistd.h>
+
+#define HOSTENT struct hostent
+#define closesocket(__x) ::close(__x)
 
 #endif
 
@@ -23,8 +29,17 @@ NAMESPACE_IRBIS_BEGIN
 
 struct TcpInternals
 {
+#ifdef IRBIS_WINDOWS
+
     WSADATA wsaData;
     SOCKET socket;
+
+#else
+
+    int socket;
+
+#endif
+
 };
 
 Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
@@ -33,7 +48,7 @@ Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
     host = host_;
     port = port_;
 
-#ifdef AM_WINDOWS
+#ifdef IRBIS_WINDOWS
 
     auto internals = static_cast<TcpInternals*>(this->_impl);
 
@@ -47,7 +62,13 @@ Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
 Tcp4Socket::~Tcp4Socket()
 {
     const auto internals = static_cast<TcpInternals*>(this->_impl);
+
+#ifdef IRBIS_WINDOWS
+
     WSACleanup();
+
+#endif
+
     delete (internals);
 }
 
@@ -68,10 +89,11 @@ void Tcp4Socket::open()
         destinationAddress.sin_addr.s_addr = inaddr;
     }
     else {
-        HOSTENT *hostent = gethostbyname(ansi.c_str());
-        if (hostent) {
+
+        HOSTENT *hostentry = gethostbyname(ansi.c_str());
+        if (hostentry) {
             ((unsigned long*)&destinationAddress.sin_addr)[0] =
-                    ((unsigned long **)hostent->h_addr_list)[0][0];
+                    ((unsigned long **)hostentry->h_addr_list)[0][0];
         }
         else {
             throw NetworkException();
