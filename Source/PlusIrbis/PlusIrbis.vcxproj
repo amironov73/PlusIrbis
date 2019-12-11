@@ -158,14 +158,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChunkedBuffer.cpp" />
+    <ClCompile Include="ClientInfo.cpp" />
     <ClCompile Include="ClientQuery.cpp" />
     <ClCompile Include="ClientSocket.cpp" />
-    <ClCompile Include="CommandCode.cpp" />
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionFactory.cpp" />
+    <ClCompile Include="DatabaseInfo.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="FileSpecification.cpp" />
     <ClCompile Include="Format.cpp" />
+    <ClCompile Include="FoundLine.cpp" />
+    <ClCompile Include="IrbisDate.cpp" />
     <ClCompile Include="MarcRecord.cpp" />
     <ClCompile Include="MemoryChunk.cpp" />
     <ClCompile Include="MenuEntry.cpp" />
@@ -186,6 +189,7 @@
     </ClCompile>
     <ClCompile Include="SubField.cpp" />
     <ClCompile Include="Tcp4Socket.cpp" />
+    <ClCompile Include="IrbisText.cpp" />
     <ClCompile Include="TextNavigator.cpp" />
     <ClCompile Include="Version.cpp" />
   </ItemGroup>

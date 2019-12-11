@@ -21,13 +21,19 @@ Connection::Connection()
     socket = new Tcp4Socket();
 }
 
+Connection::~Connection()
+{
+    // ???
+}
+
+
 bool Connection::actualizeRecord(const std::wstring &database, int mfn)
 {
     if (!connected()) {
         return false;
     }
 
-    ClientQuery query(this, CommandCode::ActualizeRecord);
+    ClientQuery query(*this, "F");
     query.addAnsi(database)
             .add(mfn);
 
@@ -49,7 +55,7 @@ bool Connection::connect()
 
     clientId = dis(gen);
     queryId = 1;
-    ClientQuery query (this, CommandCode::RegisterClient);
+    ClientQuery query (*this, "A");
     query.addAnsi(username).newLine();
     query.addAnsi(password).newLine();
     ServerResponse response (*this, query);
@@ -68,7 +74,7 @@ bool Connection::createDatabase(const std::wstring &databaseName, const std::wst
         return false;
     }
 
-    ClientQuery query (this, CommandCode::CreateDatabase);
+    ClientQuery query (*this, "T");
     query.addAnsi(databaseName)
             .addAnsi(description)
             .add(readerAccess);
@@ -83,7 +89,7 @@ bool Connection::createDictionary(const std::wstring &databaseName)
         return false;
     }
 
-    ClientQuery query (this, CommandCode::CreateDictionary);
+    ClientQuery query (*this, "Z");
     query.addAnsi(databaseName);
 
     ServerResponse response (*this, query);
@@ -96,7 +102,7 @@ bool Connection::deleteDatabase(const std::wstring &databaseName)
         return false;
     }
 
-    ClientQuery query (this, CommandCode::DeleteDatabase);
+    ClientQuery query (*this, "Z");
     query.addAnsi(databaseName);
 
     ServerResponse response (*this, query);
@@ -124,7 +130,7 @@ void Connection::disconnect()
         return;
     }
 
-    ClientQuery query(this, CommandCode::UnregisterClient);
+    ClientQuery query(*this, "B");
     query.addAnsi(username).newLine();
     execute(query);
     _connected = false;
@@ -142,11 +148,11 @@ std::wstring Connection::formatRecord(const std::wstring &format, int mfn)
         return L"";
     }
 
-    std::wstring prepared = Format::prepareFormat(format);
-    ClientQuery query (this, CommandCode::FormatRecord);
-    query.addAnsi(database)
-            .addAnsi(prepared)
-            .add(1)
+    const auto prepared = Format::prepareFormat(format);
+    ClientQuery query (*this, "G");
+    query.addAnsi(database).newLine()
+            .addAnsi(prepared).newLine()
+            .add(1).newLine()
             .add(mfn);
 
     ServerResponse response (*this, query);
@@ -154,6 +160,7 @@ std::wstring Connection::formatRecord(const std::wstring &format, int mfn)
         return L"";
     }
 
+    response.getReturnCode();
     const auto result = response.readRemainingUtfText();
     return result;
 }
@@ -165,10 +172,10 @@ std::wstring Connection::formatRecord(const std::wstring &format, MarcRecord &re
     }
 
     auto prepared = Format::prepareFormat(format);
-    ClientQuery query (this, CommandCode::FormatRecord);
-    query.addAnsi(database)
-            .addAnsi(prepared)
-            .add(-2)
+    ClientQuery query (*this, "G");
+    query.addAnsi(database).newLine()
+            .addAnsi(prepared).newLine()
+            .add(-2).newLine()
             .add(record);
 
     ServerResponse response (*this, query);
@@ -198,7 +205,7 @@ int Connection::getMaxMfn(const std::wstring &databaseName)
         return 0;
     }
 
-    ClientQuery query (this, CommandCode::GetMaxMfn);
+    ClientQuery query (*this, "O");
     query.addAnsi(databaseName);
     ServerResponse response(*this, query);
     if (!response.success())  {
@@ -233,7 +240,7 @@ Version Connection::getServerVersion()
         return result;
     }
 
-    ClientQuery query(this, CommandCode::ServerInfo);
+    ClientQuery query(*this, "1");
     ServerResponse response (*this, query);
     response.checkReturnCode();
     result.parse(response);
@@ -271,7 +278,7 @@ std::vector<std::wstring> Connection::listFiles(const FileSpecification &specifi
         return result;
     }
 
-    ClientQuery query(this, CommandCode::ListFiles);
+    ClientQuery query(*this, "1");
     query.add(specification);
 
     ServerResponse response (*this, query);
@@ -325,7 +332,7 @@ bool Connection::noOp()
         return false;
     }
 
-    ClientQuery query(this, CommandCode::Nop);
+    ClientQuery query(*this, "N");
     return execute(query);
 }
 
@@ -399,6 +406,22 @@ RawRecord Connection::readRawRecord(const std::wstring &databaseName, int mfn)
 
     if (!connected()) {
         return result;
+    }
+
+    auto db = databaseName;
+    if (db.empty()) {
+        db = database;
+    }
+
+    ClientQuery query(*this, "C");
+    query.addAnsi(db).newLine()
+        .add(mfn);
+
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode()) {
+        const auto lines = response.readRemainingUtfLines();
+        result.parseSingle(lines);
+        result.database = db;
     }
 
     return result;

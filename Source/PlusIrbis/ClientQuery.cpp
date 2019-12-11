@@ -6,15 +6,15 @@
 
 NAMESPACE_IRBIS_BEGIN
 
-ClientQuery::ClientQuery(Connection *connection, const std::string &commandCode)
+ClientQuery::ClientQuery(const Connection &connection, const std::string &commandCode)
 {
     addAnsi(commandCode).newLine();
-    addAnsi(connection->workstation).newLine();
+    addAnsi(connection.workstation).newLine();
     addAnsi(commandCode).newLine();
-    add(connection->clientId).newLine();
-    add(connection->queryId).newLine();
-    addAnsi(connection->password).newLine();
-    addAnsi(connection->username).newLine();
+    add(connection.clientId).newLine();
+    add(connection.queryId).newLine();
+    addAnsi(connection.password).newLine();
+    addAnsi(connection.username).newLine();
     newLine();
     newLine();
     newLine();

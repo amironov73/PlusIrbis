@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <cwchar>
 #include <cwctype>
 #include <cstring>
@@ -70,7 +71,6 @@ class ChunkedBuffer;
 class ClientInfo;
 class ClientQuery;
 class ClientSocket;
-class CommandCode;
 class Connection;
 class ConnectionFactory;
 class DatabaseInfo;
@@ -78,10 +78,12 @@ class DirectAccess64;
 class EmbeddedField;
 class FileSpecification;
 class Format;
+class FoundLine;
 class IlfEntry;
 class IlfFile;
 class IniFile;
 class IrbisDate;
+class IrbisText;
 class Encoding;
 class MarcRecord;
 class MarcRecordList;
@@ -102,8 +104,6 @@ class ProcessInfo;
 class ProtocolText;
 class RawRecord;
 class RecordField;
-class RecordFieldList;
-class RecordFieldListImpl;
 class RecordSerializer;
 class SearchParameters;
 class SearchScenario;
@@ -111,8 +111,6 @@ class ServerResponse;
 class ServerStat;
 class StopWords;
 class SubField;
-class SubFieldList;
-class SubFieldListImpl;
 class TableDefinition;
 class TermInfo;
 class TermParameters;
@@ -123,6 +121,54 @@ class VerificationException;
 class Version;
 class XrfFile64;
 class XrfRecord64;
+
+//=========================================================
+
+using MfnList = std::vector<int>;
+using StringList = std::vector<std::wstring>;
+using SubFieldList = std::vector<SubField>;
+using RecordFieldList = std::vector<RecordField>;
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IrbisDate final
+{
+public:
+    std::wstring text;
+    std::chrono::system_clock::time_point date;
+
+    explicit IrbisDate(const std::wstring &text);
+    explicit IrbisDate(std::chrono::system_clock::time_point date);
+
+    static std::chrono::system_clock::time_point convert(const std::wstring &text);
+    static std::wstring convert(const std::chrono::system_clock::time_point &date);
+    static std::wstring today();
+    static IrbisDate* safeParse(const std::wstring &text);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IrbisText final
+{
+public:
+    const static char CrLf[];
+    const static char Lf[];
+    const static std::wstring IrbisDelimiter;
+    const static std::wstring ShortDelimiter;
+    const static std::wstring MsDosDelimiter;
+    const static std::wstring UnixDelimiter;
+    const static std::wstring SearchDelimiter;
+
+    static std::wstring fromIrbisToDos(std::wstring &text);
+    static std::wstring fromDosToIrbis(std::wstring &text);
+    static std::wstring fromDosToUnix(std::wstring &text);
+    static StringList fromFullDelimiter (const std::wstring &text);
+    static StringList fromShortDelimiter (const std::wstring &text);
+    static std::wstring readAllAnsi(const std::wstring &filename);
+    static std::wstring readAllUtf(const std::wstring &filename);
+    static StringList readAnsiLines(const std::wstring &filename);
+    static StringList readUtfLines(const std::wstring &filename);
+};
 
 //=========================================================
 
@@ -143,7 +189,7 @@ public:
     NumberChunk(const NumberChunk &other) = default;
 
     int compareTo(const NumberChunk &other) const;
-    constexpr bool havePrefix() const;
+    bool havePrefix() const;
     std::wstring toString() const;
 };
 
@@ -167,7 +213,9 @@ public:
 
     explicit TextNavigator(const std::wstring &text);
     TextNavigator(const TextNavigator &other);
-    TextNavigator& operator = (const TextNavigator &other) = delete;
+    TextNavigator(TextNavigator&&) = delete;
+    TextNavigator& operator = (const TextNavigator &) = delete;
+    TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
 
     constexpr size_t column() const { return _column; }
@@ -227,7 +275,7 @@ public:
 //=========================================================
 
 class PLUSIRBIS_EXPORTS BaseException
-        : std::exception
+        : public std::exception
 {
 public:
 };
@@ -279,9 +327,48 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS ClientInfo final
+{
+public:
+    std::wstring number;
+    std::wstring ipAddress;
+    std::wstring port;
+    std::wstring name;
+    std::wstring id;
+    std::wstring workstation;
+    std::wstring registered;
+    std::wstring acknowledged;
+    std::wstring lastCommand;
+    std::wstring commandNumber;
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS DatabaseInfo final
 {
 public:
+    MfnList logicallyDeletedRecords;
+    MfnList physicallyDeletedRecords;
+    MfnList nonActualizedRecords;
+    MfnList lockedRecords;
+    std::wstring name;
+    std::wstring description;
+    int maxMfn {0};
+    bool databaseLocked {false};
+    bool readOnly {false};
+
+    DatabaseInfo parse(ServerResponse &response);
+    static std::vector<DatabaseInfo> parse(MenuFile &menu);
+    std::wstring toString() const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS FoundLine final
+{
+public:
+    int mfn {0};
+    std::wstring description;
 };
 
 //=========================================================
@@ -289,6 +376,9 @@ public:
 class PLUSIRBIS_EXPORTS ServerStat final
 {
 public:
+    std::vector<ClientInfo> runningClients;
+    int clientCount {0};
+    int totalCommandCount {0};
 };
 
 //=========================================================
@@ -296,6 +386,15 @@ public:
 class PLUSIRBIS_EXPORTS UserInfo final
 {
 public:
+    std::wstring number;
+    std::wstring name;
+    std::wstring password;
+    std::wstring cataloger;
+    std::wstring reader;
+    std::wstring circulation;
+    std::wstring acquisitions;
+    std::wstring provision;
+    std::wstring administrator;
 };
 
 //=========================================================
@@ -307,9 +406,33 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS IniSection final
+{
+public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IniLine final
+{
+public:
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS ProcessInfo final
 {
 public:
+    std::wstring number;
+    std::wstring ipAddress;
+    std::wstring name;
+    std::wstring clientId;
+    std::wstring workstation;
+    std::wstring started;
+    std::wstring lastCommand;
+    std::wstring commandNumber;
+    std::wstring processId;
+    std::wstring state;
 };
 
 //=========================================================
@@ -317,6 +440,15 @@ public:
 class PLUSIRBIS_EXPORTS TableDefinition final
 {
 public:
+    std::wstring database;
+    std::wstring table;
+    StringList headers;
+    std::wstring mode;
+    std::wstring searchQuery;
+    int minMfn{0};
+    int maxMfn{0};
+    std::wstring sequentialQuery;
+    MfnList mfnList;
 };
 
 //=========================================================
@@ -324,6 +456,11 @@ public:
 class PLUSIRBIS_EXPORTS TermPosting final
 {
 public:
+    int mfn { 0 };
+    int tag { 0 };
+    int occurrence { 0 };
+    int count { 0 };
+    std::wstring text;
 };
 
 //=========================================================
@@ -338,6 +475,15 @@ public:
 class PLUSIRBIS_EXPORTS SearchParameters final
 {
 public:
+    std::wstring database;
+    int firstRecord { 1 };
+    std::wstring formatSpecification;
+    int maxMfn { 0 };
+    int minMfn { 0 };
+    int numberOfRecords { 0 };
+    std::wstring searchExpression;
+    std::wstring sequentialSpecification;
+    std::wstring filterSpecification;
 };
 
 //=========================================================
@@ -345,6 +491,20 @@ public:
 class PLUSIRBIS_EXPORTS TermInfo final
 {
 public:
+    int count { 0 };
+    std::wstring text;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TermParameters final
+{
+public:
+    std::wstring database;
+    int numberOfTerms { 0 };
+    bool reverseOrder { false };
+    std::wstring startTerm;
+    std::wstring format;
 };
 
 //=========================================================
@@ -358,9 +518,11 @@ private:
     void _write(BYTE byte);
 
 public:
-    ClientQuery(Connection *connection, const std::string &commandCode);
+    ClientQuery(const Connection &connection, const std::string &commandCode);
     ClientQuery(ClientQuery &) = delete;
-    ClientQuery& operator=(ClientQuery &) = delete;
+    ClientQuery(ClientQuery &&) = delete;
+    ClientQuery& operator = (ClientQuery &) = delete;
+    ClientQuery& operator = (ClientQuery &&) = delete;
 
     ClientQuery& add(int value);
     ClientQuery& add(const FileSpecification &specification);
@@ -403,65 +565,11 @@ public:
     int getReturnCode();
     std::wstring readAnsi();
     int readInteger();
-    std::vector<std::wstring> readRemainingAnsiLines();
+    StringList readRemainingAnsiLines();
     std::wstring readRemainingAnsiText();
-    std::vector<std::wstring> readRemainingUtfLines();
+    StringList readRemainingUtfLines();
     std::wstring readRemainingUtfText();
     std::wstring readUtf();
-};
-
-//=========================================================
-
-class PLUSIRBIS_EXPORTS CommandCode final
-{
-public:
-    const static std::string ExclusizeDatabaseLock;
-    const static std::string RecordList;
-    const static std::string ServerInfo;
-    const static std::string DatabaseStat;
-    const static std::string FormatIsoGroup;
-    const static std::string UnknownCommand4;
-    const static std::string GlobalConnection;
-    const static std::string SaveRecordGroup;
-    const static std::string Print;
-    const static std::string UpdateIniFile;
-    const static std::string ImportIso;
-    const static std::string RegisterClient;
-    const static std::string UnregisterClient;
-    const static std::string ReadRecord;
-    const static std::string UpdateRecord;
-    const static std::string UnlockRecord;
-    const static std::string ActualizeRecord;
-    const static std::string FormatRecord;
-    const static std::string ReadTerms;
-    const static std::string ReadPostings;
-    const static std::string CorrectVirtualRecord;
-    const static std::string Search;
-    const static std::string ReadDocument;
-    const static std::string Backup;
-    const static std::string Nop;
-    const static std::string GetMaxMfn;
-    const static std::string ReadTermsReverse;
-    const static std::string UnlockRecords;
-    const static std::string FullTextSearch;
-    const static std::string EmptyDatabase;
-    const static std::string CreateDatabase;
-    const static std::string UnlockDatabase;
-    const static std::string GetRecordPostings;
-    const static std::string DeleteDatabase;
-    const static std::string ReloadMasterFile;
-    const static std::string ReloadDictionary;
-    const static std::string CreateDictionary;
-    const static std::string GetServerStat;
-    const static std::string UnknownCommandPlus2;
-    const static std::string GetProcessList;
-    const static std::string UnknownCommandPlus4;
-    const static std::string UnknownCommandPlus5;
-    const static std::string UnknownCommandPlus6;
-    const static std::string SetUserList;
-    const static std::string RestartServer;
-    const static std::string GetUserList;
-    const static std::string ListFiles;
 };
 
 //=========================================================
@@ -499,6 +607,40 @@ public:
 
 //=========================================================
 
+enum IrbisPath
+{
+    System = 0,
+    Data = 1,
+    MasterFile = 2,
+    InvertedFile = 3,
+    ParameterFile = 10,
+    FullText = 11,
+    InternalResource = 12
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS FileSpecification final
+{
+public:
+    bool binaryFile { false };
+    int path { 0 };
+    std::wstring database;
+    std::wstring filename;
+    std::wstring content;
+
+    FileSpecification() = default;
+    FileSpecification(int path, const std::wstring &filename);
+    FileSpecification(int path, const std::wstring &database, const std::wstring &filename);
+
+    static FileSpecification parse(const std::wstring &text);
+    bool verify(bool throwException) const;
+
+    std::wstring toString() const;
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS Version final
 {
 public:
@@ -532,7 +674,10 @@ public:
 
     Connection();
     Connection(const Connection&) = delete;
+    Connection(Connection&&) = delete;
     Connection& operator=(const Connection&) = delete;
+    Connection& operator=(Connection&&) = delete;
+    ~Connection();
 
     bool actualizeRecord(const std::wstring &database, int mfn);
     bool connect();
@@ -593,8 +738,10 @@ class PLUSIRBIS_EXPORTS ConnectionFactory
 {
 public:
     ConnectionFactory() = default;
-    ConnectionFactory(const ConnectionFactory &other) = delete;
+    ConnectionFactory(const ConnectionFactory &) = delete;
+    ConnectionFactory(ConnectionFactory&&) = delete;
     ConnectionFactory& operator=(const ConnectionFactory&) = delete;
+    ConnectionFactory& operator=(ConnectionFactory&&) = delete;
     virtual ~ConnectionFactory() = default;
 
     virtual Connection* GetConnection();
@@ -681,14 +828,16 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NetworkException : public BaseException
+class PLUSIRBIS_EXPORTS NetworkException
+    : public BaseException
 {
 public:
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NotImplementedException : public BaseException
+class PLUSIRBIS_EXPORTS NotImplementedException
+    : public BaseException
 {
 public:
 };
@@ -698,13 +847,17 @@ public:
 class PLUSIRBIS_EXPORTS RawRecord final
 {
 public:
-    int mfn = 0;
-    int status = 0;
-    int version = 0;
-    std::list<std::wstring> fields;
+    int mfn { 0 };
+    unsigned int status { 0 };
+    unsigned int version { 0 };
+    StringList fields;
     std::wstring database;
 
     friend std::wostream& operator << (std::wostream &stream, const RawRecord &record);
+
+    std::wstring encode(const std::wstring &delimiter) const;
+    void parseSingle(const StringList &lines);
+    std::wstring to_wstring() const;
 };
 
 //=========================================================
@@ -725,7 +878,8 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS Tcp4Socket final : public ClientSocket
+class PLUSIRBIS_EXPORTS Tcp4Socket final
+    : public ClientSocket
 {
 private:
     void *_impl;
@@ -734,7 +888,7 @@ public:
     explicit Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
     Tcp4Socket(const Tcp4Socket&) = delete;
     Tcp4Socket& operator=(const Tcp4Socket&) = delete;
-    ~Tcp4Socket() final;
+    ~Tcp4Socket();
 
     void open() override;
     void close() override;

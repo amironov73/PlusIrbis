@@ -33,6 +33,7 @@ ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
         }
         _write(buffer, received);
     }
+    socket.close();
 
     // decode the response
     command = readAnsi();
@@ -108,9 +109,16 @@ std::string ServerResponse::getRemaining()
     const auto size = _content.size();
     if (_position < size)
     {
-        const auto data = _content.data();
-        const auto remaining = size - _position;
-        const std::string s2(data[_position], remaining);
+        const auto data = reinterpret_cast<const char*>(_content.data() + _position);
+        int remaining = static_cast<int>(size - _position);
+        while (remaining > 0) {
+            const auto c = data[remaining-1];
+            if (c != '\r' && c != '\n') {
+                break;
+            }
+            remaining--;
+        }
+        const std::string s2(data, remaining);
         result = s2;
         _position = size;
     }
@@ -136,7 +144,7 @@ int ServerResponse::readInteger()
     return std::stoi(line);
 }
 
-std::vector<std::wstring> ServerResponse::readRemainingAnsiLines()
+StringList ServerResponse::readRemainingAnsiLines()
 {
     const auto text = readRemainingAnsiText();
     return split(text, '\n');
@@ -148,10 +156,22 @@ std::wstring ServerResponse::readRemainingAnsiText()
     return cp1251_to_unicode(line);
 }
 
-std::vector<std::wstring> ServerResponse::readRemainingUtfLines()
+StringList ServerResponse::readRemainingUtfLines()
 {
-    const auto text = readRemainingUtfText();
-    return split(text, '\n');
+    //const auto text = readRemainingUtfText();
+    //return split(text, '\n');
+
+    StringList result;
+    while (true) {
+        auto line = readUtf();
+        if (line.empty()){
+            break;
+        }
+
+        result.push_back(line);
+    }
+
+    return result;
 }
 
 std::wstring ServerResponse::readRemainingUtfText()

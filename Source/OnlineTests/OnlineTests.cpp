@@ -5,6 +5,8 @@
 
 int main()
 {
+    setlocale(LC_ALL, ""); // for cyrillic output
+
     irbis::Connection connection;
     connection.host = L"localhost";
     connection.port = 6666;
@@ -20,10 +22,16 @@ int main()
     std::wcout << L"max MFN: " << maxMfn << std::endl;
 
     connection.noOp();
-    std::wcout << "NOOP" << std::endl;
+    std::wcout << L"NOOP" << std::endl;
+
+    const auto formatted = connection.formatRecord(L"@brief", 1);
+    std::wcout << L"FORMAT: " << formatted << std::endl;
+
+    const auto record = connection.readRawRecord(L"", 1);
+    std::wcout << L"READ RAW:" << std::endl << record.encode(L"\n") << std::endl;
 
     connection.disconnect();
-    std::wcout << "disconnected" << std::endl;
+    std::wcout << L"disconnected" << std::endl;
 
     return 0;
 }
