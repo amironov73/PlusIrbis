@@ -1,8 +1,9 @@
-﻿#include "stdafx.h"
-#include "CppUnitTest.h"
+﻿#include "tests.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace irbis;
+
+// ReSharper disable StringLiteralTypo
 
 namespace OfflineTests
 {
@@ -12,13 +13,13 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_1)
         {
-            SubField sub;
+            const SubField sub;
             Assert::IsTrue(sub.empty());
         }
 
         TEST_METHOD(constructor_2)
         {
-            SubField sub{'a'};
+            const SubField sub{'a', nullptr};
             Assert::IsTrue(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.wstr() == L"^a");
@@ -26,7 +27,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_3)
         {
-            SubField sub{'a', L"SubfieldA"};
+            const SubField sub{'a', L"SubfieldA"};
             Assert::IsFalse(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.value == L"SubfieldA");
@@ -35,19 +36,19 @@ namespace OfflineTests
 
         TEST_METHOD(verify_1)
         {
-            SubField sub;
+            const SubField sub;
             Assert::IsFalse(sub.verify(false));
         }
 
         TEST_METHOD(verify_2)
         {
-            SubField sub{'a'};
+            const SubField sub{'a', nullptr};
             Assert::IsFalse(sub.verify(false));
         }
 
         TEST_METHOD(verify_3)
         {
-            SubField sub{'a', L"SubA"};
+            const SubField sub{'a', L"SubA"};
             Assert::IsTrue(sub.verify(false));
         }
 

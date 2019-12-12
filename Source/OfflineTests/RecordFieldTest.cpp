@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "CppUnitTest.h"
+﻿#include "tests.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace irbis;
@@ -12,14 +11,14 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_1)
         {
-            RecordField field;
+            const RecordField field;
             Assert::IsTrue(field.empty());
             Assert::IsTrue(field.subfields.empty());
         }
 
         TEST_METHOD(constructor_2)
         {
-            RecordField field{100};
+            const RecordField field{100};
             Assert::IsTrue(field.empty());
             Assert::IsTrue(field.subfields.empty());
             Assert::IsTrue(field.tag == 100);
@@ -27,7 +26,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_3)
         {
-            RecordField field{100, L"Field100"};
+            const RecordField field{100, L"Field100"};
             Assert::IsFalse(field.empty());
             Assert::IsTrue(field.tag == 100);
             Assert::IsTrue(field.value == L"Field100");
@@ -47,19 +46,19 @@ namespace OfflineTests
 
         TEST_METHOD(verify_1)
         {
-            RecordField field;
+            const RecordField field;
             Assert::IsFalse(field.verify(false));
         }
 
         TEST_METHOD(verify_2)
         {
-            RecordField field{100};
+            const RecordField field{100};
             Assert::IsFalse(field.verify(false));
         }
 
         TEST_METHOD(verify_3)
         {
-            RecordField field{100, L"Field100"};
+            const RecordField field{100, L"Field100"};
             Assert::IsTrue(field.verify(false));
         }
 

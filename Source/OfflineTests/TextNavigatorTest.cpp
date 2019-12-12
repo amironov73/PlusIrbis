@@ -1,5 +1,4 @@
-#include "stdafx.h"
-#include "CppUnitTest.h"
+#include "tests.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace irbis;
@@ -12,8 +11,8 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_1)
         {
-            std::wstring hello = L"Hello, world!";
-            TextNavigator navigator(hello);
+            const std::wstring hello = L"Hello, world!";
+            const TextNavigator navigator(hello);
             Assert::IsFalse(navigator.eot());
             Assert::AreEqual(navigator.line(), size_t(1));
             Assert::AreEqual(navigator.column(), size_t(1));
@@ -23,9 +22,9 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_2)
         {
-            std::wstring hello = L"Hello, world!";
-            TextNavigator navigator1(hello);
-            TextNavigator navigator2(navigator1);
+            const std::wstring hello = L"Hello, world!";
+            const TextNavigator navigator1(hello);
+            const TextNavigator navigator2(navigator1);  // NOLINT(performance-unnecessary-copy-initialization)
             Assert::AreEqual(navigator2.line(), size_t(1));
             Assert::AreEqual(navigator2.column(), size_t(1));
             Assert::AreEqual(navigator2.position(), size_t(0));
@@ -34,8 +33,8 @@ namespace OfflineTests
 
         TEST_METHOD(at_1)
         {
-            std::wstring hello = L"Hello, world!";
-            TextNavigator navigator(hello);
+            const std::wstring hello = L"Hello, world!";
+            const TextNavigator navigator(hello);
             Assert::AreEqual(navigator.at(0), L'H');
             Assert::AreEqual(navigator.at(-1), TextNavigator::EOT);
             Assert::AreEqual(navigator.at(100), TextNavigator::EOT);

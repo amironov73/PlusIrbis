@@ -1,5 +1,7 @@
 version: 1.0.{build}
-configuration: Debug
+configuration:
+  - Debug
+  - Release
 platform: x64
 image: Visual Studio 2017
 
@@ -7,5 +9,5 @@ build:
   project: Source\PlusIrbis.sln
 
 artifacts:
-  - path: Source\x64\Debug
+  - path: Source\x64
     name: Binaries

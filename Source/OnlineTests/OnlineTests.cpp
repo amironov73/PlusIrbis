@@ -1,7 +1,11 @@
-#include "pch.h"
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+#include "../irbis/irbis.h"
+
 #include <iostream>
 
-#include "stdafx.h"
+#pragma comment (lib, "irbis.lib")
 
 int main()
 {
@@ -27,12 +31,13 @@ int main()
     const auto formatted = connection.formatRecord(L"@brief", 1);
     std::wcout << L"FORMAT: " << formatted << std::endl;
 
-    const auto record = connection.readRawRecord(L"", 1);
-    std::wcout << L"READ RAW:" << std::endl << record.encode(L"\n") << std::endl;
+    const auto record = connection.readRawRecord(1);
+    std::wcout << L"READ RAW:" << std::endl << record << std::endl;
 
     connection.disconnect();
     std::wcout << L"disconnected" << std::endl;
 
     return 0;
 }
+
 

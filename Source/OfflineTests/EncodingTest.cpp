@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "CppUnitTest.h"
+﻿#include "tests.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace irbis;

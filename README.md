@@ -2,10 +2,11 @@
 
 ManagedClient ported to plain C++14. Currently supported:
 
-* 32- and 64-bit Windows;
+* 32-bit and 64-bit Windows;
 * MSVS 2017 Community Edition;
-* 32- and 64-bit Linux;
+* 32-bit and 64-bit Linux;
 * GCC 7;
+* Clang
 
 ### Links
 
@@ -18,3 +19,4 @@ ManagedClient ported to plain C++14. Currently supported:
 
 [![Issues](https://img.shields.io/github/issues/amironov73/PlusIrbis.svg)](https://github.com/amironov73/PlusIrbis/issues)
 [![Build status](https://img.shields.io/appveyor/ci/AlexeyMironov/plusirbis.svg)](https://ci.appveyor.com/project/AlexeyMironov/plusirbis/)
+[![Build status](https://api.travis-ci.org/amironov73/PlusIrbis.svg)](https://travis-ci.org/amironov73/PlusIrbis/)

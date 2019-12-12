@@ -1,5 +1,4 @@
-﻿#include "stdafx.h"
-#include "CppUnitTest.h"
+﻿#include "tests.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace irbis;
@@ -12,7 +11,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_1)
         {
-            MarcRecord record;
+            const MarcRecord record;
             Assert::AreEqual(record.mfn, 0);
             Assert::AreEqual(record.status, 0);
             Assert::AreEqual(record.version, 0);
