@@ -171,7 +171,7 @@ std::wstring Connection::formatRecord(const std::wstring &format, MarcRecord &re
         return L"";
     }
 
-    auto prepared = prepareFormat(format);
+    const auto prepared = prepareFormat(format);
     ClientQuery query (*this, "G");
     query.addAnsi(database).newLine()
             .addAnsi(prepared).newLine()
@@ -319,7 +319,6 @@ std::vector<UserInfo> Connection::getUserList()
 
     if (!connected()) {
         return result;
-
     }
 
     return result;
@@ -338,12 +337,50 @@ bool Connection::noOp()
 
 void Connection::parseConnectionString(const std::wstring &connectionString)
 {
-    throw NotImplementedException();
+    StringList items = split(connectionString, L";");
+    for (const auto item : items) {
+        StringList parts = maxSplit(item, '=', 2);
+        if (parts.size() != 2) {
+            throw IrbisException();
+        }
+        const auto name = toLower(parts[0]);
+        const auto value = parts[1];
+        if (name.empty() || value.empty()) {
+            throw IrbisException();
+        }
+
+        if (name == L"host" || name == L"server" || name == L"address") {
+            host = value;
+        }
+        else if (name == L"port") {
+            port = fastParse32(value);
+        }
+        else if (name == L"user" || name == L"username"
+                 || name == L"name" || name == L"login") {
+            username = value;
+        }
+        else if (name == L"pwd" || name == L"password") {
+            password = value;
+        }
+        else if (name == L"db" || name == L"catalog" || name == L"database") {
+            database = value;
+        }
+        else if (name == L"arm" || name == L"workstation") {
+            workstation = value.at(0);
+        }
+        else {
+            throw IrbisException();
+        }
+    }
 }
 
 std::wstring Connection::popDatabase()
 {
-    throw NotImplementedException();
+    const auto result = database;
+    database = _databaseStack.back();
+    _databaseStack.pop_back();
+
+    return result;
 }
 
 std::wstring Connection::printTable(const TableDefinition &definition)
@@ -353,7 +390,11 @@ std::wstring Connection::printTable(const TableDefinition &definition)
 
 std::wstring Connection::pushDatabase(const std::wstring &newDatabase)
 {
-    throw NotImplementedException();
+    const auto result = database;
+    _databaseStack.push_back(newDatabase);
+    database = newDatabase;
+
+    return result;
 }
 
 std::vector<BYTE> Connection::readBinaryFile(const FileSpecification &specification)
@@ -492,7 +533,9 @@ bool Connection::reloadDictionary(const std::wstring &databaseName)
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "Y");
+    query.addAnsi(databaseName);
+    return execute(query);
 }
 
 bool Connection::reloadMasterFile(const std::wstring &databaseName)
@@ -501,7 +544,9 @@ bool Connection::reloadMasterFile(const std::wstring &databaseName)
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "X");
+    query.addAnsi(databaseName);
+    return execute(query);
 }
 
 bool Connection::restartServer()
@@ -510,23 +555,28 @@ bool Connection::restartServer()
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "+8");
+    return execute(query);
 }
 
 std::wstring Connection::requireTextFile(const FileSpecification &specification)
 {
-    throw NotImplementedException();
+    auto result = readTextFile(specification);
+    if (result.empty()) {
+        throw FileNotFoundException(specification.toString());
+    }
+    return result;
 }
 
 MfnList Connection::search(const std::wstring &expression)
 {
-    MfnList result;
+    SearchParameters parameters;
+    parameters.database = database;
+    parameters.searchExpression = expression;
+    parameters.numberOfRecords = 0;
+    parameters.firstRecord = 1;
 
-    if (!connected()) {
-        return result;
-    }
-
-    return result;
+    return search(parameters);
 }
 
 MfnList Connection::search(const SearchParameters &parameters)
@@ -537,12 +587,40 @@ MfnList Connection::search(const SearchParameters &parameters)
         return result;
     }
 
+    const auto &databaseName = iif(parameters.database, database);
+    ClientQuery query (*this, "K");
+    query.addAnsi(databaseName).newLine()
+            .addUtf(parameters.searchExpression).newLine()
+            .add(parameters.numberOfRecords).newLine()
+            .add(parameters.firstRecord).newLine()
+            .addAnsi(parameters.formatSpecification).newLine()
+            .add(parameters.minMfn).newLine()
+            .add(parameters.maxMfn).newLine()
+            .addAnsi(parameters.sequentialSpecification);
+
+    ServerResponse response (*this, query);
+    response.checkReturnCode();
+    const auto expected = response.readInteger();
+    const auto batchSize = std::min(expected, 32000); // MAXPACKET
+    for (int i = 0; i < batchSize; i++) {
+        const auto line = response.readAnsi();
+        StringList parts = maxSplit(line, L'#', 2);
+        const auto mfn = fastParse32(parts[0]);
+        result.push_back(mfn);
+    }
+
     return result;
 }
 
-std::wstring Connection::toConnectionString()
+std::wstring Connection::toConnectionString() const
 {
-    throw NotImplementedException();
+    return std::wstring(L"host=") + host
+           + L";port=" + std::to_wstring(port)
+           + L";username=" + username
+           + L";password=" + password
+           + L";database" + database
+           + L";arm=" + workstation
+           + L";";
 }
 
 bool Connection::truncateDatabase(const std::wstring &databaseName)
@@ -551,7 +629,9 @@ bool Connection::truncateDatabase(const std::wstring &databaseName)
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "T");
+    query.addAnsi(databaseName);
+    return execute(query);
 }
 
 bool Connection::unlockDatabase(const std::wstring &databaseName)
@@ -560,25 +640,38 @@ bool Connection::unlockDatabase(const std::wstring &databaseName)
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "U");
+    query.addAnsi(databaseName);
+    return execute(query);
 }
 
-bool Connection::unlockRecords(const std::wstring &databaseName, const std::vector<int> &mfnList)
+bool Connection::unlockRecords(const std::wstring &databaseName, const MfnList &mfnList)
 {
     if (!connected()) {
         return false;
     }
 
-    return false;
+    ClientQuery query (*this, "Q");
+    query.addAnsi(databaseName).newLine();
+    for (const auto mfn : mfnList) {
+        query.add(mfn).newLine();
+    }
+
+    return execute(query);
 }
 
-bool Connection::updateIniFile(std::vector<std::wstring> &lines)
+bool Connection::updateIniFile(StringList &lines)
 {
     if (!connected()) {
         return false;
     }
 
-    return false;
+    ClientQuery query(*this, "8");
+    for (const auto &line : lines) {
+        query.addAnsi(line).newLine();
+    }
+
+    return execute(query);
 }
 
 int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)

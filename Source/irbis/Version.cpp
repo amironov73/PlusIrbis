@@ -7,7 +7,17 @@ namespace irbis {
 
 void Version::parse(ServerResponse &response)
 {
-    throw NotImplementedException();
+    const auto lines = response.readRemainingAnsiLines();
+    if (lines.size() == 3) {
+        this->version = lines[0];
+        this->connectedClients = fastParse32(lines[1]);
+        this->maxClients = fastParse32(lines[2]);
+    } else {
+        this->organization = lines[0];
+        this->version = lines[1];
+        this->connectedClients = fastParse32(lines[2]);
+        this->maxClients = fastParse32(lines[3]);
+    }
 }
 
 std::wstring Version::to_wstring() const
@@ -17,6 +27,5 @@ std::wstring Version::to_wstring() const
         L", maxClients=" + std::to_wstring(maxClients) +
         L", connectedClients=" + std::to_wstring(connectedClients);
 }
-
 
 }

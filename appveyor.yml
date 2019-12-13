@@ -1,7 +1,9 @@
 version: 1.0.{build}
 configuration:
   - Debug
+  - DebugDll
   - Release
+  - ReleaseDll
 platform: x64
 image: Visual Studio 2017
 

@@ -41,7 +41,7 @@ FileSpecification FileSpecification::parse(const std::wstring &text)
     result.path = path;
     result.database = database;
     result.filename = fileName;
-    result.content = content;
+    result.content = content; //-V820
 
     return result;
 }

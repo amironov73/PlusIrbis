@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+// ReSharper disable StringLiteralTypo
+
 #pragma comment (lib, "irbis.lib")
 
 int main()
@@ -33,6 +35,13 @@ int main()
 
     const auto record = connection.readRawRecord(1);
     std::wcout << L"READ RAW:" << std::endl << record << std::endl;
+
+    irbis::MfnList found = connection.search(L"K=бетон");
+    std::wcout << L"SEARCH:";
+    for (auto mfn : found) {
+        std::wcout << L" " << std::to_wstring(mfn);
+    }
+    std::wcout << std::endl;
 
     connection.disconnect();
     std::wcout << L"disconnected" << std::endl;

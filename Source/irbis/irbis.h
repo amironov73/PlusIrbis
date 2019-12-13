@@ -278,6 +278,7 @@ class PLUSIRBIS_EXPORTS Connection final
 {
 private:
     bool _connected;
+    StringList _databaseStack;
 
 public:
     std::wstring host;
@@ -341,11 +342,11 @@ public:
     std::wstring requireTextFile(const FileSpecification &specification);
     MfnList search(const std::wstring &expression);
     MfnList search(const SearchParameters &parameters);
-    std::wstring toConnectionString();
+    std::wstring toConnectionString() const;
     bool truncateDatabase(const std::wstring &databaseName);
     bool unlockDatabase(const std::wstring &databaseName);
-    bool unlockRecords(const std::wstring &databaseName, const std::vector<int> &mfnList);
-    bool updateIniFile(std::vector<std::wstring> &lines);
+    bool unlockRecords(const std::wstring &databaseName, const MfnList &mfnList);
+    bool updateIniFile(StringList &lines);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile(const FileSpecification &specification);
 };
@@ -463,6 +464,21 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS FileNotFoundException
+        : public IrbisException
+{
+    std::wstring _fileName;
+
+public:
+
+    explicit FileNotFoundException(const std::wstring& fileName)  // NOLINT(modernize-pass-by-value)
+        : _fileName(fileName)
+    {
+    }
+};
+
+//=========================================================
+
 enum IrbisPath
 {
     System = 0,
@@ -513,7 +529,7 @@ public:
     bool deleted() const;
     bool verify(bool throwOnError) const;
 
-    friend std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
+    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
 };
 
 //=========================================================
@@ -643,7 +659,7 @@ public:
     StringList fields;
     std::wstring database;
 
-    friend std::wostream& operator << (std::wostream &stream, const RawRecord &record);
+    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record);
 
     std::wstring encode(const std::wstring &delimiter) const;
     void parseSingle(const StringList &lines);
@@ -667,7 +683,7 @@ public:
     bool verify(bool throwOnError) const;
     std::wstring wstr() const;
 
-    friend std::wostream& operator << (std::wostream &stream, const RecordField &field);
+    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
 
 //=========================================================
@@ -782,7 +798,7 @@ public:
     bool verify(bool throwOnError) const;
     std::wstring wstr() const;
 
-    friend std::wostream& operator << (std::wostream &stream, const SubField &subfield);
+    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
 
 //=========================================================
@@ -814,7 +830,7 @@ public:
     Tcp4Socket(Tcp4Socket &&) = delete;
     Tcp4Socket& operator = (const Tcp4Socket &) = delete;
     Tcp4Socket& operator = (Tcp4Socket &&) = delete;
-    ~Tcp4Socket();
+    ~Tcp4Socket() override;
 
     void open() override;
     void close() override;
@@ -937,10 +953,10 @@ public:
 class PLUSIRBIS_EXPORTS Version final
 {
 public:
-    std::wstring organization; // íà êîãî ïðèîáðåòåí
-    std::wstring version; // ñîáñòâåííî âåðñèÿ, íàïðèìåð, 64.2008.1
-    int maxClients { 0 }; // ìàêñèìàëüíîå êîëè÷åñòâî ïîäêëþ÷åíèé
-    int connectedClients { 0 }; // òåêóùåå êîëè÷åñòâî ïîäêëþ÷åíèé
+    std::wstring organization; // Ð½Ð° ÐºÐ¾Ð³Ð¾ Ð¿Ñ€Ð¸Ð¾Ð±Ñ€ÐµÑ‚ÐµÐ½
+    std::wstring version; // ÑÐ¾Ð±ÑÑ‚Ð²ÐµÐ½Ð½Ð¾ Ð²ÐµÑ€ÑÐ¸Ñ, Ð½Ð°Ð¿Ñ€Ð¸Ð¼ÐµÑ€, 64.2008.1
+    int maxClients { 0 }; // Ð¼Ð°ÐºÑÐ¸Ð¼Ð°Ð»ÑŒÐ½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
+    int connectedClients { 0 }; // Ñ‚ÐµÐºÑƒÑ‰ÐµÐµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ð¾Ð´ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ð¹
 
     void parse(ServerResponse &response);
     std::wstring to_wstring() const;
@@ -952,6 +968,9 @@ public:
 
 bool PLUSIRBIS_EXPORTS sameChar(wchar_t first, wchar_t second);
 bool PLUSIRBIS_EXPORTS sameString(const std::wstring &first, const std::wstring &second);
+
+std::wstring PLUSIRBIS_EXPORTS toLower(std::wstring &text);
+std::wstring PLUSIRBIS_EXPORTS toUpper(std::wstring &text);
 
 bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fragment);
 
@@ -990,8 +1009,8 @@ PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
 PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
 PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);
 
-std::wstring removeComments(const std::wstring &text);
-std::wstring prepareFormat(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::wstring removeComments(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::wstring prepareFormat(const std::wstring &text);
 
 }
 

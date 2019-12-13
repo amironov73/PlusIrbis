@@ -7,18 +7,18 @@
 #include <sstream>
 
 //========================================================
-// Разнообразные утилиты, применяемые в проекте.
+// РЈС‚РёР»РёС‚С‹, РёСЃРїРѕР»СЊР·СѓРµРјС‹Рµ РІ РїСЂРѕРµРєС‚Рµ.
 //========================================================
 
 namespace irbis {
 
-// Сравнение двух символов с точностью до регистра.
+// РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… СЃРёРјРІРѕР»РѕРІ СЃ С‚РѕС‡РЅРѕСЃС‚СЊСЋ РґРѕ СЂРµРіРёСЃС‚СЂР°.
 bool sameChar(wchar_t first, wchar_t second)
 {
     return towupper(first) == towupper(second);
 }
 
-// Сравнение двух строк с точностью до регистра.
+// РЎСЂР°РІРЅРµРЅРёРµ РґРІСѓС… СЃС‚СЂРѕРє СЃ С‚РѕС‡РЅРѕСЃС‚СЊСЋ РґРѕ СЂРµРіРёСЃС‚СЂР° СЃРёРјРІРѕР»РѕРІ.
 bool sameString(const std::wstring &first, const std::wstring &second)
 {
     return std::equal(std::begin(first), std::end(first),
@@ -26,13 +26,33 @@ bool sameString(const std::wstring &first, const std::wstring &second)
         [] (wchar_t a, wchar_t b) { return towupper(a) == towupper(b); });
 }
 
-// Содержит ли строка указанную подстроку?
+// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё Рє РЅРёР¶РЅРµРјСѓ СЂРµРіРёСЃС‚СЂСѓ.
+std::wstring toLower(std::wstring &text)
+{
+    for (size_t i = 0; i < text.size(); i++ ) {
+        text[i] = tolower(text.at(i));
+    }
+
+    return text;
+}
+
+// РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ СЃС‚СЂРѕРєРё Рє РІРµСЂС…РЅРµРјСѓ СЂРµРіРёСЃС‚СЂСѓ.
+std::wstring toUpper(std::wstring &text)
+{
+    for (size_t i = 0; i < text.size(); i++ ) {
+        text[i] = toupper(text.at(i));
+    }
+
+    return text;
+}
+
+// РЎРѕРґРµСЂР¶РёС‚ Р»Рё СЃС‚СЂРѕРєР° Р·Р°РґР°РЅРЅСѓСЋ РїРѕРґСЃС‚СЂРѕРєСѓ?
 bool contains(const std::wstring &text, const std::wstring &fragment)
 {
     return text.find(fragment) != std::string::npos;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+// Р‘С‹СЃС‚СЂС‹Р№ Рё РіСЂСЏР·РЅС‹Р№ СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РєР°Рє С†РµР»РѕРіРѕ С‡РёСЃР»Р° Р±РµР· Р·РЅР°РєР°.
 int fastParse32(const std::wstring &text)
 {
     auto result = 0;
@@ -44,7 +64,7 @@ int fastParse32(const std::wstring &text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+// Р‘С‹СЃС‚СЂС‹Р№ Рё РіСЂСЏР·РЅС‹Р№ СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РєР°Рє С†РµР»РѕРіРѕ С‡РёСЃР»Р° Р±РµР· Р·РЅР°РєР°.
 int fastParse32(const wchar_t *text)
 {
     auto result = 0;
@@ -56,7 +76,7 @@ int fastParse32(const wchar_t *text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+// Р‘С‹СЃС‚СЂС‹Р№ Рё РіСЂСЏР·РЅС‹Р№ СЂР°Р·Р±РѕСЂ СЃС‚СЂРѕРєРё РєР°Рє С†РµР»РѕРіРѕ С‡РёСЃР»Р° Р±РµР· Р·РЅР°РєР°.
 int fastParse32(const wchar_t *text, int length)
 {
     auto result = 0;

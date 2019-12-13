@@ -7,7 +7,7 @@
 
 namespace irbis {
 
-const wchar_t TextNavigator::EOT = '\0';
+const wchar_t TextNavigator::EOT = L'\0';
 
 TextNavigator::TextNavigator(const std::wstring &text)
     : _text(text)
