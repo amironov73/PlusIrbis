@@ -6,6 +6,10 @@
 #include <algorithm>
 #include <cstring>
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4068)
+#endif
+
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace irbis {

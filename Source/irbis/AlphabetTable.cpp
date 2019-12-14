@@ -3,6 +3,10 @@
 
 #include "irbis.h"
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4068)
+#endif
+
 // ReSharper disable StringLiteralTypo
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"

@@ -48,7 +48,7 @@ void ChunkedBuffer::_appendChunk() {
     _position = 0;
 }
 
-constexpr bool ChunkedBuffer::eof() const {
+bool ChunkedBuffer::eof() const {
     if (!_current) {
         return true;
     }

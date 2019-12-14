@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+п»ї// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "../irbis/irbis.h"
@@ -14,7 +14,7 @@ int main()
     setlocale(LC_ALL, ""); // for cyrillic output
 
     irbis::Connection connection;
-    connection.host = L"localhost";
+    connection.host = L"192.168.1.35";
     connection.port = 6666;
     connection.username = L"librarian";
     connection.password = L"secret";
@@ -23,6 +23,9 @@ int main()
     if (!isConnected) {
         return -1;
     }
+
+    const auto version = connection.getServerVersion();
+    std::wcout << L"Version: " << version.version << std::endl;
 
     const auto maxMfn = connection.getMaxMfn(L"IBIS");
     std::wcout << L"max MFN: " << maxMfn << std::endl;
@@ -36,7 +39,7 @@ int main()
     const auto record = connection.readRawRecord(1);
     std::wcout << L"READ RAW:" << std::endl << record << std::endl;
 
-    irbis::MfnList found = connection.search(L"K=бетон");
+    irbis::MfnList found = connection.search(L"K=Р±РµС‚РѕРЅ");
     std::wcout << L"SEARCH:";
     for (auto mfn : found) {
         std::wcout << L" " << std::to_wstring(mfn);

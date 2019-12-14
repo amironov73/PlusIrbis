@@ -3,10 +3,61 @@
 ManagedClient ported to plain C++14. Currently supported:
 
 * 32-bit and 64-bit Windows;
-* MSVS 2017 Community Edition;
+* MSVS 2017/2019 Community Edition;
 * 32-bit and 64-bit Linux;
-* GCC 7;
+* MacOS X 10.14;
+* GCC 7 and higher;
 * Clang
+
+### Example
+
+```c++
+#include "irbis.h"
+#include <iostream>
+
+#pragma comment (lib, "irbis.lib")
+
+int main()
+{
+    setlocale(LC_ALL, ""); // for cyrillic output
+
+    irbis::Connection connection;
+    connection.host = L"192.168.1.35";
+    connection.port = 6666;
+    connection.username = L"librarian";
+    connection.password = L"secret";
+
+    const auto isConnected = connection.connect();
+    std::wcout << L"connected: " << isConnected << std::endl;
+    if (!isConnected) {
+        return -1;
+    }
+
+    const auto version = connection.getServerVersion();
+    std::wcout << L"Version: " << version.version << std::endl;
+
+    const auto maxMfn = connection.getMaxMfn(L"IBIS");
+    std::wcout << L"max MFN: " << maxMfn << std::endl;
+
+    const auto formatted = connection.formatRecord(L"@brief", 1);
+    std::wcout << L"FORMAT: " << formatted << std::endl;
+
+    const auto record = connection.readRawRecord(1);
+    std::wcout << L"READ RAW:" << std::endl << record << std::endl;
+
+    irbis::MfnList found = connection.search(L"K=бетон");
+    std::wcout << L"SEARCH:";
+    for (auto mfn : found) {
+        std::wcout << L" " << std::to_wstring(mfn);
+    }
+    std::wcout << std::endl;
+
+    connection.disconnect();
+    std::wcout << L"disconnected" << std::endl;
+
+    return 0;
+}
+```
 
 ### Links
 

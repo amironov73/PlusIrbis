@@ -195,7 +195,7 @@ public:
     ChunkedBuffer operator = (ChunkedBuffer &&) = delete;
     ~ChunkedBuffer();
 
-    constexpr bool eof() const;
+    bool eof() const;
     int peek();
     size_t read(char *buffer, size_t offset, size_t count);
     int readByte();
@@ -282,7 +282,7 @@ private:
 
 public:
     std::wstring host;
-    int port;
+    short port;
     std::wstring username;
     std::wstring password;
     std::wstring database;
@@ -889,11 +889,11 @@ public:
     TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
 
-    constexpr size_t column() const { return _column; }
-    constexpr size_t line() const { return _line; }
-    constexpr size_t length() const { return _length; }
-    constexpr size_t position() const { return _position; }
-    constexpr bool eot() const { return _position >= _length; }
+    size_t column() const { return _column; }
+    size_t line() const { return _line; }
+    size_t length() const { return _length; }
+    size_t position() const { return _position; }
+    bool eot() const { return _position >= _length; }
 
     wchar_t at(size_t position) const;
     wchar_t front() const;

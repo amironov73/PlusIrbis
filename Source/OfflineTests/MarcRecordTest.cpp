@@ -12,9 +12,9 @@ namespace OfflineTests
         TEST_METHOD(constructor_1)
         {
             const MarcRecord record;
-            Assert::AreEqual(record.mfn, 0);
-            Assert::AreEqual(record.status, 0);
-            Assert::AreEqual(record.version, 0);
+            Assert::AreEqual(record.mfn, 0u);
+            Assert::AreEqual(record.status, 0u);
+            Assert::AreEqual(record.version, 0u);
             Assert::IsTrue(record.database.empty());
             Assert::IsTrue(record.fields.empty());
         }

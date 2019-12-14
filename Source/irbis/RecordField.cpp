@@ -3,6 +3,12 @@
 
 #include "irbis.h"
 
+#include <iomanip>
+
+#if defined(_MSC_VER)
+#pragma warning(disable: 4068)
+#endif
+
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace irbis {
@@ -66,8 +72,7 @@ std::wstring RecordField::wstr() const
 PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field)
 {
     stream << std::to_wstring(field.tag) << std::wstring(L"#") << field.value;
-    for (const SubField &sub : field.subfields)
-    {
+    for (const auto &sub : field.subfields) {
         stream << sub;
     }
 
