@@ -3,12 +3,15 @@
 
 #include "irbis.h"
 
+#include <iomanip>
+
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 MarcRecord& MarcRecord::add(wchar_t code, const std::wstring &value)
 {
     fields.push_back({code, value});
-
     return *this;
 }
 
@@ -38,8 +41,7 @@ PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcR
     stream << std::to_wstring(record.mfn) << std::wstring(L"#")
         << std::to_wstring(record.status) << std::endl;
     stream << std::wstring(L"0#") << record.version << std::endl;
-    for (const RecordField &field : record.fields)
-    {
+    for (const RecordField &field : record.fields) {
         stream << field << std::endl;
     }
 

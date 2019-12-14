@@ -21,16 +21,15 @@ bool sameChar(wchar_t first, wchar_t second)
 // Сравнение двух строк с точностью до регистра символов.
 bool sameString(const std::wstring &first, const std::wstring &second)
 {
-    return std::equal(std::begin(first), std::end(first),
-        std::begin(second), std::end(second),
+    return std::equal(first.begin(), first.end(), second.begin(), second.end(),
         [] (wchar_t a, wchar_t b) { return towupper(a) == towupper(b); });
 }
 
 // Преобразование строки к нижнему регистру.
 std::wstring toLower(std::wstring &text)
 {
-    for (size_t i = 0; i < text.size(); i++ ) {
-        text[i] = tolower(text.at(i));
+    for (wchar_t &i : text) {
+        i = tolower(i);
     }
 
     return text;
@@ -39,8 +38,8 @@ std::wstring toLower(std::wstring &text)
 // Преобразование строки к верхнему регистру.
 std::wstring toUpper(std::wstring &text)
 {
-    for (size_t i = 0; i < text.size(); i++ ) {
-        text[i] = toupper(text.at(i));
+    for (wchar_t &i : text) {
+        i = toupper(i);
     }
 
     return text;

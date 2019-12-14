@@ -3,6 +3,10 @@
 
 #include "irbis.h"
 
+#include <iomanip>
+
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record)

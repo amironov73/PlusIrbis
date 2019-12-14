@@ -5,6 +5,8 @@
 
 #include <random>
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 Connection::Connection()
@@ -385,7 +387,25 @@ std::wstring Connection::popDatabase()
 
 std::wstring Connection::printTable(const TableDefinition &definition)
 {
-    throw NotImplementedException();
+    if (!connected()) {
+        return L"";
+    }
+
+    ClientQuery query(*this, "L");
+    query.addAnsi(definition.database).newLine()
+            .addAnsi(definition.table).newLine()
+            .addAnsi("").newLine() // instead of headers
+            .addAnsi(definition.mode).newLine()
+            .addUtf(definition.searchQuery).newLine()
+            .add(definition.minMfn).newLine()
+            .add(definition.maxMfn).newLine()
+            .addUtf(definition.sequentialQuery).newLine()
+            .addAnsi(""); // instead of MFN list
+
+    ServerResponse response (*this, query);
+    std::wstring result = response.readRemainingUtfText();
+
+    return result;
 }
 
 std::wstring Connection::pushDatabase(const std::wstring &newDatabase)
@@ -685,7 +705,9 @@ int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, b
 
 void Connection::writeTextFile(const FileSpecification &specification)
 {
-    throw NotImplementedException();
+    ClientQuery query(*this, "L");
+    query.add(specification);
+    execute(query);
 }
 
 }

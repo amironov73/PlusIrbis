@@ -3,12 +3,13 @@
 
 #include "irbis.h"
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 FileSpecification::FileSpecification(int path_, const std::wstring &filename_)  // NOLINT(modernize-pass-by-value)
     : path(path_), filename(filename_)
 {
-
 }
 
 FileSpecification::FileSpecification(int path_, const std::wstring &database_, const std::wstring &filename_)  // NOLINT(modernize-pass-by-value)

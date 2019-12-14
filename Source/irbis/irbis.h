@@ -519,9 +519,9 @@ public:
 class PLUSIRBIS_EXPORTS MarcRecord final
 {
 public:
-    int mfn { 0 };
-    int status { 0 };
-    int version { 0 };
+    unsigned int mfn { 0u };
+    unsigned int status { 0u };
+    unsigned int version { 0u };
     std::list<RecordField> fields;
     std::wstring database;
 
@@ -703,13 +703,13 @@ public:
 
 enum RecordStatus
 {
-    LogicallyDeleted = 1,
-    PhysicallyDeleted = 2,
+    LogicallyDeleted = 1u,
+    PhysicallyDeleted = 2u,
     Deleted = LogicallyDeleted | PhysicallyDeleted,
-    Absent = 4,
-    NonActualized = 8,
-    Last = 32,
-    Locked = 64
+    Absent = 4u,
+    NonActualized = 8u,
+    Last = 32u,
+    Locked = 64u
 };
 
 //=========================================================
@@ -1004,7 +1004,7 @@ PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length);
 PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const wchar_t *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const BYTE *src, size_t length);
-PLUSIRBIS_EXPORTS const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring &result);
+PLUSIRBIS_EXPORTS const BYTE* fromUtf(const BYTE *src, size_t &size, BYTE stop, std::wstring &result);
 PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
 PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
 PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);

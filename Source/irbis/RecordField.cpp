@@ -3,12 +3,13 @@
 
 #include "irbis.h"
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 RecordField& RecordField::add(wchar_t subFieldCode, const std::wstring &subFieldValue)
 {
     subfields.push_back({subFieldCode, subFieldValue});
-
     return *this;
 }
 

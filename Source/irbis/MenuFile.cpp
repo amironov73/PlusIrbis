@@ -3,6 +3,9 @@
 
 #include "irbis.h"
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+#pragma ide diagnostic ignored "cert-err58-cpp"
+
 namespace irbis {
 
 const std::wstring MenuFile::StopMarker = L"*****";
@@ -11,47 +14,54 @@ const std::vector<wchar_t> MenuFile::Separators = { ' ', '-', '=', ':' };
 MenuFile& MenuFile::add(const std::wstring &code, const std::wstring &comment)
 {
     entries.push_back({code, comment});
-
     return *this;
 }
 
 MenuEntry* MenuFile::getEntry(const std::wstring &code) const
 {
-    throw NotImplementedException();
+    for(const auto &entry : entries) {
+        if (sameString(entry.code, code)) {
+            return const_cast<MenuEntry*>(&entry);
+        }
+    }
+
+    return nullptr;
 }
 
 MenuEntry* MenuFile::getEntrySensitive(const std::wstring &code) const
 {
-    throw NotImplementedException();
+    for(const auto &entry : entries) {
+        if (entry.code == code) {
+            return const_cast<MenuEntry*>(&entry);
+        }
+    }
+
+    return nullptr;
 }
 
 std::wstring* MenuFile::getValue(const std::wstring &code) const
 {
-    MenuEntry *entry = getEntry(code);
-    std::wstring *result = entry ? &entry->comment : nullptr;
-
+    const auto entry = getEntry(code);
+    const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
 std::wstring* MenuFile::getValueSensitive(const std::wstring &code) const
 {
-    MenuEntry *entry = getEntrySensitive(code);
-    std::wstring *result = entry ? &entry->comment : nullptr;
-
+    const auto entry = getEntrySensitive(code);
+    const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
 const std::wstring& MenuFile::getValue(const std::wstring &code, const std::wstring &defaultValue) const
 {
-    std::wstring *value = getValue(code);
-
+    const auto value = getValue(code);
     return value ? *value : defaultValue;
 }
 
 const std::wstring& MenuFile::getValueSensitive(const std::wstring &code, const std::wstring &defaultValue) const
 {
-    std::wstring *value = getValueSensitive(code);
-
+    const auto value = getValueSensitive(code);
     return value ? *value : defaultValue;
 }
 

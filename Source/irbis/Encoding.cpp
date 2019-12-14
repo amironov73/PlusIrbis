@@ -4,6 +4,9 @@
 #include "irbis.h"
 
 #include <algorithm>
+#include <cstring>
+
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 namespace irbis {
 
@@ -289,27 +292,27 @@ BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
     while (length > 0)
     {
         const unsigned int c = *src++;
-        if (c < (1 << 7))
+        if (c < (1u << 7u))
         {
             *dst++ = static_cast<BYTE>(c);
         }
-        else if (c < (1 << 11))
+        else if (c < (1u << 11u))
         {
-            *dst++ = static_cast<BYTE>((c >> 6) | 0xC0);
-            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>((c >> 6u) | 0xC0u);
+            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
         }
-        else if (c < (1 << 16)) //-V547
+        else if (c < (1u << 16u)) //-V547
         {
-            *dst++ = static_cast<BYTE>((c >> 12) | 0xE0);
-            *dst++ = static_cast<BYTE>(((c >> 6) & 0x3F) | 0x80);
-            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>((c >> 12u) | 0xE0u);
+            *dst++ = static_cast<BYTE>(((c >> 6u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
         }
-        else if (c < (1 << 21))
+        else if (c < (1u << 21u))
         {
-            *dst++ = static_cast<BYTE>((c >> 18) | 0xF0);
-            *dst++ = static_cast<BYTE>(((c >> 12) & 0x3F) | 0x80);
-            *dst++ = static_cast<BYTE>(((c >> 6) & 0x3F) | 0x80);
-            *dst++ = static_cast<BYTE>((c & 0x3F) | 0x80);
+            *dst++ = static_cast<BYTE>((c >> 18u) | 0xF0u);
+            *dst++ = static_cast<BYTE>(((c >> 12u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<BYTE>(((c >> 6u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
         }
         else
         {
@@ -329,20 +332,20 @@ size_t countUtf(const wchar_t *src, size_t length)
     while (length > 0)
     {
         const unsigned int c = *src++;
-        if (c < (1 << 7))
+        if (c < (1u << 7u))
         {
             result++;
         }
-        else if (c < (1 << 11))
+        else if (c < (1u << 11u))
         {
             result++;
             result++;
         }
-        else if (c < (1 << 16)) //-V547
+        else if (c < (1u << 16u)) //-V547
         {
             result += 3;
         }
-        else if (c < (1 << 21))
+        else if (c < (1u << 21u))
         {
             result +=4;
         }
@@ -365,34 +368,33 @@ wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
     while (src < stop)
     {
         unsigned int c = *src++;
-        if ((c & 0x80) == 0)
+        if ((c & 0x80u) == 0u)
         {
             // 1-BYTE sequence: 000000000xxxxxxx = 0xxxxxxx
-            ;
         }
-        else if ((c & 0xE0) == 0xC0)
+        else if ((c & 0xE0u) == 0xC0u)
         {
             // 2-BYTE sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
-            c = (c & 0x1F) << 6;
-            c |= (*src++ & 0x3F);
+            c = (c & 0x1Fu) << 6u;
+            c |= (*src++ & 0x3Fu);
         }
-        else if ((c & 0xF0) == 0xE0)
+        else if ((c & 0xF0u) == 0xE0u)
         {
             // 3-BYTE sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
-            c = (c & 0x0F) << 12;
-            c |= (*src++ & 0x3F) << 6;
-            c |= (*src++ & 0x3F);
-            if (c == 0xFEFF) { // bom at start
+            c = (c & 0x0Fu) << 12u;
+            c |= (*src++ & 0x3Fu) << 6u;
+            c |= (*src++ & 0x3Fu);
+            if (c == 0xFEFFu) { // bom at start
                 continue; // skip it
             }
         }
-        else if ((c & 0xF8) == 0xF0)
+        else if ((c & 0xF8u) == 0xF0u)
         {
             // 4-BYTE sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
-            c = (c & 0x07) << 18;
-            c |= (*src++ & 0x3F) << 12;
-            c |= (*src++ & 0x3F) << 6;
-            c |= (*src++ & 0x3F);
+            c = (c & 0x07u) << 18u;
+            c |= (*src++ & 0x3Fu) << 12u;
+            c |= (*src++ & 0x3Fu) << 6u;
+            c |= (*src++ & 0x3Fu);
         }
         *dst++ = static_cast<wchar_t>(c);
     }
@@ -410,23 +412,23 @@ size_t countUtf(const BYTE *src, size_t length)
     while (src < stop)
     {
         unsigned int c = *src++;
-        if ((c & 0x80) == 0)
+        if ((c & 0x80u) == 0u)
         {
         }
-        else if ((c & 0xE0) == 0xC0)
+        else if ((c & 0xE0u) == 0xC0u)
         {
             src++;
         }
-        else if ((c & 0xF0) == 0xE0)
+        else if ((c & 0xF0u) == 0xE0u)
         {
-            c = (c & 0x0F) << 12;
-            c |= (*src++ & 0x3F) << 6;
-            c |= (*src++ & 0x3F);
+            c = (c & 0x0Fu) << 12u;
+            c |= (*src++ & 0x3Fu) << 6u;
+            c |= (*src++ & 0x3Fu);
             if (c == 0xFEFF) { // bom at start
                 continue; // skip it
             }
         }
-        else if ((c & 0xF8) == 0xF0)
+        else if ((c & 0xF8u) == 0xF0u)
         {
             src += 3;
         }
@@ -436,8 +438,8 @@ size_t countUtf(const BYTE *src, size_t length)
     return result;
 }
 
-// Считывает строку UTF-8 вплоть до разделителя
-const BYTE* fromUtf(const BYTE *src, size_t &size, const BYTE stop, std::wstring &result)
+// Считывает строку UTF-8 вплоть до разделителя.
+const BYTE* fromUtf(const BYTE *src, size_t &size, BYTE stop, std::wstring &result)
 {
     const BYTE *end = src;
     while (size && (*end != stop))
@@ -514,3 +516,4 @@ std::string toUtf(const std::wstring &text)
 }
 
 }
+

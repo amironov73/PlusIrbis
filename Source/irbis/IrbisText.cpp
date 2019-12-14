@@ -3,62 +3,65 @@
 
 #include "irbis.h"
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+#pragma ide diagnostic ignored "cert-err58-cpp"
+
 namespace irbis {
 
 const char IrbisText::CrLf[] = { 0x0D, 0x0A };
 const char IrbisText::Lf[] = { 0x0A };
 
-// Разделитель строк в ИРБИС.
+// Р Р°Р·РґРµР»РёС‚РµР»СЊ СЃС‚СЂРѕРє РІ РР Р‘РРЎ.
 const std::wstring IrbisText::IrbisDelimiter = L"\u001F\u001E";
 
-// Короткая версия разделителя строк.
+// РљРѕСЂРѕС‚РєР°СЏ РІРµСЂСЃРёСЏ СЂР°Р·РґРµР»РёС‚РµР»СЏ СЃС‚СЂРѕРє.
 const std::wstring IrbisText::ShortDelimiter = L"\u001E";
 
-// Разделитель строк в MSDOS
+//Р Р°Р·РґРµР»РёС‚РµР»СЊ СЃС‚СЂРѕРє РІ MSDOS.
 const std::wstring IrbisText::MsDosDelimiter = L"\r\n";
 
-// Разделитель строк в UNIX.
+// Р Р°Р·РґРµР»РёС‚РµР»СЊ СЃС‚СЂРѕРє РІ UNIX.
 const std::wstring IrbisText::UnixDelimiter = L"\n";
 
+// Р Р°Р·РґРµР»РёС‚РµР»СЊ СЌР»РµРјРµРЅС‚РѕРІ РІ СЃС‚СЂРѕРєРµ РѕС‚РІРµС‚Р° РЅР° РїРѕРёСЃРєРѕРІС‹Р№ Р·Р°РїСЂРѕСЃ.
 const std::wstring IrbisText::SearchDelimiter = L"#";
 
-// Замена разделителей текста с ИРБИС на MS-DOS.
-
+// Р—Р°РјРµРЅР° СЂР°Р·РґРµР»РёС‚РµР»РµР№ С‚РµРєСЃС‚Р° СЃ РР Р‘РРЎ РЅР° MS-DOS.
 std::wstring IrbisText::fromIrbisToDos (std::wstring &text)
 {
     throw NotImplementedException();
     //return text.replace(IrbisDelimiter, MsDosDelimiter);
 }
 
-// Замена разделителей текста с MS-DOS на ИРБИС.
+// Р—Р°РјРµРЅР° СЂР°Р·РґРµР»РёС‚РµР»РµР№ С‚РµРєСЃС‚Р° СЃ MS-DOS РЅР° РР Р‘РРЎ.
 std::wstring IrbisText::fromDosToIrbis (std::wstring &text)
 {
     throw NotImplementedException();
     //return text.replace(MsDosDelimiter, IrbisDelimiter);
 }
 
-// Замена разделителей текста с MS-DOS на UNIX.
+// Р—Р°РјРµРЅР° СЂР°Р·РґРµР»РёС‚РµР»РµР№ С‚РµРєСЃС‚Р° СЃ MS-DOS РЅР° UNIX.
 std::wstring IrbisText::fromDosToUnix(std::wstring &text)
 {
     throw NotImplementedException();
     //return text.replace(MsDosDelimiter, UnixDelimiter);
 }
 
-// Разбивка ответа сервера по строкам (полный вариант разделителя).
+// Р Р°Р·Р±РёРІРєР° РѕС‚РІРµС‚Р° СЃРµСЂРІРµСЂР° РїРѕ СЃС‚СЂРѕРєР°Рј (РїРѕР»РЅС‹Р№ РІР°СЂРёР°РЅС‚ СЂР°Р·РґРµР»РёС‚РµР»СЏ).
 StringList IrbisText::fromFullDelimiter (const std::wstring &text)
 {
     throw NotImplementedException();
     //return text.split(IrbisDelimiter);
 }
 
-// Строки, приходящие в ответ на команду WriteRecord.
+// РЎС‚СЂРѕРєРё, РїСЂРёС…РѕРґСЏС‰РёРµ РІ РѕС‚РІРµС‚ РЅР° РєРѕРјР°РЅРґСѓ WriteRecord.
 StringList IrbisText::fromShortDelimiter(const std::wstring &text)
 {
     throw NotImplementedException();
     //return text.split(ShortDelimiter);
 }
 
-// Считываем весь файл как строку в кодировке ANSI
+// РЎС‡РёС‚С‹РІР°РµРј РІРµСЃСЊ С„Р°Р№Р» РєР°Рє СЃС‚СЂРѕРєСѓ РІ РєРѕРґРёСЂРѕРІРєРµ ANSI.
 std::wstring IrbisText::readAllAnsi(const std::wstring &filename)
 {
     throw NotImplementedException();
@@ -73,7 +76,7 @@ std::wstring IrbisText::readAllAnsi(const std::wstring &filename)
     //return result;
 }
 
-// Считываем весь файл как строку в кодировке UTF-8
+// РЎС‡РёС‚С‹РІР°РµРј РІРµСЃСЊ С„Р°Р№Р» РєР°Рє СЃС‚СЂРѕРєСѓ РІ РєРѕРґРёСЂРѕРІРєРµ UTF-8.
 std::wstring IrbisText::readAllUtf(const std::wstring &filename)
 {
     throw NotImplementedException();
@@ -88,7 +91,7 @@ std::wstring IrbisText::readAllUtf(const std::wstring &filename)
     //return result;
 }
 
-// Считываем весь файл как массив строк в кодировке ANSI
+// РЎС‡РёС‚С‹РІР°РµРј РІРµСЃСЊ С„Р°Р№Р» РєР°Рє РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РІ РєРѕРґРёСЂРѕРІРєРµ ANSI.
 StringList IrbisText::readAnsiLines(const std::wstring &filename)
 {
     throw NotImplementedException();
@@ -112,7 +115,7 @@ StringList IrbisText::readAnsiLines(const std::wstring &filename)
     //return result;
 }
 
-// Считываем весь файл как массив строк в кодировке UTF-8
+// РЎС‡РёС‚С‹РІР°РµРј РІРµСЃСЊ С„Р°Р№Р» РєР°Рє РјР°СЃСЃРёРІ СЃС‚СЂРѕРє РІ РєРѕРґРёСЂРѕРІРєРµ UTF-8.
 StringList IrbisText::readUtfLines(const std::wstring &filename)
 {
     throw NotImplementedException();

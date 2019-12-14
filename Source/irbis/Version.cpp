@@ -3,6 +3,8 @@
 
 #include "irbis.h"
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+
 namespace irbis {
 
 void Version::parse(ServerResponse &response)

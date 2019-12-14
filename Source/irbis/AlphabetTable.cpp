@@ -5,6 +5,9 @@
 
 // ReSharper disable StringLiteralTypo
 
+#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
+#pragma ide diagnostic ignored "cert-err58-cpp"
+
 namespace irbis {
 
 const std::string AlphabetTable::FileName = "ISISACW.TAB";
