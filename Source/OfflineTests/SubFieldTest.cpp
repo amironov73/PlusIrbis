@@ -22,7 +22,7 @@ namespace OfflineTests
             const SubField sub{'a', nullptr};
             Assert::IsTrue(sub.empty());
             Assert::IsTrue(sub.code == 'a');
-            Assert::IsTrue(sub.wstr() == L"^a");
+            Assert::IsTrue(sub.toString() == L"^a");
         }
 
         TEST_METHOD(constructor_3)
@@ -31,7 +31,7 @@ namespace OfflineTests
             Assert::IsFalse(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.value == L"SubfieldA");
-            Assert::IsTrue(sub.wstr() == L"^aSubfieldA");
+            Assert::IsTrue(sub.toString() == L"^aSubfieldA");
         }
 
         TEST_METHOD(verify_1)

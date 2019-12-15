@@ -1,4 +1,4 @@
-# PlusIrbis
+# Pure C++ library for IRBIS64 system
 
 ManagedClient ported to plain C++14. Currently supported:
 
@@ -7,7 +7,7 @@ ManagedClient ported to plain C++14. Currently supported:
 * 32-bit and 64-bit Linux;
 * MacOS X 10.14;
 * GCC 7 and higher;
-* Clang
+* Clang compiler.
 
 ### Example
 
@@ -42,10 +42,10 @@ int main()
     const auto formatted = connection.formatRecord(L"@brief", 1);
     std::wcout << L"FORMAT: " << formatted << std::endl;
 
-    const auto record = connection.readRawRecord(1);
-    std::wcout << L"READ RAW:" << std::endl << record << std::endl;
+    const auto record = connection.readRecord(1);
+    std::wcout << L"READ: "  << record.fm(200, L'a') << std::endl;
 
-    irbis::MfnList found = connection.search(L"K=бетон");
+    irbis::MfnList found = connection.search(L"K=alg$");
     std::wcout << L"SEARCH:";
     for (auto mfn : found) {
         std::wcout << L" " << std::to_wstring(mfn);
@@ -71,3 +71,7 @@ int main()
 [![Issues](https://img.shields.io/github/issues/amironov73/PlusIrbis.svg)](https://github.com/amironov73/PlusIrbis/issues)
 [![Build status](https://img.shields.io/appveyor/ci/AlexeyMironov/plusirbis.svg)](https://ci.appveyor.com/project/AlexeyMironov/plusirbis/)
 [![Build status](https://api.travis-ci.org/amironov73/PlusIrbis.svg)](https://travis-ci.org/amironov73/PlusIrbis/)
+
+#### Documentation (in russian)
+
+* [**Общее описание**](Docs/chapter1.md)

@@ -51,6 +51,66 @@ bool contains(const std::wstring &text, const std::wstring &fragment)
     return text.find(fragment) != std::string::npos;
 }
 
+// Выдаёт текстовое описание ошибки по её коду.
+std::wstring describeError(int errorCode)
+{
+    if (errorCode >= 0) {
+        return L"Нет ошибки";
+    }
+
+    switch (errorCode) {
+        case    -100: return L"Заданный MFN вне пределов БД";
+        case    -101: return L"Ошибочный размер полки";
+        case    -102: return L"Ошибочный номер полки";
+        case    -140: return L"MFN вне пределов БД";
+        case    -141: return L"Ошибка чтения";
+        case    -200: return L"Указанное поле отсутствует";
+        case    -201: return L"Предыдущая версия записи отсутствует";
+        case    -202: return L"Заданный термин не найден (термин не существует)";
+        case    -203: return L"Последний термин в списке";
+        case    -204: return L"Первый термин в списке";
+        case    -300: // fall through
+        case    -301: return L"База данных монопольно заблокирована";
+        case    -400: return L"Ошибка при открытии файлов MST или XRF (ошибка файла данных)";
+        case    -401: return L"Ошибка при открытии файлов IFP (ошибка файла индекса)";
+        case    -402: return L"Ошибка при записи";
+        case    -403: return L"Ошибка при актуализации";
+        case    -600: return L"Запись логически удалена";
+        case    -601: return L"Запись физически удалена";
+        case    -602: return L"Запись заблокирована на ввод";
+        case    -603: return L"Запись логически удалена";
+        case    -605: return L"Запись физически удалена";
+        case    -607: return L"Ошибка autoin.gbl";
+        case    -608: return L"Ошибка версии записи";
+        case    -700: return L"Ошибка создания резервной копии";
+        case    -701: return L"Ошибка восстановления из резервной копии";
+        case    -702: return L"Ошибка сортировки";
+        case    -703: return L"Ошибочный термин";
+        case    -704: return L"Ошибка создания словаря";
+        case    -705: return L"Ошибка загрузки словаря";
+        case    -800: return L"Ошибка в параметрах глобальной корректировки";
+        case    -801: return L"ERR_GBL_REP";
+        case    -802: return L"ERR_GBL_MET";
+        case   -1111: return L"Ошибка исполнения сервера (SERVER_EXECUTE_ERROR)";
+        case   -2222: return L"Ошибка в протоколе (WRONG_PROTOCOL)";
+        case   -3333: return L"Незарегистрированный клиент (ошибка входа на сервер) (клиент не в списке)";
+        case   -3334: return L"Клиент не выполнил вход на сервер (клиент не используется)";
+        case   -3335: return L"Неправильный уникальный идентификатор клиента";
+        case   -3336: return L"Нет доступа к командам АРМ";
+        case   -3337: return L"Клиент уже зарегистрирован";
+        case   -3338: return L"Недопустимый клиент";
+        case   -4444: return L"Неверный пароль";
+        case   -5555: return L"Файл не существует";
+        case   -6666: return L"Сервер перегружен. Достигнуто максимальное число потоков обработки";
+        case   -7777: return L"Не удалось запустить/прервать поток администратора (ошибка процесса)";
+        case   -8888: return L"Общая ошибка";
+        case -100001: return L"Ошибка создания сокета";
+        case -100002: return L"Сбой сети";
+        case -100003: return L"Не подключен к серверу";
+        default: return L"Неизвестная ошибка";
+    }
+}
+
 // Быстрый и грязный разбор строки как целого числа без знака.
 int fastParse32(const std::wstring &text)
 {

@@ -13,12 +13,23 @@
 
 namespace irbis {
 
+SubField SubField::clone() const
+{
+    return SubField {this->code, this->value };
+}
+
+void SubField::decode(const std::wstring &line)
+{
+    this->code = line[0];
+    this->value = line.substr(1);
+}
+
 bool SubField::empty() const
 {
     return code == NoCode || value.empty();
 }
 
-std::wstring SubField::wstr() const
+std::wstring SubField::toString() const
 {
     return std::wstring(L"^") + code + value;
 }

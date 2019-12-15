@@ -36,10 +36,10 @@ int main()
     const auto formatted = connection.formatRecord(L"@brief", 1);
     std::wcout << L"FORMAT: " << formatted << std::endl;
 
-    const auto record = connection.readRawRecord(1);
-    std::wcout << L"READ RAW:" << std::endl << record << std::endl;
+    const auto record = connection.readRecord(1);
+    std::wcout << L"READ: " << record.fm(200, L'a') << std::endl;
 
-    irbis::MfnList found = connection.search(L"K=бетон");
+    irbis::MfnList found = connection.search(L"K=alg$");
     std::wcout << L"SEARCH:";
     for (auto mfn : found) {
         std::wcout << L" " << std::to_wstring(mfn);

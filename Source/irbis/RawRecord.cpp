@@ -27,7 +27,7 @@ PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRe
     return stream;
 }
 
-std::wstring RawRecord::encode(const std::wstring &delimiter) const
+std::wstring RawRecord::encode(const std::wstring &delimiter = IrbisText::IrbisDelimiter) const
 {
     std::wstring result;
     result.append(std::to_wstring(mfn));

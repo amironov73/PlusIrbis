@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #pragma once
@@ -36,23 +36,23 @@
 
     #if defined(_MSC_VER)
         // Microsoft
-        #define AM_EXPORT __declspec(dllexport)
-        #define AM_IMPORT __declspec(dllimport)
+        #define IRBIS_EXPORT __declspec(dllexport)
+        #define IRBIS_IMPORT __declspec(dllimport)
     #elif defined(__GNUC__)
         //  GCC
-        #define AM_EXPORT __attribute__((visibility("default")))
-        #define AM_IMPORT
+        #define IRBIS_EXPORT __attribute__((visibility("default")))
+        #define IRBIS_IMPORT
     #else
         //  do nothing and hope for the best?
-        #define AM_EXPORT
-        #define AM_IMPORT
+        #define IRBIS_EXPORT
+        #define IRBIS_IMPORT
         #pragma warning Unknown dynamic link import/export semantics.
     #endif
 
 #else
 
-    #define AM_EXPORT
-    #define AM_IMPORT
+    #define IRBIS_EXPORT
+    #define IRBIS_IMPORT
 
 #endif
 
@@ -60,11 +60,11 @@
 
 #ifdef PLUSIRBIS_LIBRARY
 
-    #define PLUSIRBIS_EXPORTS AM_EXPORT
+    #define PLUSIRBIS_EXPORTS IRBIS_EXPORT
 
 #else
 
-    #define PLUSIRBIS_EXPORTS AM_IMPORT
+    #define PLUSIRBIS_EXPORTS IRBIS_IMPORT
 
 #endif
 
@@ -289,6 +289,7 @@ public:
     std::wstring workstation;
     int clientId;
     int queryId;
+    int lastError;
     std::wstring serverVersion;
     ClientSocket *socket;
 
@@ -347,6 +348,7 @@ public:
     bool unlockDatabase(const std::wstring &databaseName);
     bool unlockRecords(const std::wstring &databaseName, const MfnList &mfnList);
     bool updateIniFile(StringList &lines);
+    int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile(const FileSpecification &specification);
 };
@@ -522,11 +524,19 @@ public:
     unsigned int mfn { 0u };
     unsigned int status { 0u };
     unsigned int version { 0u };
-    std::list<RecordField> fields;
     std::wstring database;
+    std::list<RecordField> fields;
 
     MarcRecord& add(wchar_t code, const std::wstring &value);
+    MarcRecord clone() const;
+    void decode(const StringList &lines);
     bool deleted() const;
+    std::wstring encode(const std::wstring &delimiter) const;
+    std::wstring fm(int tag, wchar_t code) const;
+    StringList fma(int tag, wchar_t code) const;
+    RecordField* getField(int tag, int occurrence) const;
+    std::vector<RecordField*> getFields(int tag) const;
+    MarcRecord& reset();
     bool verify(bool throwOnError) const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
@@ -671,7 +681,7 @@ public:
 class PLUSIRBIS_EXPORTS RecordField final
 {
 public:
-    constexpr static int NoTag = 0;
+    const static int NoTag = 0;
 
     int tag { 0 };
     std::wstring value;
@@ -679,9 +689,13 @@ public:
 
     RecordField& add(wchar_t code, const std::wstring &value = L"");
     RecordField& clear();
+    RecordField clone() const;
+    void decode(const std::wstring &line);
     bool empty() const;
+    SubField* getFirstSubfield(wchar_t code) const;
+    std::wstring getFirstSubfieldValue(wchar_t code) const;
     bool verify(bool throwOnError) const;
-    std::wstring wstr() const;
+    std::wstring toString() const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
@@ -789,14 +803,16 @@ public:
 class PLUSIRBIS_EXPORTS SubField final
 {
 public:
-    constexpr static wchar_t NoCode { L'\0' };
+    const static wchar_t NoCode { L'\0' };
 
     wchar_t code { L'\0' };
     std::wstring value;
 
+    SubField clone() const;
+    void decode(const std::wstring &line);
     bool empty() const;
     bool verify(bool throwOnError) const;
-    std::wstring wstr() const;
+    std::wstring toString() const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
@@ -973,6 +989,9 @@ std::wstring PLUSIRBIS_EXPORTS toLower(std::wstring &text);
 std::wstring PLUSIRBIS_EXPORTS toUpper(std::wstring &text);
 
 bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fragment);
+
+std::wstring PLUSIRBIS_EXPORTS describeError(int errorCode);
+
 
 int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);

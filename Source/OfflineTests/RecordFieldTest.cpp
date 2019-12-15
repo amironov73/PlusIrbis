@@ -31,7 +31,7 @@ namespace OfflineTests
             Assert::IsTrue(field.tag == 100);
             Assert::IsTrue(field.value == L"Field100");
             Assert::IsTrue(field.subfields.empty());
-            Assert::IsTrue(field.wstr() == L"100#Field100");
+            Assert::IsTrue(field.toString() == L"100#Field100");
         }
 
         TEST_METHOD(constructor_4)
@@ -41,7 +41,7 @@ namespace OfflineTests
             Assert::IsFalse(field.empty());
             Assert::IsTrue(field.value.empty());
             Assert::IsTrue(field.subfields.size() == 2);
-            Assert::IsTrue(field.wstr() == L"100#^aSubA^bSubB");
+            Assert::IsTrue(field.toString() == L"100#^aSubA^bSubB");
         }
 
         TEST_METHOD(verify_1)

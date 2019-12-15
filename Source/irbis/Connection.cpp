@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -484,6 +484,17 @@ MarcRecord Connection::readRecord(int mfn)
         return result;
     }
 
+    ClientQuery query(*this, "C");
+    query.addAnsi(database).newLine()
+            .add(mfn);
+
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode()) {
+        const auto lines = response.readRemainingUtfLines();
+        result.decode(lines);
+        result.database = database;
+    }
+
     return result;
 }
 
@@ -704,7 +715,64 @@ int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, b
         return 0;
     }
 
-    return 0;
+    const auto db = iif(record.database, this->database);
+    ClientQuery query(*this, "D");
+    query.addAnsi(db).newLine();
+    query.add(lockFlag).newLine();
+    query.add(actualize).newLine();
+    query.addUtf(record.encode(IrbisText::IrbisDelimiter)).newLine();
+    ServerResponse response(*this, query);
+    if (!response.success()) {
+        return 0;
+    }
+
+    if (!dontParseResponse) {
+        record.fields.clear();
+        const auto temp1 = response.readRemainingUtfLines();
+        if (temp1.size() > 1) {
+            StringList lines;
+            lines.push_back(temp1[0]);
+            const auto temp2 = split(temp1[1], 0x1E);
+            lines.insert(lines.end(), temp2.begin(), temp2.end());
+            record.decode(lines);
+            record.database = this->database;
+        }
+    }
+
+    return response.returnCode;
+}
+
+int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
+{
+    if (!connected()) {
+        return 0;
+    }
+
+    const auto db = iif(record.database, this->database);
+    ClientQuery query(*this, "D");
+    query.addAnsi(db).newLine();
+    query.add(lockFlag).newLine();
+    query.add(actualize).newLine();
+    query.addUtf(record.encode(IrbisText::IrbisDelimiter)).newLine();
+    ServerResponse response(*this, query);
+    if (!response.success()) {
+        return 0;
+    }
+
+    if (!dontParseResponse) {
+        record.fields.clear();
+        const auto temp1 = response.readRemainingUtfLines();
+        if (temp1.size() > 1) {
+            StringList lines;
+            lines.push_back(temp1[0]);
+            const auto temp2 = split(temp1[1], 0x1E);
+            lines.insert(lines.end(), temp2.begin(), temp2.end());
+            record.parseSingle(lines);
+            record.database = this->database;
+        }
+    }
+
+    return response.returnCode;
 }
 
 void Connection::writeTextFile(const FileSpecification &specification)

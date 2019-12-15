@@ -27,9 +27,68 @@ RecordField& RecordField::clear()
     return *this;
 }
 
+RecordField RecordField::clone() const
+{
+    RecordField result { this->tag, this->value };
+    for (const auto &sub : this->subfields) {
+        result.subfields.push_back(sub.clone());
+    }
+
+    return result;
+}
+
+void RecordField::decode(const std::wstring &line)
+{
+    const auto parts = maxSplit(line, L'#', 2);
+    this->tag = fastParse32(parts[0]);
+    if (parts.size() == 1 || parts[1].empty()) {
+        return;
+    }
+
+    const auto body = parts[1];
+    StringList all;
+    if (body[0] == L'^') {
+        all = split(body, L'^');
+    } else {
+        const auto parts2 = maxSplit(body, L'#', 2);
+        this->value = parts2[0];
+        all = split(parts2[1], L'^');
+    }
+
+    for (const auto &one : all) {
+        if (!one.empty()) {
+            SubField subField;
+            subField.decode(one);
+            this->subfields.push_back(subField);
+        }
+    }
+}
+
 bool RecordField::empty() const
 {
     return !tag || (value.empty() && subfields.empty());
+}
+
+SubField* RecordField::getFirstSubfield(wchar_t code) const
+{
+    for (const auto &one : this->subfields) {
+        if (sameChar(one.code, code)) {
+            return const_cast<SubField*>(&one);
+        }
+    }
+
+    return nullptr;
+}
+
+std::wstring RecordField::getFirstSubfieldValue(wchar_t code) const
+{
+    for (const auto &one : this->subfields) {
+        if (sameChar(one.code, code)) {
+            return one.value;
+        }
+    }
+
+    return std::wstring();
 }
 
 bool RecordField::verify(bool throwOnError) const
@@ -57,13 +116,13 @@ bool RecordField::verify(bool throwOnError) const
     return result;
 }
 
-std::wstring RecordField::wstr() const
+std::wstring RecordField::toString() const
 {
     std::wstring result = std::to_wstring(tag)
         + std::wstring(L"#") + value;
     for (const auto &sub : subfields)
     {
-        result += sub.wstr();
+        result += sub.toString();
     }
 
     return result;
