@@ -142,6 +142,8 @@ class TermInfo;
 class TermParameters;
 class TermPosting;
 class TextNavigator;
+class TreeFile;
+class TreeNode;
 class UserInfo;
 class VerificationException;
 class Version;
@@ -656,6 +658,8 @@ public:
     std::wstring commandNumber;
     std::wstring processId;
     std::wstring state;
+
+    static std::vector<ProcessInfo> parse(ServerResponse &response);
 };
 
 //=========================================================
@@ -942,6 +946,28 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS TreeFile final
+{
+public:
+    std::vector<TreeNode> roots;
+
+    void parse(const StringList &lines);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS TreeNode final
+{
+public:
+    std::wstring value;
+    std::vector<TreeNode> children;
+    int level { 0 };
+
+    TreeNode& add(const std::wstring &name);
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS UserInfo final
 {
 public:
@@ -975,7 +1001,7 @@ public:
     int connectedClients { 0 }; // текущее количество подключений
 
     void parse(ServerResponse &response);
-    std::wstring to_wstring() const;
+    std::wstring toString() const;
 };
 
 //=========================================================

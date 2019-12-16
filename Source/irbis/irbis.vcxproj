@@ -313,6 +313,7 @@
     <ClCompile Include="MenuEntry.cpp" />
     <ClCompile Include="MenuFile.cpp" />
     <ClCompile Include="NumberChunk.cpp" />
+    <ClCompile Include="ProcessInfo.cpp" />
     <ClCompile Include="RawRecord.cpp" />
     <ClCompile Include="RecordField.cpp" />
     <ClCompile Include="RecordSerializer.cpp" />
@@ -320,6 +321,8 @@
     <ClCompile Include="SubField.cpp" />
     <ClCompile Include="Tcp4Socket.cpp" />
     <ClCompile Include="TextNavigator.cpp" />
+    <ClCompile Include="TreeFile.cpp" />
+    <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="Version.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

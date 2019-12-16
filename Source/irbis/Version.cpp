@@ -26,7 +26,7 @@ void Version::parse(ServerResponse &response)
     }
 }
 
-std::wstring Version::to_wstring() const
+std::wstring Version::toString() const
 {
     return std::wstring(L"organization=") + organization +
         L", version=" + version +
