@@ -109,6 +109,8 @@ class FoundLine;
 class IlfEntry;
 class IlfFile;
 class IniFile;
+class IniLine;
+class IniSection;
 class IrbisDate;
 class IrbisException;
 class IrbisText;
@@ -388,7 +390,7 @@ public:
     bool databaseLocked { false };
     bool readOnly { false };
 
-    DatabaseInfo parse(ServerResponse &response);
+    void parse(ServerResponse &response);
     static std::vector<DatabaseInfo> parse(MenuFile &menu);
     std::wstring toString() const;
 };
@@ -400,6 +402,26 @@ enum DirectAccessMode
     Exclusive = 0,
     Shared    = 1,
     ReadOnly  = 2
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS DirectAccess64 final
+{
+public:
+    MstFile64 *mst;
+    XrfFile64 *xrf;
+    std::wstring database;
+
+    DirectAccess64(const std::wstring &path);
+    DirectAccess64(const DirectAccess64 &) = delete;
+    DirectAccess64(const DirectAccess64 &&) = delete;
+    DirectAccess64& operator = (const DirectAccess64 &) = delete;
+    DirectAccess64& operator = (const DirectAccess64 &&) = delete;
+    ~DirectAccess64();
+
+    MstRecord64 readRawRecord(unsigned int mfn);
+    MarcRecord readRecord(unsigned int mfn);
 };
 
 //=========================================================
@@ -437,6 +459,24 @@ public:
 class PLUSIRBIS_EXPORTS IniFile final
 {
 public:
+    std::vector<IniSection> sections;
+
+    //IniFile();
+
+    IniFile& clear();
+    bool containsSection (const std::wstring &name) const;
+    IniSection& createSection(const std::wstring &name);
+    bool isModified() const;
+    void notModified();
+    int getIndex(const std::wstring &name) const;
+    IniSection* getSection(const std::wstring &name) const;
+    const std::wstring& getValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &defaultValue) const;
+    //void parse(QTextStream &stream);
+    IniFile& removeSection(const std::wstring &sectionName);
+    IniFile& removeValue(const std::wstring &sectionName, const std::wstring &keyName);
+    IniFile& setValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &value);
+    //void write(const std::wstring &filename, QTextCodec *encoding) const;
+    //void writeModifiedOnly(QTextStream &stream) const;
 };
 
 //=========================================================
@@ -444,13 +484,38 @@ public:
 class PLUSIRBIS_EXPORTS IniLine final
 {
 public:
+    std::wstring key;
+    std::wstring value;
+
+    bool modified() const { return this->_modified; }
+    void notModified() { this->_modified = false; }
+    void setKey(const std::wstring &newKey);
+    void setValue(const std::wstring &newValue);
+    std::wstring toString() const;
+
+private:
+    bool _modified;
 };
 
 //=========================================================
 
 class PLUSIRBIS_EXPORTS IniSection final
 {
-public:
+    std::wstring name;
+    std::vector<IniLine> lines;
+
+    IniSection& clear();
+    bool containsKey(const std::wstring &key) const;
+    int getIndex(const std::wstring &key) const;
+    IniLine* getLine(const std::wstring &key) const;
+    const std::wstring& getValue(const std::wstring &key, const std::wstring &defaultValue) const;
+    bool modified() const;
+    void notModified();
+    IniSection& removeValue(const std::wstring &key);
+    IniSection& setValue(const std::wstring &key, const std::wstring &value);
+    std::wstring toString() const;
+
+    const std::wstring& operator[] (const std::wstring &index) const;
 };
 
 //=========================================================
@@ -905,6 +970,18 @@ public:
 class PLUSIRBIS_EXPORTS SearchScenario final
 {
 public:
+    std::wstring name;
+    std::wstring prefix;
+    int dictionaryType { 0 };
+    std::wstring menuName;
+    std::wstring oldFormat;
+    std::wstring correction;
+    std::wstring truncation;
+    std::wstring hint;
+    std::wstring modByDicAuto;
+    std::wstring logic;
+    std::wstring advance;
+    std::wstring format;
 };
 
 //=========================================================
@@ -985,8 +1062,8 @@ public:
     StringList headers;
     std::wstring mode;
     std::wstring searchQuery;
-    int minMfn{0};
-    int maxMfn{0};
+    int minMfn { 0 };
+    int maxMfn { 0 };
     std::wstring sequentialQuery;
     MfnList mfnList;
 };
@@ -1155,6 +1232,43 @@ public:
     int connectedClients { 0 }; // текущее количество подключений
 
     void parse(ServerResponse &response);
+    std::wstring toString() const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS XrfFile64 final
+{
+    std::wstring _fileName;
+    FILE *_file;
+
+    static unsigned long getOffset(unsigned int mfn);
+
+public:
+
+    XrfFile64(const std::wstring &fileName);
+    XrfFile64(const XrfFile64 &) = delete;
+    XrfFile64(const XrfFile64 &&) = delete;
+    XrfFile64& operator = (const XrfFile64 &) = delete;
+    XrfFile64& operator = (const XrfFile64 &&) = delete;
+    ~XrfFile64();
+
+    XrfRecord64 readRecord(unsigned int mfn);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS XrfRecord final
+{
+public:
+    const static int RecordSize;
+
+    unsigned int mfn { 0 };
+    long offset { 0L };
+    unsigned int status { 0 };
+
+    bool deleted() const;
+    bool locked() const;
     std::wstring toString() const;
 };
 
