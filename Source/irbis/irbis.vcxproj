@@ -312,11 +312,17 @@
     <ClCompile Include="MemoryChunk.cpp" />
     <ClCompile Include="MenuEntry.cpp" />
     <ClCompile Include="MenuFile.cpp" />
+    <ClCompile Include="MstControlRecord64.cpp" />
+    <ClCompile Include="MstDictionaryEntry64.cpp" />
+    <ClCompile Include="MstFile64.cpp" />
+    <ClCompile Include="MstRecord64.cpp" />
+    <ClCompile Include="MstRecordLeader64.cpp" />
     <ClCompile Include="NumberChunk.cpp" />
     <ClCompile Include="ProcessInfo.cpp" />
     <ClCompile Include="RawRecord.cpp" />
     <ClCompile Include="RecordField.cpp" />
     <ClCompile Include="RecordSerializer.cpp" />
+    <ClCompile Include="Search.cpp" />
     <ClCompile Include="ServerResponse.cpp" />
     <ClCompile Include="SubField.cpp" />
     <ClCompile Include="Tcp4Socket.cpp" />

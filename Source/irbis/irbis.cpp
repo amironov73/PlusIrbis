@@ -51,6 +51,33 @@ bool contains(const std::wstring &text, const std::wstring &fragment)
     return text.find(fragment) != std::string::npos;
 }
 
+// Содержит ли строка заданный символ?
+bool contains(const std::wstring &text, wchar_t c)
+{
+    return text.find(c) != std::string::npos;
+}
+
+// Удаление пробельных символов в начале строки.
+std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text)
+{
+    // TODO implement
+    return text;
+}
+
+// Удаление пробельных символов в конце строки.
+std::wstring PLUSIRBIS_EXPORTS trimEnd(const std::wstring &text)
+{
+    // TODO implement
+    return text;
+}
+
+// Удаление пробельных символов в начале и в конце строки.
+std::wstring trim(const std::wstring &text)
+{
+    // TODO implement
+    return text;
+}
+
 // Выдаёт текстовое описание ошибки по её коду.
 std::wstring describeError(int errorCode)
 {

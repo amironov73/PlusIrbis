@@ -7,6 +7,8 @@
 
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 
+#include <cstdio>
+#include <cstdlib>
 #include <chrono>
 #include <string>
 #include <ios>
@@ -131,6 +133,7 @@ class ProtocolText;
 class RawRecord;
 class RecordField;
 class RecordSerializer;
+class Search;
 class SearchParameters;
 class SearchScenario;
 class ServerResponse;
@@ -392,6 +395,15 @@ public:
 
 //=========================================================
 
+enum DirectAccessMode
+{
+    Exclusive = 0,
+    Shared    = 1,
+    ReadOnly  = 2
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS FileSpecification final
 {
 public:
@@ -595,6 +607,100 @@ public:
 
 //=========================================================
 
+#pragma pack(push, 1)
+class PLUSIRBIS_EXPORTS MstControlRecord64 final
+{
+public:
+    const static int RecordSize;
+    const static long LockFlagPosition;
+
+    int ctlMfn { 0 };
+    int nextMfn { 0 };
+    long nextPosition { 0 };
+    int mftType { 0 };
+    int recCnt { 0 };
+    int reserv1 { 0 };
+    int reserv2 { 0 };
+    int blocked { 0 };
+
+    void read(FILE *file);
+};
+#pragma pack(pop)
+
+//=========================================================
+
+#pragma pack(push, 1)
+class PLUSIRBIS_EXPORTS MstDictionaryEntry64 final
+{
+public:
+    const static int EntrySize;
+
+    int tag { 0 };
+    int position { 0 };
+    int length { 0 };
+    std::wstring text;
+
+    void read(FILE *file);
+};
+#pragma pack(pop)
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS MstFile64 final
+{
+    FILE *_file;
+
+public:
+    MstControlRecord64 control;
+    std::wstring fileName;
+
+    MstFile64(const std::wstring &fileName, DirectAccessMode mode);
+    MstFile64(const MstFile64 &) = delete;
+    MstFile64(const MstFile64 &&) = delete;
+    MstFile64& operator = (const MstFile64 &) = delete;
+    MstFile64& operator = (const MstFile64 &&) = delete;
+    ~MstFile64();
+
+    MstRecord64 readRecord(long position);
+};
+
+//=========================================================
+
+#pragma pack(push, 1)
+class PLUSIRBIS_EXPORTS MstRecordLeader64 final
+{
+public:
+    const static int LeaderSize;
+
+    unsigned int mfn { 0 };
+    unsigned int length { 0 };
+    long previous { 0 };
+    unsigned int base { 0 };
+    unsigned int nvf { 0 };
+    unsigned int status { 0 };
+    unsigned int version { 0 };
+
+    void read(FILE *file);
+};
+#pragma pack(pop)
+
+//=========================================================
+
+#pragma pack(push, 1)
+class PLUSIRBIS_EXPORTS MstRecord64 final
+{
+public:
+    MstRecordLeader64 leader;
+    long offset { 0 };
+    std::vector<MstDictionaryEntry64> dictionary;
+
+    bool deleted() const;
+    MarcRecord toMarcRecord() const;
+};
+#pragma pack(pop)
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS NetworkException final
     : public IrbisException
 {
@@ -729,6 +835,54 @@ enum RecordStatus
     Last = 32u,
     Locked = 64u
 };
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS Search final
+{
+    std::wstring _buffer;
+
+public:
+    static Search all();
+    Search& and_(const std::wstring &text);
+    Search& and_(const std::wstring &text1, const std::wstring &text2);
+    Search& and_(const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
+    Search& and_(const Search &item);
+    Search& and_(const Search &item1, const Search &item2);
+    Search& and_(const Search &item1, const Search &item2, const Search &item3);
+    static Search equals(const std::wstring &prefix, const std::wstring &text);
+    static Search equals(const std::wstring &prefix, const std::wstring &text1, const std::wstring &text2);
+    static Search equals(const std::wstring &prefix, const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
+    static bool needWrap(const std::wstring &text);
+    Search& not_(const std::wstring &text);
+    Search& not_(const Search &item);
+    Search& or_(const std::wstring &text);
+    Search& or_(const std::wstring &text1, const std::wstring &text2);
+    Search& or_(const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
+    Search& or_(const Search &item);
+    Search& or_(const Search &item1, const Search &item2);
+    Search& or_(const Search &item1, const Search &item2, const Search &item3);
+    Search& sameField(const std::wstring &text);
+    Search& sameRepeat(const std::wstring &text);
+    std::wstring toString() const;
+    static std::wstring wrap(const std::wstring &text);
+    static std::wstring wrap(const Search &item);
+};
+
+Search keyword(const std::wstring &value1);
+Search author(const std::wstring &value1);
+Search title(const std::wstring &value1);
+Search publisher(const std::wstring &value1);
+Search place(const std::wstring &value1);
+Search subject(const std::wstring &value1);
+Search language(const std::wstring &value1);
+Search year(const std::wstring &value1);
+Search magazine(const std::wstring &value1);
+Search documentKind(const std::wstring &value1);
+Search udc(const std::wstring &value1);
+Search bbk(const std::wstring &value1);
+Search rzn(const std::wstring &value1);
+Search mhr(const std::wstring &value1);
 
 //=========================================================
 
@@ -1015,9 +1169,13 @@ std::wstring PLUSIRBIS_EXPORTS toLower(std::wstring &text);
 std::wstring PLUSIRBIS_EXPORTS toUpper(std::wstring &text);
 
 bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fragment);
+bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, wchar_t c);
+
+std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text);
+std::wstring PLUSIRBIS_EXPORTS trimEnd(const std::wstring &text);
+std::wstring trim(const std::wstring &text);
 
 std::wstring PLUSIRBIS_EXPORTS describeError(int errorCode);
-
 
 int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
