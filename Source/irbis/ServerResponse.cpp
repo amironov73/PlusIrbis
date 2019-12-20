@@ -9,6 +9,7 @@ namespace irbis {
 
 ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
 {
+    this->_connection = &connection;
     returnCode = 0;
     _success = false;
     _position = 0;
@@ -52,16 +53,27 @@ ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
     _success = true;
 }
 
+bool ServerResponse::checkReturnCode()
+{
+    return this->checkReturnCode(0);
+}
+
 bool ServerResponse::checkReturnCode(int nargs, ...)
 {
-    va_list args;
-    bool result = true;
+    this->_connection->lastError = 0;
+    if (!this->_success) {
+        this->_connection->lastError = -100002;
+        return false;
+    }
 
-    va_start(args, nargs);
-    if (getReturnCode() < 0)
+    va_list args;
+    auto result = true;
+
+    if (this->getReturnCode() < 0)
     {
+        va_start(args, nargs);
         result = false;
-        for(int i = 0; i < nargs; i++)
+        for(auto i = 0; i < nargs; i++)
         {
             const int code = va_arg(args, int);
             if (code == returnCode)
@@ -70,8 +82,9 @@ bool ServerResponse::checkReturnCode(int nargs, ...)
                 break;
             }
         }
+        va_end(args);
+        this->_connection->lastError = this->returnCode;
     }
-    va_end(args);
 
     return result;
 }
@@ -164,7 +177,7 @@ StringList ServerResponse::readRemainingUtfLines()
 
     StringList result;
     while (true) {
-        auto line = readUtf();
+        const auto line = readUtf();
         if (line.empty()){
             break;
         }
@@ -187,17 +200,20 @@ std::wstring ServerResponse::readUtf()
     return fromUtf(line);
 }
 
+bool ServerResponse::success() const
+{
+    return this->_success;
+}
+
 void ServerResponse::_write(const BYTE *bytes, size_t size)
 {
-    const size_t newSize = _content.size() + size;
-    if (_content.capacity() < newSize)
-    {
-        _content.reserve(newSize);
+    const auto newSize = this->_content.size() + size;
+    if (this->_content.capacity() < newSize) {
+        this->_content.reserve(newSize);
     }
 
-    for (size_t i = 0; i < size; i++)
-    {
-        _content.push_back(bytes[i]);
+    for (size_t i = 0; i < size; i++) {
+        this->_content.push_back(bytes[i]);
     }
 }
 

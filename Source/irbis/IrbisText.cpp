@@ -33,22 +33,25 @@ const std::wstring IrbisText::SearchDelimiter = L"#";
 // Замена разделителей текста с ИРБИС на MS-DOS.
 std::wstring IrbisText::fromIrbisToDos (std::wstring &text)
 {
-    throw NotImplementedException();
-    //return text.replace(IrbisDelimiter, MsDosDelimiter);
+    return replace(text, IrbisDelimiter, MsDosDelimiter);
+}
+
+// Замена разделителей текста с ИРБИС на UNIX.
+std::wstring IrbisText::fromIrbisToUnix (std::wstring &text)
+{
+    return replace(text, IrbisDelimiter, UnixDelimiter);
 }
 
 // Замена разделителей текста с MS-DOS на ИРБИС.
 std::wstring IrbisText::fromDosToIrbis (std::wstring &text)
 {
-    throw NotImplementedException();
-    //return text.replace(MsDosDelimiter, IrbisDelimiter);
+    return replace(text, MsDosDelimiter, IrbisDelimiter);
 }
 
 // Замена разделителей текста с MS-DOS на UNIX.
 std::wstring IrbisText::fromDosToUnix(std::wstring &text)
 {
-    throw NotImplementedException();
-    //return text.replace(MsDosDelimiter, UnixDelimiter);
+    return replace(text, MsDosDelimiter, UnixDelimiter);
 }
 
 // Разбивка ответа сервера по строкам (полный вариант разделителя).
@@ -61,8 +64,7 @@ StringList IrbisText::fromFullDelimiter (const std::wstring &text)
 // Строки, приходящие в ответ на команду WriteRecord.
 StringList IrbisText::fromShortDelimiter(const std::wstring &text)
 {
-    throw NotImplementedException();
-    //return text.split(ShortDelimiter);
+    return split(text, L'\u001E');
 }
 
 // Считываем весь файл как строку в кодировке ANSI.

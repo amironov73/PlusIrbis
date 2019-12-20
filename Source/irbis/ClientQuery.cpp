@@ -42,12 +42,12 @@ ClientQuery& ClientQuery::add(int value)
 
 ClientQuery& ClientQuery::add(const FileSpecification &specification)
 {
-    return *this;
+    return this->addAnsi(specification.toString());
 }
 
-ClientQuery& ClientQuery::add(const MarcRecord &record)
+ClientQuery& ClientQuery::add(const MarcRecord &record, const std::wstring &delimiter=L"\u001E")
 {
-    return *this;
+    return this->addUtf(record.encode(delimiter));
 }
 
 ClientQuery& ClientQuery::addAnsi(const std::string &text)
@@ -77,6 +77,27 @@ ClientQuery& ClientQuery::addAnsi(const std::wstring &text)
     _write(dst, size);
     delete[] dst;
     return *this;
+}
+
+bool ClientQuery::addFormat(const std::wstring &format)
+{
+    if (format.empty()) {
+        this->newLine();
+        return false;
+    }
+
+    const auto prepared = prepareFormat(trimStart(format));
+
+    if (format[0] == '@') {
+        this->addAnsi(format);
+    } else if (format[0] == '!') {
+        this->addUtf(prepared);
+    } else {
+        this->addUtf(std::wstring (L"!") + prepared);
+    }
+
+    this->newLine();
+    return true;
 }
 
 ClientQuery& ClientQuery::addUtf(const std::wstring &text)

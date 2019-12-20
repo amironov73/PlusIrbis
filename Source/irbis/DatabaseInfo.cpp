@@ -32,7 +32,7 @@ void DatabaseInfo::parse(ServerResponse &response)
     this->databaseLocked = fastParse32(response.readAnsi()) != 0;
 }
 
-std::vector<DatabaseInfo> DatabaseInfo::parse(MenuFile &menu)
+std::vector<DatabaseInfo> DatabaseInfo::parse(const MenuFile &menu)
 {
     std::vector<DatabaseInfo> result;
     for (const MenuEntry &entry: menu.entries) {

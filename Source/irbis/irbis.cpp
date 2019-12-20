@@ -57,6 +57,40 @@ bool contains(const std::wstring &text, wchar_t c)
     return text.find(c) != std::string::npos;
 }
 
+// Заменяет все вхождения одной подстроки на другую.
+std::string replace(const std::string &text, const std::string &from, const std::string &to)
+{
+    std::string result = text;
+    size_t index = 0;
+    while (true) {
+        index = text.find(from, index);
+        if (index == std::string::npos) {
+            break;
+        }
+        result.replace(index, to.length(), to);
+        index += to.length();
+    }
+
+    return result;
+}
+
+// Заменяет все вхождения одной подстроки на другую.
+std::wstring replace(const std::wstring &text, const std::wstring &from, const std::wstring &to)
+{
+    std::wstring result = text;
+    size_t index = 0;
+    while (true) {
+        index = text.find(from, index);
+        if (index == std::string::npos) {
+            break;
+        }
+        result.replace(index, to.length(), to);
+        index += to.length();
+    }
+
+    return result;
+}
+
 // Удаление пробельных символов в начале строки.
 std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text)
 {

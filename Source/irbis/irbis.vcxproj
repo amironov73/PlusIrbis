@@ -303,11 +303,17 @@
     <ClCompile Include="Connection.cpp" />
     <ClCompile Include="ConnectionFactory.cpp" />
     <ClCompile Include="DatabaseInfo.cpp" />
+    <ClCompile Include="DirectAccess.cpp" />
+    <ClCompile Include="EmbeddedField.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="FileSpecification.cpp" />
+    <ClCompile Include="GblResult.cpp" />
+    <ClCompile Include="IlfFile.cpp" />
+    <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="irbis.cpp" />
     <ClCompile Include="IrbisDate.cpp" />
     <ClCompile Include="IrbisText.cpp" />
+    <ClCompile Include="Iso2709.cpp" />
     <ClCompile Include="MarcRecord.cpp" />
     <ClCompile Include="MemoryChunk.cpp" />
     <ClCompile Include="MenuEntry.cpp" />
@@ -324,12 +330,17 @@
     <ClCompile Include="RecordSerializer.cpp" />
     <ClCompile Include="Search.cpp" />
     <ClCompile Include="ServerResponse.cpp" />
+    <ClCompile Include="ServerStat.cpp" />
     <ClCompile Include="SubField.cpp" />
     <ClCompile Include="Tcp4Socket.cpp" />
+    <ClCompile Include="TermInfo.cpp" />
+    <ClCompile Include="TermPosting.cpp" />
     <ClCompile Include="TextNavigator.cpp" />
     <ClCompile Include="TreeFile.cpp" />
     <ClCompile Include="TreeNode.cpp" />
     <ClCompile Include="Version.cpp" />
+    <ClCompile Include="XrfFile64.cpp" />
+    <ClCompile Include="XrfRecord64.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

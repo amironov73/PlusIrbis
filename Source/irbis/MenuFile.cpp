@@ -69,12 +69,17 @@ const std::wstring& MenuFile::getValueSensitive(const std::wstring &code, const 
     return value ? *value : defaultValue;
 }
 
-MenuFile MenuFile::parse(std::istream &stream)
+void MenuFile::parse(std::istream &stream)
 {
     throw NotImplementedException();
 }
 
-MenuFile MenuFile::parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */)
+void MenuFile::parse(const StringList &lines)
+{
+    throw NotImplementedException();
+}
+
+void MenuFile::parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */)
 {
     throw NotImplementedException();
 }
