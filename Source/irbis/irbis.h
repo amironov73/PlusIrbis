@@ -103,6 +103,7 @@ class ConnectionFactory;
 class DatabaseInfo;
 class DirectAccess64;
 class EmbeddedField;
+class Encoding;
 class FileSpecification;
 class Format;
 class FoundLine;
@@ -393,6 +394,7 @@ public:
     bool updateIniFile(StringList &lines);
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
+    bool writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile(const FileSpecification &specification);
 };
 
@@ -469,6 +471,26 @@ public:
     const static char DefaultCode;
 
     static RecordFieldList getEmbeddedFields(const RecordField &field, char sign = DefaultCode);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS Encoding // abstract
+{
+    static Encoding *_ansi;
+    static Encoding *_utf;
+
+public:
+
+    virtual std::vector<BYTE> fromUnicode(const std::wstring &text) const = 0;
+    virtual std::wstring toUnicode(const BYTE *bytes, size_t count) const = 0;
+
+    static Encoding* ansi();
+    static std::wstring fromAnsi(const BYTE *bytes, size_t count);
+    static std::wstring fromUtf(const BYTE *bytes, size_t count);
+    static std::vector<BYTE> toAnsi(const std::wstring &text);
+    static std::vector<BYTE> toUtf(const std::wstring &text);
+    static Encoding* utf();
 };
 
 //=========================================================
@@ -706,8 +728,8 @@ public:
     static const char FieldDelimiter = 0x1E;
     static const char SubFieldDelimiter = 0x1F;
 
-    static MarcRecord* readRecord(FILE *device, Encoding *encoding);
-    static void writeRecord(FILE *device, const MarcRecord &record, Encoding *encoding);
+    static MarcRecord* readRecord(FILE *device, const Encoding *encoding);
+    static void writeRecord(FILE *device, const MarcRecord &record, const Encoding *encoding);
 };
 
 //=========================================================
@@ -1435,6 +1457,9 @@ std::wstring PLUSIRBIS_EXPORTS describeError(int errorCode);
 int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, int length);
+int PLUSIRBIS_EXPORTS fastParse32(const std::string &text);
+int PLUSIRBIS_EXPORTS fastParse32(const char *text);
+int PLUSIRBIS_EXPORTS fastParse32(const char *text, int length);
 
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2);
 PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2);

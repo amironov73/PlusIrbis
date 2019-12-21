@@ -519,5 +519,40 @@ std::string toUtf(const std::wstring &text)
     return result;
 }
 
+//=========================================================
+
+Encoding* Encoding::_ansi = nullptr;
+Encoding* Encoding::_utf = nullptr;
+
+Encoding* Encoding::ansi()
+{
+    return Encoding::_ansi;
+}
+
+std::wstring fromAnsi(const BYTE *bytes, size_t count)
+{
+    throw NotImplementedException();
+}
+
+std::wstring fromUtf(const BYTE *bytes, size_t count)
+{
+    throw NotImplementedException();
+}
+
+std::vector<BYTE> toAnsi(const std::wstring &text)
+{
+    throw NotImplementedException();
+}
+
+std::vector<BYTE> Encoding::toUtf(const std::wstring &text)
+{
+    throw NotImplementedException();
+}
+
+Encoding* Encoding::utf()
+{
+    return Encoding::_utf;
+}
+
 }
 

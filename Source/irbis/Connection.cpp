@@ -923,18 +923,18 @@ bool Connection::updateIniFile(StringList &lines)
     return execute(query);
 }
 
-int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
+int Connection::writeRecord(MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false)
 {
     if (!this->_checkConnection()) {
         return 0;
     }
 
-    const auto db = iif(record.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
-    ClientQuery query(*this, "D");
-    query.addAnsi(db).newLine();
-    query.add(lockFlag).newLine();
-    query.add(actualize).newLine();
-    query.addUtf(record.encode(IrbisText::IrbisDelimiter)).newLine();
+    const auto db = iif (record.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
+    ClientQuery query (*this, "D");
+    query.addAnsi (db).newLine();
+    query.add (lockFlag).newLine();
+    query.add (actualize).newLine();
+    query.addUtf (record.encode(IrbisText::IrbisDelimiter)).newLine();
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
         return 0;
@@ -955,6 +955,56 @@ int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, b
 
     return response.returnCode;
 }
+
+bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse)
+{
+    if (!this->_checkConnection()) {
+        return false;
+    }
+
+    if (records.empty()) {
+        return true;
+    }
+
+    if (records.size() == 1) {
+        this->writeRecord (*records[0], lockFlag, actualize, dontParseResponse);
+        return true;
+    }
+
+    ClientQuery query (*this, "6");
+    query.add (lockFlag).newLine();
+    query.add (actualize).newLine();
+    for (const auto record : records) {
+        const auto db = iif (record->database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
+        query.addAnsi (db).addAnsi (IrbisText::IrbisDelimiter)
+            .addUtf (record->encode(IrbisText::IrbisDelimiter)).newLine();
+    }
+    ServerResponse response (*this, query);
+    if (!response.success()) {
+        return false;
+    }
+
+    response.getReturnCode();
+
+    if (!dontParseResponse) {
+        const auto lines = response.readRemainingUtfLines();
+        for (auto i = 0; i < lines.size(); i++) {
+            const auto &line = lines[i];
+            if (line.empty()) {
+                continue;
+            }
+
+            auto record = records[i];
+            record->fields.clear();
+            record->database = iif (record->database, this->database);
+            const auto recordLines = IrbisText::fromFullDelimiter(line);
+            record->decode(recordLines);
+        }
+    }
+
+    return true;
+}
+
 
 int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {

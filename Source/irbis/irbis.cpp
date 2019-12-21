@@ -209,6 +209,43 @@ int fastParse32(const wchar_t *text, int length)
     return result;
 }
 
+// Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const std::string &text)
+{
+    auto result = 0;
+    const size_t length = text.length();
+    for (size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text.at(offset) - '0';
+    }
+
+    return result;
+}
+
+// Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const char *text)
+{
+    auto result = 0;
+    while (*text != 0) {
+        result = result * 10 + *text - '0';
+        text++;
+    }
+
+    return result;
+}
+
+// Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const char *text, int length)
+{
+    auto result = 0;
+    while (length > 0) {
+        result = result * 10 + *text - L'0';
+        text++;
+        length--;
+    }
+
+    return result;
+}
+
 const std::string& iif(const std::string& s1, const std::string &s2)
 {
     if (!s1.empty())
