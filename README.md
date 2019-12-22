@@ -75,3 +75,4 @@ int main()
 #### Documentation (in russian)
 
 * [**Общее описание**](Docs/chapter1.md)
+* [**Класс Connection**](Docs/chapter2.md)

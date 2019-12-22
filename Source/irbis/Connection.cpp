@@ -81,6 +81,9 @@ bool Connection::connect()
     }
 
     this->_connected = true;
+    this->serverVersion = response.serverVersion;
+    const auto lines = response.readRemainingAnsiLines();
+    this->iniFile.parse(lines);
     return true;
 }
 
@@ -93,7 +96,7 @@ bool Connection::createDatabase(const std::wstring &databaseName, const std::wst
     ClientQuery query(*this, "T");
     query.addAnsi(databaseName).newLine()
             .addAnsi(description).newLine()
-            .add(readerAccess);
+            .add(readerAccess).newLine();
 
     return this->execute(query);
 }
@@ -105,7 +108,7 @@ bool Connection::createDictionary(const std::wstring &databaseName)
     }
 
     ClientQuery query(*this, "Z");
-    query.addAnsi(databaseName);
+    query.addAnsi(databaseName).newLine();
     return this->execute(query);
 }
 
@@ -116,7 +119,7 @@ bool Connection::deleteDatabase(const std::wstring &databaseName)
     }
 
     ClientQuery query(*this, "Z");
-    query.addAnsi(databaseName);
+    query.addAnsi(databaseName).newLine();
     return this->execute(query);
 }
 

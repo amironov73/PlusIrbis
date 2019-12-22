@@ -192,6 +192,71 @@ public:
 
 //=========================================================
 
+class PLUSIRBIS_EXPORTS IniFile final
+{
+public:
+    std::vector<IniSection> sections;
+
+    //IniFile();
+
+    IniFile& clear();
+    bool containsSection (const std::wstring &name) const;
+    IniSection& createSection(const std::wstring &name);
+    bool modified() const;
+    void notModified();
+    size_t getIndex(const std::wstring &name) const;
+    IniSection* getSection(const std::wstring &name) const;
+    const std::wstring& getValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &defaultValue) const;
+    void parse(const StringList &lines);
+    IniFile& removeSection(const std::wstring &sectionName);
+    IniFile& removeValue(const std::wstring &sectionName, const std::wstring &keyName);
+    IniFile& setValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &value);
+    //void write(const std::wstring &filename, QTextCodec *encoding) const;
+    //void writeModifiedOnly(QTextStream &stream) const;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IniLine final
+{
+public:
+    std::wstring key;
+    std::wstring value;
+
+    bool modified() const;
+    void notModified();
+    void setKey(const std::wstring &newKey);
+    void setValue(const std::wstring &newValue);
+    std::wstring toString() const;
+
+private:
+    bool _modified { false };
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS IniSection final
+{
+public:
+    std::wstring name;
+    std::vector<IniLine> lines;
+
+    IniSection& clear();
+    bool containsKey(const std::wstring &key) const;
+    size_t getIndex(const std::wstring &key) const;
+    IniLine* getLine(const std::wstring &key) const;
+    const std::wstring& getValue(const std::wstring &key, const std::wstring &defaultValue) const;
+    bool modified() const;
+    void notModified();
+    IniSection& removeValue(const std::wstring &key);
+    IniSection& setValue(const std::wstring &key, const std::wstring &value);
+    std::wstring toString() const;
+
+    const std::wstring& operator[] (const std::wstring &index) const;
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS AlphabetTable final
 {
 public:
@@ -329,6 +394,7 @@ public:
     int queryId;
     int lastError;
     std::wstring serverVersion;
+    IniFile iniFile;
     ClientSocket *socket;
 
     Connection();
@@ -596,71 +662,6 @@ public:
     IlfFile();
 
     void readLocalFile(const std::wstring &fileName);
-};
-
-//=========================================================
-
-class PLUSIRBIS_EXPORTS IniFile final
-{
-public:
-    std::vector<IniSection> sections;
-
-    //IniFile();
-
-    IniFile& clear();
-    bool containsSection (const std::wstring &name) const;
-    IniSection& createSection(const std::wstring &name);
-    bool modified() const;
-    void notModified();
-    size_t getIndex(const std::wstring &name) const;
-    IniSection* getSection(const std::wstring &name) const;
-    const std::wstring& getValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &defaultValue) const;
-    void parse(const StringList &lines);
-    IniFile& removeSection(const std::wstring &sectionName);
-    IniFile& removeValue(const std::wstring &sectionName, const std::wstring &keyName);
-    IniFile& setValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &value);
-    //void write(const std::wstring &filename, QTextCodec *encoding) const;
-    //void writeModifiedOnly(QTextStream &stream) const;
-};
-
-//=========================================================
-
-class PLUSIRBIS_EXPORTS IniLine final
-{
-public:
-    std::wstring key;
-    std::wstring value;
-
-    bool modified() const;
-    void notModified();
-    void setKey(const std::wstring &newKey);
-    void setValue(const std::wstring &newValue);
-    std::wstring toString() const;
-
-private:
-    bool _modified { false };
-};
-
-//=========================================================
-
-class PLUSIRBIS_EXPORTS IniSection final
-{
-public:
-    std::wstring name;
-    std::vector<IniLine> lines;
-
-    IniSection& clear();
-    bool containsKey(const std::wstring &key) const;
-    size_t getIndex(const std::wstring &key) const;
-    IniLine* getLine(const std::wstring &key) const;
-    const std::wstring& getValue(const std::wstring &key, const std::wstring &defaultValue) const;
-    bool modified() const;
-    void notModified();
-    IniSection& removeValue(const std::wstring &key);
-    IniSection& setValue(const std::wstring &key, const std::wstring &value);
-    std::wstring toString() const;
-
-    const std::wstring& operator[] (const std::wstring &index) const;
 };
 
 //=========================================================

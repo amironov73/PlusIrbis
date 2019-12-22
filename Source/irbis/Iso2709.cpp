@@ -3,6 +3,7 @@
 
 #include "irbis.h"
 
+#include <cstring>
 #include <sys/stat.h>
 
 #if defined(_MSC_VER)
