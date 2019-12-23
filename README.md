@@ -76,3 +76,4 @@ int main()
 
 * [**Общее описание**](Docs/chapter1.md)
 * [**Класс Connection**](Docs/chapter2.md)
+* [**Классы MarcRecord, RecordField и SubField**](Docs/chapter3.md)

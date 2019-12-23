@@ -330,9 +330,9 @@ toConnectionString | Получение строки подключения
 
 ```c++
 irbis::Connection client;
-$client.username = L"librarian";
-$client.password = L"secret";
-$client.workstation = L"A"; // обратите внимание!
+client.username = L"librarian";
+client.password = L"secret";
+client.workstation = L"A"; // обратите внимание!
 if (!client.connect()) {
     std::wcout << L"Не удалось подключиться!\n";
     exit(1);
@@ -359,4 +359,4 @@ unlockRecords     | Разблокирование записей
 updateUserList    | Обновление списка пользователей на сервере
 
 
-[Предыдущая глава](chapter1.md)
+[Предыдущая глава](chapter1.md) | [Следующая глава](chapter2.md)

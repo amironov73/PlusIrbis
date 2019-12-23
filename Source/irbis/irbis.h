@@ -501,11 +501,11 @@ public:
 
 //=========================================================
 
-enum DirectAccessMode
+enum DirectAccessMode : unsigned int
 {
-    Exclusive = 0,
-    Shared    = 1,
-    ReadOnly  = 2
+    Exclusive = 0u,
+    Shared    = 1u,
+    ReadOnly  = 2u
 };
 
 //=========================================================
@@ -683,15 +683,15 @@ public:
 
 //=========================================================
 
-enum IrbisPath
+enum IrbisPath : unsigned int
 {
-    System = 0,
-    Data = 1,
-    MasterFile = 2,
-    InvertedFile = 3,
-    ParameterFile = 10,
-    FullText = 11,
-    InternalResource = 12
+    System = 0u,
+    Data = 1u,
+    MasterFile = 2u,
+    InvertedFile = 3u,
+    ParameterFile = 10u,
+    FullText = 11u,
+    InternalResource = 12u
 };
 
 //=========================================================
@@ -1041,7 +1041,7 @@ public:
 
 //=========================================================
 
-enum RecordStatus
+enum RecordStatus : unsigned int
 {
     LogicallyDeleted = 1u,
     PhysicallyDeleted = 2u,
