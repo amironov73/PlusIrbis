@@ -121,4 +121,4 @@ status   | unsigned int | Статус записи: логически удал
 version  | unsigned int | Номер версии записи
 fields   | StringList   | Список полей записи в "сыром" виде
 
-[Предыдущая глава](chapter2.md)
+[Предыдущая глава](chapter2.md) | [Следующая глава](chapter3.md)

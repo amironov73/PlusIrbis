@@ -2,24 +2,26 @@
 
 ManagedClient ported to plain C++14. Currently supported:
 
-* 32-bit and 64-bit Windows;
-* MSVS 2017/2019 Community Edition;
-* 32-bit and 64-bit Linux;
-* MacOS X 10.14;
-* GCC 7 and higher;
-* Clang compiler.
+* 32-bit and 64-bit Windows (version 7, 8, 8.1, 10);
+* MacOS X 10.14 (64-bit);
+* 32-bit and 64-bit Linux (CentOS 7);
+* MSVS 2017/2019 Community Edition on Windows;
+* GCC 7 and higher both on Windows and Linux/OS X;
+* Clang compiler 9 both on Windows and Linux/OS X.
 
 ### Example
 
 ```c++
 #include "irbis.h"
+
 #include <iostream>
+#include <string>
 
 #pragma comment (lib, "irbis.lib")
 
 int main()
 {
-    setlocale(LC_ALL, ""); // for cyrillic output
+    std::wcout.imbue( std::locale("") ); // for cyrillic output
 
     irbis::Connection connection;
     connection.host = L"192.168.1.35";
@@ -77,3 +79,6 @@ int main()
 * [**Общее описание**](Docs/chapter1.md)
 * [**Класс Connection**](Docs/chapter2.md)
 * [**Классы MarcRecord, RecordField и SubField**](Docs/chapter3.md)
+* [**Прочие (вспомогательные) классы и функции**](Docs/chapter4.md)
+* [**Построитель запросов**](Docs/chapter5.md)
+* [**Глобальная корректировка**](Docs/chapter6.md)
