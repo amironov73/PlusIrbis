@@ -13,6 +13,7 @@
 #include <string>
 #include <ios>
 #include <list>
+#include <map>
 #include <set>
 #include <vector>
 
@@ -134,6 +135,9 @@ class NetworkException;
 class NotImplementedException;
 class NumberChunk;
 class NumberText;
+class OptFile;
+class OptLine;
+class ParFile;
 class PostingParameters;
 class ProcessInfo;
 class ProtocolText;
@@ -950,6 +954,47 @@ public:
 class PLUSIRBIS_EXPORTS NumberText final
 {
 public:
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS OptFile final
+{
+public:
+    std::vector<OptLine> lines;
+
+    void parse(const StringList &text);
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS OptLine final
+{
+public:
+    std::wstring key;
+    std::wstring value;
+};
+
+//=========================================================
+
+class PLUSIRBIS_EXPORTS ParFile final
+{
+public:
+    std::wstring xrf;
+    std::wstring mst;
+    std::wstring cnt;
+    std::wstring n01;
+    std::wstring n02;
+    std::wstring l01;
+    std::wstring l02;
+    std::wstring ifp;
+    std::wstring any;
+    std::wstring pft;
+    std::wstring ext;
+
+    void assign (const std::wstring &path);
+    void parse(const StringList &lines);
+    std::map<int, std::wstring> toDictionary() const;
 };
 
 //=========================================================
