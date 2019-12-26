@@ -340,6 +340,7 @@
     <ClCompile Include="TextNavigator.cpp" />
     <ClCompile Include="TreeFile.cpp" />
     <ClCompile Include="TreeNode.cpp" />
+    <ClCompile Include="UserInfo.cpp" />
     <ClCompile Include="Version.cpp" />
     <ClCompile Include="XrfFile64.cpp" />
     <ClCompile Include="XrfRecord64.cpp" />

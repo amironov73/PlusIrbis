@@ -166,8 +166,9 @@ class XrfRecord64;
 
 //=========================================================
 
+using String = std::wstring;
 using MfnList = std::vector<int>;
-using StringList = std::vector<std::wstring>;
+using StringList = std::vector<String>;
 using SubFieldList = std::vector<SubField>;
 using RecordFieldList = std::vector<RecordField>;
 
@@ -399,6 +400,7 @@ public:
     int lastError;
     std::wstring serverVersion;
     IniFile iniFile;
+    int interval { 0 };
     ClientSocket *socket;
 
     Connection();
@@ -462,6 +464,7 @@ public:
     bool unlockDatabase(const std::wstring &databaseName);
     bool unlockRecords(const std::wstring &databaseName, const MfnList &mfnList);
     bool updateIniFile(StringList &lines);
+    bool updateUserList(const std::vector<UserInfo> &users);
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     bool writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
@@ -1417,6 +1420,9 @@ public:
     std::wstring acquisitions;
     std::wstring provision;
     std::wstring administrator;
+
+    String toString() const;
+    static std::vector<UserInfo> parse(const StringList &lines);
 };
 
 //=========================================================

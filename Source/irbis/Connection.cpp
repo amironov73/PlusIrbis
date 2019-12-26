@@ -70,18 +70,29 @@ bool Connection::connect()
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> dis(100000, 900000);
 
-    this->clientId = dis(gen);
+    AGAIN: this->clientId = dis(gen);
     this->queryId = 1;
     ClientQuery query(*this, "A");
     query.addAnsi(this->username).newLine()
-            .addAnsi(this->password).newLine();
+            .addAnsi(this->password);
     ServerResponse response(*this, query);
     if (!response.success()) {
         return false;
     }
 
+    response.getReturnCode();
+    if (response.returnCode == -3337) {
+        // клиент с данным идентификатором уже зарегистрирован
+        goto AGAIN;
+    }
+
+    if (response.returnCode < 0) {
+        return false;
+    }
+
     this->_connected = true;
     this->serverVersion = response.serverVersion;
+    this->interval = response.readInteger();
     const auto lines = response.readRemainingAnsiLines();
     this->iniFile.parse(lines);
     return true;
@@ -283,6 +294,15 @@ std::vector<UserInfo> Connection::getUserList()
         return result;
     }
 
+    ClientQuery query (*this, "+9");
+    ServerResponse response (*this, query);
+    if (!response.checkReturnCode()) {
+        return result;
+    }
+
+    const auto lines = response.readRemainingAnsiLines();
+    result = UserInfo::parse(lines);
+
     return result;
 }
 
@@ -310,7 +330,7 @@ GblResult Connection::globalCorrection(const GblSettings &settings)
     return result;
 }
 
-std::vector<DatabaseInfo> Connection::listDatabases(const IniFile &iniFile, const std::string &defaultFileName)
+std::vector<DatabaseInfo> Connection::listDatabases(const IniFile &theIni, const std::string &defaultFileName)
 {
     std::vector<DatabaseInfo> result;
 
@@ -659,6 +679,24 @@ MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn, int
         return result;
     }
 
+    ClientQuery query(*this, "C");
+    query.addAnsi(databaseName).newLine()
+            .add(mfn).newLine()
+            .add(version);
+
+    ServerResponse response(*this, query);
+    if (response.checkReturnCode()) {
+        const auto lines = response.readRemainingUtfLines();
+        result.decode(lines);
+        result.database = this->database;
+    }
+
+    if (version) {
+        // TODO unlockRecord
+        std::vector<int> records { mfn };
+        this->unlockRecords(databaseName, records);
+    }
+
     return result;
 }
 
@@ -924,6 +962,20 @@ bool Connection::updateIniFile(StringList &lines)
     }
 
     return execute(query);
+}
+
+bool Connection::updateUserList(const std::vector<UserInfo> &users)
+{
+    if (!this->_checkConnection()) {
+        return false;
+    }
+
+    ClientQuery query (*this, "+7");
+    for (const auto &user : users) {
+        query.addAnsi(user.toString()).newLine();
+    }
+
+    return this->execute(query);
 }
 
 int Connection::writeRecord(MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false)
