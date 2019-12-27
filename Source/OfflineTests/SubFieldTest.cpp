@@ -19,7 +19,7 @@ namespace OfflineTests
 
         TEST_METHOD(constructor_2)
         {
-            const SubField sub{'a', nullptr};
+            const SubField sub{'a'};
             Assert::IsTrue(sub.empty());
             Assert::IsTrue(sub.code == 'a');
             Assert::IsTrue(sub.toString() == L"^a");
@@ -42,7 +42,7 @@ namespace OfflineTests
 
         TEST_METHOD(verify_2)
         {
-            const SubField sub{'a', nullptr};
+            const SubField sub{'a'};
             Assert::IsFalse(sub.verify(false));
         }
 

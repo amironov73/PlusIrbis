@@ -174,6 +174,44 @@ using RecordFieldList = std::vector<RecordField>;
 
 //=========================================================
 
+/// \brief Результат выполнения функции.
+template<class T>
+class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
+{
+public:
+    bool success { false };
+    T result;
+    String errorMessage;
+
+    operator bool() const // NOLINT(hicpp-explicit-conversions)
+    {
+        return this->success;
+    }
+
+    operator T() const // NOLINT(hicpp-explicit-conversions)
+    {
+        return this->result;
+    }
+
+    /// \brief Успешное выполнение.
+    static Result Success(T value)
+    {
+        Result result { true, value };
+        return result;
+    }
+
+    /// \brief Возникла ошибка.
+    static Result Failure (const String &message)
+    {
+        Result result { false };
+        result.errorMessage = message;
+        return result;
+    }
+};
+
+//=========================================================
+
+/// \brief Базовое исключение для всех нештатных ситуаций.
 class PLUSIRBIS_EXPORTS IrbisException
         : public std::exception
 {
@@ -182,6 +220,7 @@ public:
 
 //=========================================================
 
+/// \brief Файл на сервере не найден.
 class PLUSIRBIS_EXPORTS FileNotFoundException
         : public IrbisException
 {
@@ -197,6 +236,7 @@ public:
 
 //=========================================================
 
+/// \brief INI-файл.
 class PLUSIRBIS_EXPORTS IniFile final
 {
 public:
@@ -222,6 +262,7 @@ public:
 
 //=========================================================
 
+/// \brief Строка INI-файла.
 class PLUSIRBIS_EXPORTS IniLine final
 {
 public:
@@ -240,10 +281,15 @@ private:
 
 //=========================================================
 
+/// \brief Секция INI-файла.
 class PLUSIRBIS_EXPORTS IniSection final
 {
 public:
+    /// \brief Имя секции.
     std::wstring name;
+
+    /// \brief Строки, входящие в секцию.
+    /// \see IniLine
     std::vector<IniLine> lines;
 
     IniSection& clear();
@@ -262,20 +308,41 @@ public:
 
 //=========================================================
 
+///
+/// \brief Таблица алфавитных символов.
+///
+/// Таблица алфавитных символов используется системой ИРБИС
+/// при разбиении текста на слова и представляет собой список
+/// кодов символов, которые считаются алфавитными.
+///
 class PLUSIRBIS_EXPORTS AlphabetTable final
 {
 public:
-    const static std::string FileName;
+    const static String FileName;
     std::set<wchar_t> characters;
 
-    explicit AlphabetTable(const std::vector<unsigned char> &bytes);
+    /// Конструктор.
+    explicit AlphabetTable(const std::vector<BYTE> &bytes);
 
+    /// Синглтон.
     static const AlphabetTable& instance();
+
+    /// Проверка, является ли указанный символ буквой.
     bool isAlpha(const wchar_t &c) const;
+
+    /// Парсинг потока.
     static AlphabetTable parse(std::istream &stream);
-    static AlphabetTable readLocalFile(const std::string &fileName);
-    std::wstring trimText(const std::wstring &text) const;
-    std::vector<std::wstring> splitWords(const std::wstring &text) const;
+
+    /// Чтение локального файла.
+    static AlphabetTable readLocalFile(const String &fileName);
+
+    /// Удаление пробелов в начале и в конце строки.
+    String trimText(const String &text) const;
+
+    /// Разбиение текста на слова.
+    StringList splitWords(const String &text) const;
+
+    /// Верификация таблицы.
     bool verify(bool throwOnError) const;
 };
 
@@ -313,6 +380,7 @@ public:
 
 //=========================================================
 
+/// \brief Информация о подключенном клиенте.
 class PLUSIRBIS_EXPORTS ClientInfo final
 {
 public:
@@ -330,6 +398,7 @@ public:
 
 //=========================================================
 
+/// \brief Абстрактный клиентский сокет.
 class PLUSIRBIS_EXPORTS ClientSocket // abstract
 {
 public:
@@ -351,6 +420,7 @@ public:
 
 //=========================================================
 
+/// \brief Клиентский запрос.
 class PLUSIRBIS_EXPORTS ClientQuery final
 {
     std::vector<BYTE> _content;
@@ -457,7 +527,8 @@ public:
     bool reloadMasterFile(const std::wstring &databaseName);
     bool restartServer();
     std::wstring requireTextFile(const FileSpecification &specification);
-    MfnList search(const std::wstring &expression);
+    MfnList search(const Search &search);
+    MfnList search(const String &expression);
     MfnList search(const SearchParameters &parameters);
     std::wstring toConnectionString() const;
     bool truncateDatabase(const std::wstring &databaseName);

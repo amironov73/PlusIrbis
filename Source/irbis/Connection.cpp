@@ -858,10 +858,21 @@ std::wstring Connection::requireTextFile(const FileSpecification &specification)
     return result;
 }
 
-MfnList Connection::search(const std::wstring &expression)
+MfnList Connection::search(const Search &search)
 {
     SearchParameters parameters;
-    parameters.database = database;
+    parameters.database = this->database;
+    parameters.searchExpression = search.toString();
+    parameters.numberOfRecords = 0;
+    parameters.firstRecord = 1;
+
+    return this->search(parameters);
+}
+
+MfnList Connection::search(const String &expression)
+{
+    SearchParameters parameters;
+    parameters.database = this->database;
     parameters.searchExpression = expression;
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;

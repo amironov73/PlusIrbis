@@ -14,14 +14,14 @@
 
 namespace irbis {
 
-const std::string AlphabetTable::FileName = "ISISACW.TAB";
+const String AlphabetTable::FileName = L"ISISACW.TAB";
 
-AlphabetTable::AlphabetTable(const std::vector<unsigned char>& bytes)
+AlphabetTable::AlphabetTable(const std::vector<BYTE> &bytes)
 {
     throw NotImplementedException();
 }
 
-static unsigned char _bytes[] =
+static BYTE _bytes[] =
 {
      38,  64,  65,  66,  67,  68,  69,  70,  71,  72,
      73,  74,  75,  76,  77,  78,  79,  80,  81,  82,
@@ -61,12 +61,12 @@ AlphabetTable AlphabetTable::parse(std::istream &stream)
     throw NotImplementedException();
 }
 
-AlphabetTable AlphabetTable::readLocalFile(const std::string &fileName)
+AlphabetTable AlphabetTable::readLocalFile(const String &fileName)
 {
     throw NotImplementedException();
 }
 
-std::wstring AlphabetTable::trimText(const std::wstring &text) const
+String AlphabetTable::trimText(const String &text) const
 {
     if (text.empty()) {
         return text;

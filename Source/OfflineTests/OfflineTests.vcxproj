@@ -39,6 +39,7 @@
     <ClCompile Include="FormatTest.cpp" />
     <ClCompile Include="MarcRecordTest.cpp" />
     <ClCompile Include="RecordFieldTest.cpp" />
+    <ClCompile Include="ResultTest.cpp" />
     <ClCompile Include="SubFieldTest.cpp" />
     <ClCompile Include="TextNavigatorTest.cpp" />
     <ClCompile Include="UtilsTest.cpp" />

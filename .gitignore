@@ -330,6 +330,9 @@ ASALocalRun/
 .mfractor/
 *.filters
 
+# Doxygen
+doxygen/
+
 # CMake
 cmake-build-debug/
 compile_commands.json
