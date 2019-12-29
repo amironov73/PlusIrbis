@@ -6,58 +6,86 @@
 #include <iterator>
 #include <sstream>
 
-//========================================================
-// Утилиты, используемые в проекте.
-//========================================================
+///
+/// \file irbis.cpp
+/// \brief Утилиты, используемые в PlusIrbis.
+///
+
+///
+/// \mainpage Универсальный клиент для системы ИРБИС64.
+///
+/// Универсальный программный клиент для автоматизированной
+/// библиотечно-информационной системы ИРБИС64 на языке С++.
+///
 
 namespace irbis {
 
-// Сравнение двух символов с точностью до регистра.
+/// \brief Сравнение двух символов с точностью до регистра.
+/// \param first Первый символ.
+/// \param second Второй символ.
+/// \return Возвращает true, если символы равны с точностью до регистра,
+/// иначе false.
 bool sameChar(wchar_t first, wchar_t second)
 {
     return towupper(first) == towupper(second);
 }
 
-// Сравнение двух строк с точностью до регистра символов.
-bool sameString(const std::wstring &first, const std::wstring &second)
+/// \brief Сравнение двух строк с точностью до регистра символов.
+/// \param first Первая строка.
+/// \param second Вторая строка.
+/// \return Возвращает true, если строки равны с точностью до регистра,
+/// иначе false.
+bool sameString(const String &first, const String &second)
 {
     return std::equal(first.begin(), first.end(), second.begin(), second.end(),
         [] (wchar_t a, wchar_t b) { return towupper(a) == towupper(b); });
 }
 
-// Преобразование строки к нижнему регистру.
-std::wstring toLower(std::wstring &text)
+/// \brief Преобразование строки к нижнему регистру.
+/// \param text Текст, подлежащий трансформации.
+/// \return Возвращает преобразованную строку.
+/// \warning Трансформация осуществляется "по месту"!
+String toLower(String &text)
 {
-    for (wchar_t &i : text) {
+    for (auto &i : text) {
         i = tolower(i);
     }
 
     return text;
 }
 
-// Преобразование строки к верхнему регистру.
-std::wstring toUpper(std::wstring &text)
+/// \brief Преобразование строки к верхнему регистру.
+/// \param text Текст, подлежащий трансформации.
+/// \return Возвращает преобразованную строку.
+/// \warning Трансформация осуществляется "по месту"!
+String toUpper(String &text)
 {
-    for (wchar_t &i : text) {
+    for (auto &i : text) {
         i = toupper(i);
     }
 
     return text;
 }
 
-// Содержит ли строка заданную подстроку?
-bool contains(const std::wstring &text, const std::wstring &fragment)
+/// \brief Содержит ли строка заданную подстроку?
+/// \param text Текст для изучения.
+/// \param fragment Подстрока для поиска.
+/// \return Возвращает true, если подстрока найдена, иначе false.
+bool contains(const String &text, const String &fragment)
 {
     return text.find(fragment) != std::string::npos;
 }
 
-// Содержит ли строка заданный символ?
-bool contains(const std::wstring &text, wchar_t c)
+/// \brief Содержит ли строка заданный символ?
+/// \param text Текст для изучения.
+/// \param c Символ для поиска.
+/// \return Возвращает true, если символ найден, иначе false.
+bool contains(const String &text, wchar_t c)
 {
     return text.find(c) != std::string::npos;
 }
 
-// Заменяет все вхождения одной подстроки на другую.
+/// \brief Заменяет все вхождения одной подстроки на другую.
 std::string replace(const std::string &text, const std::string &from, const std::string &to)
 {
     std::string result = text;
@@ -91,28 +119,28 @@ std::wstring replace(const std::wstring &text, const std::wstring &from, const s
     return result;
 }
 
-// Удаление пробельных символов в начале строки.
+/// \brief Удаление пробельных символов в начале строки.
 std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text)
 {
     // TODO implement
     return text;
 }
 
-// Удаление пробельных символов в конце строки.
+/// \brief Удаление пробельных символов в конце строки.
 std::wstring PLUSIRBIS_EXPORTS trimEnd(const std::wstring &text)
 {
     // TODO implement
     return text;
 }
 
-// Удаление пробельных символов в начале и в конце строки.
+/// \brief Удаление пробельных символов в начале и в конце строки.
 std::wstring trim(const std::wstring &text)
 {
     // TODO implement
     return text;
 }
 
-// Выдаёт текстовое описание ошибки по её коду.
+/// \brief Выдаёт текстовое описание ошибки по её коду.
 std::wstring describeError(int errorCode)
 {
     if (errorCode >= 0) {
@@ -172,7 +200,7 @@ std::wstring describeError(int errorCode)
     }
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
 int fastParse32(const std::wstring &text)
 {
     auto result = 0;
@@ -184,7 +212,7 @@ int fastParse32(const std::wstring &text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
 int fastParse32(const wchar_t *text)
 {
     auto result = 0;
@@ -196,8 +224,8 @@ int fastParse32(const wchar_t *text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const wchar_t *text, int length)
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const wchar_t *text, size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -209,7 +237,7 @@ int fastParse32(const wchar_t *text, int length)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
 int fastParse32(const std::string &text)
 {
     auto result = 0;
@@ -221,7 +249,7 @@ int fastParse32(const std::string &text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
 int fastParse32(const char *text)
 {
     auto result = 0;
@@ -233,8 +261,12 @@ int fastParse32(const char *text)
     return result;
 }
 
-// Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const char *text, int length)
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст в однобайтовой кодировке.
+/// \param length Длина текста в байтах.
+/// \return Результат разбора.
+/// \warning Мусор на входе -- мусор на выходе!
+int fastParse32(const char *text, size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -246,6 +278,10 @@ int fastParse32(const char *text, int length)
     return result;
 }
 
+///
+/// \param s1
+/// \param s2
+/// \return
 const std::string& iif(const std::string& s1, const std::string &s2)
 {
     if (!s1.empty())
@@ -256,6 +292,10 @@ const std::string& iif(const std::string& s1, const std::string &s2)
     return s2;
 }
 
+///
+/// \param s1
+/// \param s2
+/// \return
 const std::wstring& iif(const std::wstring& s1, const std::wstring &s2)
 {
     if (!s1.empty())
@@ -266,6 +306,11 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2)
     return s2;
 }
 
+///
+/// \param s1
+/// \param s2
+/// \param s3
+/// \return
 const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3)
 {
     if (!s1.empty())
@@ -281,6 +326,11 @@ const std::string& iif(const std::string& s1, const std::string &s2, const std::
     return s3;
 }
 
+///
+/// \param s1
+/// \param s2
+/// \param s3
+/// \return
 const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3)
 {
     if (!s1.empty())
@@ -296,6 +346,10 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const st
     return s3;
 }
 
+///
+/// \param list
+/// \param index
+/// \return
 std::wstring safeAt(const StringList &list, size_t index)
 {
     if (index >= list.size())
@@ -306,7 +360,12 @@ std::wstring safeAt(const StringList &list, size_t index)
     return list.at(index);
 }
 
-StringList maxSplit(const std::wstring &text, wchar_t separator, int count)
+///
+/// \param text
+/// \param separator
+/// \param count
+/// \return
+StringList maxSplit(const String &text, wchar_t separator, int count)
 {
     std::vector<std::wstring> result;
 
@@ -332,6 +391,10 @@ StringList maxSplit(const std::wstring &text, wchar_t separator, int count)
 
 }
 
+///
+/// \param text
+/// \param delimiter
+/// \return
 std::vector<std::string> split(const std::string &text, char delimiter)
 {
     std::vector<std::string> result;
@@ -345,7 +408,11 @@ std::vector<std::string> split(const std::string &text, char delimiter)
     return result;
 }
 
-StringList split(const std::wstring &text, wchar_t delimiter)
+///
+/// \param text
+/// \param delimiter
+/// \return
+StringList split(const String &text, wchar_t delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
@@ -358,6 +425,10 @@ StringList split(const std::wstring &text, wchar_t delimiter)
     return result;
 }
 
+///
+/// \param text
+/// \param delimiter
+/// \return
 std::vector<std::string> split(const std::string &text, const std::string &delimiter)
 {
     std::vector<std::string> result;
@@ -379,7 +450,11 @@ std::vector<std::string> split(const std::string &text, const std::string &delim
     return result;
 }
 
-StringList split(const std::wstring &text, const std::wstring &delimiter)
+///
+/// \param text
+/// \param delimiter
+/// \return
+StringList split(const String &text, const String &delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
@@ -402,7 +477,10 @@ StringList split(const std::wstring &text, const std::wstring &delimiter)
 
 //=========================================================
 
-std::wstring removeComments(const std::wstring &text)
+///
+/// \param text
+/// \return
+String removeComments(const String &text)
 {
     if (text.empty()) {
         return text;
@@ -463,6 +541,9 @@ std::wstring removeComments(const std::wstring &text)
     return result;
 }
 
+///
+/// \param text
+/// \return
 std::wstring prepareFormat(const std::wstring &text)
 {
     std::wstring text2 = removeComments(text);

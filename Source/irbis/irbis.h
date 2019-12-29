@@ -174,33 +174,40 @@ using RecordFieldList = std::vector<RecordField>;
 
 //=========================================================
 
-/// \brief Результат выполнения функции.
+/// \brief Результат выполнения функции (с учетом успеха/ошибки).
 template<class T>
 class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 public:
+    /// \brief Признак успешного завершения.
     bool success { false };
+
+    /// \brief Результирующее значение (имеет смысл при успешном завершении).
     T result;
+
+    /// \brief Сообщение об ошибке.
     String errorMessage;
 
+    /// \brief Преобразование к логическому значению. true означает успех.
     operator bool() const // NOLINT(hicpp-explicit-conversions)
     {
         return this->success;
     }
 
+    /// \brief Получение результирующего значения.
     operator T() const // NOLINT(hicpp-explicit-conversions)
     {
         return this->result;
     }
 
-    /// \brief Успешное выполнение.
+    /// \brief Формирование результата успешного выполнения.
     static Result Success(T value)
     {
         Result result { true, value };
         return result;
     }
 
-    /// \brief Возникла ошибка.
+    /// \brief Формирование признака ошибки.
     static Result Failure (const String &message)
     {
         Result result { false };
@@ -308,7 +315,6 @@ public:
 
 //=========================================================
 
-///
 /// \brief Таблица алфавитных символов.
 ///
 /// Таблица алфавитных символов используется системой ИРБИС
@@ -384,26 +390,29 @@ public:
 class PLUSIRBIS_EXPORTS ClientInfo final
 {
 public:
-    std::wstring number;
-    std::wstring ipAddress;
-    std::wstring port;
-    std::wstring name;
-    std::wstring id;
-    std::wstring workstation;
-    std::wstring registered;
-    std::wstring acknowledged;
-    std::wstring lastCommand;
-    std::wstring commandNumber;
+    String number;        ///< Порядковый номер.
+    String ipAddress;     ///< Адрес клиента.
+    String port;          ///< Порт клиента.
+    String name;          ///< Логин пользователя.
+    String id;            ///< Идентификатор клиентской программы (просто уникальное число).
+    String workstation;   ///< Тип клиентского АРМ.
+    String registered;    ///< Момент подключения к серверу.
+    String acknowledged;  ///< Последнее подтверждение, посланное серверу.
+    String lastCommand;   ///< Последняя команда, посланная серверу.
+    String commandNumber; ///< Порядковый номер последней программы.
 };
 
 //=========================================================
 
 /// \brief Абстрактный клиентский сокет.
+///
+/// Наследники обязательно должны переопределить методы send и receive.
+/// Объекты данного класса неперемещаемые.
 class PLUSIRBIS_EXPORTS ClientSocket // abstract
 {
 public:
-    std::wstring host { L"localhost" };
-    short port { 6666 };
+    String host { L"localhost" }; ///< Адрес сервера в виде строки.
+    short port { 6666 }; ///< Номер порта сервера.
 
     ClientSocket() = default;
     ClientSocket(ClientSocket &) = delete;
@@ -414,13 +423,28 @@ public:
 
     virtual void open();
     virtual void close();
+
+    /// \brief Отсылка данных на сервер.
+    /// \param buffer Указатель на буфер с данными.
+    /// \param size Размер данных в байтах.
     virtual void send(const BYTE *buffer, size_t size) = 0;
+
+    /// \brief Получение отвера от сервера (частями).
+    /// \param buffer Буфер для размещения полученного ответа.
+    /// \param size Размер буфера в байтах.
+    /// \return Количество полученных данных в байтах.
+    /// Отрицательное число означает ошибку.
+    /// 0 означает, что сервер закончил передачу данных.
+    /// Положительное число означает, что приём продолжается,
+    /// и вызов нужно будет повторить для получения следующей порции.
     virtual size_t receive(BYTE *buffer, size_t size) = 0;
 };
 
 //=========================================================
 
 /// \brief Клиентский запрос.
+///
+/// Объекты данного класса неперемещаемые.
 class PLUSIRBIS_EXPORTS ClientQuery final
 {
     std::vector<BYTE> _content;
@@ -450,6 +474,9 @@ public:
 
 //=========================================================
 
+/// \brief Подключение к серверу ИРБИС64.
+///
+/// Объекты данного типа неперемещаемые.
 class PLUSIRBIS_EXPORTS Connection final
 {
 private:
@@ -459,19 +486,19 @@ private:
     bool _checkConnection();
 
 public:
-    std::wstring host;
-    short port;
-    std::wstring username;
-    std::wstring password;
-    std::wstring database;
-    std::wstring workstation;
-    int clientId;
-    int queryId;
-    int lastError;
-    std::wstring serverVersion;
-    IniFile iniFile;
-    int interval { 0 };
-    ClientSocket *socket;
+    String host;          ///< Адрес сервера в виде строки.
+    short port;           ///< Номер порта сервера.
+    String username;      ///< Логин пользователя.
+    String password;      ///< Пароль пользователя.
+    String database;      ///< Имя текущей базы данных.
+    String workstation;   ///< Тип клиента.
+    int clientId;         ///< Уникальный идентификатор клиента.
+    int queryId;          ///< Порядковый номер команды, отсылаемой на сервер.
+    int lastError;        ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
+    String serverVersion; ///< Версия сервера (получается при подключении).
+    IniFile iniFile;      ///< Содержимое серверного INI-файла для данного клиента.
+    int interval { 0 };   ///< Интервал автоматического подтверждения.
+    ClientSocket *socket; ///< Клиентский сокет.
 
     Connection();
     Connection(const Connection&) = delete;
@@ -480,20 +507,20 @@ public:
     Connection& operator=(Connection&&) = delete;
     ~Connection();
 
-    bool actualizeDatabase(const std::wstring &databaseName);
-    bool actualizeRecord(const std::wstring &databaseName, int mfn);
+    bool actualizeDatabase(const String &databaseName);
+    bool actualizeRecord(const String &databaseName, int mfn);
     bool connect();
-    bool createDatabase(const std::wstring &databaseName, const std::wstring &description, bool readerAccess);
-    bool createDictionary(const std::wstring &databaseName);
-    bool deleteDatabase(const std::wstring &databaseName);
+    bool createDatabase(const String &databaseName, const String &description, bool readerAccess);
+    bool createDictionary(const String &databaseName);
+    bool deleteDatabase(const String &databaseName);
     bool deleteRecord(int mfn);
     bool connected() const { return _connected; }
     void disconnect();
     bool execute(ClientQuery &query);
-    std::wstring formatRecord(const std::wstring &format, int mfn);
-    std::wstring formatRecord(const std::wstring &format, const MarcRecord &record);
+    String formatRecord(const String &format, int mfn);
+    String formatRecord(const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo(const std::wstring &databaseName);
-    int getMaxMfn(const std::wstring &databaseName);
+    int getMaxMfn(const String &databaseName);
     GblResult globalCorrection(const GblSettings &settings);
     ServerStat getServerStat();
     Version getServerVersion();
@@ -503,37 +530,37 @@ public:
     StringList listFiles(const FileSpecification &specification);
     StringList listFiles(const std::vector<FileSpecification> &specifications);
     std::vector<ProcessInfo> listProcesses();
-    StringList listTerms(const std::wstring &prefix);
+    StringList listTerms(const String &prefix);
     bool noOp();
-    void parseConnectionString(const std::wstring &connectionString);
-    std::wstring popDatabase();
-    std::wstring printTable(const TableDefinition &definition);
-    std::wstring pushDatabase(const std::wstring &newDatabase);
+    void parseConnectionString(const String &connectionString);
+    String popDatabase();
+    String printTable(const TableDefinition &definition);
+    String pushDatabase(const String &newDatabase);
     std::vector<BYTE> readBinaryFile(const FileSpecification &specification);
     IniFile readIniFile(const FileSpecification &specification);
     MenuFile readMenuFile(const FileSpecification &specification);
     std::vector<TermPosting> readPostings(const PostingParameters &parameters);
     RawRecord readRawRecord(int mfn);
     MarcRecord readRecord(int mfn);
-    MarcRecord readRecord(const std::wstring &databaseName, int mfn);
-    MarcRecord readRecord(const std::wstring &databaseName, int mfn, int version);
+    MarcRecord readRecord(const String &databaseName, int mfn);
+    MarcRecord readRecord(const String &databaseName, int mfn, int version);
     std::vector<SearchScenario> readSearchScenario(const FileSpecification &specification);
-    std::vector<TermInfo> readTerms(const std::wstring &startTerm, int numberOfTerms);
+    std::vector<TermInfo> readTerms(const String &startTerm, int numberOfTerms);
     std::vector<TermInfo> readTerms(const TermParameters &parameters);
-    std::wstring readTextFile(const FileSpecification &specification);
+    String readTextFile(const FileSpecification &specification);
     StringList readTextFiles(std::vector<FileSpecification> specifications);
     StringList  readTextLines(const FileSpecification &specification);
-    bool reloadDictionary(const std::wstring &databaseName);
-    bool reloadMasterFile(const std::wstring &databaseName);
+    bool reloadDictionary(const String &databaseName);
+    bool reloadMasterFile(const String &databaseName);
     bool restartServer();
-    std::wstring requireTextFile(const FileSpecification &specification);
+    String requireTextFile(const FileSpecification &specification);
     MfnList search(const Search &search);
     MfnList search(const String &expression);
     MfnList search(const SearchParameters &parameters);
     std::wstring toConnectionString() const;
-    bool truncateDatabase(const std::wstring &databaseName);
-    bool unlockDatabase(const std::wstring &databaseName);
-    bool unlockRecords(const std::wstring &databaseName, const MfnList &mfnList);
+    bool truncateDatabase(const String &databaseName);
+    bool unlockDatabase(const String &databaseName);
+    bool unlockRecords(const String &databaseName, const MfnList &mfnList);
     bool updateIniFile(StringList &lines);
     bool updateUserList(const std::vector<UserInfo> &users);
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
@@ -1225,12 +1252,12 @@ class PLUSIRBIS_EXPORTS SearchParameters final
 {
 public:
     std::wstring database;
+    std::wstring searchExpression;
     int firstRecord { 1 };
     std::wstring formatSpecification;
     int maxMfn { 0 };
     int minMfn { 0 };
     int numberOfRecords { 0 };
-    std::wstring searchExpression;
     std::wstring sequentialSpecification;
     std::wstring filterSpecification;
 };
@@ -1560,34 +1587,34 @@ public:
 // Utilities
 
 bool PLUSIRBIS_EXPORTS sameChar(wchar_t first, wchar_t second);
-bool PLUSIRBIS_EXPORTS sameString(const std::wstring &first, const std::wstring &second);
+bool PLUSIRBIS_EXPORTS sameString(const String &first, const String &second);
 
-std::wstring PLUSIRBIS_EXPORTS toLower(std::wstring &text);
-std::wstring PLUSIRBIS_EXPORTS toUpper(std::wstring &text);
+String PLUSIRBIS_EXPORTS toLower(String &text);
+String PLUSIRBIS_EXPORTS toUpper(String &text);
 
-bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, const std::wstring &fragment);
-bool PLUSIRBIS_EXPORTS contains(const std::wstring &text, wchar_t c);
+bool PLUSIRBIS_EXPORTS contains(const String &text, const String &fragment);
+bool PLUSIRBIS_EXPORTS contains(const String &text, wchar_t c);
 
 std::string PLUSIRBIS_EXPORTS replace(const std::string &text, const std::string &from, const std::string &to);
-std::wstring PLUSIRBIS_EXPORTS replace(const std::wstring &text, const std::wstring &from, const std::wstring &to);
+String PLUSIRBIS_EXPORTS replace(const String &text, const String &from, const String &to);
 
-std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text);
-std::wstring PLUSIRBIS_EXPORTS trimEnd(const std::wstring &text);
-std::wstring trim(const std::wstring &text);
+String PLUSIRBIS_EXPORTS trimStart(const String &text);
+String PLUSIRBIS_EXPORTS trimEnd(const String &text);
+String trim(const String &text);
 
-std::wstring PLUSIRBIS_EXPORTS describeError(int errorCode);
+String PLUSIRBIS_EXPORTS describeError(int errorCode);
 
-int PLUSIRBIS_EXPORTS fastParse32(const std::wstring &text);
+int PLUSIRBIS_EXPORTS fastParse32(const String &text);
 int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
-int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, int length);
+int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, size_t length);
 int PLUSIRBIS_EXPORTS fastParse32(const std::string &text);
 int PLUSIRBIS_EXPORTS fastParse32(const char *text);
-int PLUSIRBIS_EXPORTS fastParse32(const char *text, int length);
+int PLUSIRBIS_EXPORTS fastParse32(const char *text, size_t length);
 
-PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2);
-PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2);
-PLUSIRBIS_EXPORTS const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3);
-PLUSIRBIS_EXPORTS const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3);
+PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2);
+PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
+PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2, const std::string &s3);
+PLUSIRBIS_EXPORTS const String& iif(const String& s1, const String &s2, const String &s3);
 
 PLUSIRBIS_EXPORTS std::wstring safeAt(const StringList &list, size_t index);
 
@@ -1615,8 +1642,8 @@ PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
 PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
 PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);
 
-PLUSIRBIS_EXPORTS std::wstring removeComments(const std::wstring &text);
-PLUSIRBIS_EXPORTS std::wstring prepareFormat(const std::wstring &text);
+PLUSIRBIS_EXPORTS String removeComments(const String &text);
+PLUSIRBIS_EXPORTS String prepareFormat(const String &text);
 
 }
 

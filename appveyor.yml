@@ -8,7 +8,7 @@ platform: x64
 image: Visual Studio 2017
 
 before_build:
-- cmd: choco install doxygen.install
+- cmd: choco install doxygen.portable
 
 build:
   project: Source\PlusIrbis.sln

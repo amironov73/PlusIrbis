@@ -5,12 +5,13 @@
 
 namespace irbis {
 
-
+/// \brief Открытие сокета.
 void ClientSocket::open()
 {
     // Nothing to do here
 }
 
+/// \brief Закрытие сокета.
 void ClientSocket::close()
 {
     // Nothing to do here

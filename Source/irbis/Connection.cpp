@@ -13,6 +13,7 @@
 
 namespace irbis {
 
+/// \brief Единственный конструктор для данного класса.
 Connection::Connection()
         : _connected(false),
           host(L"127.0.0.1"),
@@ -27,6 +28,9 @@ Connection::Connection()
     this->socket = new Tcp4Socket();
 }
 
+/// \brief Деструктор для данного класса.
+///
+/// Если необходимо, выполняет отключение от сервера.
 Connection::~Connection() {
     this->disconnect();
     delete this->socket;
@@ -42,12 +46,21 @@ bool Connection::_checkConnection()
     return true;
 }
 
-bool Connection::actualizeDatabase(const std::wstring &databaseName)
+/// \brief Актуализация всех неактуализированных записей в указанной базе данных (если таковые имеются).
+/// \param databaseName Имя базы данных.
+/// \return Признак успешного выполнения операции.
+bool Connection::actualizeDatabase(const String &databaseName)
 {
     return this->actualizeRecord(databaseName, 0);
 }
 
-bool Connection::actualizeRecord(const std::wstring &databaseName, int mfn)
+/// \brief Актуализация на сервере записи по её MFN в базе данных с заданным именем.
+/// \param databaseName Имя базы данных.
+/// \param mfn MFN записи, подлежащей актуализации.
+/// \return Признак успешности выполения операции.
+///
+/// Если запись уже актуализирована, это не считается ошибкой.
+bool Connection::actualizeRecord(const String &databaseName, int mfn)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -60,6 +73,12 @@ bool Connection::actualizeRecord(const std::wstring &databaseName, int mfn)
     return this->execute(query);
 }
 
+/// \brief Подключение к серверу.
+/// \return Признак успешности выполнения операции.
+/// \warning Подключение некоторыми типами клиентов увеличивает на сервере счетчик использованных лицензий!
+///
+/// Повторные попытки подключения с помощью того же объекта Connection игнорируются.
+/// При этом возвращается true.
 bool Connection::connect()
 {
     if (this->connected()) {
@@ -98,7 +117,13 @@ bool Connection::connect()
     return true;
 }
 
-bool Connection::createDatabase(const std::wstring &databaseName, const std::wstring &description, bool readerAccess)
+/// \brief Создание на сервере базы данных с указанным именем.
+/// \param databaseName Имя создаваемой базы данных.
+/// \param description Описание базы данных в произвольной форме.
+/// \param readerAccess Созданная база должна быть доступна АРМ "Читатель"?
+/// \return Признак успешного выполнения операции.
+/// \warning Операция доступна лишь администратору.
+bool Connection::createDatabase(const String &databaseName, const String &description, bool readerAccess)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -112,7 +137,12 @@ bool Connection::createDatabase(const std::wstring &databaseName, const std::wst
     return this->execute(query);
 }
 
-bool Connection::createDictionary(const std::wstring &databaseName)
+/// \brief Создание на сервере словаря в базе данных с заданным именем.
+/// \param databaseName Имя базы данных.
+/// \return Признак успешного выполенения операции.
+/// \warning Операция доступна лишь администратору.
+/// \warning Операция может занять много времени.
+bool Connection::createDictionary(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -123,7 +153,11 @@ bool Connection::createDictionary(const std::wstring &databaseName)
     return this->execute(query);
 }
 
-bool Connection::deleteDatabase(const std::wstring &databaseName)
+/// \brief Удаление на сервере базы данных с заданным именем.
+/// \param databaseName Имя базы данных, подлежащей удалению.
+/// \return Признак успешного выполнения операции.
+/// \warning Операция доступна лишь администратору.
+bool Connection::deleteDatabase(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -134,6 +168,11 @@ bool Connection::deleteDatabase(const std::wstring &databaseName)
     return this->execute(query);
 }
 
+/// \brief Удаление на сервере в текущей базе данных записи по её MFN.
+/// \param mfn MNF записи, подлежащей удалению.
+/// \return Признак успешности выполнения операции.
+///
+/// Если запись уже удалена, это не считается ошибкой.
 bool Connection::deleteRecord(int mfn)
 {
     if (!this->_checkConnection()) {
@@ -149,6 +188,10 @@ bool Connection::deleteRecord(int mfn)
     return true;
 }
 
+/// \brief Отключение от сервера.
+///
+/// Повторные попытки отключения уже отключенного экземпляра клиента игнорируются.
+/// Если при подключении был увеличен счётчик использованных лицензий, он соответственно уменьшается.
 void Connection::disconnect()
 {
     if (!this->connected()) {
@@ -161,6 +204,12 @@ void Connection::disconnect()
     _connected = false;
 }
 
+/// \brief Результат исполнения запроса на сервере.
+/// \param query Полностью сформированный клиентский запрос.
+/// \return Признак успешного выполнения запроса.
+/// \warning Должно быть установлено подключение к серверу!
+///
+/// Если метод вернул false, конкретный код ошибки находится в lastError.
 bool Connection::execute(ClientQuery &query)
 {
     if (!this->_checkConnection()) {
@@ -171,7 +220,11 @@ bool Connection::execute(ClientQuery &query)
     return response.checkReturnCode();
 }
 
-std::wstring Connection::formatRecord(const std::wstring &format, int mfn)
+/// \brief Форматирование записи на сервере по её MFN.
+/// \param format Спецификация формата.
+/// \param mfn MFN записи, подлежащей расформатированию.
+/// \return Результат расформатирования.
+String Connection::formatRecord(const String &format, int mfn)
 {
     if (!this->_checkConnection()) {
         return L"";
@@ -193,7 +246,11 @@ std::wstring Connection::formatRecord(const std::wstring &format, int mfn)
     return result;
 }
 
-std::wstring Connection::formatRecord(const std::wstring &format, const MarcRecord &record)
+/// \brief Форматирование виртуальной записи (записи в клиентском представлении).
+/// \param format Спецификация формата.
+/// \param record Запись, подлежащая расформатированию.
+/// \return Результат расформатирования.
+String Connection::formatRecord(const String &format, const MarcRecord &record)
 {
     if (!this->_checkConnection()) {
         return L"";
@@ -215,7 +272,10 @@ std::wstring Connection::formatRecord(const std::wstring &format, const MarcReco
     return result;
 }
 
-DatabaseInfo Connection::getDatabaseInfo(const std::wstring &databaseName)
+/// \brief Получение информации о базе данных с указанным именем.
+/// \param databaseName Имя базы данных.
+/// \return Информация о базе данных.
+DatabaseInfo Connection::getDatabaseInfo(const String &databaseName)
 {
     DatabaseInfo result;
 
@@ -234,7 +294,9 @@ DatabaseInfo Connection::getDatabaseInfo(const std::wstring &databaseName)
     return result;
 }
 
-
+/// \brief Получение максимального MFN для базы данных с указанным именем.
+/// \param databaseName Имя базы данных.
+/// \return Максимальный MFN. 0 или отрицательное число означают ошибку.
 int Connection::getMaxMfn(const std::wstring &databaseName)
 {
     if (!this->_checkConnection()) {
@@ -252,6 +314,8 @@ int Connection::getMaxMfn(const std::wstring &databaseName)
     return result;
 }
 
+/// \brief Получение статистики работы сервера ИРБИС64.
+/// \return Статистика работы сервера.
 ServerStat Connection::getServerStat()
 {
     ServerStat result;
@@ -270,6 +334,8 @@ ServerStat Connection::getServerStat()
     return result;
 }
 
+/// \brief Получение версии сервера ИРБИС64.
+/// \return Версия сервера.
 Version Connection::getServerVersion()
 {
     Version result;
@@ -286,6 +352,9 @@ Version Connection::getServerVersion()
     return result;
 }
 
+/// \brief Получение списка пользователей, имеющих (потенциальный) доступ к серверу ИРБИС64.
+/// \return Список пользователей.
+/// \warning Операция доступна лишь администратору.
 std::vector<UserInfo> Connection::getUserList()
 {
     std::vector<UserInfo> result;
@@ -306,6 +375,9 @@ std::vector<UserInfo> Connection::getUserList()
     return result;
 }
 
+/// \brief Выполнение глобальной корректировки на сервере.
+/// \param settings Настройки глобальной корректировки.
+/// \return Результат выполнения глобальной корректировки.
 GblResult Connection::globalCorrection(const GblSettings &settings)
 {
     GblResult result;
@@ -359,6 +431,9 @@ std::vector<DatabaseInfo> Connection::listDatabases(const FileSpecification &spe
     return result;
 }
 
+/// \brief Получение списка файлов на сервере.
+/// \param specification Спецификация файла.
+/// \return Список файлов.
 StringList Connection::listFiles(const FileSpecification &specification)
 {
     StringList result;
@@ -384,6 +459,9 @@ StringList Connection::listFiles(const FileSpecification &specification)
     return result;
 }
 
+/// \brief Получение списка файлов на сервере.
+/// \param specifications Вектор спецификаций файлов.
+/// \return Список файлов.
 StringList Connection::listFiles(const std::vector<FileSpecification> &specifications)
 {
     StringList result;
@@ -411,6 +489,9 @@ StringList Connection::listFiles(const std::vector<FileSpecification> &specifica
     return result;
 }
 
+/// \brief Получение списка (рабочих) процессов, выполняемых в настоящий момент на сервере ИРБИС64.
+/// \return Массив серверных процессов.
+/// \warning Операция доступна только администратору.
 std::vector<ProcessInfo> Connection::listProcesses()
 {
     std::vector<ProcessInfo> result;
@@ -426,7 +507,12 @@ std::vector<ProcessInfo> Connection::listProcesses()
     return result;
 }
 
-StringList Connection::listTerms(const std::wstring &prefix)
+/// \brief Получение списка терминов в текущей базе данных с указанным префиксом.
+/// \param prefix Префикс, для которого строится список терминов (например, "T=")
+/// \return Термины, очищенные от префикса.
+/// \warning Для больших баз данных выполнение операции может потребовать
+/// много времени и занять слишком много оперативной памяти.
+StringList Connection::listTerms(const String &prefix)
 {
     StringList result;
 
@@ -435,8 +521,8 @@ StringList Connection::listTerms(const std::wstring &prefix)
     }
 
     const auto prefixSize = prefix.size();
-    std::wstring startTerm = prefix;
-    std::wstring lastTerm = startTerm;
+    String startTerm = prefix;
+    String lastTerm = startTerm;
     while (true) {
         const auto terms = this->readTerms(startTerm, 512);
         if (terms.empty()) {
@@ -444,7 +530,7 @@ StringList Connection::listTerms(const std::wstring &prefix)
         }
 
         for (const auto &term : terms) {
-            std::wstring text = term.text;
+            String text = term.text;
             const auto begin = text.substr(0, prefixSize);
             if (begin != prefix) {
                 goto DONE;
@@ -462,6 +548,11 @@ StringList Connection::listTerms(const std::wstring &prefix)
     return result;
 }
 
+/// \brief Пустая операция (не требует от сервера никаких действий).
+/// \return Признак успешности выполнения операции.
+///
+/// Используется для подтверждения подключения клиента
+/// при длительном бездействии пользователя.
 bool Connection::noOp() {
     if (!this->_checkConnection()) {
         return false;
@@ -471,7 +562,10 @@ bool Connection::noOp() {
     return this->execute(query);
 }
 
-void Connection::parseConnectionString(const std::wstring &connectionString) {
+/// \brief Разбор строки подключения.
+/// \param connectionString Строка подключения.
+/// \throw IrbisException Ошибка в структуре строки подключения.
+void Connection::parseConnectionString(const String &connectionString) {
     const auto items = split(connectionString, L";");
     for (auto &item : items) {
         auto parts = maxSplit(item, '=', 2);
@@ -503,7 +597,9 @@ void Connection::parseConnectionString(const std::wstring &connectionString) {
     }
 }
 
-std::wstring Connection::popDatabase()
+/// \brief Возврат к предыдущей базе данных.
+/// \return Имя базы данных, использовавшейся до возврата.
+String Connection::popDatabase()
 {
     const auto result = this->database;
     this->database = _databaseStack.back();
@@ -512,7 +608,10 @@ std::wstring Connection::popDatabase()
     return result;
 }
 
-std::wstring Connection::printTable(const TableDefinition &definition)
+/// \brief Расформатирование таблицы в RTF.
+/// \param definition Определение таблицы.
+/// \return Результат расформатирования.
+String Connection::printTable(const TableDefinition &definition)
 {
     if (!this->_checkConnection()) {
         return L"";
@@ -530,11 +629,17 @@ std::wstring Connection::printTable(const TableDefinition &definition)
             .addAnsi(""); // instead of MFN list
 
     ServerResponse response(*this, query);
+    if (!response.success()) {
+        return L"";
+    }
     const auto result = response.readRemainingUtfText();
     return result;
 }
 
-std::wstring Connection::pushDatabase(const std::wstring &newDatabase)
+/// \brief Запоминание имени текущей базы данных для последующего возврата к ней.
+/// \param newDatabase Имя базы данных, устанавливаемой в качестве текущей.
+/// \return Имя базы данных, использовавшейся в качестве текущей.
+String Connection::pushDatabase(const String &newDatabase)
 {
     const auto result = this->database;
     _databaseStack.push_back(newDatabase);
@@ -618,7 +723,7 @@ RawRecord Connection::readRawRecord(int mfn)
             .add(mfn);
 
     ServerResponse response(*this, query);
-    if (response.checkReturnCode()) {
+    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.parseSingle(lines);
         result.database = database;
@@ -640,7 +745,7 @@ MarcRecord Connection::readRecord(int mfn)
             .add(mfn);
 
     ServerResponse response(*this, query);
-    if (response.checkReturnCode()) {
+    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.decode(lines);
         result.database = this->database;
@@ -649,7 +754,7 @@ MarcRecord Connection::readRecord(int mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn)
+MarcRecord Connection::readRecord(const String &databaseName, int mfn)
 {
     MarcRecord result;
 
@@ -662,7 +767,7 @@ MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn)
             .add(mfn);
 
     ServerResponse response(*this, query);
-    if (response.checkReturnCode()) {
+    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.decode(lines);
         result.database = this->database;
@@ -671,7 +776,7 @@ MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn, int version)
+MarcRecord Connection::readRecord(const String &databaseName, int mfn, int version)
 {
     MarcRecord result;
 
@@ -685,7 +790,7 @@ MarcRecord Connection::readRecord(const std::wstring &databaseName, int mfn, int
             .add(version);
 
     ServerResponse response(*this, query);
-    if (response.checkReturnCode()) {
+    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.decode(lines);
         result.database = this->database;
@@ -711,7 +816,7 @@ std::vector<SearchScenario> Connection::readSearchScenario(const FileSpecificati
     return result;
 }
 
-std::vector<TermInfo> Connection::readTerms(const std::wstring &startTerm, int numberOfTerms = 100)
+std::vector<TermInfo> Connection::readTerms(const String &startTerm, int numberOfTerms = 100)
 {
     auto parameters = TermParameters();
     parameters.startTerm = startTerm;
@@ -739,8 +844,9 @@ std::vector<TermInfo> Connection::readTerms(const TermParameters &parameters)
     if (!response.success()) {
         return result;
     }
-    //if (!$response || !$response->checkReturnCode(codes_for_read_terms()))
-    //    return false;
+    if (!response.checkReturnCode(3, -202, -203, -204)) {
+        return result;
+    }
 
     const auto lines = response.readRemainingUtfLines();
     result = TermInfo::parse(lines);
@@ -748,7 +854,7 @@ std::vector<TermInfo> Connection::readTerms(const TermParameters &parameters)
     return result;
 }
 
-std::wstring Connection::readTextFile(const FileSpecification &specification)
+String Connection::readTextFile(const FileSpecification &specification)
 {
     std::wstring result;
 
@@ -848,7 +954,7 @@ bool Connection::restartServer()
     return this->execute(query);
 }
 
-std::wstring Connection::requireTextFile(const FileSpecification &specification)
+String Connection::requireTextFile(const FileSpecification &specification)
 {
     const auto result = readTextFile(specification);
     if (result.empty()) {
@@ -860,9 +966,7 @@ std::wstring Connection::requireTextFile(const FileSpecification &specification)
 
 MfnList Connection::search(const Search &search)
 {
-    SearchParameters parameters;
-    parameters.database = this->database;
-    parameters.searchExpression = search.toString();
+    SearchParameters parameters { this->database, search.toString() };
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;
 
@@ -871,9 +975,7 @@ MfnList Connection::search(const Search &search)
 
 MfnList Connection::search(const String &expression)
 {
-    SearchParameters parameters;
-    parameters.database = this->database;
-    parameters.searchExpression = expression;
+    SearchParameters parameters { this->database, expression };
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;
 
@@ -915,16 +1017,16 @@ MfnList Connection::search(const SearchParameters &parameters)
 
 std::wstring Connection::toConnectionString() const
 {
-    return std::wstring(L"host=") + host
-           + L";port=" + std::to_wstring(port)
-           + L";username=" + username
-           + L";password=" + password
-           + L";database" + database
-           + L";arm=" + workstation
+    return String(L"host=") + this->host
+           + L";port=" + std::to_wstring(this->port)
+           + L";username=" + this->username
+           + L";password=" + this->password
+           + L";database" + this->database
+           + L";arm=" + this->workstation
            + L";";
 }
 
-bool Connection::truncateDatabase(const std::wstring &databaseName)
+bool Connection::truncateDatabase(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -935,7 +1037,7 @@ bool Connection::truncateDatabase(const std::wstring &databaseName)
     return execute(query);
 }
 
-bool Connection::unlockDatabase(const std::wstring &databaseName)
+bool Connection::unlockDatabase(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -946,7 +1048,7 @@ bool Connection::unlockDatabase(const std::wstring &databaseName)
     return execute(query);
 }
 
-bool Connection::unlockRecords(const std::wstring &databaseName, const MfnList &mfnList)
+bool Connection::unlockRecords(const String &databaseName, const MfnList &mfnList)
 {
     if (!this->_checkConnection()) {
         return false;
