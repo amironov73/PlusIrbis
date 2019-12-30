@@ -648,9 +648,9 @@ String Connection::pushDatabase(const String &newDatabase)
     return result;
 }
 
-std::vector<BYTE> Connection::readBinaryFile(const FileSpecification &specification)
+Bytes Connection::readBinaryFile(const FileSpecification &specification)
 {
-    std::vector<BYTE> result;
+    Bytes result;
 
     if (!this->_checkConnection()) {
         return result;

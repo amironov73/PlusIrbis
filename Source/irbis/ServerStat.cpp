@@ -12,6 +12,7 @@
 
 namespace irbis {
 
+/// \brief Разбор ответа сервера.
 void ServerStat::parse(ServerResponse &response)
 {
     this->totalCommandCount = response.readInteger();

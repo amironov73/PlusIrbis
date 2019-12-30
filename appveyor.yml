@@ -7,15 +7,14 @@ configuration:
 platform: x64
 image: Visual Studio 2017
 
-before_build:
-- cmd: choco install doxygen.portable
-
 build:
   project: Source\PlusIrbis.sln
 
 after_build:
-- cmd: doxygen
+- cmd: Utils\doxygen
 
 artifacts:
   - path: Source\x64
     name: Binaries
+  - path: doxygen\html
+    name: HtmlDocs

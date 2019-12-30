@@ -20,14 +20,14 @@ static const int LengthOfLength = 5;
 MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
 {
     // Считываем длину записи
-    BYTE marker[LengthOfLength];
+    Byte marker[LengthOfLength];
     if (fread(marker, LengthOfLength, 1, device) != 1) {
         return nullptr;
     }
 
     // а затем и ее остаток
     const auto recordLength = static_cast<const size_t>(fastParse32((const char *) marker, LengthOfLength));
-    BYTE *record = new BYTE[recordLength];
+    Byte *record = new Byte[recordLength];
     const auto need = recordLength - LengthOfLength;
     if (fread(record + LengthOfLength, 1, need, device) != need) {
         delete []record;
@@ -109,16 +109,16 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
     return result;
 }
 
-static void encode(BYTE *bytes, size_t pos, size_t len, size_t val) {
+static void encode(Byte *bytes, size_t pos, size_t len, size_t val) {
     len--;
     for (pos += len; len >= 0; len--) {
-        bytes[pos] = static_cast<BYTE>(val % 10 + '0');
+        bytes[pos] = static_cast<Byte>(val % 10 + '0');
         val /= 10;
         pos--;
     }
 }
 
-static size_t encode(BYTE *bytes, size_t pos, const std::wstring &str, const Encoding *encoding) {
+static size_t encode(Byte *bytes, size_t pos, const std::wstring &str, const Encoding *encoding) {
     if (!str.empty()) {
         auto encoded = encoding->fromUnicode(str);
         for (size_t i = 0; i < encoded.size(); pos++, i++) {
@@ -189,7 +189,7 @@ void Iso2709::writeRecord(FILE *device, const MarcRecord &record, const Encoding
     size_t dictionaryPosition = MarkerLength;
     const size_t baseAddress = MarkerLength + dictionaryLength;
     size_t currentAddress = baseAddress;
-    BYTE *bytes = new BYTE[recordLength];
+    Byte *bytes = new Byte[recordLength];
     memset(bytes, ' ', recordLength);
 
     // Маркер записи
@@ -235,7 +235,7 @@ void Iso2709::writeRecord(FILE *device, const MarcRecord &record, const Encoding
             // Подполя
             for (const auto &subfield : field.subfields) {
                 bytes[currentAddress++] = SubFieldDelimiter;
-                bytes[currentAddress++] = static_cast<BYTE>(subfield.code);
+                bytes[currentAddress++] = static_cast<Byte>(subfield.code);
                 currentAddress = encode(bytes, currentAddress, subfield.value, encoding);
             }
         }

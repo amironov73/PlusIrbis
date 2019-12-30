@@ -5,7 +5,7 @@
 
 namespace irbis {
 
-DirectAccess64::DirectAccess64(const std::wstring &path)
+DirectAccess64::DirectAccess64(const String &path)
 {
     this->mst = new MstFile64(L"", DirectAccessMode::ReadOnly);
     this->xrf = new XrfFile64(L"", DirectAccessMode::ReadOnly);

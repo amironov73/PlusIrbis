@@ -25,7 +25,7 @@ ClientQuery::ClientQuery(const Connection &connection, const std::string &comman
 /// \brief Добавление информации к запросу.
 /// \param bytes Массив с информацией.
 /// \param size Количество байт.
-void ClientQuery::_write(const BYTE *bytes, size_t size)
+void ClientQuery::_write(const Byte *bytes, size_t size)
 {
     for (size_t i = 0; i < size; i++)     {
         this->_content.push_back(bytes[i]);
@@ -34,7 +34,7 @@ void ClientQuery::_write(const BYTE *bytes, size_t size)
 
 /// \brief Добавление байта к запросу.
 /// \param byte Добавляемый байт.
-void ClientQuery::_write(BYTE byte)
+void ClientQuery::_write(Byte byte)
 {
     _content.push_back(byte);
 }
@@ -76,7 +76,7 @@ ClientQuery& ClientQuery::addAnsi(const std::string &text)
         return *this;
     }
 
-    const BYTE *ptr = reinterpret_cast<const BYTE*>(text.c_str());
+    const Byte *ptr = reinterpret_cast<const Byte*>(text.c_str());
     _write(ptr, size);
     return *this;
 }
@@ -93,7 +93,7 @@ ClientQuery& ClientQuery::addAnsi(const std::wstring &text)
     }
 
     const wchar_t *src = text.c_str();
-    BYTE *dst = new BYTE[size];
+    Byte *dst = new Byte[size];
     unicode_to_cp1251(dst, src, size);
     _write(dst, size);
     delete[] dst;
@@ -137,8 +137,8 @@ ClientQuery& ClientQuery::addUtf(const std::wstring &text)
 
     const wchar_t *src = text.c_str();
     const size_t bufSize = countUtf(src, size);
-    BYTE *dst = new BYTE[bufSize];
-    BYTE *end = toUtf(dst, src, size);
+    Byte *dst = new Byte[bufSize];
+    Byte *end = toUtf(dst, src, size);
     _write(dst, end - dst);
     delete[] dst;
     return *this;
@@ -155,9 +155,9 @@ void ClientQuery::dump(std::ostream &stream) const
 
 /// \brief Кодирование запроса.
 /// \return Закодированный запрос.
-std::vector<BYTE> ClientQuery::encode() const
+std::vector<Byte> ClientQuery::encode() const
 {
-    std::vector<BYTE> result;
+    std::vector<Byte> result;
     result.reserve(_content.size() + 10);
     const auto prefix = std::to_string(_content.size());
     const auto ptr = prefix.c_str();

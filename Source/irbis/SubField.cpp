@@ -13,27 +13,38 @@
 
 namespace irbis {
 
+/// \brief Клонирование подполя.
+/// \return Точная копия подполя.
 SubField SubField::clone() const
 {
     return SubField {this->code, this->value };
 }
 
-void SubField::decode(const std::wstring &line)
+/// \brief Декодирование подполя из клиентского представления.
+/// \param line Строка с клиентским представлением (не должна быть пустой).
+void SubField::decode(const String &line)
 {
     this->code = line[0];
     this->value = line.substr(1);
 }
 
+/// \brief Пустое подполе?
+/// \return true, если подполе пустое.
 bool SubField::empty() const
 {
     return code == NoCode || value.empty();
 }
 
+/// \brief Кодирование подполя в клиентское (строковое) представление.
+/// \return Закодированное подполе.
 std::wstring SubField::toString() const
 {
     return std::wstring(L"^") + code + value;
 }
 
+/// \brief Проверка, является подполе полноценным (с кодом и значением).
+/// \param throwOnError Бросать исключение, если подполе не полноценное.
+/// \return true, если с полем всё нормально.
 bool SubField::verify(bool throwOnError) const
 {
     const bool result = (code != NoCode) && !value.empty();

@@ -5,7 +5,7 @@
 
 namespace irbis {
 
-static MfnList parseLine(const std::wstring &line)
+static MfnList parseLine(const String &line)
 {
     MfnList result;
 
@@ -13,7 +13,7 @@ static MfnList parseLine(const std::wstring &line)
         return result;
     }
 
-    StringList items = split(line, L'\u001E');
+    auto items = split(line, L'\u001E');
     for (const auto &item : items) {
         auto mfn = fastParse32(item);
         result.push_back(mfn);
@@ -22,6 +22,8 @@ static MfnList parseLine(const std::wstring &line)
     return result;
 }
 
+/// \brief Разбор ответа сервера.
+/// \param response Ответ сервера.
 void DatabaseInfo::parse(ServerResponse &response)
 {
     this->logicallyDeletedRecords = parseLine(response.readAnsi());
@@ -32,10 +34,13 @@ void DatabaseInfo::parse(ServerResponse &response)
     this->databaseLocked = fastParse32(response.readAnsi()) != 0;
 }
 
+/// \brief Разбор меню.
+/// \param menu Содержимое MNU-файла.
+/// \return Вектор информации о базах данных.
 std::vector<DatabaseInfo> DatabaseInfo::parse(const MenuFile &menu)
 {
     std::vector<DatabaseInfo> result;
-    for (const MenuEntry &entry: menu.entries) {
+    for (const auto &entry: menu.entries) {
         auto name = entry.code;
         auto description = entry.comment;
         auto readOnly = false;
@@ -44,9 +49,7 @@ std::vector<DatabaseInfo> DatabaseInfo::parse(const MenuFile &menu)
             readOnly = true;
         }
 
-        DatabaseInfo info;
-        info.name = name;
-        info.description = description;
+        DatabaseInfo info { name, description };
         info.readOnly = readOnly;
         result.push_back(info);
     }
@@ -54,7 +57,9 @@ std::vector<DatabaseInfo> DatabaseInfo::parse(const MenuFile &menu)
     return result;
 }
 
-std::wstring DatabaseInfo::toString() const
+/// \brief Получение текстового представления.
+/// \return Текстовое представление информации о базе данных.
+String DatabaseInfo::toString() const
 {
     if (this->description.empty()) {
         return name;

@@ -5,6 +5,7 @@
 
 namespace irbis {
 
+/// \brief Получение нового подключения к серверу ИРБИС64.
 Connection* ConnectionFactory::GetConnection()
 {
     return new Connection();

@@ -245,7 +245,7 @@ std::string unicode_to_cp1251(const std::wstring &text)
     return result;
 }
 
-void unicode_to_cp1251(BYTE *dst, const wchar_t *src, size_t size)
+void unicode_to_cp1251(Byte *dst, const wchar_t *src, size_t size)
 {
     const wchar_t *first = &_cp1251_from_unicode[0], *last = first + 256;
     for (size_t i = 0; i < size; i++)
@@ -291,32 +291,32 @@ std::string unicode_to_koi8r(const std::wstring &text)
 
 // Преобразует UCS-16 в UTF-8
 // Возвращает указатель на место после последнего преобразованного символа
-BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length)
+Byte* toUtf(Byte *dst, const wchar_t *src, size_t length)
 {
     while (length > 0)
     {
         const unsigned int c = *src++;
         if (c < (1u << 7u))
         {
-            *dst++ = static_cast<BYTE>(c);
+            *dst++ = static_cast<Byte>(c);
         }
         else if (c < (1u << 11u))
         {
-            *dst++ = static_cast<BYTE>((c >> 6u) | 0xC0u);
-            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>((c >> 6u) | 0xC0u);
+            *dst++ = static_cast<Byte>((c & 0x3Fu) | 0x80u);
         }
         else if (c < (1u << 16u)) //-V547
         {
-            *dst++ = static_cast<BYTE>((c >> 12u) | 0xE0u);
-            *dst++ = static_cast<BYTE>(((c >> 6u) & 0x3Fu) | 0x80u);
-            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>((c >> 12u) | 0xE0u);
+            *dst++ = static_cast<Byte>(((c >> 6u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>((c & 0x3Fu) | 0x80u);
         }
         else if (c < (1u << 21u))
         {
-            *dst++ = static_cast<BYTE>((c >> 18u) | 0xF0u);
-            *dst++ = static_cast<BYTE>(((c >> 12u) & 0x3Fu) | 0x80u);
-            *dst++ = static_cast<BYTE>(((c >> 6u) & 0x3Fu) | 0x80u);
-            *dst++ = static_cast<BYTE>((c & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>((c >> 18u) | 0xF0u);
+            *dst++ = static_cast<Byte>(((c >> 12u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>(((c >> 6u) & 0x3Fu) | 0x80u);
+            *dst++ = static_cast<Byte>((c & 0x3Fu) | 0x80u);
         }
         else
         {
@@ -365,26 +365,26 @@ size_t countUtf(const wchar_t *src, size_t length)
 
 // Преобразует UTF-8 в UCS-16
 // Возвращает указатель на место после последнего преобразованного символа
-wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
+wchar_t* fromUtf(wchar_t *dst, const Byte *src, size_t length)
 {
-    const BYTE *stop = src + length;
+    const Byte *stop = src + length;
 
     while (src < stop)
     {
         unsigned int c = *src++;
         if ((c & 0x80u) == 0u)
         {
-            // 1-BYTE sequence: 000000000xxxxxxx = 0xxxxxxx
+            // 1-Byte sequence: 000000000xxxxxxx = 0xxxxxxx
         }
         else if ((c & 0xE0u) == 0xC0u)
         {
-            // 2-BYTE sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
+            // 2-Byte sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
             c = (c & 0x1Fu) << 6u;
             c |= (*src++ & 0x3Fu);
         }
         else if ((c & 0xF0u) == 0xE0u)
         {
-            // 3-BYTE sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
+            // 3-Byte sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
             c = (c & 0x0Fu) << 12u;
             c |= (*src++ & 0x3Fu) << 6u;
             c |= (*src++ & 0x3Fu);
@@ -394,7 +394,7 @@ wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
         }
         else if ((c & 0xF8u) == 0xF0u)
         {
-            // 4-BYTE sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
+            // 4-Byte sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
             c = (c & 0x07u) << 18u;
             c |= (*src++ & 0x3Fu) << 12u;
             c |= (*src++ & 0x3Fu) << 6u;
@@ -407,11 +407,11 @@ wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length)
 }
 
 // Подсчитывает число wchar_t, необходимых для размещения в UCS-16.
-size_t countUtf(const BYTE *src, size_t length)
+size_t countUtf(const Byte *src, size_t length)
 {
     size_t result = 0;
 
-    const BYTE *stop = src + length;
+    const Byte *stop = src + length;
 
     while (src < stop)
     {
@@ -443,9 +443,9 @@ size_t countUtf(const BYTE *src, size_t length)
 }
 
 // Считывает строку UTF-8 вплоть до разделителя.
-const BYTE* fromUtf(const BYTE *src, size_t &size, BYTE stop, std::wstring &result)
+const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &result)
 {
-    const BYTE *end = src;
+    const Byte *end = src;
     while (size && (*end != stop))
     {
         end++;
@@ -477,7 +477,7 @@ std::wstring fromUtf(const std::string &text)
         return std::wstring();
     }
 
-    const auto *src = reinterpret_cast<const BYTE*>(text.c_str());
+    const auto *src = reinterpret_cast<const Byte*>(text.c_str());
     const auto dstSize = countUtf(src, srcSize);
     auto *dst = new wchar_t[dstSize + 1];
     memset(dst, 0, sizeof(wchar_t)*(dstSize+1));
@@ -491,7 +491,7 @@ std::wstring fromUtf(const std::string &text)
 }
 
 // Записывает строку в UTF-8
-BYTE* toUtf(BYTE *dst, const std::wstring &text)
+Byte* toUtf(Byte *dst, const std::wstring &text)
 {
     const size_t length = text.length();
     const wchar_t *src = text.c_str();
@@ -508,8 +508,8 @@ std::string toUtf(const std::wstring &text)
 
     const auto *src = reinterpret_cast<const wchar_t*>(text.c_str());
     const auto dstSize = countUtf(src, srcSize);
-    auto *dst = new BYTE[dstSize + 1];
-    memset(dst, 0, sizeof(BYTE)*(dstSize+1));
+    auto *dst = new Byte[dstSize + 1];
+    memset(dst, 0, sizeof(Byte)*(dstSize+1));
     if (!toUtf(dst, src, srcSize))
     {
         return std::string();
@@ -529,22 +529,22 @@ Encoding* Encoding::ansi()
     return Encoding::_ansi;
 }
 
-std::wstring fromAnsi(const BYTE *bytes, size_t count)
+std::wstring fromAnsi(const Byte *bytes, size_t count)
 {
     throw NotImplementedException();
 }
 
-std::wstring fromUtf(const BYTE *bytes, size_t count)
+std::wstring fromUtf(const Byte *bytes, size_t count)
 {
     throw NotImplementedException();
 }
 
-std::vector<BYTE> toAnsi(const std::wstring &text)
+std::vector<Byte> toAnsi(const std::wstring &text)
 {
     throw NotImplementedException();
 }
 
-std::vector<BYTE> Encoding::toUtf(const std::wstring &text)
+std::vector<Byte> Encoding::toUtf(const std::wstring &text)
 {
     throw NotImplementedException();
 }

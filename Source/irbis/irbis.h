@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <cstdint>
 #include <chrono>
 #include <string>
 #include <ios>
@@ -78,14 +79,6 @@
     #pragma warning(push)
     #pragma warning(disable: 4251)
     #pragma warning(disable: 4275)
-
-#endif
-
-//=========================================================
-
-#ifndef BYTE
-
-typedef unsigned char BYTE; //-V677
 
 #endif
 
@@ -166,6 +159,8 @@ class XrfRecord64;
 
 //=========================================================
 
+using Byte = std::uint8_t;
+using Bytes = std::vector<Byte>;
 using String = std::wstring;
 using MfnList = std::vector<int>;
 using StringList = std::vector<String>;
@@ -179,14 +174,9 @@ template<class T>
 class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 public:
-    /// \brief Признак успешного завершения.
-    bool success { false };
-
-    /// \brief Результирующее значение (имеет смысл при успешном завершении).
-    T result;
-
-    /// \brief Сообщение об ошибке.
-    String errorMessage;
+    bool success { false }; ///< Признак успешного завершения.
+    T result; ///< Результирующее значение (имеет смысл при успешном завершении).
+    String errorMessage; ///< Сообщение об ошибке.
 
     /// \brief Преобразование к логическому значению. true означает успех.
     operator bool() const // NOLINT(hicpp-explicit-conversions)
@@ -328,7 +318,7 @@ public:
     std::set<wchar_t> characters;
 
     /// Конструктор.
-    explicit AlphabetTable(const std::vector<BYTE> &bytes);
+    explicit AlphabetTable(const std::vector<Byte> &bytes);
 
     /// Синглтон.
     static const AlphabetTable& instance();
@@ -427,7 +417,7 @@ public:
     /// \brief Отсылка данных на сервер.
     /// \param buffer Указатель на буфер с данными.
     /// \param size Размер данных в байтах.
-    virtual void send(const BYTE *buffer, size_t size) = 0;
+    virtual void send(const Byte *buffer, size_t size) = 0;
 
     /// \brief Получение отвера от сервера (частями).
     /// \param buffer Буфер для размещения полученного ответа.
@@ -437,7 +427,7 @@ public:
     /// 0 означает, что сервер закончил передачу данных.
     /// Положительное число означает, что приём продолжается,
     /// и вызов нужно будет повторить для получения следующей порции.
-    virtual size_t receive(BYTE *buffer, size_t size) = 0;
+    virtual size_t receive(Byte *buffer, size_t size) = 0;
 };
 
 //=========================================================
@@ -447,10 +437,10 @@ public:
 /// Объекты данного класса неперемещаемые.
 class PLUSIRBIS_EXPORTS ClientQuery final
 {
-    std::vector<BYTE> _content;
+    std::vector<Byte> _content;
 
-    void _write(const BYTE *bytes, size_t size);
-    void _write(BYTE byte);
+    void _write(const Byte *bytes, size_t size);
+    void _write(Byte byte);
 
 public:
     ClientQuery(const Connection &connection, const std::string &commandCode);
@@ -468,7 +458,7 @@ public:
     bool addFormat(const std::wstring &format);
     ClientQuery& addUtf(const std::wstring &text);
     void dump(std::ostream &stream) const;
-    std::vector<BYTE> encode() const;
+    std::vector<Byte> encode() const;
     ClientQuery& newLine();
 };
 
@@ -536,7 +526,7 @@ public:
     String popDatabase();
     String printTable(const TableDefinition &definition);
     String pushDatabase(const String &newDatabase);
-    std::vector<BYTE> readBinaryFile(const FileSpecification &specification);
+    Bytes readBinaryFile(const FileSpecification &specification);
     IniFile readIniFile(const FileSpecification &specification);
     MenuFile readMenuFile(const FileSpecification &specification);
     std::vector<TermPosting> readPostings(const PostingParameters &parameters);
@@ -571,6 +561,7 @@ public:
 
 //=========================================================
 
+/// \brief Фабрика подключений.
 class PLUSIRBIS_EXPORTS ConnectionFactory
 {
 public:
@@ -586,31 +577,33 @@ public:
 
 //=========================================================
 
+/// \brief Информация о базе данных ИРБИС.
 class PLUSIRBIS_EXPORTS DatabaseInfo final
 {
 public:
-    MfnList logicallyDeletedRecords;
-    MfnList physicallyDeletedRecords;
-    MfnList nonActualizedRecords;
-    MfnList lockedRecords;
-    std::wstring name;
-    std::wstring description;
-    int maxMfn { 0 };
-    bool databaseLocked { false };
-    bool readOnly { false };
+    String name;                      ///< Имя базы данных.
+    String description;               ///< Описание базы данных в произвольной форме (может быть пустым).
+    MfnList logicallyDeletedRecords;  ///< Список логически удалённых записей (может быть пустым).
+    MfnList physicallyDeletedRecords; ///< Список физически удалённых записей (может быть пустым).
+    MfnList nonActualizedRecords;     ///< Список неактуализированных записей (может быть пустым).
+    MfnList lockedRecords;            ///< Список заблокированных записей (может быть пустым).
+    int maxMfn { 0 };                 ///< Максимальный MFN для базы данных.
+    bool databaseLocked { false };    ///< Признак блокировки базы данных в целом.
+    bool readOnly { false };          ///< База данных доступна только для чтения.
 
     void parse(ServerResponse &response);
     static std::vector<DatabaseInfo> parse(const MenuFile &menu);
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================
 
+/// \brief Режим прямого доступа к базе данных.
 enum DirectAccessMode : unsigned int
 {
-    Exclusive = 0u,
-    Shared    = 1u,
-    ReadOnly  = 2u
+    Exclusive = 0u, ///< Эксклюзивный (чтение-запись).
+    Shared    = 1u, ///< Разделяемый (чтение-запись).
+    ReadOnly  = 2u  ///< Только чтение.
 };
 
 //=========================================================
@@ -620,9 +613,9 @@ class PLUSIRBIS_EXPORTS DirectAccess64 final
 public:
     MstFile64 *mst;
     XrfFile64 *xrf;
-    std::wstring database;
+    String database;
 
-    DirectAccess64(const std::wstring &path);
+    DirectAccess64(const String &path);
     DirectAccess64(const DirectAccess64 &) = delete;
     DirectAccess64(const DirectAccess64 &&) = delete;
     DirectAccess64& operator = (const DirectAccess64 &) = delete;
@@ -653,14 +646,14 @@ class PLUSIRBIS_EXPORTS Encoding // abstract
 
 public:
 
-    virtual std::vector<BYTE> fromUnicode(const std::wstring &text) const = 0;
-    virtual std::wstring toUnicode(const BYTE *bytes, size_t count) const = 0;
+    virtual std::vector<Byte> fromUnicode(const std::wstring &text) const = 0;
+    virtual std::wstring toUnicode(const Byte *bytes, size_t count) const = 0;
 
     static Encoding* ansi();
-    static std::wstring fromAnsi(const BYTE *bytes, size_t count);
-    static std::wstring fromUtf(const BYTE *bytes, size_t count);
-    static std::vector<BYTE> toAnsi(const std::wstring &text);
-    static std::vector<BYTE> toUtf(const std::wstring &text);
+    static std::wstring fromAnsi(const Byte *bytes, size_t count);
+    static std::wstring fromUtf(const Byte *bytes, size_t count);
+    static std::vector<Byte> toAnsi(const std::wstring &text);
+    static std::vector<Byte> toUtf(const std::wstring &text);
     static Encoding* utf();
 };
 
@@ -1187,117 +1180,122 @@ public:
 
 //=========================================================
 
+/// \brief Статус записи.
 enum RecordStatus : unsigned int
 {
-    LogicallyDeleted = 1u,
-    PhysicallyDeleted = 2u,
-    Deleted = LogicallyDeleted | PhysicallyDeleted,
-    Absent = 4u,
-    NonActualized = 8u,
-    Last = 32u,
-    Locked = 64u
+    LogicallyDeleted = 1u, ///< Запись логически удалена.
+    PhysicallyDeleted = 2u, ///< Запись физически удалена.
+    Deleted = LogicallyDeleted | PhysicallyDeleted, ///< Запись удалена.
+    Absent = 4u, ///< Запись отсутствует.
+    NonActualized = 8u, ///< Не актуализирована.
+    Last = 32u, ///< Последняя версия записи.
+    Locked = 64u ///< Запись заблокирована.
 };
 
 //=========================================================
 
+/// \brief Построитель запросов.
 class PLUSIRBIS_EXPORTS Search final
 {
-    std::wstring _buffer;
+    String _buffer;
 
 public:
     static Search all();
-    Search& and_(const std::wstring &text);
-    Search& and_(const std::wstring &text1, const std::wstring &text2);
-    Search& and_(const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
+    Search& and_(const String &text);
+    Search& and_(const String &text1, const String &text2);
+    Search& and_(const String &text1, const String &text2, const String &text3);
     Search& and_(const Search &item);
     Search& and_(const Search &item1, const Search &item2);
     Search& and_(const Search &item1, const Search &item2, const Search &item3);
-    static Search equals(const std::wstring &prefix, const std::wstring &text);
-    static Search equals(const std::wstring &prefix, const std::wstring &text1, const std::wstring &text2);
-    static Search equals(const std::wstring &prefix, const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
-    static bool needWrap(const std::wstring &text);
-    Search& not_(const std::wstring &text);
+    static Search equals(const String &prefix, const String &text);
+    static Search equals(const String &prefix, const String &text1, const String &text2);
+    static Search equals(const String &prefix, const String &text1, const String &text2, const String &text3);
+    static bool needWrap(const String &text);
+    Search& not_(const String &text);
     Search& not_(const Search &item);
-    Search& or_(const std::wstring &text);
-    Search& or_(const std::wstring &text1, const std::wstring &text2);
-    Search& or_(const std::wstring &text1, const std::wstring &text2, const std::wstring &text3);
+    Search& or_(const String &text);
+    Search& or_(const String &text1, const String &text2);
+    Search& or_(const String &text1, const String &text2, const String &text3);
     Search& or_(const Search &item);
     Search& or_(const Search &item1, const Search &item2);
     Search& or_(const Search &item1, const Search &item2, const Search &item3);
-    Search& sameField(const std::wstring &text);
-    Search& sameRepeat(const std::wstring &text);
-    std::wstring toString() const;
-    static std::wstring wrap(const std::wstring &text);
-    static std::wstring wrap(const Search &item);
+    Search& sameField(const String &text);
+    Search& sameRepeat(const String &text);
+    String toString() const;
+    static String wrap(const String &text);
+    static String wrap(const Search &item);
 };
 
-Search keyword(const std::wstring &value1);
-Search author(const std::wstring &value1);
-Search title(const std::wstring &value1);
-Search publisher(const std::wstring &value1);
-Search place(const std::wstring &value1);
-Search subject(const std::wstring &value1);
-Search language(const std::wstring &value1);
-Search year(const std::wstring &value1);
-Search magazine(const std::wstring &value1);
-Search documentKind(const std::wstring &value1);
-Search udc(const std::wstring &value1);
-Search bbk(const std::wstring &value1);
-Search rzn(const std::wstring &value1);
-Search mhr(const std::wstring &value1);
+Search keyword(const String &value1);
+Search author(const String &value1);
+Search title(const String &value1);
+Search publisher(const String &value1);
+Search place(const String &value1);
+Search subject(const String &value1);
+Search language(const String &value1);
+Search year(const String &value1);
+Search magazine(const String &value1);
+Search documentKind(const String &value1);
+Search udc(const String &value1);
+Search bbk(const String &value1);
+Search rzn(const String &value1);
+Search mhr(const String &value1);
 
 //=========================================================
 
+/// \brief Параметры для поиска записей.
 class PLUSIRBIS_EXPORTS SearchParameters final
 {
 public:
-    std::wstring database;
-    std::wstring searchExpression;
-    int firstRecord { 1 };
-    std::wstring formatSpecification;
-    int maxMfn { 0 };
-    int minMfn { 0 };
-    int numberOfRecords { 0 };
-    std::wstring sequentialSpecification;
-    std::wstring filterSpecification;
+    String searchExpression;        ///< Выражение для поиска по словарю.
+    String database;                ///< Имя базы данных.
+    int firstRecord { 1 };          ///< Индекс первой требуемой записи.
+    String formatSpecification;     ///< Формат для расформатирования записей.
+    int maxMfn { 0 };               ///< Максимальный MFN.
+    int minMfn { 0 };               ///< Минимальный MFN.
+    int numberOfRecords { 0 };      ///< Общее число требуемых записей.
+    String sequentialSpecification; ///< Выражение для последовательного поиска.
+    String filterSpecification;     ///< Выражение для локальной фильтрации.
 };
 
 //=========================================================
 
+/// \brief Сценарий поиска.
 class PLUSIRBIS_EXPORTS SearchScenario final
 {
 public:
-    std::wstring name;
-    std::wstring prefix;
-    int dictionaryType { 0 };
-    std::wstring menuName;
-    std::wstring oldFormat;
-    std::wstring correction;
-    std::wstring truncation;
-    std::wstring hint;
-    std::wstring modByDicAuto;
-    std::wstring logic;
-    std::wstring advance;
-    std::wstring format;
+    String name;              ///< Название поискового атрибута(автор, инвентарный номер и т. д.).
+    String prefix;            ///< Префикс соответствующих терминов в словаре (может быть пустым).
+    int dictionaryType { 0 }; ///< Тип словаря для соответствующего поиска.
+    String menuName;          ///< Имя файла справочника.
+    String oldFormat;         ///< Имя формата (без расширения).
+    String correction;        ///< Способ корректировки по словарю.
+    String truncation;        ///< Исходное положение переключателя "Усечение".
+    String hint;              ///< Текст подсказки/предупреждения.
+    String modByDicAuto;      ///< Параметр пока не задействован.
+    String logic;             ///< Применимые логические операторы.
+    String advance;           ///< Правила автоматического расширения поиска на основе авторитетного файла или тезауруса.
+    String format;            ///< Имя формата показа документов.
 };
 
 //=========================================================
 
+/// \brief Ответ сервера на клиентский запрос.
 class PLUSIRBIS_EXPORTS ServerResponse final
 {
     Connection *_connection;
     bool _success;
     size_t _position;
-    std::vector<BYTE> _content;
-    void _write(const BYTE *bytes, size_t size);
+    Bytes _content;
+    void _write(const Byte *bytes, size_t size);
 
 public:
-    std::wstring command;
-    int clientId;
-    int queryId;
-    int answerSize;
-    int returnCode;
-    std::wstring serverVersion;
+    String command;       ///< Код команды (дублирует клиентский запрос).
+    int clientId;         ///< Идентификатор клиента (дублирует клиентский запрос).
+    int queryId;          ///< Номер команды (дублирует клиентский запрос).
+    int answerSize;       ///< Размер ответа сервера в байтах (в некоторых сценариях отсутствует).
+    int returnCode;       ///< Код возврата (бывает не у всех ответов).
+    String serverVersion; ///< Версия сервера (в некоторых сценариях отсутствует).
 
     ServerResponse(Connection &connection, ClientQuery &query);
     ServerResponse(ServerResponse &) = delete;
@@ -1306,6 +1304,7 @@ public:
     ServerResponse& operator = (ServerResponse &&) = delete;
     ~ServerResponse() = default;
 
+    bool eot() const;
     bool success() const;
 
     bool checkReturnCode();
@@ -1313,60 +1312,65 @@ public:
     std::string getLine();
     std::string getRemaining();
     int getReturnCode();
-    std::wstring readAnsi();
+    String readAnsi();
     int readInteger();
     StringList readRemainingAnsiLines();
-    std::wstring readRemainingAnsiText();
+    String readRemainingAnsiText();
     StringList readRemainingUtfLines();
-    std::wstring readRemainingUtfText();
-    std::wstring readUtf();
+    String readRemainingUtfText();
+    String readUtf();
 };
 
 //=========================================================
 
+/// \brief Статистика работы ИРБИС-сервера.
 class PLUSIRBIS_EXPORTS ServerStat final
 {
 public:
-    std::vector<ClientInfo> runningClients;
-    int clientCount { 0 };
-    int totalCommandCount { 0 };
+    std::vector<ClientInfo> runningClients; ///< Подключенные в данный момент клиенты.
+    int clientCount { 0 }; ///< Число клиентов, подключенных в данный момент.
+    int totalCommandCount { 0 }; ///< Общее количество команд, выполненных сервером с момента запуска.
 
     void parse(ServerResponse &response);
 };
 
 //=========================================================
 
+/// \brief Подполе записи.
 class PLUSIRBIS_EXPORTS SubField final
 {
 public:
+    /// \brief Отсутствующий код подполя.
     const static wchar_t NoCode { L'\0' };
 
+    /// \brief Одноисмвольный код подполя.
     wchar_t code { L'\0' };
-    std::wstring value;
+    String value; ///< Значение подполя (может быть пустой строкой).
 
     SubField clone() const;
-    void decode(const std::wstring &line);
+    void decode(const String &line);
     bool empty() const;
     bool verify(bool throwOnError) const;
-    std::wstring toString() const;
+    String toString() const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
 
 //=========================================================
 
+/// \brief Данные для метода printTable.
 class PLUSIRBIS_EXPORTS TableDefinition final
 {
 public:
-    std::wstring database;
-    std::wstring table;
-    StringList headers;
-    std::wstring mode;
-    std::wstring searchQuery;
-    int minMfn { 0 };
-    int maxMfn { 0 };
-    std::wstring sequentialQuery;
-    MfnList mfnList;
+    String database;        ///< Имя базы данных.
+    String table;           ///< Имя таблицы.
+    StringList headers;     ///< Заголовки таблицы.
+    String mode;            ///< Режим таблицы.
+    String searchQuery;     ///< Поисковый запрос.
+    int minMfn { 0 };       ///< Минимальный MFN.
+    int maxMfn { 0 };       ///< Максимальный MFN.
+    String sequentialQuery; ///< Запрос для последовательного поиска.
+    MfnList mfnList;        ///< Список MFN, по которым строится таблица.
 };
 
 //=========================================================
@@ -1386,8 +1390,8 @@ public:
 
     void open() override;
     void close() override;
-    void send(const BYTE *buffer, size_t size) override;
-    size_t receive(BYTE *buffer, size_t size) override;
+    void send(const Byte *buffer, size_t size) override;
+    size_t receive(Byte *buffer, size_t size) override;
 };
 
 //=========================================================
@@ -1600,7 +1604,7 @@ String PLUSIRBIS_EXPORTS replace(const String &text, const String &from, const S
 
 String PLUSIRBIS_EXPORTS trimStart(const String &text);
 String PLUSIRBIS_EXPORTS trimEnd(const String &text);
-String trim(const String &text);
+String PLUSIRBIS_EXPORTS trim(const String &text);
 
 String PLUSIRBIS_EXPORTS describeError(int errorCode);
 
@@ -1630,15 +1634,15 @@ PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
 
 PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
-PLUSIRBIS_EXPORTS void unicode_to_cp1251(BYTE *dst, const wchar_t *src, size_t size);
+PLUSIRBIS_EXPORTS void unicode_to_cp1251(Byte *dst, const wchar_t *src, size_t size);
 PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
 
-PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const wchar_t *src, size_t length);
-PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const BYTE *src, size_t length);
+PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const wchar_t *src, size_t length);
+PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const Byte *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const wchar_t *src, size_t length);
-PLUSIRBIS_EXPORTS size_t countUtf(const BYTE *src, size_t length);
-PLUSIRBIS_EXPORTS const BYTE* fromUtf(const BYTE *src, size_t &size, BYTE stop, std::wstring &result);
-PLUSIRBIS_EXPORTS BYTE* toUtf(BYTE *dst, const std::wstring &text);
+PLUSIRBIS_EXPORTS size_t countUtf(const Byte *src, size_t length);
+PLUSIRBIS_EXPORTS const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &result);
+PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const std::wstring &text);
 PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
 PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);
 
