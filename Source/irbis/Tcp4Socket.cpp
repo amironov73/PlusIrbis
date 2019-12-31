@@ -110,7 +110,7 @@ void Tcp4Socket::close()
     closesocket(internals->socket);
 }
 
-void Tcp4Socket::send(const BYTE *buffer, size_t size)
+void Tcp4Socket::send(const Byte *buffer, size_t size)
 {
     auto *internals = static_cast<TcpInternals*>(this->_impl);
     const auto ptr = reinterpret_cast<const char*>(buffer);
@@ -118,7 +118,7 @@ void Tcp4Socket::send(const BYTE *buffer, size_t size)
     ::send(internals->socket, ptr, size2, 0);
 }
 
-size_t Tcp4Socket::receive(BYTE *buffer, size_t size)
+size_t Tcp4Socket::receive(Byte *buffer, size_t size)
 {
     auto *internals = static_cast<TcpInternals*>(this->_impl);
     const auto ptr = reinterpret_cast<char*>(buffer);

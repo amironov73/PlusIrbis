@@ -170,6 +170,7 @@ using RecordFieldList = std::vector<RecordField>;
 //=========================================================
 
 /// \brief Результат выполнения функции (с учетом успеха/ошибки).
+/// \tparam T Тип результата.
 template<class T>
 class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
@@ -208,6 +209,18 @@ public:
 
 //=========================================================
 
+/// \brief Непрерывный кусок памяти.
+/// \tparam T Тип элемента.
+template<class T>
+class Span final
+{
+public:
+    T *ptr;        ///< Указатель на начала куска.
+    size_t length; ///< Длина куска в элементах.
+};
+
+//=========================================================
+
 /// \brief Базовое исключение для всех нештатных ситуаций.
 class PLUSIRBIS_EXPORTS IrbisException
         : public std::exception
@@ -237,22 +250,20 @@ public:
 class PLUSIRBIS_EXPORTS IniFile final
 {
 public:
-    std::vector<IniSection> sections;
-
-    //IniFile();
+    std::vector<IniSection> sections; ///< Секции INI-файла.
 
     IniFile& clear();
-    bool containsSection (const std::wstring &name) const;
-    IniSection& createSection(const std::wstring &name);
+    bool containsSection (const String &name) const;
+    IniSection& createSection(const String &name);
     bool modified() const;
     void notModified();
-    size_t getIndex(const std::wstring &name) const;
-    IniSection* getSection(const std::wstring &name) const;
-    const std::wstring& getValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &defaultValue) const;
+    ptrdiff_t getIndex(const String &name) const;
+    IniSection* getSection(const String &name) const;
+    const String& getValue(const String &sectionName, const String &keyName, const String &defaultValue) const;
     void parse(const StringList &lines);
-    IniFile& removeSection(const std::wstring &sectionName);
-    IniFile& removeValue(const std::wstring &sectionName, const std::wstring &keyName);
-    IniFile& setValue(const std::wstring &sectionName, const std::wstring &keyName, const std::wstring &value);
+    IniFile& removeSection(const String &sectionName);
+    IniFile& removeValue(const String &sectionName, const String &keyName);
+    IniFile& setValue(const String &sectionName, const String &keyName, const String &value);
     //void write(const std::wstring &filename, QTextCodec *encoding) const;
     //void writeModifiedOnly(QTextStream &stream) const;
 };
@@ -260,17 +271,19 @@ public:
 //=========================================================
 
 /// \brief Строка INI-файла.
+///
+/// Состоит из ключа и значения, разделённых символом '='.
 class PLUSIRBIS_EXPORTS IniLine final
 {
 public:
-    std::wstring key;
-    std::wstring value;
+    String key;    ///< Ключ (не должен быть пустым).
+    String value;  ///< Значение (может быть пустым).
 
     bool modified() const;
     void notModified();
-    void setKey(const std::wstring &newKey);
-    void setValue(const std::wstring &newValue);
-    std::wstring toString() const;
+    void setKey(const String &newKey);
+    void setValue(const String &newValue);
+    String toString() const;
 
 private:
     bool _modified { false };
@@ -282,25 +295,21 @@ private:
 class PLUSIRBIS_EXPORTS IniSection final
 {
 public:
-    /// \brief Имя секции.
-    std::wstring name;
-
-    /// \brief Строки, входящие в секцию.
-    /// \see IniLine
-    std::vector<IniLine> lines;
+    String name; ///< Имя секции.
+    std::vector<IniLine> lines; ///< Строки, входящие в секцию. \see IniLine
 
     IniSection& clear();
-    bool containsKey(const std::wstring &key) const;
-    size_t getIndex(const std::wstring &key) const;
-    IniLine* getLine(const std::wstring &key) const;
-    const std::wstring& getValue(const std::wstring &key, const std::wstring &defaultValue) const;
+    bool containsKey(const String &key) const;
+    ptrdiff_t getIndex(const String &key) const;
+    IniLine* getLine(const String &key) const;
+    const String& getValue(const String &key, const String &defaultValue) const;
     bool modified() const;
     void notModified();
-    IniSection& removeValue(const std::wstring &key);
-    IniSection& setValue(const std::wstring &key, const std::wstring &value);
-    std::wstring toString() const;
+    IniSection& removeValue(const String &key);
+    IniSection& setValue(const String &key, const String &value);
+    String toString() const;
 
-    const std::wstring& operator[] (const std::wstring &index) const;
+    const String& operator[] (const String &index) const;
 };
 
 //=========================================================
@@ -454,11 +463,11 @@ public:
     ClientQuery& add(const FileSpecification &specification);
     ClientQuery& add(const MarcRecord &record, const std::wstring &delimiter);
     ClientQuery& addAnsi(const std::string &text);
-    ClientQuery& addAnsi(const std::wstring &text);
-    bool addFormat(const std::wstring &format);
-    ClientQuery& addUtf(const std::wstring &text);
+    ClientQuery& addAnsi(const String &text);
+    bool addFormat(const String &format);
+    ClientQuery& addUtf(const String &text);
     void dump(std::ostream &stream) const;
-    std::vector<Byte> encode() const;
+    Bytes encode() const;
     ClientQuery& newLine();
 };
 

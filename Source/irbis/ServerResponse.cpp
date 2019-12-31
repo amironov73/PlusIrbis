@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -67,7 +67,7 @@ bool ServerResponse::checkReturnCode()
 /// \return true, если достигнут конец, иначе false.
 bool ServerResponse::eot() const
 {
-    return this->_position < this->_content.size();
+    return this->_position >= this->_content.size();
 }
 
 /// \brief Проверка кода возврата последней операции, выполненной сервером.

@@ -975,7 +975,7 @@ MfnList Connection::search(const Search &search)
 
 MfnList Connection::search(const String &expression)
 {
-    SearchParameters parameters { this->database, expression };
+    SearchParameters parameters { expression, this->database };
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;
 
@@ -990,7 +990,7 @@ MfnList Connection::search(const SearchParameters &parameters)
         return result;
     }
 
-    const auto &databaseName = iif(parameters.database, database);
+    const auto &databaseName = iif(parameters.database, this->database);
     ClientQuery query (*this, "K");
     query.addAnsi(databaseName).newLine()
             .addUtf(parameters.searchExpression).newLine()
@@ -1002,7 +1002,9 @@ MfnList Connection::search(const SearchParameters &parameters)
             .addAnsi(parameters.sequentialSpecification);
 
     ServerResponse response (*this, query);
-    response.checkReturnCode();
+    if (!response.checkReturnCode()) {
+        return result;
+    }
     const auto expected = response.readInteger();
     const auto batchSize = std::min(expected, 32000); // MAXPACKET
     for (auto i = 0; i < batchSize; i++) {

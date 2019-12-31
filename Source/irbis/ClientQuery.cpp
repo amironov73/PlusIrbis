@@ -7,7 +7,9 @@
 
 namespace irbis {
 
-/// \brief Конструктор.
+/// \brief Конструктор клиентского запроса.
+/// \param connection Подключение, для которого формируется запрос.
+/// \param commandCode Код команды.
 ClientQuery::ClientQuery(const Connection &connection, const std::string &commandCode)
 {
     this->addAnsi(commandCode).newLine();
@@ -44,7 +46,7 @@ void ClientQuery::_write(Byte byte)
 /// \return this.
 ClientQuery& ClientQuery::add(int value)
 {
-    std::string s = std::to_string(value);
+    const auto s = std::to_string(value);
     return addAnsi(s);
 }
 
@@ -59,15 +61,15 @@ ClientQuery& ClientQuery::add(const FileSpecification &specification)
 /// \brief Добавление записи к запросу.
 /// \param record Добавляемая запись.
 /// \param delimiter Разделитель элементов записи.
-/// \return this
-ClientQuery& ClientQuery::add(const MarcRecord &record, const std::wstring &delimiter=L"\u001E")
+/// \return `this`.
+ClientQuery& ClientQuery::add(const MarcRecord &record, const String &delimiter=L"\u001E")
 {
     return this->addUtf(record.encode(delimiter));
 }
 
 /// \brief Добавление строки в кодировке ANSI.
 /// \param text Добавляемый текст.
-/// \return this
+/// \return `this`.
 ClientQuery& ClientQuery::addAnsi(const std::string &text)
 {
     const size_t size = text.length();
@@ -83,27 +85,25 @@ ClientQuery& ClientQuery::addAnsi(const std::string &text)
 
 /// \brief Добавление строки в кодировке ANSI.
 /// \param text Добавляемый текст.
-/// \return this.
-ClientQuery& ClientQuery::addAnsi(const std::wstring &text)
+/// \return `this`.
+ClientQuery& ClientQuery::addAnsi(const String &text)
 {
-    const size_t size = text.length();
-    if (!size)
-    {
+    const auto size = text.length();
+    if (!size) {
         return *this;
     }
 
-    const wchar_t *src = text.c_str();
-    Byte *dst = new Byte[size];
-    unicode_to_cp1251(dst, src, size);
-    _write(dst, size);
-    delete[] dst;
+    const auto *src = text.c_str();
+    Bytes dst(size);
+    unicode_to_cp1251(dst.data(), src, size);
+    _write(dst.data(), size);
     return *this;
 }
 
 /// \brief Добавление формата к запросу.
 /// \param format Спецификация формата.
 /// \return Был ли добавлен формат?
-bool ClientQuery::addFormat(const std::wstring &format)
+bool ClientQuery::addFormat(const String &format)
 {
     if (format.empty()) {
         this->newLine();
@@ -127,20 +127,18 @@ bool ClientQuery::addFormat(const std::wstring &format)
 /// \brief Добавление строки в формате UTF-8.
 /// \param text Добавляемый текст.
 /// \return this.
-ClientQuery& ClientQuery::addUtf(const std::wstring &text)
+ClientQuery& ClientQuery::addUtf(const String &text)
 {
-    const size_t size = text.length();
-    if (!size)
-    {
+    const auto size = text.length();
+    if (!size) {
         return *this;
     }
 
-    const wchar_t *src = text.c_str();
-    const size_t bufSize = countUtf(src, size);
-    Byte *dst = new Byte[bufSize];
-    Byte *end = toUtf(dst, src, size);
-    _write(dst, end - dst);
-    delete[] dst;
+    const auto src = text.c_str();
+    const auto bufSize = countUtf(src, size);
+    Bytes dst(bufSize);
+    toUtf(dst.data(), src, size);
+    _write(dst.data(), bufSize);
     return *this;
 }
 
@@ -148,16 +146,16 @@ ClientQuery& ClientQuery::addUtf(const std::wstring &text)
 /// \param stream Поток, в который выводится дамп.
 void ClientQuery::dump(std::ostream &stream) const
 {
-    for (auto value : _content) {
+    for (const auto value : _content) {
         stream << std::hex << std::setw(2) << value << " ";
     }
 }
 
 /// \brief Кодирование запроса.
 /// \return Закодированный запрос.
-std::vector<Byte> ClientQuery::encode() const
+Bytes ClientQuery::encode() const
 {
-    std::vector<Byte> result;
+    Bytes result;
     result.reserve(_content.size() + 10);
     const auto prefix = std::to_string(_content.size());
     const auto ptr = prefix.c_str();
@@ -171,7 +169,7 @@ std::vector<Byte> ClientQuery::encode() const
 }
 
 /// \brief Добавление перевода строки.
-/// \return this.
+/// \return `this`.
 ClientQuery& ClientQuery::newLine()
 {
     _write(0x0A);

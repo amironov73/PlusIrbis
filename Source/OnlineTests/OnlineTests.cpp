@@ -13,6 +13,8 @@ int main()
 {
     setlocale(LC_ALL, ""); // for cyrillic output
 
+    try {
+
     irbis::Connection connection;
     connection.host = L"192.168.1.35";
     connection.port = 6666;
@@ -48,6 +50,11 @@ int main()
 
     connection.disconnect();
     std::wcout << L"disconnected" << std::endl;
+
+    }
+    catch (std::exception &exception) {
+        std::cout << exception.what() << std::endl;
+    }
 
     return 0;
 }
