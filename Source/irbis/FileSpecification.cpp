@@ -11,17 +11,17 @@
 
 namespace irbis {
 
-FileSpecification::FileSpecification(int path_, const std::wstring &filename_)  // NOLINT(modernize-pass-by-value)
+FileSpecification::FileSpecification(int path_, const String &filename_)  // NOLINT(modernize-pass-by-value)
     : path(path_), filename(filename_)
 {
 }
 
-FileSpecification::FileSpecification(int path_, const std::wstring &database_, const std::wstring &filename_)  // NOLINT(modernize-pass-by-value)
+FileSpecification::FileSpecification(int path_, const String &database_, const String &filename_)  // NOLINT(modernize-pass-by-value)
     : path(path_), database(database_), filename(filename_)
 {
 }
 
-FileSpecification FileSpecification::parse(const std::wstring &text)
+FileSpecification FileSpecification::parse(const String &text)
 {
     TextNavigator navigator(text);
     const auto path = fastParse32(navigator.readTo('.'));
@@ -33,9 +33,9 @@ FileSpecification FileSpecification::parse(const std::wstring &text)
         fileName = fileName.substr(1);
     }
 
-    std::wstring content;
+    String content;
     const auto position = fileName.find(L'&');
-    if (position != std::string::npos)
+    if (position != String::npos)
     {
         content = fileName.substr(position + 1);
         fileName = fileName.substr(0, position);
@@ -68,7 +68,7 @@ bool FileSpecification::verify(bool throwException) const
 
 std::wstring FileSpecification::toString() const
 {
-    std::wstring result = filename;
+    String result = filename;
 
     if (binaryFile) {
         result = L"@" + result;

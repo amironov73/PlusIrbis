@@ -13,7 +13,7 @@
 
 namespace irbis {
 
-RecordField& RecordField::add(wchar_t subFieldCode, const std::wstring &subFieldValue)
+RecordField& RecordField::add(wchar_t subFieldCode, const String &subFieldValue)
 {
     subfields.push_back({subFieldCode, subFieldValue});
     return *this;
@@ -37,7 +37,7 @@ RecordField RecordField::clone() const
     return result;
 }
 
-void RecordField::decode(const std::wstring &line)
+void RecordField::decode(const String &line)
 {
     const auto parts = maxSplit(line, L'#', 2);
     this->tag = fastParse32(parts[0]);
@@ -64,12 +64,12 @@ void RecordField::decode(const std::wstring &line)
     }
 }
 
-bool RecordField::empty() const
+bool RecordField::empty() const noexcept
 {
-    return !tag || (value.empty() && subfields.empty());
+    return !this->tag || (this->value.empty() && this->subfields.empty());
 }
 
-SubField* RecordField::getFirstSubfield(wchar_t code) const
+SubField* RecordField::getFirstSubfield(wchar_t code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
@@ -80,7 +80,7 @@ SubField* RecordField::getFirstSubfield(wchar_t code) const
     return nullptr;
 }
 
-std::wstring RecordField::getFirstSubfieldValue(wchar_t code) const
+std::wstring RecordField::getFirstSubfieldValue(wchar_t code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
@@ -88,7 +88,7 @@ std::wstring RecordField::getFirstSubfieldValue(wchar_t code) const
         }
     }
 
-    return std::wstring();
+    return String();
 }
 
 bool RecordField::verify(bool throwOnError) const
@@ -116,12 +116,11 @@ bool RecordField::verify(bool throwOnError) const
     return result;
 }
 
-std::wstring RecordField::toString() const
+String RecordField::toString() const
 {
-    std::wstring result = std::to_wstring(tag)
+    String result = std::to_wstring(tag)
         + std::wstring(L"#") + value;
-    for (const auto &sub : subfields)
-    {
+    for (const auto &sub : subfields) {
         result += sub.toString();
     }
 

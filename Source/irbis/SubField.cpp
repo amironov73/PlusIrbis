@@ -30,7 +30,7 @@ void SubField::decode(const String &line)
 
 /// \brief Пустое подполе?
 /// \return true, если подполе пустое.
-bool SubField::empty() const
+bool SubField::empty() const noexcept
 {
     return code == NoCode || value.empty();
 }

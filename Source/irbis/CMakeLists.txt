@@ -12,4 +12,4 @@ FILE(GLOB CppFiles *.cpp)
 
 set(SOURCES ${CppFiles} ${HFiles})
 
-add_library(PlusIrbis SHARED ${SOURCES} ${HEADERS} ${UI})
+add_library(irbis SHARED ${SOURCES} ${HEADERS} ${UI})

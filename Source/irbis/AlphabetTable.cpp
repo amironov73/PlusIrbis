@@ -51,7 +51,7 @@ const AlphabetTable& AlphabetTable::instance()
     throw NotImplementedException();
 }
 
-bool AlphabetTable::isAlpha(const wchar_t &c) const
+bool AlphabetTable::isAlpha(const Char &c) const
 {
     throw NotImplementedException();
 }
@@ -97,7 +97,7 @@ std::vector<std::wstring> AlphabetTable::splitWords(const std::wstring &text) co
     }
 
     std::wstring accumulator;
-    for (const wchar_t &c : text) {
+    for (const Char &c : text) {
         if (isAlpha(c)) {
             accumulator.push_back(c);
         } else {

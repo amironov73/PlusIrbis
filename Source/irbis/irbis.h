@@ -161,8 +161,12 @@ class XrfRecord64;
 
 using Byte = std::uint8_t;
 using Bytes = std::vector<Byte>;
+using Char = wchar_t;
+using Chars = std::vector<Char>;
 using String = std::wstring;
-using MfnList = std::vector<int>;
+using Flag = std::uint32_t;
+using Mfn = std::uint32_t;
+using MfnList = std::vector<Mfn>;
 using StringList = std::vector<String>;
 using SubFieldList = std::vector<SubField>;
 using RecordFieldList = std::vector<RecordField>;
@@ -221,6 +225,20 @@ public:
 
 //=========================================================
 
+/// \brief Перечислитель объектов. Абстрактный базовый класс.
+/// \tparam T Тип перечисляемых объектов
+///
+/// Поддерживает простой перебор по некоторой коллекции.
+template<class T>
+class Enumerator
+{
+public:
+    bool moveNext() = 0;   ///< Перемещает перечислитель к следующему элементу коллекции.
+    T current() const = 0; ///< Возвращает элемент коллекции, соответствующий текущей позиции перечислителя.
+};
+
+//=========================================================
+
 /// \brief Базовое исключение для всех нештатных ситуаций.
 class PLUSIRBIS_EXPORTS IrbisException
         : public std::exception
@@ -234,11 +252,11 @@ public:
 class PLUSIRBIS_EXPORTS FileNotFoundException
         : public IrbisException
 {
-    std::wstring _fileName;
+    String _fileName;
 
 public:
 
-    explicit FileNotFoundException(const std::wstring& fileName)  // NOLINT(modernize-pass-by-value)
+    explicit FileNotFoundException(const String &fileName)  // NOLINT(modernize-pass-by-value)
         : _fileName(fileName)
     {
     }
@@ -253,13 +271,13 @@ public:
     std::vector<IniSection> sections; ///< Секции INI-файла.
 
     IniFile& clear();
-    bool containsSection (const String &name) const;
+    bool containsSection (const String &name) const noexcept;
     IniSection& createSection(const String &name);
-    bool modified() const;
+    bool modified() const noexcept;
     void notModified();
-    ptrdiff_t getIndex(const String &name) const;
-    IniSection* getSection(const String &name) const;
-    const String& getValue(const String &sectionName, const String &keyName, const String &defaultValue) const;
+    ptrdiff_t getIndex(const String &name) const noexcept;
+    IniSection* getSection(const String &name) const noexcept;
+    const String& getValue(const String &sectionName, const String &keyName, const String &defaultValue) const noexcept;
     void parse(const StringList &lines);
     IniFile& removeSection(const String &sectionName);
     IniFile& removeValue(const String &sectionName, const String &keyName);
@@ -279,10 +297,10 @@ public:
     String key;    ///< Ключ (не должен быть пустым).
     String value;  ///< Значение (может быть пустым).
 
-    bool modified() const;
-    void notModified();
-    void setKey(const String &newKey);
-    void setValue(const String &newValue);
+    bool modified() const noexcept;
+    void notModified() noexcept;
+    void setKey(const String &newKey) noexcept;
+    void setValue(const String &newValue) noexcept;
     String toString() const;
 
 private:
@@ -299,17 +317,17 @@ public:
     std::vector<IniLine> lines; ///< Строки, входящие в секцию. \see IniLine
 
     IniSection& clear();
-    bool containsKey(const String &key) const;
-    ptrdiff_t getIndex(const String &key) const;
-    IniLine* getLine(const String &key) const;
-    const String& getValue(const String &key, const String &defaultValue) const;
-    bool modified() const;
+    bool containsKey(const String &key) const noexcept;
+    ptrdiff_t getIndex(const String &key) const noexcept;
+    IniLine* getLine(const String &key) const noexcept;
+    const String& getValue(const String &key, const String &defaultValue) const noexcept;
+    bool modified() const noexcept;
     void notModified();
     IniSection& removeValue(const String &key);
     IniSection& setValue(const String &key, const String &value);
     String toString() const;
 
-    const String& operator[] (const String &index) const;
+    const String& operator[] (const String &index) const noexcept;
 };
 
 //=========================================================
@@ -324,7 +342,7 @@ class PLUSIRBIS_EXPORTS AlphabetTable final
 {
 public:
     const static String FileName;
-    std::set<wchar_t> characters;
+    std::set<Char> characters;
 
     /// Конструктор.
     explicit AlphabetTable(const std::vector<Byte> &bytes);
@@ -333,7 +351,7 @@ public:
     static const AlphabetTable& instance();
 
     /// Проверка, является ли указанный символ буквой.
-    bool isAlpha(const wchar_t &c) const;
+    bool isAlpha(const Char &c) const;
 
     /// Парсинг потока.
     static AlphabetTable parse(std::istream &stream);
@@ -513,18 +531,18 @@ public:
     bool createDictionary(const String &databaseName);
     bool deleteDatabase(const String &databaseName);
     bool deleteRecord(int mfn);
-    bool connected() const { return _connected; }
+    bool connected() const noexcept { return _connected; }
     void disconnect();
     bool execute(ClientQuery &query);
-    String formatRecord(const String &format, int mfn);
+    String formatRecord(const String &format, Mfn mfn);
     String formatRecord(const String &format, const MarcRecord &record);
-    DatabaseInfo getDatabaseInfo(const std::wstring &databaseName);
-    int getMaxMfn(const String &databaseName);
+    DatabaseInfo getDatabaseInfo(const String &databaseName);
+    Mfn getMaxMfn(const String &databaseName);
     GblResult globalCorrection(const GblSettings &settings);
     ServerStat getServerStat();
     Version getServerVersion();
     std::vector<UserInfo> getUserList();
-    std::vector<DatabaseInfo> listDatabases(const IniFile &iniFile, const std::string &defaultFileName);
+    std::vector<DatabaseInfo> listDatabases(const IniFile &iniFile, const String &defaultFileName);
     std::vector<DatabaseInfo> listDatabases(const FileSpecification &specification);
     StringList listFiles(const FileSpecification &specification);
     StringList listFiles(const std::vector<FileSpecification> &specifications);
@@ -539,10 +557,10 @@ public:
     IniFile readIniFile(const FileSpecification &specification);
     MenuFile readMenuFile(const FileSpecification &specification);
     std::vector<TermPosting> readPostings(const PostingParameters &parameters);
-    RawRecord readRawRecord(int mfn);
-    MarcRecord readRecord(int mfn);
-    MarcRecord readRecord(const String &databaseName, int mfn);
-    MarcRecord readRecord(const String &databaseName, int mfn, int version);
+    RawRecord readRawRecord(Mfn mfn);
+    MarcRecord readRecord(Mfn mfn);
+    MarcRecord readRecord(const String &databaseName, Mfn mfn);
+    MarcRecord readRecord(const String &databaseName, Mfn mfn, int version);
     std::vector<SearchScenario> readSearchScenario(const FileSpecification &specification);
     std::vector<TermInfo> readTerms(const String &startTerm, int numberOfTerms);
     std::vector<TermInfo> readTerms(const TermParameters &parameters);
@@ -556,11 +574,11 @@ public:
     MfnList search(const Search &search);
     MfnList search(const String &expression);
     MfnList search(const SearchParameters &parameters);
-    std::wstring toConnectionString() const;
+    String toConnectionString() const;
     bool truncateDatabase(const String &databaseName);
     bool unlockDatabase(const String &databaseName);
     bool unlockRecords(const String &databaseName, const MfnList &mfnList);
-    bool updateIniFile(StringList &lines);
+    bool updateIniFile(const StringList &lines);
     bool updateUserList(const std::vector<UserInfo> &users);
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
@@ -596,7 +614,7 @@ public:
     MfnList physicallyDeletedRecords; ///< Список физически удалённых записей (может быть пустым).
     MfnList nonActualizedRecords;     ///< Список неактуализированных записей (может быть пустым).
     MfnList lockedRecords;            ///< Список заблокированных записей (может быть пустым).
-    int maxMfn { 0 };                 ///< Максимальный MFN для базы данных.
+    Mfn maxMfn { 0 };                 ///< Максимальный MFN для базы данных.
     bool databaseLocked { false };    ///< Признак блокировки базы данных в целом.
     bool readOnly { false };          ///< База данных доступна только для чтения.
 
@@ -655,14 +673,14 @@ class PLUSIRBIS_EXPORTS Encoding // abstract
 
 public:
 
-    virtual std::vector<Byte> fromUnicode(const std::wstring &text) const = 0;
-    virtual std::wstring toUnicode(const Byte *bytes, size_t count) const = 0;
+    virtual std::vector<Byte> fromUnicode(const String &text) const = 0;
+    virtual String toUnicode(const Byte *bytes, size_t count) const = 0;
 
     static Encoding* ansi();
-    static std::wstring fromAnsi(const Byte *bytes, size_t count);
-    static std::wstring fromUtf(const Byte *bytes, size_t count);
-    static std::vector<Byte> toAnsi(const std::wstring &text);
-    static std::vector<Byte> toUtf(const std::wstring &text);
+    static String fromAnsi(const Byte *bytes, size_t count);
+    static String fromUtf(const Byte *bytes, size_t count);
+    static Bytes toAnsi(const String &text);
+    static Bytes toUtf(const String &text);
     static Encoding* utf();
 };
 
@@ -673,13 +691,13 @@ class PLUSIRBIS_EXPORTS FileSpecification final
 public:
     bool binaryFile { false };
     int path { 0 };
-    std::wstring database;
-    std::wstring filename;
-    std::wstring content;
+    String database;
+    String filename;
+    String content;
 
     FileSpecification() = default;
-    FileSpecification(int path, const std::wstring &filename);
-    FileSpecification(int path, const std::wstring &database, const std::wstring &filename);
+    FileSpecification(int path, const String &filename);
+    FileSpecification(int path, const String &database, const String &filename);
 
     static FileSpecification parse(const std::wstring &text);
     bool verify(bool throwException) const;
@@ -692,8 +710,8 @@ public:
 class PLUSIRBIS_EXPORTS FoundLine final
 {
 public:
-    int mfn {0};
-    std::wstring description;
+    Mfn mfn {0};
+    String description;
 };
 
 //=========================================================
@@ -710,11 +728,11 @@ public:
 class PLUSIRBIS_EXPORTS GblStatement final
 {
 public:
-    std::wstring command;
-    std::wstring parameter1;
-    std::wstring parameter2;
-    std::wstring format1;
-    std::wstring format2;
+    String command;
+    String parameter1;
+    String parameter2;
+    String format1;
+    String format2;
 };
 
 //=========================================================
@@ -724,15 +742,15 @@ class PLUSIRBIS_EXPORTS GblSettings final
 public:
     bool actualize { false };
     bool autoin { false };
-    std::wstring database;
-    std::wstring fileName;
-    int firstRecord { 0 };
+    String database;
+    String fileName;
+    Mfn firstRecord { 0 };
     bool formalControl { false };
-    int maxMfn { 0 };
+    Mfn maxMfn { 0 };
     std::vector<int> mfnList;
-    int minMfn { 0 };
-    int numberOfRecords { 0 };
-    std::wstring searchExpression;
+    Mfn minMfn { 0 };
+    Mfn numberOfRecords { 0 };
+    String searchExpression;
     std::vector<GblStatement> statements;
 };
 
@@ -741,10 +759,10 @@ public:
 class PLUSIRBIS_EXPORTS IlfEntry final
 {
 public:
-    std::wstring date;
-    std::wstring name;
-    std::wstring description;
-    std::wstring data;
+    String date;
+    String name;
+    String description;
+    String data;
     int position { 0 };
     int number { 0 };
     int dataLength { 0 };
@@ -768,7 +786,7 @@ public:
 
     IlfFile();
 
-    void readLocalFile(const std::wstring &fileName);
+    void readLocalFile(const String &fileName);
 };
 
 //=========================================================
@@ -776,7 +794,7 @@ public:
 class PLUSIRBIS_EXPORTS IrbisDate final
 {
 public:
-    std::wstring text;
+    String text;
     std::chrono::system_clock::time_point date;
 
     explicit IrbisDate(const std::wstring &text);
@@ -808,22 +826,22 @@ class PLUSIRBIS_EXPORTS IrbisText final
 public:
     const static char CrLf[];
     const static char Lf[];
-    const static std::wstring IrbisDelimiter;
-    const static std::wstring ShortDelimiter;
-    const static std::wstring MsDosDelimiter;
-    const static std::wstring UnixDelimiter;
-    const static std::wstring SearchDelimiter;
+    const static String IrbisDelimiter;
+    const static String ShortDelimiter;
+    const static String MsDosDelimiter;
+    const static String UnixDelimiter;
+    const static String SearchDelimiter;
 
-    static std::wstring fromIrbisToDos(std::wstring &text);
-    static std::wstring fromIrbisToUnix(std::wstring &text);
-    static std::wstring fromDosToIrbis(std::wstring &text);
-    static std::wstring fromDosToUnix(std::wstring &text);
-    static StringList fromFullDelimiter (const std::wstring &text);
-    static StringList fromShortDelimiter (const std::wstring &text);
-    static std::wstring readAllAnsi(const std::wstring &filename);
-    static std::wstring readAllUtf(const std::wstring &filename);
-    static StringList readAnsiLines(const std::wstring &filename);
-    static StringList readUtfLines(const std::wstring &filename);
+    static String fromIrbisToDos(String &text);
+    static String fromIrbisToUnix(String &text);
+    static String fromDosToIrbis(String &text);
+    static String fromDosToUnix(String &text);
+    static StringList fromFullDelimiter (const String &text);
+    static StringList fromShortDelimiter (const String &text);
+    static String readAllAnsi(const String &filename);
+    static String readAllUtf(const String &filename);
+    static StringList readAnsiLines(const String &filename);
+    static StringList readUtfLines(const String &filename);
 };
 
 //=========================================================
@@ -845,22 +863,22 @@ public:
 class PLUSIRBIS_EXPORTS MarcRecord final
 {
 public:
-    unsigned int mfn { 0u };
-    unsigned int status { 0u };
+    Mfn mfn { 0u };
+    Flag status { 0u };
     unsigned int version { 0u };
-    std::wstring database;
+    String database;
     std::list<RecordField> fields;
 
-    MarcRecord& add(wchar_t code, const std::wstring &value);
+    RecordField& add(int tag, const String &value);
     MarcRecord clone() const;
     void decode(const StringList &lines);
-    bool deleted() const;
-    std::wstring encode(const std::wstring &delimiter) const;
-    std::wstring fm(int tag, wchar_t code) const;
-    StringList fma(int tag, wchar_t code) const;
-    RecordField* getField(int tag, int occurrence) const;
+    bool deleted() const noexcept;
+    String encode(const String &delimiter) const;
+    String fm(int tag, Char code) const noexcept;
+    StringList fma(int tag, Char code) const;
+    RecordField* getField(int tag, int occurrence) const noexcept;
     std::vector<RecordField*> getFields(int tag) const;
-    MarcRecord& reset();
+    MarcRecord& reset() noexcept;
     bool verify(bool throwOnError) const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
@@ -898,19 +916,19 @@ public:
 class PLUSIRBIS_EXPORTS MenuFile final
 {
 public:
-    const static std::wstring StopMarker;
-    const static std::vector<wchar_t> Separators;
+    const static String StopMarker;
+    const static Chars Separators;
 
-    std::string fileName;
+    String fileName;
     std::list<MenuEntry> entries;
 
-    MenuFile& add(const std::wstring &code, const std::wstring &comment);
-    MenuEntry* getEntry(const std::wstring &code) const;
-    MenuEntry* getEntrySensitive(const std::wstring &code) const;
-    std::wstring* getValue(const std::wstring &code) const;
-    std::wstring* getValueSensitive(const std::wstring &code) const;
-    const std::wstring& getValue(const std::wstring &code, const std::wstring &defaultValue) const;
-    const std::wstring& getValueSensitive(const std::wstring &code, const std::wstring &defaultValue) const;
+    MenuFile& add(const String &code, const String &comment);
+    MenuEntry* getEntry(const String &code) const noexcept;
+    MenuEntry* getEntrySensitive(const String &code) const noexcept;
+    String* getValue(const String &code) const noexcept;
+    String* getValueSensitive(const String &code) const noexcept;
+    const String& getValue(const String &code, const String &defaultValue) const noexcept;
+    const String& getValueSensitive(const String &code, const String &defaultValue) const noexcept;
     void parse(std::istream &stream);
     void parse(const StringList &lines);
     void parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */);
@@ -925,14 +943,14 @@ public:
     const static int RecordSize;
     const static long LockFlagPosition;
 
-    int ctlMfn { 0 };
-    int nextMfn { 0 };
-    long nextPosition { 0 };
-    int mftType { 0 };
-    int recCnt { 0 };
-    int reserv1 { 0 };
-    int reserv2 { 0 };
-    int blocked { 0 };
+    uint32_t ctlMfn { 0 };
+    uint32_t nextMfn { 0 };
+    int64_t nextPosition { 0 };
+    uint32_t mftType { 0 };
+    uint32_t recCnt { 0 };
+    uint32_t reserv1 { 0 };
+    uint32_t reserv2 { 0 };
+    uint32_t blocked { 0 };
 
     void read(FILE *file);
 };
@@ -963,9 +981,9 @@ class PLUSIRBIS_EXPORTS MstFile64 final
 
 public:
     MstControlRecord64 control;
-    std::wstring fileName;
+    String fileName;
 
-    MstFile64(const std::wstring &fileName, DirectAccessMode mode);
+    MstFile64(const String &fileName, DirectAccessMode mode);
     MstFile64(const MstFile64 &) = delete;
     MstFile64(const MstFile64 &&) = delete;
     MstFile64& operator = (const MstFile64 &) = delete;
@@ -983,13 +1001,13 @@ class PLUSIRBIS_EXPORTS MstRecordLeader64 final
 public:
     const static int LeaderSize;
 
-    unsigned int mfn { 0 };
-    unsigned int length { 0 };
-    long previous { 0 };
-    unsigned int base { 0 };
-    unsigned int nvf { 0 };
-    unsigned int status { 0 };
-    unsigned int version { 0 };
+    uint32_t mfn { 0 };
+    uint32_t length { 0 };
+    uint64_t previous { 0 };
+    uint32_t base { 0 };
+    uint32_t nvf { 0 };
+    uint32_t status { 0 };
+    uint32_t version { 0 };
 
     void read(FILE *file);
 };
@@ -1002,7 +1020,7 @@ class PLUSIRBIS_EXPORTS MstRecord64 final
 {
 public:
     MstRecordLeader64 leader;
-    long offset { 0 };
+    uint64_t offset { 0 };
     std::vector<MstDictionaryEntry64> dictionary;
 
     bool deleted() const;
@@ -1030,15 +1048,15 @@ public:
 
 class PLUSIRBIS_EXPORTS NumberChunk final
 {
-    bool setUp(const std::wstring &str, const std::wstring &number);
+    bool setUp(const String &str, const String &number);
 
     friend class NumberText;
 
 public:
-    std::wstring prefix;
-    long long value{0};
-    int length{0};
-    bool haveValue{false};
+    String prefix;
+    int64_t value { 0 };
+    int length { 0 };
+    bool haveValue { false };
 
     NumberChunk() = default;
     NumberChunk(const NumberChunk &) = delete;
@@ -1083,21 +1101,21 @@ public:
 class PLUSIRBIS_EXPORTS ParFile final
 {
 public:
-    std::wstring xrf;
-    std::wstring mst;
-    std::wstring cnt;
-    std::wstring n01;
-    std::wstring n02;
-    std::wstring l01;
-    std::wstring l02;
-    std::wstring ifp;
-    std::wstring any;
-    std::wstring pft;
-    std::wstring ext;
+    String xrf;
+    String mst;
+    String cnt;
+    String n01;
+    String n02;
+    String l01;
+    String l02;
+    String ifp;
+    String any;
+    String pft;
+    String ext;
 
-    void assign (const std::wstring &path);
+    void assign (const String &path);
     void parse(const StringList &lines);
-    std::map<int, std::wstring> toDictionary() const;
+    std::map<int, String> toDictionary() const;
 };
 
 //=========================================================
@@ -1106,9 +1124,9 @@ class PLUSIRBIS_EXPORTS PostingParameters final
 {
 public:
     StringList listOfTerms;
-    std::wstring database;
-    std::wstring format;
-    std::wstring term;
+    String database;
+    String format;
+    String term;
     int firstPosting { 0 };
     int numberOfPostings { 0 };
 };
@@ -1118,16 +1136,16 @@ public:
 class PLUSIRBIS_EXPORTS ProcessInfo final
 {
 public:
-    std::wstring number;
-    std::wstring ipAddress;
-    std::wstring name;
-    std::wstring clientId;
-    std::wstring workstation;
-    std::wstring started;
-    std::wstring lastCommand;
-    std::wstring commandNumber;
-    std::wstring processId;
-    std::wstring state;
+    String number;
+    String ipAddress;
+    String name;
+    String clientId;
+    String workstation;
+    String started;
+    String lastCommand;
+    String commandNumber;
+    String processId;
+    String state;
 
     static std::vector<ProcessInfo> parse(ServerResponse &response);
 };
@@ -1137,17 +1155,17 @@ public:
 class PLUSIRBIS_EXPORTS RawRecord final
 {
 public:
-    int mfn { 0 };
+    Mfn mfn { 0 };
     unsigned int status { 0 };
     unsigned int version { 0 };
     StringList fields;
-    std::wstring database;
+    String database;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record);
 
-    std::wstring encode(const std::wstring &delimiter) const;
+    String encode(const String &delimiter) const;
     void parseSingle(const StringList &lines);
-    std::wstring to_wstring() const;
+    String toString() const;
 };
 
 //=========================================================
@@ -1155,21 +1173,21 @@ public:
 class PLUSIRBIS_EXPORTS RecordField final
 {
 public:
-    const static int NoTag = 0;
+    //const static int NoTag = 0;
 
     int tag { 0 };
-    std::wstring value;
+    String value;
     std::list<SubField> subfields;
 
-    RecordField& add(wchar_t code, const std::wstring &value = L"");
+    RecordField& add(Char code, const String &value = L"");
     RecordField& clear();
     RecordField clone() const;
-    void decode(const std::wstring &line);
-    bool empty() const;
-    SubField* getFirstSubfield(wchar_t code) const;
-    std::wstring getFirstSubfieldValue(wchar_t code) const;
+    void decode(const String &line);
+    bool empty() const noexcept;
+    SubField* getFirstSubfield(Char code) const noexcept;
+    String getFirstSubfieldValue(Char code) const noexcept;
     bool verify(bool throwOnError) const;
-    std::wstring toString() const;
+    String toString() const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
@@ -1219,7 +1237,7 @@ public:
     static Search equals(const String &prefix, const String &text);
     static Search equals(const String &prefix, const String &text1, const String &text2);
     static Search equals(const String &prefix, const String &text1, const String &text2, const String &text3);
-    static bool needWrap(const String &text);
+    static bool needWrap(const String &text) noexcept;
     Search& not_(const String &text);
     Search& not_(const Search &item);
     Search& or_(const String &text);
@@ -1230,7 +1248,7 @@ public:
     Search& or_(const Search &item1, const Search &item2, const Search &item3);
     Search& sameField(const String &text);
     Search& sameRepeat(const String &text);
-    String toString() const;
+    String toString() const noexcept;
     static String wrap(const String &text);
     static String wrap(const Search &item);
 };
@@ -1258,11 +1276,11 @@ class PLUSIRBIS_EXPORTS SearchParameters final
 public:
     String searchExpression;        ///< Выражение для поиска по словарю.
     String database;                ///< Имя базы данных.
-    int firstRecord { 1 };          ///< Индекс первой требуемой записи.
+    int32_t firstRecord { 1 };          ///< Индекс первой требуемой записи.
     String formatSpecification;     ///< Формат для расформатирования записей.
-    int maxMfn { 0 };               ///< Максимальный MFN.
-    int minMfn { 0 };               ///< Минимальный MFN.
-    int numberOfRecords { 0 };      ///< Общее число требуемых записей.
+    int32_t maxMfn { 0 };               ///< Максимальный MFN.
+    int32_t minMfn { 0 };               ///< Минимальный MFN.
+    int32_t numberOfRecords { 0 };      ///< Общее число требуемых записей.
     String sequentialSpecification; ///< Выражение для последовательного поиска.
     String filterSpecification;     ///< Выражение для локальной фильтрации.
 };
@@ -1350,15 +1368,15 @@ class PLUSIRBIS_EXPORTS SubField final
 {
 public:
     /// \brief Отсутствующий код подполя.
-    const static wchar_t NoCode { L'\0' };
+    const static Char NoCode { L'\0' };
 
     /// \brief Одноисмвольный код подполя.
-    wchar_t code { L'\0' };
+    Char code { L'\0' };
     String value; ///< Значение подполя (может быть пустой строкой).
 
     SubField clone() const;
     void decode(const String &line);
-    bool empty() const;
+    bool empty() const noexcept;
     bool verify(bool throwOnError) const;
     String toString() const;
 
@@ -1420,11 +1438,11 @@ public:
 class PLUSIRBIS_EXPORTS TermParameters final
 {
 public:
-    std::wstring database;
+    String database;
     int numberOfTerms { 0 };
     bool reverseOrder { false };
-    std::wstring startTerm;
-    std::wstring format;
+    String startTerm;
+    String format;
 };
 
 //=========================================================
@@ -1436,7 +1454,7 @@ public:
     int tag { 0 };
     int occurrence { 0 };
     int count { 0 };
-    std::wstring text;
+    String text;
 
     static std::vector<TermPosting> parse(const StringList &lines);
     std::wstring toString() const;
@@ -1448,35 +1466,35 @@ class PLUSIRBIS_EXPORTS TextNavigator final
 {
 private:
     size_t _column, _length, _line, _position;
-    const std::wstring &_text;
+    const String &_text;
 
 public:
-    const static wchar_t EOT;
+    const static Char EOT;
 
-    explicit TextNavigator(const std::wstring &text);
+    explicit TextNavigator(const String &text);
     TextNavigator(const TextNavigator &other);
     TextNavigator(TextNavigator&&) = delete;
     TextNavigator& operator = (const TextNavigator &) = delete;
     TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
 
-    size_t column() const { return _column; }
-    size_t line() const { return _line; }
-    size_t length() const { return _length; }
-    size_t position() const { return _position; }
-    bool eot() const { return _position >= _length; }
+    inline size_t column() const noexcept { return this->_column; }
+    inline size_t line() const noexcept { return this->_line; }
+    inline size_t length() const noexcept { return this->_length; }
+    inline size_t position() const noexcept { return this->_position; }
+    inline bool eot() const noexcept { return this->_position >= this->_length; }
 
-    wchar_t at(size_t position) const;
-    wchar_t front() const;
-    wchar_t back() const;
-    wchar_t lookAhead(ptrdiff_t distance = 1) const;
-    wchar_t lookBehind(ptrdiff_t distance = 1) const;
+    Char at(size_t position) const;
+    Char front() const;
+    Char back() const;
+    Char lookAhead(ptrdiff_t distance = 1) const;
+    Char lookBehind(ptrdiff_t distance = 1) const;
     TextNavigator& move(ptrdiff_t distance);
-    wchar_t peekChar() const;
-    wchar_t readChar();
+    Char peekChar() const;
+    Char readChar();
     std::wstring peekString(size_t length);
-    std::wstring peekTo(wchar_t stopChar);
-    std::wstring peekUntil(wchar_t stopChar);
+    std::wstring peekTo(Char stopChar);
+    std::wstring peekUntil(Char stopChar);
     std::wstring readLine();
     bool isControl() const;
     bool isDigit() const;
@@ -1484,9 +1502,9 @@ public:
     bool isWhitespace() const;
     std::wstring readInteger();
     std::wstring readString(size_t length);
-    std::wstring readTo(wchar_t stopChar);
-    std::wstring readUntil(wchar_t stopChar);
-    std::wstring readWhile(wchar_t goodChar);
+    std::wstring readTo(Char stopChar);
+    std::wstring readUntil(Char stopChar);
+    std::wstring readWhile(Char goodChar);
     std::wstring readWord();
     std::wstring recentText(ptrdiff_t length) const;
     std::wstring remainingText() const;
@@ -1599,14 +1617,14 @@ public:
 
 // Utilities
 
-bool PLUSIRBIS_EXPORTS sameChar(wchar_t first, wchar_t second);
+bool PLUSIRBIS_EXPORTS sameChar(Char first, Char second);
 bool PLUSIRBIS_EXPORTS sameString(const String &first, const String &second);
 
 String PLUSIRBIS_EXPORTS toLower(String &text);
 String PLUSIRBIS_EXPORTS toUpper(String &text);
 
 bool PLUSIRBIS_EXPORTS contains(const String &text, const String &fragment);
-bool PLUSIRBIS_EXPORTS contains(const String &text, wchar_t c);
+bool PLUSIRBIS_EXPORTS contains(const String &text, Char c);
 
 std::string PLUSIRBIS_EXPORTS replace(const std::string &text, const std::string &from, const std::string &to);
 String PLUSIRBIS_EXPORTS replace(const String &text, const String &from, const String &to);
@@ -1618,11 +1636,18 @@ String PLUSIRBIS_EXPORTS trim(const String &text);
 String PLUSIRBIS_EXPORTS describeError(int errorCode);
 
 int PLUSIRBIS_EXPORTS fastParse32(const String &text);
-int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text);
-int PLUSIRBIS_EXPORTS fastParse32(const wchar_t *text, size_t length);
+int PLUSIRBIS_EXPORTS fastParse32(const Char *text);
+int PLUSIRBIS_EXPORTS fastParse32(const Char *text, size_t length);
 int PLUSIRBIS_EXPORTS fastParse32(const std::string &text);
 int PLUSIRBIS_EXPORTS fastParse32(const char *text);
 int PLUSIRBIS_EXPORTS fastParse32(const char *text, size_t length);
+
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const String &text);
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const Char *text);
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const Char *text, size_t length);
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const std::string &text);
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const char *text);
+unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const char *text, size_t length);
 
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2);
 PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
@@ -1632,10 +1657,10 @@ PLUSIRBIS_EXPORTS const String& iif(const String& s1, const String &s2, const St
 PLUSIRBIS_EXPORTS std::wstring safeAt(const StringList &list, size_t index);
 
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, char delimiter);
-PLUSIRBIS_EXPORTS StringList split(const std::wstring &text, wchar_t delimiter);
+PLUSIRBIS_EXPORTS StringList split(const std::wstring &text, Char delimiter);
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, const std::string &delimiter);
 PLUSIRBIS_EXPORTS StringList split(const std::wstring &text, const std::wstring &delimiter);
-PLUSIRBIS_EXPORTS StringList maxSplit(const std::wstring &text, wchar_t separator, int count);
+PLUSIRBIS_EXPORTS StringList maxSplit(const std::wstring &text, Char separator, int count);
 
 PLUSIRBIS_EXPORTS std::wstring cp866_to_unicode(const std::string &text);
 PLUSIRBIS_EXPORTS std::wstring cp1251_to_unicode(const std::string &text);
@@ -1643,12 +1668,12 @@ PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
 
 PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
 PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
-PLUSIRBIS_EXPORTS void unicode_to_cp1251(Byte *dst, const wchar_t *src, size_t size);
+PLUSIRBIS_EXPORTS void unicode_to_cp1251(Byte *dst, const Char *src, size_t size);
 PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
 
-PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const wchar_t *src, size_t length);
-PLUSIRBIS_EXPORTS wchar_t* fromUtf(wchar_t *dst, const Byte *src, size_t length);
-PLUSIRBIS_EXPORTS size_t countUtf(const wchar_t *src, size_t length);
+PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const Char *src, size_t length);
+PLUSIRBIS_EXPORTS Char* fromUtf(Char *dst, const Byte *src, size_t length);
+PLUSIRBIS_EXPORTS size_t countUtf(const Char *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const Byte *src, size_t length);
 PLUSIRBIS_EXPORTS const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &result);
 PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const std::wstring &text);

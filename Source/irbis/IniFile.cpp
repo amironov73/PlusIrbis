@@ -20,13 +20,13 @@ namespace irbis {
 /// Состояние "строка модифицирована" устанавливается
 /// при вызове `setKey` и `setValue`.
 /// \see IniLine::setKey(), IniLine::setValue()
-bool IniLine::modified() const
+bool IniLine::modified() const noexcept
 {
     return this->_modified;
 }
 
 /// \brief Установка состояния строки "не модифицирована".
-void IniLine::notModified()
+void IniLine::notModified() noexcept
 {
     this->_modified = false;
 }
@@ -35,7 +35,7 @@ void IniLine::notModified()
 /// \param newKey Новый ключ строки.
 ///
 /// Устанавливает состояние "строка модифицирована".
-void IniLine::setKey(const String &newKey)
+void IniLine::setKey(const String &newKey) noexcept
 {
     this->key = newKey;
     this->_modified = true;
@@ -45,7 +45,7 @@ void IniLine::setKey(const String &newKey)
 /// \param newValue Новое значение строки.
 ///
 /// Устанавливает состояние "строка модифицирована".
-void IniLine::setValue(const String &newValue)
+void IniLine::setValue(const String &newValue) noexcept
 {
     this->value = newValue;
     this->_modified = true;
@@ -70,7 +70,7 @@ IniSection& IniSection::clear()
 /// \brief Содержит ли данная секция строку с указанным ключом?
 /// \param key Искомый ключ.
 /// \return `true` если содержит.
-bool IniSection::containsKey(const String &key) const
+bool IniSection::containsKey(const String &key) const noexcept
 {
     return std::any_of(begin(this->lines), end(this->lines),
             [&key] (const auto &x) { return sameString(x.key, key); });
@@ -80,7 +80,7 @@ bool IniSection::containsKey(const String &key) const
 /// \param key Искомый ключ.
 /// \return Индекс строки, либо отрицательное значение,
 /// если строка не найдена.
-ptrdiff_t IniSection::getIndex(const String &key) const
+ptrdiff_t IniSection::getIndex(const String &key) const noexcept
 {
     for (size_t i=0; i < this->lines.size(); i++) {
         if (sameString(this->lines[i].key, key)) {
@@ -94,7 +94,7 @@ ptrdiff_t IniSection::getIndex(const String &key) const
 /// \brief Поиск строки с указанным ключом.
 /// \param key Искомый ключ.
 /// \return Указатель на найденную строку, либо `nullptr`.
-IniLine* IniSection::getLine(const String &key) const
+IniLine* IniSection::getLine(const String &key) const noexcept
 {
     for (const auto &line : this->lines) {
         if (sameString(line.key, key)) {
@@ -109,7 +109,7 @@ IniLine* IniSection::getLine(const String &key) const
 /// \param key Искомый ключ.
 /// \param defaultValue Значение, возвращаемое, если строка не найдена.
 /// \return Найденное значение либо значение по умолчанию.
-const String& IniSection::getValue(const String &key, const String &defaultValue) const
+const String& IniSection::getValue(const String &key, const String &defaultValue) const noexcept
 {
     const auto line = this->getLine(key);
     return line ? line->value : defaultValue;
@@ -117,7 +117,7 @@ const String& IniSection::getValue(const String &key, const String &defaultValue
 
 /// \brief Есть ли модифицированные строки в данной секции?
 /// \return `true`, если модифицированные строки есть.
-bool IniSection::modified() const
+bool IniSection::modified() const noexcept
 {
     return std::any_of(begin(this->lines), end(this->lines),
             [] (const auto &x) { return x.modified(); });
@@ -182,7 +182,7 @@ String IniSection::toString() const
 /// Получение значения строки с указанным ключом.
 /// \param index Искомый ключ.
 /// \return Значение найденной строки либо пустая строка.
-const String& IniSection::operator[] (const String &index) const
+const String& IniSection::operator[] (const String &index) const noexcept
 {
     return this->getValue(index, L"");
 }
@@ -198,7 +198,7 @@ IniFile& IniFile::clear()
 /// \brief Есть ли секция с указанным именем?
 /// \param name Искомое имя секции.
 /// \return `true` если секция существует.
-bool IniFile::containsSection (const String &name) const
+bool IniFile::containsSection (const String &name) const noexcept
 {
     return std::any_of
         (
@@ -228,7 +228,7 @@ IniSection& IniFile::createSection(const String &name)
 
 /// \brief Есть ли модифицированные секции?
 /// \return `true`, если есть модифицированные секции.
-bool IniFile::modified() const
+bool IniFile::modified() const noexcept
 {
     return std::any_of(begin(this->sections), end(this->sections),
             [] (const auto &x) { return x.modified(); } );
@@ -244,7 +244,7 @@ void IniFile::notModified()
 /// \brief Получение индекса секции с указанным именем.
 /// \param name Искомое имя секции.
 /// \return Индекс секции либо отрицательное число, если секция не найдена.
-ptrdiff_t IniFile::getIndex(const String &name) const
+ptrdiff_t IniFile::getIndex(const String &name) const noexcept
 {
     for (size_t i = 0; i < this->sections.size(); i++) {
         if (sameString(this->sections[i].name, name)) {
@@ -257,7 +257,7 @@ ptrdiff_t IniFile::getIndex(const String &name) const
 /// \brief Получение указателя на секцию с указанным именем.
 /// \param name Искомое имя секции.
 /// \return Указатель на найденную секцию, либо `nullptr`, если секция не найдена.
-IniSection* IniFile::getSection(const String &name) const
+IniSection* IniFile::getSection(const String &name) const noexcept
 {
     for (const auto &section : this->sections) {
         if (sameString(section.name, name)) {
@@ -273,7 +273,7 @@ IniSection* IniFile::getSection(const String &name) const
 /// \param keyName Ключ строки.
 /// \param defaultValue Значение, возвращаемое, если строка не найдена.
 /// \return Значение найденной строки либо значение по умолчанию.
-const String& IniFile::getValue(const String &sectionName, const String &keyName, const String &defaultValue) const
+const String& IniFile::getValue(const String &sectionName, const String &keyName, const String &defaultValue) const noexcept
 {
     const auto section = this->getSection(sectionName);
     return section ? section->getValue(keyName, defaultValue) : defaultValue;

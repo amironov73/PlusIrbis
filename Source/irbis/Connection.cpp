@@ -224,7 +224,7 @@ bool Connection::execute(ClientQuery &query)
 /// \param format Спецификация формата.
 /// \param mfn MFN записи, подлежащей расформатированию.
 /// \return Результат расформатирования.
-String Connection::formatRecord(const String &format, int mfn)
+String Connection::formatRecord(const String &format, Mfn mfn)
 {
     if (!this->_checkConnection()) {
         return L"";
@@ -297,7 +297,7 @@ DatabaseInfo Connection::getDatabaseInfo(const String &databaseName)
 /// \brief Получение максимального MFN для базы данных с указанным именем.
 /// \param databaseName Имя базы данных.
 /// \return Максимальный MFN. 0 или отрицательное число означают ошибку.
-int Connection::getMaxMfn(const std::wstring &databaseName)
+Mfn Connection::getMaxMfn(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return 0;
@@ -402,7 +402,7 @@ GblResult Connection::globalCorrection(const GblSettings &settings)
     return result;
 }
 
-std::vector<DatabaseInfo> Connection::listDatabases(const IniFile &theIni, const std::string &defaultFileName)
+std::vector<DatabaseInfo> Connection::listDatabases(const IniFile &theIni, const String &defaultFileName)
 {
     std::vector<DatabaseInfo> result;
 
@@ -710,7 +710,7 @@ std::vector<TermPosting> Connection::readPostings(const PostingParameters &param
     return result;
 }
 
-RawRecord Connection::readRawRecord(int mfn)
+RawRecord Connection::readRawRecord(Mfn mfn)
 {
     RawRecord result;
 
@@ -732,7 +732,7 @@ RawRecord Connection::readRawRecord(int mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(int mfn)
+MarcRecord Connection::readRecord(Mfn mfn)
 {
     MarcRecord result;
 
@@ -754,7 +754,7 @@ MarcRecord Connection::readRecord(int mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(const String &databaseName, int mfn)
+MarcRecord Connection::readRecord(const String &databaseName, Mfn mfn)
 {
     MarcRecord result;
 
@@ -776,7 +776,7 @@ MarcRecord Connection::readRecord(const String &databaseName, int mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(const String &databaseName, int mfn, int version)
+MarcRecord Connection::readRecord(const String &databaseName, Mfn mfn, int version)
 {
     MarcRecord result;
 
@@ -798,7 +798,7 @@ MarcRecord Connection::readRecord(const String &databaseName, int mfn, int versi
 
     if (version) {
         // TODO unlockRecord
-        std::vector<int> records { mfn };
+        MfnList records { mfn };
         this->unlockRecords(databaseName, records);
     }
 
@@ -922,7 +922,7 @@ StringList Connection::readTextLines(const FileSpecification &specification)
     return result;
 }
 
-bool Connection::reloadDictionary(const std::wstring &databaseName)
+bool Connection::reloadDictionary(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -933,7 +933,7 @@ bool Connection::reloadDictionary(const std::wstring &databaseName)
     return this->execute(query);
 }
 
-bool Connection::reloadMasterFile(const std::wstring &databaseName)
+bool Connection::reloadMasterFile(const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1017,7 +1017,7 @@ MfnList Connection::search(const SearchParameters &parameters)
     return result;
 }
 
-std::wstring Connection::toConnectionString() const
+String Connection::toConnectionString() const
 {
     return String(L"host=") + this->host
            + L";port=" + std::to_wstring(this->port)
@@ -1065,7 +1065,7 @@ bool Connection::unlockRecords(const String &databaseName, const MfnList &mfnLis
     return execute(query);
 }
 
-bool Connection::updateIniFile(StringList &lines)
+bool Connection::updateIniFile(const StringList &lines)
 {
     if (!this->_checkConnection()) {
         return false;

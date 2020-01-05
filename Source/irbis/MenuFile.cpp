@@ -12,16 +12,16 @@
 
 namespace irbis {
 
-const std::wstring MenuFile::StopMarker = L"*****";
-const std::vector<wchar_t> MenuFile::Separators = { ' ', '-', '=', ':' };
+const String MenuFile::StopMarker = L"*****";
+const Chars MenuFile::Separators = { ' ', '-', '=', ':' };
 
-MenuFile& MenuFile::add(const std::wstring &code, const std::wstring &comment)
+MenuFile& MenuFile::add(const String &code, const String &comment)
 {
-    entries.push_back({code, comment});
+    entries.push_back({ code, comment });
     return *this;
 }
 
-MenuEntry* MenuFile::getEntry(const std::wstring &code) const
+MenuEntry* MenuFile::getEntry(const String &code) const noexcept
 {
     for(const auto &entry : entries) {
         if (sameString(entry.code, code)) {
@@ -32,7 +32,7 @@ MenuEntry* MenuFile::getEntry(const std::wstring &code) const
     return nullptr;
 }
 
-MenuEntry* MenuFile::getEntrySensitive(const std::wstring &code) const
+MenuEntry* MenuFile::getEntrySensitive(const String &code) const noexcept
 {
     for(const auto &entry : entries) {
         if (entry.code == code) {
@@ -43,27 +43,27 @@ MenuEntry* MenuFile::getEntrySensitive(const std::wstring &code) const
     return nullptr;
 }
 
-std::wstring* MenuFile::getValue(const std::wstring &code) const
+String* MenuFile::getValue(const String &code) const noexcept
 {
     const auto entry = getEntry(code);
     const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
-std::wstring* MenuFile::getValueSensitive(const std::wstring &code) const
+String* MenuFile::getValueSensitive(const String &code) const noexcept
 {
     const auto entry = getEntrySensitive(code);
     const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
-const std::wstring& MenuFile::getValue(const std::wstring &code, const std::wstring &defaultValue) const
+const String& MenuFile::getValue(const String &code, const String &defaultValue) const noexcept
 {
     const auto value = getValue(code);
     return value ? *value : defaultValue;
 }
 
-const std::wstring& MenuFile::getValueSensitive(const std::wstring &code, const std::wstring &defaultValue) const
+const String& MenuFile::getValueSensitive(const String &code, const String &defaultValue) const noexcept
 {
     const auto value = getValueSensitive(code);
     return value ? *value : defaultValue;
@@ -79,7 +79,7 @@ void MenuFile::parse(const StringList &lines)
     throw NotImplementedException();
 }
 
-void MenuFile::parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */)
+void MenuFile::parseLocalFile(const String &filename /* const QTextCodec *encoding */)
 {
     throw NotImplementedException();
 }

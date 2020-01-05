@@ -16,59 +16,59 @@ const char IrbisText::CrLf[] = { 0x0D, 0x0A };
 const char IrbisText::Lf[] = { 0x0A };
 
 // Разделитель строк в ИРБИС.
-const std::wstring IrbisText::IrbisDelimiter = L"\u001F\u001E";
+const String IrbisText::IrbisDelimiter = L"\u001F\u001E";
 
 // Короткая версия разделителя строк.
-const std::wstring IrbisText::ShortDelimiter = L"\u001E";
+const String IrbisText::ShortDelimiter = L"\u001E";
 
 //Разделитель строк в MSDOS.
-const std::wstring IrbisText::MsDosDelimiter = L"\r\n";
+const String IrbisText::MsDosDelimiter = L"\r\n";
 
 // Разделитель строк в UNIX.
-const std::wstring IrbisText::UnixDelimiter = L"\n";
+const String IrbisText::UnixDelimiter = L"\n";
 
 // Разделитель элементов в строке ответа на поисковый запрос.
-const std::wstring IrbisText::SearchDelimiter = L"#";
+const String IrbisText::SearchDelimiter = L"#";
 
 // Замена разделителей текста с ИРБИС на MS-DOS.
-std::wstring IrbisText::fromIrbisToDos (std::wstring &text)
+String IrbisText::fromIrbisToDos (String &text)
 {
     return replace(text, IrbisDelimiter, MsDosDelimiter);
 }
 
 // Замена разделителей текста с ИРБИС на UNIX.
-std::wstring IrbisText::fromIrbisToUnix (std::wstring &text)
+String IrbisText::fromIrbisToUnix (String &text)
 {
     return replace(text, IrbisDelimiter, UnixDelimiter);
 }
 
 // Замена разделителей текста с MS-DOS на ИРБИС.
-std::wstring IrbisText::fromDosToIrbis (std::wstring &text)
+String IrbisText::fromDosToIrbis (String &text)
 {
     return replace(text, MsDosDelimiter, IrbisDelimiter);
 }
 
 // Замена разделителей текста с MS-DOS на UNIX.
-std::wstring IrbisText::fromDosToUnix(std::wstring &text)
+String IrbisText::fromDosToUnix(String &text)
 {
     return replace(text, MsDosDelimiter, UnixDelimiter);
 }
 
 // Разбивка ответа сервера по строкам (полный вариант разделителя).
-StringList IrbisText::fromFullDelimiter (const std::wstring &text)
+StringList IrbisText::fromFullDelimiter (const String &text)
 {
     throw NotImplementedException();
     //return text.split(IrbisDelimiter);
 }
 
 // Строки, приходящие в ответ на команду WriteRecord.
-StringList IrbisText::fromShortDelimiter(const std::wstring &text)
+StringList IrbisText::fromShortDelimiter(const String &text)
 {
     return split(text, L'\u001E');
 }
 
 // Считываем весь файл как строку в кодировке ANSI.
-std::wstring IrbisText::readAllAnsi(const std::wstring &filename)
+String IrbisText::readAllAnsi(const String &filename)
 {
     throw NotImplementedException();
     //QFile file(filename);
@@ -77,13 +77,13 @@ std::wstring IrbisText::readAllAnsi(const std::wstring &filename)
     //}
 
     //QByteArray bytes = file.readAll();
-    //std::wstring result = IrbisEncoding::ansi()->toUnicode(bytes);
+    //String result = IrbisEncoding::ansi()->toUnicode(bytes);
 
     //return result;
 }
 
 // Считываем весь файл как строку в кодировке UTF-8.
-std::wstring IrbisText::readAllUtf(const std::wstring &filename)
+String IrbisText::readAllUtf(const String &filename)
 {
     throw NotImplementedException();
     //QFile file(filename);
@@ -92,13 +92,13 @@ std::wstring IrbisText::readAllUtf(const std::wstring &filename)
     //}
 
     //QByteArray bytes = file.readAll();
-    //std::wstring result = IrbisEncoding::ansi()->toUnicode(bytes);
+    //String result = IrbisEncoding::ansi()->toUnicode(bytes);
 
     //return result;
 }
 
 // Считываем весь файл как массив строк в кодировке ANSI.
-StringList IrbisText::readAnsiLines(const std::wstring &filename)
+StringList IrbisText::readAnsiLines(const String &filename)
 {
     throw NotImplementedException();
     //QFile file(filename);
@@ -114,7 +114,7 @@ StringList IrbisText::readAnsiLines(const std::wstring &filename)
     //        break;
     //    }
 
-    //    std::wstring line = ansi->toUnicode(bytes);
+    //    String line = ansi->toUnicode(bytes);
     //    result.append(line);
     //}
 
@@ -122,7 +122,7 @@ StringList IrbisText::readAnsiLines(const std::wstring &filename)
 }
 
 // Считываем весь файл как массив строк в кодировке UTF-8.
-StringList IrbisText::readUtfLines(const std::wstring &filename)
+StringList IrbisText::readUtfLines(const String &filename)
 {
     throw NotImplementedException();
     //QFile file(filename);
@@ -138,7 +138,7 @@ StringList IrbisText::readUtfLines(const std::wstring &filename)
     //        break;
     //    }
 
-    //    std::wstring line = utf->toUnicode(bytes);
+    //    String line = utf->toUnicode(bytes);
     //    result.append(line);
     //}
 

@@ -15,11 +15,11 @@ namespace irbis {
 
 PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record)
 {
-    stream << std::to_wstring(record.mfn) << std::wstring(L"#")
+    stream << std::to_wstring(record.mfn) << String(L"#")
         << std::to_wstring(record.status) << std::endl;
-    stream << std::wstring(L"0#") << std::to_wstring(record.version)
+    stream << String(L"0#") << std::to_wstring(record.version)
         << std::endl;
-    for (const std::wstring &field : record.fields)
+    for (const String &field : record.fields)
     {
         stream << field << std::endl;
     }
@@ -27,9 +27,9 @@ PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRe
     return stream;
 }
 
-std::wstring RawRecord::encode(const std::wstring &delimiter = IrbisText::IrbisDelimiter) const
+String RawRecord::encode(const String &delimiter = IrbisText::IrbisDelimiter) const
 {
-    std::wstring result;
+    String result;
     result.append(std::to_wstring(mfn));
     result.append(L"#");
     result.append(std::to_wstring(status));
@@ -38,7 +38,7 @@ std::wstring RawRecord::encode(const std::wstring &delimiter = IrbisText::IrbisD
     result.append(std::to_wstring(version));
     result.append(delimiter);
 
-    for (const std::wstring &field : fields) {
+    for (const String &field : fields) {
         result.append(field).append(delimiter);
 
     }
@@ -53,16 +53,16 @@ void RawRecord::parseSingle(const StringList &lines)
     }
 
     const StringList parts1 = maxSplit(lines[0], '#', 2);
-    mfn = fastParse32(parts1[0]);
+    mfn = fastParseUnsigned32(parts1[0]);
     status = 0;
     if (parts1.size() == 2) {
-        status = fastParse32(parts1[1]);
+        status = fastParseUnsigned32(parts1[1]);
     }
 
     const StringList parts2 = maxSplit(lines[1], '#', 2);
     version = 0;
     if (parts2.size() == 2) {
-        version = fastParse32(parts2[1]);
+        version = fastParseUnsigned32(parts2[1]);
     }
 
     fields.clear();
@@ -71,7 +71,7 @@ void RawRecord::parseSingle(const StringList &lines)
     }
 }
 
-std::wstring RawRecord::to_wstring() const
+String RawRecord::toString() const
 {
     return encode(L"\n");
 }

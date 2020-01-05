@@ -25,7 +25,7 @@ namespace irbis {
 /// \param second Второй символ.
 /// \return Возвращает true, если символы равны с точностью до регистра,
 /// иначе false.
-bool sameChar(wchar_t first, wchar_t second)
+bool sameChar(Char first, Char second)
 {
     return towupper(first) == towupper(second);
 }
@@ -38,7 +38,7 @@ bool sameChar(wchar_t first, wchar_t second)
 bool sameString(const String &first, const String &second)
 {
     return std::equal(first.begin(), first.end(), second.begin(), second.end(),
-        [] (wchar_t a, wchar_t b) { return towupper(a) == towupper(b); });
+        [] (Char a, Char b) { return towupper(a) == towupper(b); });
 }
 
 /// \brief Преобразование строки к нижнему регистру.
@@ -80,7 +80,7 @@ bool contains(const String &text, const String &fragment)
 /// \param text Текст для изучения.
 /// \param c Символ для поиска.
 /// \return Возвращает true, если символ найден, иначе false.
-bool contains(const String &text, wchar_t c)
+bool contains(const String &text, Char c)
 {
     return text.find(c) != std::string::npos;
 }
@@ -201,7 +201,7 @@ std::wstring describeError(int errorCode)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const std::wstring &text)
+int fastParse32(const String &text)
 {
     auto result = 0;
     const size_t length = text.length();
@@ -213,7 +213,19 @@ int fastParse32(const std::wstring &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const wchar_t *text)
+unsigned int fastParseUnsigned32(const String &text)
+{
+    auto result = 0u;
+    const size_t length = text.length();
+    for (size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text.at(offset) - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const Char *text)
 {
     auto result = 0;
     while (*text != 0) {
@@ -225,9 +237,34 @@ int fastParse32(const wchar_t *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const wchar_t *text, size_t length)
+unsigned int fastParseUnsigned32(const Char *text)
+{
+    auto result = 0u;
+    while (*text != 0) {
+        result = result * 10 + *text - '0';
+        text++;
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const Char *text, size_t length)
 {
     auto result = 0;
+    while (length > 0) {
+        result = result * 10 + *text - L'0';
+        text++;
+        length--;
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+unsigned int fastParseUnsigned32(const Char *text, size_t length)
+{
+    auto result = 0u;
     while (length > 0) {
         result = result * 10 + *text - L'0';
         text++;
@@ -241,6 +278,18 @@ int fastParse32(const wchar_t *text, size_t length)
 int fastParse32(const std::string &text)
 {
     auto result = 0;
+    const size_t length = text.length();
+    for (size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text.at(offset) - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+unsigned int fastParseUnsigned32(const std::string &text)
+{
+    auto result = 0u;
     const size_t length = text.length();
     for (size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
@@ -269,6 +318,23 @@ int fastParse32(const char *text)
 int fastParse32(const char *text, size_t length)
 {
     auto result = 0;
+    while (length > 0) {
+        result = result * 10 + *text - L'0';
+        text++;
+        length--;
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст в однобайтовой кодировке.
+/// \param length Длина текста в байтах.
+/// \return Результат разбора.
+/// \warning Мусор на входе -- мусор на выходе!
+unsigned int fastParseUnsigned32(const char *text, size_t length)
+{
+    auto result = 0u;
     while (length > 0) {
         result = result * 10 + *text - L'0';
         text++;
@@ -365,7 +431,7 @@ std::wstring safeAt(const StringList &list, size_t index)
 /// \param separator
 /// \param count
 /// \return
-StringList maxSplit(const String &text, wchar_t separator, int count)
+StringList maxSplit(const String &text, Char separator, int count)
 {
     std::vector<std::wstring> result;
 
@@ -412,7 +478,7 @@ std::vector<std::string> split(const std::string &text, char delimiter)
 /// \param text
 /// \param delimiter
 /// \return
-StringList split(const String &text, wchar_t delimiter)
+StringList split(const String &text, Char delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
@@ -491,11 +557,11 @@ String removeComments(const String &text)
     }
 
     std::wstring result;
-    wchar_t state = 0;
+    Char state = 0;
     size_t index = 0;
     const size_t length = text.length();
     while (index < length) {
-        wchar_t c = text.at(index);
+        Char c = text.at(index);
 
         switch(state) {
         case '\'':
@@ -566,7 +632,7 @@ std::wstring prepareFormat(const std::wstring &text)
 
     std::wstring result;
     for (size_t i = 0; i < length; i++) {
-        const wchar_t c = text.at(i);
+        const Char c = text.at(i);
         if (c >= ' ') {
             result.push_back(c);
         }

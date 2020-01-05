@@ -13,10 +13,10 @@
 
 namespace irbis {
 
-MarcRecord& MarcRecord::add(wchar_t code, const std::wstring &value)
+RecordField& MarcRecord::add(int tag, const String &value)
 {
-    fields.push_back({code, value});
-    return *this;
+    this->fields.push_back(RecordField { tag, value });
+    return this->fields.back();
 }
 
 MarcRecord MarcRecord::clone() const
@@ -37,12 +37,12 @@ void MarcRecord::decode(const StringList &lines)
 
     // mfn and status of the record
     const auto firstLine = split(lines[0], L'#');
-    this->mfn = fastParse32(firstLine[0]);
-    this->status = fastParse32(safeAt(firstLine, 1));
+    this->mfn = fastParseUnsigned32(firstLine[0]);
+    this->status = fastParseUnsigned32(safeAt(firstLine, 1));
 
     // version of the record
     const auto secondLine = split(lines[1], L'#');
-    this->version = fastParse32(safeAt(secondLine, 1));
+    this->version = fastParseUnsigned32(safeAt(secondLine, 1));
 
     // fields
     for (size_t i = 2; i < lines.size(); i++) {
@@ -55,14 +55,14 @@ void MarcRecord::decode(const StringList &lines)
     }
 }
 
-bool MarcRecord::deleted() const
+bool MarcRecord::deleted() const noexcept
 {
     return (this->status & RecordStatus::Deleted) != 0u;
 }
 
-std::wstring MarcRecord::encode(const std::wstring &delimiter = IrbisText::IrbisDelimiter) const
+String MarcRecord::encode(const String &delimiter = IrbisText::IrbisDelimiter) const
 {
-    std::wstring result = std::to_wstring(this->mfn) + L"#"
+    String result = std::to_wstring(this->mfn) + L"#"
             + std::to_wstring(this->status) + delimiter
             + L"0#" + std::to_wstring(this->version) + delimiter;
     for (const auto &field : this->fields) {
@@ -73,7 +73,7 @@ std::wstring MarcRecord::encode(const std::wstring &delimiter = IrbisText::Irbis
     return result;
 }
 
-std::wstring MarcRecord::fm(int tag, wchar_t code = 0) const
+String MarcRecord::fm(int tag, Char code = 0) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
@@ -89,10 +89,10 @@ std::wstring MarcRecord::fm(int tag, wchar_t code = 0) const
         }
     }
 
-    return std::wstring();
+    return String();
 }
 
-StringList MarcRecord::fma(int tag, wchar_t code) const
+StringList MarcRecord::fma(int tag, Char code) const
 {
     StringList result;
     for (const auto &field : this->fields) {
@@ -116,7 +116,7 @@ StringList MarcRecord::fma(int tag, wchar_t code) const
     return result;
 }
 
-RecordField* MarcRecord::getField(int tag, int occurrence = 0) const
+RecordField* MarcRecord::getField(int tag, int occurrence = 0) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
@@ -142,12 +142,12 @@ std::vector<RecordField*> MarcRecord::getFields(int tag) const
     return result;
 }
 
-MarcRecord& MarcRecord::reset()
+MarcRecord& MarcRecord::reset() noexcept
 {
     this->mfn = 0;
     this->status = 0;
     this->version = 0;
-    this->database = std::wstring();
+    this->database = String();
 
     return *this;
 }
@@ -170,9 +170,9 @@ bool MarcRecord::verify(bool throwOnError) const
 
 PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record)
 {
-    stream << std::to_wstring(record.mfn) << std::wstring(L"#")
+    stream << std::to_wstring(record.mfn) << String(L"#")
         << std::to_wstring(record.status) << std::endl;
-    stream << std::wstring(L"0#") << record.version << std::endl;
+    stream << String(L"0#") << record.version << std::endl;
     for (const RecordField &field : record.fields) {
         stream << field << std::endl;
     }

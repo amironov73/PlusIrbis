@@ -153,7 +153,7 @@ Search Search::equals(const String &prefix, const String &text1, const String &t
 /// \brief Определяет, нужно ли заключать в кавычки заданный текст.
 /// \param text Текст, который нужно обернуть (или не обернуть) кавычками.
 /// \return `true` если текст необходимо заключить в кавычки.
-bool Search::needWrap(const String &text)
+bool Search::needWrap(const String &text) noexcept
 {
     if (text.empty()) {
         return true;
@@ -299,7 +299,7 @@ Search& Search::sameRepeat(const String &text)
 
 /// \brief Выдача текста построенного выражения.
 /// \return Текстовое представление.
-String Search::toString() const
+String Search::toString() const noexcept
 {
     return this->_buffer;
 }

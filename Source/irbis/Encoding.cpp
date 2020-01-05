@@ -14,7 +14,7 @@
 
 namespace irbis {
 
-static wchar_t _cp866_to_unicode[256]{
+static Char _cp866_to_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -33,7 +33,7 @@ static wchar_t _cp866_to_unicode[256]{
 0x0401, 0x0451, 0x0404, 0x0454, 0x0407, 0x0457, 0x040E, 0x045E, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x2116, 0x00A4, 0x25A0, 0x00A0
 };
 
-static wchar_t _cp1251_to_unicode[256]{
+static Char _cp1251_to_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -52,7 +52,7 @@ static wchar_t _cp1251_to_unicode[256]{
 0x0440, 0x0441, 0x0442, 0x0443, 0x0444, 0x0445, 0x0446, 0x0447, 0x0448, 0x0449, 0x044A, 0x044B, 0x044C, 0x044D, 0x044E, 0x044F
 };
 
-static wchar_t _koi8r_to_unicode[256]{
+static Char _koi8r_to_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -71,7 +71,7 @@ static wchar_t _koi8r_to_unicode[256]{
 0x041F, 0x042F, 0x0420, 0x0421, 0x0422, 0x0423, 0x0416, 0x0412, 0x042C, 0x042B, 0x0417, 0x0428, 0x042D, 0x0429, 0x0427, 0x042A
 };
 
-static wchar_t _cp866_from_unicode[256]{
+static Char _cp866_from_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -90,7 +90,7 @@ static wchar_t _cp866_from_unicode[256]{
 0x0401, 0x0451, 0x0404, 0x0454, 0x0407, 0x0457, 0x040E, 0x045E, 0x00B0, 0x2219, 0x00B7, 0x221A, 0x2116, 0x00A4, 0x25A0, 0x00A0
 };
 
-static wchar_t _cp1251_from_unicode[256]{
+static Char _cp1251_from_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -109,7 +109,7 @@ static wchar_t _cp1251_from_unicode[256]{
 0x2018, 0x2019, 0x201A, 0x201C, 0x201D, 0x201E, 0x2020, 0x2021, 0x2022, 0x2026, 0x2030, 0x2039, 0x203A, 0x20AC, 0x2116, 0x2122
 };
 
-static wchar_t _koi8r_from_unicode[256]{
+static Char _koi8r_from_unicode[256]{
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
 0x0020, 0x0021, 0x0022, 0x0023, 0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002D, 0x002E, 0x002F,
@@ -192,7 +192,7 @@ std::wstring cp866_to_unicode(const std::string &text)
     for (const char c : text)
     {
         const auto uc = static_cast<unsigned char>(c);
-        const wchar_t wc = _cp866_to_unicode[uc];
+        const Char wc = _cp866_to_unicode[uc];
         result.push_back(wc);
     }
 
@@ -203,8 +203,8 @@ std::string unicode_to_cp866(const std::wstring &text)
 {
     std::string result;
     result.reserve(text.size());
-    const wchar_t *first = &_cp866_from_unicode[0], *last = first + 256;
-    for (const wchar_t c : text)
+    const Char *first = &_cp866_from_unicode[0], *last = first + 256;
+    for (const Char c : text)
     {
         const ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
@@ -222,7 +222,7 @@ std::wstring cp1251_to_unicode(const std::string &text)
     for (const char c : text)
     {
         const auto uc = static_cast<unsigned char>(c);
-        const wchar_t wc = _cp1251_to_unicode[uc];
+        const Char wc = _cp1251_to_unicode[uc];
         result.push_back(wc);
     }
 
@@ -233,8 +233,8 @@ std::string unicode_to_cp1251(const std::wstring &text)
 {
     std::string result;
     result.reserve(text.size());
-    const wchar_t *first = &_cp1251_from_unicode[0], *last = first + 256;
-    for (const wchar_t c : text)
+    const Char *first = &_cp1251_from_unicode[0], *last = first + 256;
+    for (const Char c : text)
     {
         const ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
@@ -245,12 +245,12 @@ std::string unicode_to_cp1251(const std::wstring &text)
     return result;
 }
 
-void unicode_to_cp1251(Byte *dst, const wchar_t *src, size_t size)
+void unicode_to_cp1251(Byte *dst, const Char *src, size_t size)
 {
-    const wchar_t *first = &_cp1251_from_unicode[0], *last = first + 256;
+    const Char *first = &_cp1251_from_unicode[0], *last = first + 256;
     for (size_t i = 0; i < size; i++)
     {
-        wchar_t c = src[i];
+        Char c = src[i];
         const ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
         *dst++ = _cp1251_xlat[sc];
@@ -264,7 +264,7 @@ std::wstring koi8r_to_unicode(const std::string &text)
     for (const char c : text)
     {
         const auto uc = static_cast<unsigned char>(c);
-        const wchar_t wc = _koi8r_to_unicode[uc];
+        const Char wc = _koi8r_to_unicode[uc];
         result.push_back(wc);
     }
 
@@ -275,8 +275,8 @@ std::string unicode_to_koi8r(const std::wstring &text)
 {
     std::string result;
     result.reserve(text.size());
-    const wchar_t *first = &_koi8r_from_unicode[0], *last = first + 256;
-    for (const wchar_t c : text)
+    const Char *first = &_koi8r_from_unicode[0], *last = first + 256;
+    for (const Char c : text)
     {
         const ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
@@ -291,7 +291,7 @@ std::string unicode_to_koi8r(const std::wstring &text)
 
 // Преобразует UCS-16 в UTF-8
 // Возвращает указатель на место после последнего преобразованного символа
-Byte* toUtf(Byte *dst, const wchar_t *src, size_t length)
+Byte* toUtf(Byte *dst, const Char *src, size_t length)
 {
     while (length > 0)
     {
@@ -329,7 +329,7 @@ Byte* toUtf(Byte *dst, const wchar_t *src, size_t length)
 }
 
 // Подсчитывает число байт, необходимых для размещения в UTF-8.
-size_t countUtf(const wchar_t *src, size_t length)
+size_t countUtf(const Char *src, size_t length)
 {
     size_t result = 0;
 
@@ -365,7 +365,7 @@ size_t countUtf(const wchar_t *src, size_t length)
 
 // Преобразует UTF-8 в UCS-16
 // Возвращает указатель на место после последнего преобразованного символа
-wchar_t* fromUtf(wchar_t *dst, const Byte *src, size_t length)
+Char* fromUtf(Char *dst, const Byte *src, size_t length)
 {
     const Byte *stop = src + length;
 
@@ -400,13 +400,13 @@ wchar_t* fromUtf(wchar_t *dst, const Byte *src, size_t length)
             c |= (*src++ & 0x3Fu) << 6u;
             c |= (*src++ & 0x3Fu);
         }
-        *dst++ = static_cast<wchar_t>(c);
+        *dst++ = static_cast<Char>(c);
     }
 
     return dst;
 }
 
-// Подсчитывает число wchar_t, необходимых для размещения в UCS-16.
+// Подсчитывает число Char, необходимых для размещения в UCS-16.
 size_t countUtf(const Byte *src, size_t length)
 {
     size_t result = 0;
@@ -457,8 +457,8 @@ const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &resu
         result.clear();
         return end;
     }
-    auto dst = new wchar_t[length + 1];
-    memset(dst, 0, sizeof(wchar_t)*(length + 1));
+    auto dst = new Char[length + 1];
+    memset(dst, 0, sizeof(Char)*(length + 1));
     if (!fromUtf(dst, src, length))
     {
         result.clear();
@@ -479,8 +479,8 @@ std::wstring fromUtf(const std::string &text)
 
     const auto *src = reinterpret_cast<const Byte*>(text.c_str());
     const auto dstSize = countUtf(src, srcSize);
-    auto *dst = new wchar_t[dstSize + 1];
-    memset(dst, 0, sizeof(wchar_t)*(dstSize+1));
+    auto *dst = new Char[dstSize + 1];
+    memset(dst, 0, sizeof(Char)*(dstSize+1));
     if (!fromUtf(dst, src, srcSize))
     {
         return std::wstring();
@@ -494,7 +494,7 @@ std::wstring fromUtf(const std::string &text)
 Byte* toUtf(Byte *dst, const std::wstring &text)
 {
     const size_t length = text.length();
-    const wchar_t *src = text.c_str();
+    const Char *src = text.c_str();
     return toUtf(dst, src, length);
 }
 
@@ -506,7 +506,7 @@ std::string toUtf(const std::wstring &text)
         return std::string();
     }
 
-    const auto *src = reinterpret_cast<const wchar_t*>(text.c_str());
+    const auto *src = reinterpret_cast<const Char*>(text.c_str());
     const auto dstSize = countUtf(src, srcSize);
     auto *dst = new Byte[dstSize + 1];
     memset(dst, 0, sizeof(Byte)*(dstSize+1));
