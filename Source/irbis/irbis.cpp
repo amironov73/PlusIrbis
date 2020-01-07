@@ -25,7 +25,7 @@ namespace irbis {
 /// \param second Второй символ.
 /// \return Возвращает true, если символы равны с точностью до регистра,
 /// иначе false.
-bool sameChar(Char first, Char second)
+bool sameChar(Char first, Char second) noexcept
 {
     return towupper(first) == towupper(second);
 }
@@ -35,7 +35,7 @@ bool sameChar(Char first, Char second)
 /// \param second Вторая строка.
 /// \return Возвращает true, если строки равны с точностью до регистра,
 /// иначе false.
-bool sameString(const String &first, const String &second)
+bool sameString(const String &first, const String &second) noexcept
 {
     return std::equal(first.begin(), first.end(), second.begin(), second.end(),
         [] (Char a, Char b) { return towupper(a) == towupper(b); });
@@ -45,7 +45,7 @@ bool sameString(const String &first, const String &second)
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toLower(String &text)
+String toLower(String &text) noexcept
 {
     for (auto &i : text) {
         i = tolower(i);
@@ -58,7 +58,7 @@ String toLower(String &text)
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toUpper(String &text)
+String toUpper(String &text) noexcept
 {
     for (auto &i : text) {
         i = toupper(i);

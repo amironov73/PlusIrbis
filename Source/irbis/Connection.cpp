@@ -117,6 +117,13 @@ bool Connection::connect()
     return true;
 }
 
+/// \brief Асинхронный вариант connect.
+/// \return Признак успешности выполнения операции.
+std::future<bool> Connection::connectAsync()
+{
+    return std::async(std::launch::async, &Connection::connect, this);
+}
+
 /// \brief Создание на сервере базы данных с указанным именем.
 /// \param databaseName Имя создаваемой базы данных.
 /// \param description Описание базы данных в произвольной форме.
@@ -204,6 +211,12 @@ void Connection::disconnect()
     _connected = false;
 }
 
+/// \brief Асинхронный вариант disconnect.
+std::future<void> Connection::disconnectAsync()
+{
+    return std::async(std::launch::async, &Connection::disconnect, this);
+}
+
 /// \brief Результат исполнения запроса на сервере.
 /// \param query Полностью сформированный клиентский запрос.
 /// \return Признак успешного выполнения запроса.
@@ -218,6 +231,14 @@ bool Connection::execute(ClientQuery &query)
 
     ServerResponse response(*this, query);
     return response.checkReturnCode();
+}
+
+/// \brief Асинхронный вариант execute.
+/// \param query Клиентский запрос.
+/// \return Признак успешного выполнения запроса.
+std::future<bool> Connection::executeAsync(ClientQuery &query)
+{
+    return std::async(std::launch::async, &Connection::execute, this, std::ref(query));
 }
 
 /// \brief Форматирование записи на сервере по её MFN.
@@ -560,6 +581,13 @@ bool Connection::noOp() {
 
     ClientQuery query(*this, "N");
     return this->execute(query);
+}
+
+/// \brief Асинхронный вариант noOp.
+/// \return Признак успешности выполнения операции.
+std::future<bool> Connection::noOpAsync()
+{
+    return std::async(std::launch::async, &Connection::noOp, this);
 }
 
 /// \brief Разбор строки подключения.

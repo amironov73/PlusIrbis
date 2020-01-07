@@ -323,6 +323,7 @@
     <ClCompile Include="MstFile64.cpp" />
     <ClCompile Include="MstRecord64.cpp" />
     <ClCompile Include="MstRecordLeader64.cpp" />
+    <ClCompile Include="NewEncoding.cpp" />
     <ClCompile Include="NumberChunk.cpp" />
     <ClCompile Include="OptFile.cpp" />
     <ClCompile Include="ParFile.cpp" />

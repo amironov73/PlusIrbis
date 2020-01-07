@@ -24,7 +24,7 @@ IlfFile::IlfFile()
     throw NotImplementedException();
 }
 
-void IlfFile::readLocalFile(const std::wstring &fileName)
+void IlfFile::readLocalFile(const String &fileName)
 {
     throw NotImplementedException();
 }

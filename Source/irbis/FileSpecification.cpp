@@ -66,7 +66,7 @@ bool FileSpecification::verify(bool throwException) const
     return result;
 }
 
-std::wstring FileSpecification::toString() const
+String FileSpecification::toString() const
 {
     String result = filename;
 

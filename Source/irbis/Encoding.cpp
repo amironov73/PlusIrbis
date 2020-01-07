@@ -185,9 +185,9 @@ static unsigned char _koi8r_xlat[256]{
 0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-std::wstring cp866_to_unicode(const std::string &text)
+String cp866_to_unicode(const std::string &text)
 {
-    std::wstring result;
+    String result;
     result.reserve(text.size());
     for (const char c : text)
     {
@@ -199,7 +199,7 @@ std::wstring cp866_to_unicode(const std::string &text)
     return result;
 }
 
-std::string unicode_to_cp866(const std::wstring &text)
+std::string unicode_to_cp866(const String &text)
 {
     std::string result;
     result.reserve(text.size());
@@ -215,9 +215,9 @@ std::string unicode_to_cp866(const std::wstring &text)
     return result;
 }
 
-std::wstring cp1251_to_unicode(const std::string &text)
+String cp1251_to_unicode(const std::string &text)
 {
-    std::wstring result;
+    String result;
     result.reserve(text.size());
     for (const char c : text)
     {
@@ -229,7 +229,7 @@ std::wstring cp1251_to_unicode(const std::string &text)
     return result;
 }
 
-std::string unicode_to_cp1251(const std::wstring &text)
+std::string unicode_to_cp1251(const String &text)
 {
     std::string result;
     result.reserve(text.size());
@@ -257,9 +257,9 @@ void unicode_to_cp1251(Byte *dst, const Char *src, size_t size)
     }
 }
 
-std::wstring koi8r_to_unicode(const std::string &text)
+String koi8r_to_unicode(const std::string &text)
 {
-    std::wstring result;
+    String result;
     result.reserve(text.size());
     for (const char c : text)
     {
@@ -271,7 +271,7 @@ std::wstring koi8r_to_unicode(const std::string &text)
     return result;
 }
 
-std::string unicode_to_koi8r(const std::wstring &text)
+std::string unicode_to_koi8r(const String &text)
 {
     std::string result;
     result.reserve(text.size());
@@ -469,7 +469,7 @@ const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &resu
     return end;
 }
 
-std::wstring fromUtf(const std::string &text)
+String fromUtf(const std::string &text)
 {
     const auto srcSize = text.length();
     if (!srcSize)
@@ -485,20 +485,20 @@ std::wstring fromUtf(const std::string &text)
     {
         return std::wstring();
     }
-    std::wstring result(dst);
+    String result(dst);
     delete[] dst;
     return result;
 }
 
 // Записывает строку в UTF-8
-Byte* toUtf(Byte *dst, const std::wstring &text)
+Byte* toUtf(Byte *dst, const String &text)
 {
     const size_t length = text.length();
     const Char *src = text.c_str();
     return toUtf(dst, src, length);
 }
 
-std::string toUtf(const std::wstring &text)
+std::string toUtf(const String &text)
 {
     const auto srcSize = text.length();
     if (!srcSize)

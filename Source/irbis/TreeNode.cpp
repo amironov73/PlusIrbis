@@ -11,10 +11,10 @@
 
 namespace irbis {
 
-TreeNode& TreeNode::add(const std::wstring &name)
+TreeNode& TreeNode::add(const String &name)
 {
     TreeNode item { name };
-    children.push_back(item);
+    children.emplace_back(item);
 
     return children.back();
 }

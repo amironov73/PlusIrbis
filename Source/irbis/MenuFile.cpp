@@ -17,13 +17,13 @@ const Chars MenuFile::Separators = { ' ', '-', '=', ':' };
 
 MenuFile& MenuFile::add(const String &code, const String &comment)
 {
-    entries.push_back({ code, comment });
+    this->entries.push_back({ code, comment });
     return *this;
 }
 
 MenuEntry* MenuFile::getEntry(const String &code) const noexcept
 {
-    for(const auto &entry : entries) {
+    for(const auto &entry : this->entries) {
         if (sameString(entry.code, code)) {
             return const_cast<MenuEntry*>(&entry);
         }
@@ -34,7 +34,7 @@ MenuEntry* MenuFile::getEntry(const String &code) const noexcept
 
 MenuEntry* MenuFile::getEntrySensitive(const String &code) const noexcept
 {
-    for(const auto &entry : entries) {
+    for(const auto &entry : this->entries) {
         if (entry.code == code) {
             return const_cast<MenuEntry*>(&entry);
         }
@@ -45,27 +45,27 @@ MenuEntry* MenuFile::getEntrySensitive(const String &code) const noexcept
 
 String* MenuFile::getValue(const String &code) const noexcept
 {
-    const auto entry = getEntry(code);
+    const auto entry = this->getEntry(code);
     const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
 String* MenuFile::getValueSensitive(const String &code) const noexcept
 {
-    const auto entry = getEntrySensitive(code);
+    const auto entry = this->getEntrySensitive(code);
     const auto result = entry ? &entry->comment : nullptr;
     return result;
 }
 
 const String& MenuFile::getValue(const String &code, const String &defaultValue) const noexcept
 {
-    const auto value = getValue(code);
+    const auto value = this->getValue(code);
     return value ? *value : defaultValue;
 }
 
 const String& MenuFile::getValueSensitive(const String &code, const String &defaultValue) const noexcept
 {
-    const auto value = getValueSensitive(code);
+    const auto value = this->getValueSensitive(code);
     return value ? *value : defaultValue;
 }
 

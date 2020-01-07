@@ -35,6 +35,10 @@ int main()
     connection.noOp();
     std::wcout << L"NOOP" << std::endl;
 
+    auto f = connection.noOpAsync();
+    f.get();
+    std::wcout << L"NOOP ASYNC" << std::endl;
+
     const auto formatted = connection.formatRecord(L"@brief", 1);
     std::wcout << L"FORMAT: " << formatted << std::endl;
 

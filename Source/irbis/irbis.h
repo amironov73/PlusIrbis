@@ -7,15 +7,16 @@
 
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
-#include <chrono>
-#include <string>
+#include <future>
 #include <ios>
 #include <list>
 #include <map>
 #include <set>
+#include <string>
 #include <vector>
 
 //=========================================================
@@ -527,13 +528,16 @@ public:
     bool actualizeDatabase(const String &databaseName);
     bool actualizeRecord(const String &databaseName, int mfn);
     bool connect();
+    std::future<bool> connectAsync();
     bool createDatabase(const String &databaseName, const String &description, bool readerAccess);
     bool createDictionary(const String &databaseName);
     bool deleteDatabase(const String &databaseName);
     bool deleteRecord(int mfn);
-    bool connected() const noexcept { return _connected; }
+    bool connected() const noexcept { return this->_connected; }
     void disconnect();
+    std::future<void> disconnectAsync();
     bool execute(ClientQuery &query);
+    std::future<bool> executeAsync(ClientQuery &query);
     String formatRecord(const String &format, Mfn mfn);
     String formatRecord(const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo(const String &databaseName);
@@ -549,6 +553,7 @@ public:
     std::vector<ProcessInfo> listProcesses();
     StringList listTerms(const String &prefix);
     bool noOp();
+    std::future<bool> noOpAsync();
     void parseConnectionString(const String &connectionString);
     String popDatabase();
     String printTable(const TableDefinition &definition);
@@ -1528,11 +1533,11 @@ public:
 class PLUSIRBIS_EXPORTS TreeNode final
 {
 public:
-    std::wstring value;
+    String value;
     std::vector<TreeNode> children;
     int level { 0 };
 
-    TreeNode& add(const std::wstring &name);
+    TreeNode& add(const String &name);
 };
 
 //=========================================================
@@ -1617,37 +1622,37 @@ public:
 
 // Utilities
 
-bool PLUSIRBIS_EXPORTS sameChar(Char first, Char second);
-bool PLUSIRBIS_EXPORTS sameString(const String &first, const String &second);
+PLUSIRBIS_EXPORTS bool sameChar(Char first, Char second) noexcept;
+PLUSIRBIS_EXPORTS bool sameString(const String &first, const String &second) noexcept;
 
-String PLUSIRBIS_EXPORTS toLower(String &text);
-String PLUSIRBIS_EXPORTS toUpper(String &text);
+PLUSIRBIS_EXPORTS String toLower(String &text) noexcept;
+PLUSIRBIS_EXPORTS String toUpper(String &text) noexcept ;
 
-bool PLUSIRBIS_EXPORTS contains(const String &text, const String &fragment);
-bool PLUSIRBIS_EXPORTS contains(const String &text, Char c);
+PLUSIRBIS_EXPORTS bool contains(const String &text, const String &fragment);
+PLUSIRBIS_EXPORTS bool contains(const String &text, Char c);
 
-std::string PLUSIRBIS_EXPORTS replace(const std::string &text, const std::string &from, const std::string &to);
-String PLUSIRBIS_EXPORTS replace(const String &text, const String &from, const String &to);
+PLUSIRBIS_EXPORTS std::string replace(const std::string &text, const std::string &from, const std::string &to);
+PLUSIRBIS_EXPORTS String replace(const String &text, const String &from, const String &to);
 
-String PLUSIRBIS_EXPORTS trimStart(const String &text);
-String PLUSIRBIS_EXPORTS trimEnd(const String &text);
-String PLUSIRBIS_EXPORTS trim(const String &text);
+PLUSIRBIS_EXPORTS String trimStart(const String &text);
+PLUSIRBIS_EXPORTS String trimEnd(const String &text);
+PLUSIRBIS_EXPORTS String trim(const String &text);
 
-String PLUSIRBIS_EXPORTS describeError(int errorCode);
+PLUSIRBIS_EXPORTS String describeError(int errorCode);
 
-int PLUSIRBIS_EXPORTS fastParse32(const String &text);
-int PLUSIRBIS_EXPORTS fastParse32(const Char *text);
-int PLUSIRBIS_EXPORTS fastParse32(const Char *text, size_t length);
-int PLUSIRBIS_EXPORTS fastParse32(const std::string &text);
-int PLUSIRBIS_EXPORTS fastParse32(const char *text);
-int PLUSIRBIS_EXPORTS fastParse32(const char *text, size_t length);
+PLUSIRBIS_EXPORTS int fastParse32(const String &text);
+PLUSIRBIS_EXPORTS int fastParse32(const Char *text);
+PLUSIRBIS_EXPORTS int fastParse32(const Char *text, size_t length);
+PLUSIRBIS_EXPORTS int fastParse32(const std::string &text);
+PLUSIRBIS_EXPORTS int fastParse32(const char *text);
+PLUSIRBIS_EXPORTS int fastParse32(const char *text, size_t length);
 
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const String &text);
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const Char *text);
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const Char *text, size_t length);
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const std::string &text);
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const char *text);
-unsigned int PLUSIRBIS_EXPORTS fastParseUnsigned32(const char *text, size_t length);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const String &text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const Char *text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const Char *text, size_t length);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const std::string &text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const char *text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const char *text, size_t length);
 
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2);
 PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
@@ -1657,28 +1662,35 @@ PLUSIRBIS_EXPORTS const String& iif(const String& s1, const String &s2, const St
 PLUSIRBIS_EXPORTS std::wstring safeAt(const StringList &list, size_t index);
 
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, char delimiter);
-PLUSIRBIS_EXPORTS StringList split(const std::wstring &text, Char delimiter);
+PLUSIRBIS_EXPORTS StringList split(const String &text, Char delimiter);
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, const std::string &delimiter);
-PLUSIRBIS_EXPORTS StringList split(const std::wstring &text, const std::wstring &delimiter);
-PLUSIRBIS_EXPORTS StringList maxSplit(const std::wstring &text, Char separator, int count);
+PLUSIRBIS_EXPORTS StringList split(const String &text, const String &delimiter);
+PLUSIRBIS_EXPORTS StringList maxSplit(const String &text, Char separator, int count);
 
-PLUSIRBIS_EXPORTS std::wstring cp866_to_unicode(const std::string &text);
-PLUSIRBIS_EXPORTS std::wstring cp1251_to_unicode(const std::string &text);
-PLUSIRBIS_EXPORTS std::wstring koi8r_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS String cp866_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS String cp1251_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS String koi8r_to_unicode(const std::string &text);
 
-PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const std::wstring &text);
-PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const String &text);
+PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const String &text);
 PLUSIRBIS_EXPORTS void unicode_to_cp1251(Byte *dst, const Char *src, size_t size);
-PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const std::wstring &text);
+PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const String &text);
+
+PLUSIRBIS_EXPORTS std::string narrow(const String &wide, const std::locale &loc);
+PLUSIRBIS_EXPORTS String widen(const std::string &str, const std::locale &loc);
+PLUSIRBIS_EXPORTS String new_cp1251_to_unicode(const std::string &text);
+PLUSIRBIS_EXPORTS std::string new_unicode_to_cp1251(const String &text);
+PLUSIRBIS_EXPORTS std::string new_toUtf(const String &text);
+PLUSIRBIS_EXPORTS String new_fromUtf(const std::string &text);
 
 PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const Char *src, size_t length);
 PLUSIRBIS_EXPORTS Char* fromUtf(Char *dst, const Byte *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const Char *src, size_t length);
 PLUSIRBIS_EXPORTS size_t countUtf(const Byte *src, size_t length);
-PLUSIRBIS_EXPORTS const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &result);
-PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const std::wstring &text);
-PLUSIRBIS_EXPORTS std::wstring fromUtf(const std::string &text);
-PLUSIRBIS_EXPORTS std::string toUtf(const std::wstring &text);
+PLUSIRBIS_EXPORTS const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, String &result);
+PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const String &text);
+PLUSIRBIS_EXPORTS String fromUtf(const std::string &text);
+PLUSIRBIS_EXPORTS std::string toUtf(const String &text);
 
 PLUSIRBIS_EXPORTS String removeComments(const String &text);
 PLUSIRBIS_EXPORTS String prepareFormat(const String &text);

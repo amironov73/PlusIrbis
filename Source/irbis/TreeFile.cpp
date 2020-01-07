@@ -42,7 +42,7 @@ static void arrangeLevel(std::vector<TreeNode> &list, int level) {
     }
 }
 
-static int countIndent(const std::wstring &text) {
+static int countIndent(const String &text) {
     int result = 0;
     for (wchar_t c : text) {
         if (c == L'\u0009') {

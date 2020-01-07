@@ -47,7 +47,7 @@ void ClientQuery::_write(Byte byte)
 ClientQuery& ClientQuery::add(int value)
 {
     const auto s = std::to_string(value);
-    return addAnsi(s);
+    return this->addAnsi(s);
 }
 
 /// \brief Добавление файловой спецификации к запросу.
@@ -70,6 +70,7 @@ ClientQuery& ClientQuery::add(const MarcRecord &record, const String &delimiter=
 /// \brief Добавление строки в кодировке ANSI.
 /// \param text Добавляемый текст.
 /// \return `this`.
+/// \warning Предполагается, что переданный текст в кодировке ANSI!
 ClientQuery& ClientQuery::addAnsi(const std::string &text)
 {
     const size_t size = text.length();
@@ -79,7 +80,7 @@ ClientQuery& ClientQuery::addAnsi(const std::string &text)
     }
 
     const Byte *ptr = reinterpret_cast<const Byte*>(text.c_str());
-    _write(ptr, size);
+    this->_write(ptr, size);
     return *this;
 }
 
@@ -96,7 +97,7 @@ ClientQuery& ClientQuery::addAnsi(const String &text)
     const auto *src = text.c_str();
     Bytes dst(size);
     unicode_to_cp1251(dst.data(), src, size);
-    _write(dst.data(), size);
+    this->_write(dst.data(), size);
     return *this;
 }
 
@@ -117,7 +118,7 @@ bool ClientQuery::addFormat(const String &format)
     } else if (format[0] == '!') {
         this->addUtf(prepared);
     } else {
-        this->addUtf(std::wstring (L"!") + prepared);
+        this->addUtf(String (L"!") + prepared);
     }
 
     this->newLine();
@@ -138,7 +139,7 @@ ClientQuery& ClientQuery::addUtf(const String &text)
     const auto bufSize = countUtf(src, size);
     Bytes dst(bufSize);
     toUtf(dst.data(), src, size);
-    _write(dst.data(), bufSize);
+    this->_write(dst.data(), bufSize);
     return *this;
 }
 
@@ -146,7 +147,7 @@ ClientQuery& ClientQuery::addUtf(const String &text)
 /// \param stream Поток, в который выводится дамп.
 void ClientQuery::dump(std::ostream &stream) const
 {
-    for (const auto value : _content) {
+    for (const auto value : this->_content) {
         stream << std::hex << std::setw(2) << value << " ";
     }
 }
@@ -156,14 +157,14 @@ void ClientQuery::dump(std::ostream &stream) const
 Bytes ClientQuery::encode() const
 {
     Bytes result;
-    result.reserve(_content.size() + 10);
-    const auto prefix = std::to_string(_content.size());
+    result.reserve(this->_content.size() + 10);
+    const auto prefix = std::to_string(this->_content.size());
     const auto ptr = prefix.c_str();
     for (size_t i = 0; i < prefix.length(); i++) {
-        result.push_back(ptr[i]);
+        result.push_back(static_cast<Byte>(ptr[i]));
     }
     result.push_back(0x0a);
-    result.insert(result.end(), _content.begin(), _content.end());
+    result.insert(result.end(), this->_content.begin(), this->_content.end());
 
     return result;
 }
@@ -172,7 +173,7 @@ Bytes ClientQuery::encode() const
 /// \return `this`.
 ClientQuery& ClientQuery::newLine()
 {
-    _write(0x0A);
+    this->_write(0x0A);
     return *this;
 }
 
