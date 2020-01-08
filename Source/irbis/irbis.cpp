@@ -37,7 +37,10 @@ bool sameChar(Char first, Char second) noexcept
 /// иначе false.
 bool sameString(const String &first, const String &second) noexcept
 {
-    return std::equal(first.begin(), first.end(), second.begin(), second.end(),
+    if (first.size() != second.size()) {
+        return false;
+    }
+    return std::equal(first.begin(), first.end(), second.begin(),
         [] (Char a, Char b) { return towupper(a) == towupper(b); });
 }
 

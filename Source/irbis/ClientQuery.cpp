@@ -3,6 +3,7 @@
 
 #include "irbis.h"
 
+#include <iostream>
 #include <iomanip>
 
 namespace irbis {

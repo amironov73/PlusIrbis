@@ -4,6 +4,7 @@
 #include "irbis.h"
 
 #include <iomanip>
+#include <iostream>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -15,7 +16,10 @@ namespace irbis {
 
 RecordField& RecordField::add(wchar_t subFieldCode, const String &subFieldValue)
 {
-    subfields.push_back({subFieldCode, subFieldValue});
+    SubField subField;
+    subField.code = subFieldCode;
+    subField.value = subFieldValue;
+    subfields.push_back(subField);
     return *this;
 }
 
@@ -29,7 +33,9 @@ RecordField& RecordField::clear()
 
 RecordField RecordField::clone() const
 {
-    RecordField result { this->tag, this->value };
+    RecordField result;
+    result.tag = this->tag;
+    result.value = this->value;
     for (const auto &sub : this->subfields) {
         result.subfields.push_back(sub.clone());
     }

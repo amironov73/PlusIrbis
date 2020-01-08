@@ -24,7 +24,8 @@ MarcRecord MstRecord64::toMarcRecord() const
     result.version = 0; // TODO obtain the version
     //result.fields.reserve(dictionary.size());
     for (const auto &entry : dictionary) {
-        RecordField field { entry.tag };
+        RecordField field;
+        field.tag = entry.tag;
         // field.parse(entry.text); // TODO parse the field
         result.fields.push_back(field);
     }

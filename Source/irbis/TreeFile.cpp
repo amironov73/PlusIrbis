@@ -66,10 +66,12 @@ void TreeFile::parse(const StringList &lines) {
     if (countIndent(firstLine)) {
         throw IrbisException();
     }
-    list.push_back(TreeNode{firstLine});
+    TreeNode node1;
+    node1.value = firstLine;
+    list.push_back(node1);
 
     auto currentLevel = 0;
-    for (size_t i = 1; i < lines.size(); i++) {
+    for (std::size_t i = 1; i < lines.size(); i++) {
         auto line = lines[i];
         if (line.empty()) {
             return;
@@ -82,9 +84,10 @@ void TreeFile::parse(const StringList &lines) {
 
         currentLevel = level;
         // line = line.trimmed(); // TODO: trimStart()
-        TreeNode node{line};
-        node.level = level;
-        list.push_back(node);
+        TreeNode node2;
+        node2.value = line;
+        node2.level = level;
+        list.push_back(node2);
     }
 
     auto maxLevel = list[0].level;

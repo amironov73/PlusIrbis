@@ -57,7 +57,8 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
         const auto fieldLength = static_cast<const size_t>(fastParse32((const char *) (record + directory + 3), 4)); //-V112
         const auto fieldOffset = static_cast<const size_t>(baseAddress +
                                                              fastParse32((const char *) (record + directory + 7), 5));
-        RecordField field { tag };
+        RecordField field;
+        field.tag = tag;
         result->fields.push_back(field);
         if (tag < 10) {
             // Фиксированное поле
@@ -96,7 +97,8 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
                     }
                     position++;
                 }
-                SubField subField {record[start + 1]};
+                SubField subField;
+                subField.code = record[start + 1];
                 subField.value = encoding->toUnicode(record + start + 2, position - start - 1);
                 field.subfields.push_back(subField);
                 start = position;

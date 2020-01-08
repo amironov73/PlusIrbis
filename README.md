@@ -1,12 +1,12 @@
 # Pure C++ library for IRBIS64 system
 
-ManagedClient ported to plain C++14. Currently supported:
+Universal client software for IRBIS64 library automation system (ManagedClient ported to plain C++ 11). Currently supported:
 
-* 32-bit and 64-bit Windows (version 7, 8, 8.1, 10);
+* 32-bit and 64-bit Windows (XP, 7, 8, 8.1, 10);
 * MacOS X 10.14 (64-bit);
-* 32-bit and 64-bit Linux (CentOS 7);
-* MSVS 2017/2019 Community Edition on Windows;
-* GCC 7 and higher both on Windows and Linux/OS X;
+* 32-bit and 64-bit Linux (CentOS 7/8);
+* MSVS 2015/2017/2019 Community Edition on Windows;
+* GCC 4.8 and higher both on Windows and Linux/OS X;
 * Clang compiler 9 both on Windows and Linux/OS X.
 
 ### Example
@@ -17,7 +17,7 @@ ManagedClient ported to plain C++14. Currently supported:
 #include <iostream>
 #include <string>
 
-#pragma comment (lib, "irbis.lib")
+#pragma comment (lib, "irbis.lib") // autolink hack
 
 int main()
 {

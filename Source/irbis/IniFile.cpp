@@ -73,14 +73,14 @@ IniSection& IniSection::clear()
 bool IniSection::containsKey(const String &key) const noexcept
 {
     return std::any_of(begin(this->lines), end(this->lines),
-            [&key] (const auto &x) { return sameString(x.key, key); });
+            [&key] (const IniLine &x) { return sameString(x.key, key); });
 }
 
 /// \brief Получение индекса строки с указанным ключом.
 /// \param key Искомый ключ.
 /// \return Индекс строки, либо отрицательное значение,
 /// если строка не найдена.
-ptrdiff_t IniSection::getIndex(const String &key) const noexcept
+std::ptrdiff_t IniSection::getIndex(const String &key) const noexcept
 {
     for (size_t i=0; i < this->lines.size(); i++) {
         if (sameString(this->lines[i].key, key)) {
@@ -120,14 +120,14 @@ const String& IniSection::getValue(const String &key, const String &defaultValue
 bool IniSection::modified() const noexcept
 {
     return std::any_of(begin(this->lines), end(this->lines),
-            [] (const auto &x) { return x.modified(); });
+            [] (const IniLine &x) { return x.modified(); });
 }
 
 /// \brief Пометка всех строк в данной секции как немодифицированных.
 void IniSection::notModified()
 {
     std::for_each(begin(this->lines), end(this->lines),
-            [] (auto &x) { x.notModified(); });
+            [] (IniLine &x) { x.notModified(); });
 }
 
 /// \brief Удаление строки с указанным ключом.
@@ -204,7 +204,7 @@ bool IniFile::containsSection (const String &name) const noexcept
         (
             begin(this->sections),
             end(this->sections),
-            [&name] (const auto &x) { return sameString(x.name, name); }
+            [&name] (const IniSection &x) { return sameString(x.name, name); }
         );
 }
 
@@ -231,20 +231,20 @@ IniSection& IniFile::createSection(const String &name)
 bool IniFile::modified() const noexcept
 {
     return std::any_of(begin(this->sections), end(this->sections),
-            [] (const auto &x) { return x.modified(); } );
+            [] (const IniSection &x) { return x.modified(); } );
 }
 
 /// \brief Установка состояния "не модифицировано" для всех секций.
 void IniFile::notModified()
 {
     std::for_each(begin(this->sections), end(this->sections),
-            [] (auto &x) { x.notModified(); });
+            [] (IniSection &x) { x.notModified(); });
 }
 
 /// \brief Получение индекса секции с указанным именем.
 /// \param name Искомое имя секции.
 /// \return Индекс секции либо отрицательное число, если секция не найдена.
-ptrdiff_t IniFile::getIndex(const String &name) const noexcept
+std::ptrdiff_t IniFile::getIndex(const String &name) const noexcept
 {
     for (size_t i = 0; i < this->sections.size(); i++) {
         if (sameString(this->sections[i].name, name)) {

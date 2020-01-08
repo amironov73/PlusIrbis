@@ -21,7 +21,8 @@ RecordFieldList EmbeddedField::getEmbeddedFields(const RecordField &field, char 
             auto value = subField.value;
             auto tagValue = value.substr(0, 3);
             auto tag = fastParse32(tagValue);
-            RecordField found { tag };
+            RecordField found;
+            found.tag = tag;
             if (tagValue[0] == '0' && tagValue[1] == '0' && value.length() > 3) {
                 found.value = value.substr(3);
             }

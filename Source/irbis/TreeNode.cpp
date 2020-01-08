@@ -13,7 +13,8 @@ namespace irbis {
 
 TreeNode& TreeNode::add(const String &name)
 {
-    TreeNode item { name };
+    TreeNode item;
+    item.value = name;
     children.emplace_back(item);
 
     return children.back();

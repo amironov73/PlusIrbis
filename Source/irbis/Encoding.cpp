@@ -206,7 +206,7 @@ std::string unicode_to_cp866(const String &text)
     const Char *first = &_cp866_from_unicode[0], *last = first + 256;
     for (const Char c : text)
     {
-        const ptrdiff_t index = std::lower_bound(first, last, c) - first;
+        const std::ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
         sc = _cp866_xlat[sc];
         result.push_back(sc);
@@ -236,7 +236,7 @@ std::string unicode_to_cp1251(const String &text)
     const Char *first = &_cp1251_from_unicode[0], *last = first + 256;
     for (const Char c : text)
     {
-        const ptrdiff_t index = std::lower_bound(first, last, c) - first;
+        const std::ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
         sc = _cp1251_xlat[sc];
         result.push_back(sc);
@@ -251,7 +251,7 @@ void unicode_to_cp1251(Byte *dst, const Char *src, size_t size)
     for (size_t i = 0; i < size; i++)
     {
         Char c = src[i];
-        const ptrdiff_t index = std::lower_bound(first, last, c) - first;
+        const std::ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
         *dst++ = _cp1251_xlat[sc];
     }
@@ -278,7 +278,7 @@ std::string unicode_to_koi8r(const String &text)
     const Char *first = &_koi8r_from_unicode[0], *last = first + 256;
     for (const Char c : text)
     {
-        const ptrdiff_t index = std::lower_bound(first, last, c) - first;
+        const std::ptrdiff_t index = std::lower_bound(first, last, c) - first;
         unsigned char sc = (index == 256) ? '?' : static_cast<unsigned char>(index);
         sc = _koi8r_xlat[sc];
         result.push_back(sc);

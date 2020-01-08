@@ -11,10 +11,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
-#include <future>
+// #include <future>
 #include <ios>
 #include <list>
 #include <map>
+#include <mutex>
 #include <set>
 #include <string>
 #include <vector>
@@ -276,7 +277,7 @@ public:
     IniSection& createSection(const String &name);
     bool modified() const noexcept;
     void notModified();
-    ptrdiff_t getIndex(const String &name) const noexcept;
+    std::ptrdiff_t getIndex(const String &name) const noexcept;
     IniSection* getSection(const String &name) const noexcept;
     const String& getValue(const String &sectionName, const String &keyName, const String &defaultValue) const noexcept;
     void parse(const StringList &lines);
@@ -319,7 +320,7 @@ public:
 
     IniSection& clear();
     bool containsKey(const String &key) const noexcept;
-    ptrdiff_t getIndex(const String &key) const noexcept;
+    std::ptrdiff_t getIndex(const String &key) const noexcept;
     IniLine* getLine(const String &key) const noexcept;
     const String& getValue(const String &key, const String &defaultValue) const noexcept;
     bool modified() const noexcept;
@@ -500,8 +501,11 @@ class PLUSIRBIS_EXPORTS Connection final
 private:
     bool _connected;
     StringList _databaseStack;
+    std::mutex _mutex;
 
     bool _checkConnection();
+
+    friend class ServerResponse;
 
 public:
     String host;          ///< Адрес сервера в виде строки.
@@ -528,16 +532,16 @@ public:
     bool actualizeDatabase(const String &databaseName);
     bool actualizeRecord(const String &databaseName, int mfn);
     bool connect();
-    std::future<bool> connectAsync();
+    // std::future<bool> connectAsync();
     bool createDatabase(const String &databaseName, const String &description, bool readerAccess);
     bool createDictionary(const String &databaseName);
     bool deleteDatabase(const String &databaseName);
     bool deleteRecord(int mfn);
     bool connected() const noexcept { return this->_connected; }
     void disconnect();
-    std::future<void> disconnectAsync();
+    // std::future<void> disconnectAsync();
     bool execute(ClientQuery &query);
-    std::future<bool> executeAsync(ClientQuery &query);
+    // std::future<bool> executeAsync(ClientQuery &query);
     String formatRecord(const String &format, Mfn mfn);
     String formatRecord(const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo(const String &databaseName);
@@ -553,7 +557,7 @@ public:
     std::vector<ProcessInfo> listProcesses();
     StringList listTerms(const String &prefix);
     bool noOp();
-    std::future<bool> noOpAsync();
+    // std::future<bool> noOpAsync();
     void parseConnectionString(const String &connectionString);
     String popDatabase();
     String printTable(const TableDefinition &definition);
@@ -1281,11 +1285,11 @@ class PLUSIRBIS_EXPORTS SearchParameters final
 public:
     String searchExpression;        ///< Выражение для поиска по словарю.
     String database;                ///< Имя базы данных.
-    int32_t firstRecord { 1 };          ///< Индекс первой требуемой записи.
+    int32_t firstRecord { 1 };      ///< Индекс первой требуемой записи.
     String formatSpecification;     ///< Формат для расформатирования записей.
-    int32_t maxMfn { 0 };               ///< Максимальный MFN.
-    int32_t minMfn { 0 };               ///< Минимальный MFN.
-    int32_t numberOfRecords { 0 };      ///< Общее число требуемых записей.
+    int32_t maxMfn { 0 };           ///< Максимальный MFN.
+    int32_t minMfn { 0 };           ///< Минимальный MFN.
+    int32_t numberOfRecords { 0 };  ///< Общее число требуемых записей.
     String sequentialSpecification; ///< Выражение для последовательного поиска.
     String filterSpecification;     ///< Выражение для локальной фильтрации.
 };
@@ -1470,7 +1474,7 @@ public:
 class PLUSIRBIS_EXPORTS TextNavigator final
 {
 private:
-    size_t _column, _length, _line, _position;
+    std::size_t _column, _length, _line, _position;
     const String &_text;
 
 public:
@@ -1483,39 +1487,39 @@ public:
     TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
 
-    inline size_t column() const noexcept { return this->_column; }
-    inline size_t line() const noexcept { return this->_line; }
-    inline size_t length() const noexcept { return this->_length; }
-    inline size_t position() const noexcept { return this->_position; }
+    inline std::size_t column()   const noexcept { return this->_column; }
+    inline std::size_t line()     const noexcept { return this->_line; }
+    inline std::size_t length()   const noexcept { return this->_length; }
+    inline std::size_t position() const noexcept { return this->_position; }
     inline bool eot() const noexcept { return this->_position >= this->_length; }
 
-    Char at(size_t position) const;
-    Char front() const;
-    Char back() const;
-    Char lookAhead(ptrdiff_t distance = 1) const;
-    Char lookBehind(ptrdiff_t distance = 1) const;
-    TextNavigator& move(ptrdiff_t distance);
-    Char peekChar() const;
-    Char readChar();
-    std::wstring peekString(size_t length);
-    std::wstring peekTo(Char stopChar);
-    std::wstring peekUntil(Char stopChar);
-    std::wstring readLine();
-    bool isControl() const;
-    bool isDigit() const;
-    bool isLetter() const;
-    bool isWhitespace() const;
-    std::wstring readInteger();
-    std::wstring readString(size_t length);
-    std::wstring readTo(Char stopChar);
-    std::wstring readUntil(Char stopChar);
-    std::wstring readWhile(Char goodChar);
-    std::wstring readWord();
-    std::wstring recentText(ptrdiff_t length) const;
-    std::wstring remainingText() const;
+    Char at(std::size_t position) const noexcept;
+    Char front() const noexcept;
+    Char back() const noexcept;
+    Char lookAhead(std::ptrdiff_t distance = 1) const noexcept;
+    Char lookBehind(std::ptrdiff_t distance = 1) const noexcept;
+    TextNavigator& move(std::ptrdiff_t distance) noexcept;
+    Char peekChar() const noexcept;
+    Char readChar() noexcept;
+    String peekString(std::size_t length);
+    String peekTo(Char stopChar);
+    String peekUntil(Char stopChar);
+    String readLine();
+    bool isControl() const noexcept;
+    bool isDigit() const noexcept;
+    bool isLetter() const noexcept;
+    bool isWhitespace() const noexcept;
+    String readInteger();
+    String readString(std::size_t length);
+    String readTo(Char stopChar);
+    String readUntil(Char stopChar);
+    String readWhile(Char goodChar);
+    String readWord();
+    String recentText(std::ptrdiff_t length) const;
+    String remainingText() const;
     TextNavigator& skipWhitespace();
     TextNavigator& skipPunctuation();
-    std::wstring substr(size_t offset, size_t length) const;
+    String substr(std::size_t offset, std::size_t length) const;
 };
 
 //=========================================================

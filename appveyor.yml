@@ -4,11 +4,12 @@ configuration:
   - DebugDll
   - Release
   - ReleaseDll
+  - ReleaseStatic
 platform: x64
 image: Visual Studio 2017
 
 build:
-  project: Source\PlusIrbis.sln
+  project: Source\PlusIrbis.2017.sln
 
 after_build:
 - cmd: Utils\doxygen

@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 2.8)
 
 project(irbis)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-add_compile_definitions(PLUSIRBIS_LIBRARY)
+# add_compile_definitions(PLUSIRBIS_LIBRARY)
+add_definitions(-DPLUSIRBIS_LIBRARY)
  
 FILE(GLOB HFiles *.h)
 FILE(GLOB CppFiles *.cpp)

@@ -49,7 +49,9 @@ std::vector<DatabaseInfo> DatabaseInfo::parse(const MenuFile &menu)
             readOnly = true;
         }
 
-        DatabaseInfo info { name, description };
+        DatabaseInfo info;
+        info.name = name;
+        info.description = description;
         info.readOnly = readOnly;
         result.push_back(info);
     }

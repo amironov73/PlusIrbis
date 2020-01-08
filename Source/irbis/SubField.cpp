@@ -4,6 +4,7 @@
 #include "irbis.h"
 
 #include <iomanip>
+#include <iostream>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -17,7 +18,10 @@ namespace irbis {
 /// \return Точная копия подполя.
 SubField SubField::clone() const
 {
-    return SubField {this->code, this->value };
+    SubField result;
+    result.code = this->code;
+    result.value = this->value;
+    return result;
 }
 
 /// \brief Декодирование подполя из клиентского представления.
@@ -39,7 +43,7 @@ bool SubField::empty() const noexcept
 /// \return Закодированное подполе.
 std::wstring SubField::toString() const
 {
-    return std::wstring(L"^") + code + value;
+    return String (L"^") + code + value;
 }
 
 /// \brief Проверка, является подполе полноценным (с кодом и значением).

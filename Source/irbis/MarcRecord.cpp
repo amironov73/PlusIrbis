@@ -4,6 +4,7 @@
 #include "irbis.h"
 
 #include <iomanip>
+#include <iostream>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -15,13 +16,20 @@ namespace irbis {
 
 RecordField& MarcRecord::add(int tag, const String &value)
 {
-    this->fields.push_back(RecordField { tag, value });
+    RecordField field;
+    field.tag = tag;
+    field.value = value;
+    this->fields.push_back(field);
     return this->fields.back();
 }
 
 MarcRecord MarcRecord::clone() const
 {
-    MarcRecord result { this->mfn, this->status, this->version, this->database};
+    MarcRecord result;
+    result.mfn = this->mfn;
+    result.status = this->status;
+    result.version = this->version;
+    result.database = this->database;
     for (const auto &one : this->fields) {
         result.fields.push_back(one.clone());
     }

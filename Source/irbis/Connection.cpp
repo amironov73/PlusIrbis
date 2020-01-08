@@ -117,12 +117,12 @@ bool Connection::connect()
     return true;
 }
 
-/// \brief Асинхронный вариант connect.
-/// \return Признак успешности выполнения операции.
-std::future<bool> Connection::connectAsync()
-{
-    return std::async(std::launch::async, &Connection::connect, this);
-}
+// /// \brief Асинхронный вариант connect.
+// /// \return Признак успешности выполнения операции.
+//std::future<bool> Connection::connectAsync()
+//{
+//    return std::async(std::launch::async, &Connection::connect, this);
+//}
 
 /// \brief Создание на сервере базы данных с указанным именем.
 /// \param databaseName Имя создаваемой базы данных.
@@ -206,16 +206,16 @@ void Connection::disconnect()
     }
 
     ClientQuery query(*this, "B");
-    query.addAnsi(username).newLine();
+    query.addAnsi(this->username).newLine();
     this->execute(query);
     _connected = false;
 }
 
-/// \brief Асинхронный вариант disconnect.
-std::future<void> Connection::disconnectAsync()
-{
-    return std::async(std::launch::async, &Connection::disconnect, this);
-}
+// /// \brief Асинхронный вариант disconnect.
+//std::future<void> Connection::disconnectAsync()
+//{
+//    return std::async(std::launch::async, &Connection::disconnect, this);
+//}
 
 /// \brief Результат исполнения запроса на сервере.
 /// \param query Полностью сформированный клиентский запрос.
@@ -233,13 +233,13 @@ bool Connection::execute(ClientQuery &query)
     return response.checkReturnCode();
 }
 
-/// \brief Асинхронный вариант execute.
-/// \param query Клиентский запрос.
-/// \return Признак успешного выполнения запроса.
-std::future<bool> Connection::executeAsync(ClientQuery &query)
-{
-    return std::async(std::launch::async, &Connection::execute, this, std::ref(query));
-}
+// /// \brief Асинхронный вариант execute.
+// /// \param query Клиентский запрос.
+// /// \return Признак успешного выполнения запроса.
+//std::future<bool> Connection::executeAsync(ClientQuery &query)
+//{
+//    return std::async(std::launch::async, &Connection::execute, this, std::ref(query));
+//}
 
 /// \brief Форматирование записи на сервере по её MFN.
 /// \param format Спецификация формата.
@@ -583,12 +583,12 @@ bool Connection::noOp() {
     return this->execute(query);
 }
 
-/// \brief Асинхронный вариант noOp.
-/// \return Признак успешности выполнения операции.
-std::future<bool> Connection::noOpAsync()
-{
-    return std::async(std::launch::async, &Connection::noOp, this);
-}
+// /// \brief Асинхронный вариант noOp.
+// /// \return Признак успешности выполнения операции.
+//std::future<bool> Connection::noOpAsync()
+//{
+//    return std::async(std::launch::async, &Connection::noOp, this);
+//}
 
 /// \brief Разбор строки подключения.
 /// \param connectionString Строка подключения.
@@ -994,7 +994,9 @@ String Connection::requireTextFile(const FileSpecification &specification)
 
 MfnList Connection::search(const Search &search)
 {
-    SearchParameters parameters { this->database, search.toString() };
+    SearchParameters parameters;
+    parameters.database = this->database;
+    parameters.searchExpression = search.toString();
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;
 
@@ -1003,7 +1005,9 @@ MfnList Connection::search(const Search &search)
 
 MfnList Connection::search(const String &expression)
 {
-    SearchParameters parameters { expression, this->database };
+    SearchParameters parameters;
+    parameters.database = this->database;
+    parameters.searchExpression = expression;
     parameters.numberOfRecords = 0;
     parameters.firstRecord = 1;
 
@@ -1034,7 +1038,10 @@ MfnList Connection::search(const SearchParameters &parameters)
         return result;
     }
     const auto expected = response.readInteger();
-    const auto batchSize = std::min(expected, 32000); // MAXPACKET
+    auto batchSize = 32000; // MAXPACKET
+    if (expected < batchSize) {
+        batchSize = expected;
+    }
     for (auto i = 0; i < batchSize; i++) {
         const auto line = response.readAnsi();
         StringList parts = maxSplit(line, L'#', 2);

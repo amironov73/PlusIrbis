@@ -3,7 +3,10 @@
 
 #include "irbis.h"
 
+#ifdef NOTDEF
+
 #include <codecvt>
+#include <locale>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -71,3 +74,5 @@ String new_fromUtf(const std::string &text)
 }
 
 }
+
+#endif

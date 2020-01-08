@@ -9,96 +9,98 @@ namespace irbis {
 
 const wchar_t TextNavigator::EOT = L'\0';
 
-TextNavigator::TextNavigator(const std::wstring &text)
+TextNavigator::TextNavigator(const String &text)
     : _text(text)
 {
-    _position = 0;
-    _length = _text.length();
-    _line = 1;
-    _column = 1;
+    this->_position = 0;
+    this->_length = _text.length();
+    this->_line = 1;
+    this->_column = 1;
 }
 
 TextNavigator::TextNavigator(const TextNavigator &other)
     : _text(other._text)
 {
-    _position = other._position;
-    _length = other._length;
-    _line = other._line;
-    _column = other._column;
+    this->_position = other._position;
+    this->_length = other._length;
+    this->_line = other._line;
+    this->_column = other._column;
 }
 
-wchar_t TextNavigator::at(size_t position) const
+Char TextNavigator::at(std::size_t position) const noexcept
 {
-    return position < _length ? _text.at(position) : EOT;
+    return position < this->_length ? this->_text.at(position) : EOT;
 }
 
-wchar_t TextNavigator::front() const
+Char TextNavigator::front() const noexcept
 {
-    return at(0);
+    return this->at(0);
 }
 
-wchar_t TextNavigator::back() const
+Char TextNavigator::back() const noexcept
 {
-    return at(_length - 1);
+    return this->at(this->_length - 1);
 }
 
-wchar_t TextNavigator::lookAhead(ptrdiff_t distance) const
+Char TextNavigator::lookAhead(std::ptrdiff_t distance) const noexcept
 {
-    const size_t newPosition = _position + distance;
+    const std::size_t newPosition = this->_position + distance;
 
-    return at(newPosition);
+    return this->at(newPosition);
 }
 
-wchar_t TextNavigator::lookBehind(ptrdiff_t distance) const
+Char TextNavigator::lookBehind(std::ptrdiff_t distance) const noexcept
 {
-    const size_t newPosition = _position - distance;
+    const std::size_t newPosition = this->_position - distance;
 
-    return at(newPosition);
+    return this->at(newPosition);
 }
 
-TextNavigator& TextNavigator::move(ptrdiff_t distance)
+TextNavigator& TextNavigator::move(std::ptrdiff_t distance) noexcept
 {
     // TODO Some checks
 
-    _position += distance;
-    _column += distance;
+    this->_position += distance;
+    this->_column += distance;
 
     return *this;
 }
 
-wchar_t TextNavigator::peekChar() const
+Char TextNavigator::peekChar() const noexcept
 {
-    return _position >= _length ? EOT : _text.at(_position);
+    return this->_position >= this->_length ? EOT : this->_text.at(_position);
 }
 
-wchar_t TextNavigator::readChar()
+Char TextNavigator::readChar() noexcept
 {
-    if (_position >= _length) {
+    if (this->_position >= this->_length) {
         return EOT;
     }
 
-    const wchar_t result = _text.at(_position++);
+    const Char result = this->_text.at(this->_position++);
     if (result == '\n') {
-        _line++;
-        _column = 1;
+        this->_line++;
+        this->_column = 1;
     } else {
-        _column++;
+        this->_column++;
     }
 
     return result;
 }
 
-std::wstring TextNavigator::peekString(size_t length)
+String TextNavigator::peekString(std::size_t length)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
-    const size_t savePosition = _position, saveColumn = _column, saveLine = _line;
-    for (size_t i = 0; i < length; ++i) {
-        const wchar_t c = readChar();
+    const std::size_t savePosition = this->_position,
+        saveColumn = this->_column,
+        saveLine = this->_line;
+    for (std::size_t i = 0; i < length; ++i) {
+        const Char c = this->readChar();
         if ((c == EOT) || (c == '\r') || (c == '\n')) {
             break;
         }
@@ -106,132 +108,136 @@ std::wstring TextNavigator::peekString(size_t length)
         result.push_back(c);
     }
 
-    _position = savePosition;
-    _column = saveColumn;
-    _line = saveLine;
+    this->_position = savePosition;
+    this->_column = saveColumn;
+    this->_line = saveLine;
 
     return result;
 }
 
-std::wstring TextNavigator::peekTo(wchar_t stopChar)
+String TextNavigator::peekTo(Char stopChar)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
-    const size_t savePosition = _position, saveColumn = _column, saveLine = _line;
-    result = readTo(stopChar);
-    _position = savePosition;
-    _column = saveColumn;
-    _line = saveLine;
+    const std::size_t savePosition = this->_position,
+        saveColumn = this->_column,
+        saveLine = this->_line;
+    result = this->readTo(stopChar);
+    this->_position = savePosition;
+    this->_column = saveColumn;
+    this->_line = saveLine;
 
     return result;
 }
 
-std::wstring TextNavigator::peekUntil(wchar_t stopChar)
+String TextNavigator::peekUntil(Char stopChar)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
-    const size_t savePosition = _position, saveColumn = _column, saveLine = _line;
-    result = readUntil(stopChar);
-    _position = savePosition;
-    _column = saveColumn;
-    _line = saveLine;
+    const std::size_t savePosition = this->_position,
+        saveColumn = this->_column,
+        saveLine = this->_line;
+    result = this->readUntil(stopChar);
+    this->_position = savePosition;
+    this->_column = saveColumn;
+    this->_line = saveLine;
 
     return result;
 }
 
-std::wstring TextNavigator::readLine()
+String TextNavigator::readLine()
 {
-    std::wstring result;
-    if (_position >= _length) {
+    String result;
+    if (this->_position >= this->_length) {
         return result;
     }
 
-    const size_t start = _position;
-    while (_position < _length) {
-        const wchar_t c = _text.at(_position);
+    const std::size_t start = this->_position;
+    while (this->_position < this->_length) {
+        const Char c = this->_text.at(this->_position);
         if (c == '\r' || c == '\n') {
             break;
         }
 
-        readChar();
+        this->readChar();
     }
 
-    result = _text.substr(start, _position - start);
-    if (_position < _length) {
-        wchar_t c = _text.at(_position);
+    result = this->_text.substr(start, this->_position - start);
+    if (this->_position < this->_length) {
+        Char c = this->_text.at(this->_position);
         if (c == '\r') {
-            readChar();
-            c = peekChar();
+            this->readChar();
+            c = this->peekChar();
         }
 
         if (c == '\n') {
-            readChar();
+            this->readChar();
         }
     }
 
     return result;
 }
 
-bool TextNavigator::isControl() const
+bool TextNavigator::isControl() const noexcept
 {
-    const wchar_t c = peekChar();
+    const Char c = this->peekChar();
 
     return (c > 0) && (c < ' ');
 }
 
-bool TextNavigator::isDigit() const
+bool TextNavigator::isDigit() const noexcept
 {
-    const wchar_t c = peekChar();
+    const Char c = this->peekChar();
 
     return std::iswdigit(c);
 }
 
-bool TextNavigator::isLetter() const
+bool TextNavigator::isLetter() const noexcept
 {
-    const wchar_t c = peekChar();
+    const Char c = this->peekChar();
 
     return std::iswalpha(c);
 }
 
-bool TextNavigator::isWhitespace() const
+bool TextNavigator::isWhitespace() const noexcept
 {
-    const wchar_t c = peekChar();
+    const Char c = this->peekChar();
 
     return std::iswspace(c);
 }
 
-std::wstring TextNavigator::readInteger()
+String TextNavigator::readInteger()
 {
-    std::wstring result;
+    String result;
 
-    if (isDigit()) {
-        while (isDigit()) {
-            result.push_back(readChar());
+    if (this->isDigit()) {
+        while (this->isDigit()) {
+            result.push_back(this->readChar());
         }
     }
 
     return result;
 }
 
-std::wstring TextNavigator::readString(size_t length)
+String TextNavigator::readString(std::size_t length)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
     result.reserve(length);
-    for (size_t i = 0; i < length; ++i) {
-        const wchar_t c = readChar();
+    for (std::size_t i = 0; i < length; ++i) {
+        const Char c = this->readChar();
         if (c == EOT) {
             break;
         }
@@ -242,106 +248,102 @@ std::wstring TextNavigator::readString(size_t length)
     return result;
 }
 
-// —читывание вплоть до указанного символа
-// (не включа€ его, однако, символ считываетс€).
-std::wstring TextNavigator::readTo(wchar_t stopChar)
+String TextNavigator::readTo(Char stopChar)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
-    const size_t start = _position;
-    size_t end = _position;
+    const std::size_t start = this->_position;
+    std::size_t end = this->_position;
     while (true) {
-        const wchar_t c = readChar();
+        const Char c = this->readChar();
         if ((c == EOT) || (c == stopChar)) {
             break;
         }
-        end = _position;
+        end = this->_position;
     }
 
-    result = _text.substr(start, end - start);
+    result = this->_text.substr(start, end - start);
 
     return result;
 }
 
-// —читывание вплоть до указанного символа
-// (сам символ остаетс€ несчитанным).
-std::wstring TextNavigator::readUntil(wchar_t stopChar)
+String TextNavigator::readUntil(Char stopChar)
 {
-    std::wstring result;
+    String result;
 
-    if (eot()) {
+    if (this->eot()) {
         return result;
     }
 
-    const size_t start = _position;
+    const std::size_t start = this->_position;
     while (true) {
-        const wchar_t c = peekChar();
+        const Char c = this->peekChar();
         if ((c == EOT) || (c == stopChar)) {
             break;
         }
 
-        readChar();
+        this->readChar();
     }
 
-    result = _text.substr(start, _position - start);
+    result = this->_text.substr(start, this->_position - start);
 
     return result;
 }
 
-std::wstring TextNavigator::readWhile(wchar_t goodChar)
+String TextNavigator::readWhile(wchar_t goodChar)
 {
-    std::wstring result;
+    String result;
 
     while (true) {
-        const wchar_t c = peekChar();
+        const Char c = this->peekChar();
         if ((c == EOT) || (c != goodChar)) {
             break;
         }
 
-        result.push_back(readChar());
+        result.push_back(this->readChar());
     }
 
     return result;
 }
 
-std::wstring TextNavigator::readWord()
+String TextNavigator::readWord()
 {
-    std::wstring result;
+    String result;
 
     while (true) {
-        const wchar_t c = peekChar();
+        const Char c = this->peekChar();
         if ((c == EOT) || !std::iswalnum(c)) {
             break;
         }
 
-        result.push_back(readChar());
+        result.push_back(this->readChar());
     }
 
     return result;
 }
 
-std::wstring TextNavigator::remainingText() const
+String TextNavigator::remainingText() const
 {
-    if (eot()) {
-        return std::wstring();
+    if (this->eot()) {
+        return String();
     }
 
-    return _text.substr(_position);
+    return this->_text.substr(this->_position);
 }
 
-std::wstring TextNavigator::recentText(ptrdiff_t length) const
+String TextNavigator::recentText(std::ptrdiff_t length) const
 {
-    ptrdiff_t start = _position - length;
+    std::ptrdiff_t start = this->_position - length;
     if (start < 0) {
         length += start;
         start = 0;
     }
 
-    if (static_cast<size_t>(start) >= _length) {
+    if (static_cast<size_t>(start) >= this->_length) {
         start = 0;
         length = 0;
     }
@@ -350,17 +352,17 @@ std::wstring TextNavigator::recentText(ptrdiff_t length) const
         length = 0;
     }
 
-    return _text.substr(start, length);
+    return this->_text.substr(start, length);
 }
 
 TextNavigator& TextNavigator::skipWhitespace()
 {
     while (true) {
-        const wchar_t c = peekChar();
+        const Char c = this->peekChar();
         if (!std::iswspace(c)) {
             break;
         }
-        readChar();
+        this->readChar();
     }
 
     return *this;
@@ -369,19 +371,19 @@ TextNavigator& TextNavigator::skipWhitespace()
 TextNavigator& TextNavigator::skipPunctuation()
 {
     while (true) {
-        const wchar_t c = peekChar();
+        const wchar_t c = this->peekChar();
         if (!std::iswpunct(c)) {
             break;
         }
-        readChar();
+        this->readChar();
     }
 
     return *this;
 }
 
-std::wstring TextNavigator::substr(size_t offset, size_t length) const
+String TextNavigator::substr(std::size_t offset, std::size_t length) const
 {
-    return _text.substr(offset, length);
+    return this->_text.substr(offset, length);
 }
 
 }
