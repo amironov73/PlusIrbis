@@ -16,10 +16,7 @@ namespace irbis {
 
 RecordField& RecordField::add(wchar_t subFieldCode, const String &subFieldValue)
 {
-    SubField subField;
-    subField.code = subFieldCode;
-    subField.value = subFieldValue;
-    subfields.push_back(subField);
+    this->subfields.emplace_back(subFieldCode, subFieldValue);
     return *this;
 }
 

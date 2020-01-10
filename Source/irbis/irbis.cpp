@@ -51,7 +51,7 @@ bool sameString(const String &first, const String &second) noexcept
 String toLower(String &text) noexcept
 {
     for (auto &i : text) {
-        i = tolower(i);
+        i = ::tolower(i);
     }
 
     return text;
@@ -64,7 +64,7 @@ String toLower(String &text) noexcept
 String toUpper(String &text) noexcept
 {
     for (auto &i : text) {
-        i = toupper(i);
+        i = ::toupper(i);
     }
 
     return text;

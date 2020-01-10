@@ -7,7 +7,7 @@
 
 namespace irbis {
 
-const wchar_t TextNavigator::EOT = L'\0';
+const Char TextNavigator::EOT = L'\0';
 
 TextNavigator::TextNavigator(const String &text)
     : _text(text)

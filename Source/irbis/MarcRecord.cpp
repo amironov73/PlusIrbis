@@ -16,10 +16,7 @@ namespace irbis {
 
 RecordField& MarcRecord::add(int tag, const String &value)
 {
-    RecordField field;
-    field.tag = tag;
-    field.value = value;
-    this->fields.push_back(field);
+    this->fields.emplace_back(tag, value);
     return this->fields.back();
 }
 

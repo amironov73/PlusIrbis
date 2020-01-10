@@ -221,9 +221,129 @@ template<class T>
 class Span final
 {
 public:
-    T *ptr;        ///< Указатель на начала куска.
-    size_t length; ///< Длина куска в элементах.
+    T *ptr;              ///< Указатель на начала куска.
+    size_t length { 0 }; ///< Длина куска в элементах.
+
+    Span() = default;
+    Span(T *ptr_, size_t length_) : ptr(ptr_), length(length_) {}
+    Span(const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
+    Span(const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
+
+    static Span<T> fromString(const T*ptr) noexcept
+    {
+        size_t length = 0;
+        while (*ptr) {
+            ++ptr;
+            length++;
+        }
+
+        return Span<T> (const_cast<T*>(ptr), length);
+    }
+
+    T* data() const noexcept { return this->ptr; }
+    bool empty() const noexcept { return this->length == 0; }
+    size_t size() const noexcept { return this->length; }
+
+    T& operator[](ptrdiff_t offset) const noexcept { return this->ptr[offset]; }
+    bool contains(const T &val) const
+    {
+        for (const auto &item : this) {
+            if (item == val) {
+                return true;
+            }
+        }
+        return false;
+    }
+    Span<T>& fill(const T &val) noexcept
+    {
+        for(size_t ofs = 0; ofs < this->length; ofs++) {
+            this->ptr[ofs] = val;
+        }
+        return *this;
+    }
+    ptrdiff_t indexOf(const T &val) const
+    {
+        for (size_t i = 0; i < this->length; i++) {
+            if (this->ptr[i] == val) {
+                return static_cast<ptrdiff_t >(i);
+            }
+        }
+        return -1;
+    }
+    ptrdiff_t lastIndexOf(const T &val) const
+    {
+        for (ptrdiff_t i = static_cast<ptrdiff_t>(this->length - 1); i >= 0; i++) {
+            if (this->ptr[i] == val) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    Span<T> slice(ptrdiff_t start, ptrdiff_t length=-1) const noexcept
+    {
+        if (length == -1) {
+            length = this->length - start;
+        }
+
+        if (length < 0) {
+            length = 0;
+        }
+
+        return Span<T>(this->ptr + start, length);
+    }
+
+    T* begin() const noexcept { return &this->ptr[0]; }
+    const T* cbegin() const noexcept { return &this->ptr[0]; }
+    T* end() const noexcept { return &this->ptr[this->length]; }
+    const T* cend() const noexcept { return &this->ptr[this->length]; }
+
+    std::basic_string<T> toString() const
+    {
+        std::basic_string<T> result;
+        result.reserve(this->length);
+        for (size_t ofs = 0; ofs < this->length; ofs++) {
+            result.push_back(this->ptr[ofs]);
+        }
+        return result;
+    }
+    std::vector<T> toVector() const
+    {
+        std::vector<T> result;
+        result.reserve(this->length);
+        for (size_t ofs = 0; ofs < this->length; ofs++) {
+            result.push_back(this->ptr[ofs]);
+        }
+
+        return result;
+    }
 };
+
+using CSpan = Span<char>;
+using WSpan = Span<Char>;
+using BSpan = Span<Byte>;
+
+PLUSIRBIS_EXPORTS bool sameString(CSpan first, CSpan second);
+PLUSIRBIS_EXPORTS bool sameString(WSpan first, WSpan second);
+PLUSIRBIS_EXPORTS bool startsWith(CSpan text, CSpan prefix);
+PLUSIRBIS_EXPORTS bool startsWith(WSpan text, WSpan prefix);
+PLUSIRBIS_EXPORTS bool endsWith(CSpan text, CSpan suffix);
+PLUSIRBIS_EXPORTS bool endsWith(WSpan text, WSpan suffix);
+PLUSIRBIS_EXPORTS int compare(CSpan first, CSpan second);
+PLUSIRBIS_EXPORTS int compare(WSpan first, WSpan second);
+PLUSIRBIS_EXPORTS CSpan trimStart(CSpan text);
+PLUSIRBIS_EXPORTS WSpan trimStart(WSpan text);
+PLUSIRBIS_EXPORTS CSpan trimEnd(CSpan text);
+PLUSIRBIS_EXPORTS WSpan trimEnd(WSpan text);
+PLUSIRBIS_EXPORTS CSpan trim(CSpan text);
+PLUSIRBIS_EXPORTS WSpan trim(WSpan text);
+PLUSIRBIS_EXPORTS std::vector<CSpan> split(CSpan text, char c);
+PLUSIRBIS_EXPORTS std::vector<WSpan> split(WSpan text, Char c);
+PLUSIRBIS_EXPORTS std::vector<CSpan> split(CSpan text, char c, int nelem);
+PLUSIRBIS_EXPORTS std::vector<WSpan> split(WSpan text, Char c, int nelem);
+PLUSIRBIS_EXPORTS CSpan toupper(CSpan text);
+PLUSIRBIS_EXPORTS WSpan toupper(WSpan text);
+PLUSIRBIS_EXPORTS CSpan tolower(CSpan text);
+PLUSIRBIS_EXPORTS WSpan tolower(WSpan text);
 
 //=========================================================
 
@@ -681,6 +801,8 @@ class PLUSIRBIS_EXPORTS Encoding // abstract
     static Encoding *_utf;
 
 public:
+    Encoding() = default;
+    virtual ~Encoding() = default;
 
     virtual std::vector<Byte> fromUnicode(const String &text) const = 0;
     virtual String toUnicode(const Byte *bytes, size_t count) const = 0;
@@ -877,6 +999,13 @@ public:
     unsigned int version { 0u };
     String database;
     std::list<RecordField> fields;
+
+    MarcRecord() = default;
+    MarcRecord(const MarcRecord &other) = default;
+    MarcRecord(MarcRecord &&other) = default;
+    MarcRecord& operator = (const MarcRecord &other) = default;
+    MarcRecord& operator = (MarcRecord &&other) = default;
+    ~MarcRecord() = default;
 
     RecordField& add(int tag, const String &value);
     MarcRecord clone() const;
@@ -1188,6 +1317,14 @@ public:
     String value;
     std::list<SubField> subfields;
 
+    RecordField() = default;
+    RecordField(int tag, const String &value = L"") : tag(tag), value(value) {}
+    RecordField(const RecordField &other) = default;
+    RecordField(RecordField &&other) = default;
+    RecordField& operator = (const RecordField &other) = default;
+    RecordField& operator = (RecordField &&other) = default;
+    ~RecordField() = default;
+
     RecordField& add(Char code, const String &value = L"");
     RecordField& clear();
     RecordField clone() const;
@@ -1372,7 +1509,7 @@ public:
 
 //=========================================================
 
-/// \brief Подполе записи.
+/// \brief Подполе записи. Состоит из кода и значения.
 class PLUSIRBIS_EXPORTS SubField final
 {
 public:
@@ -1382,6 +1519,14 @@ public:
     /// \brief Одноисмвольный код подполя.
     Char code { L'\0' };
     String value; ///< Значение подполя (может быть пустой строкой).
+
+    SubField() = default;
+    SubField(Char code, const String &value = L"") : code(code), value(value) {}
+    SubField(const SubField &other) = default;
+    SubField(SubField &&other) = default;
+    SubField& operator = (const SubField &other) = default;
+    SubField& operator = (SubField &&other) = default;
+    ~SubField() = default;
 
     SubField clone() const;
     void decode(const String &line);
