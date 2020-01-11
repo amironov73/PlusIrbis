@@ -14,7 +14,7 @@
 
 namespace irbis {
 
-void ParFile::assign (const std::wstring &path)
+void ParFile::assign (const String &path)
 {
     assert(!path.empty());
 
@@ -33,7 +33,7 @@ void ParFile::assign (const std::wstring &path)
 
 void ParFile::parse(const StringList &lines)
 {
-    std::map<int, std::wstring> dict;
+    std::map<int, String> dict;
 
     for (const auto &line : lines) {
         const auto parts = maxSplit(line, L'=', 2);
@@ -57,9 +57,9 @@ void ParFile::parse(const StringList &lines)
     }
 }
 
-std::map<int, std::wstring> ParFile::toDictionary() const
+std::map<int, String> ParFile::toDictionary() const
 {
-    std::map<int, std::wstring> result;
+    std::map<int, String> result;
 
     result[1] = this->xrf;
     result[2] = this->mst;

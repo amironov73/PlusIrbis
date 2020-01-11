@@ -78,7 +78,10 @@
     <ClCompile Include="EmbeddedField.cpp" />
     <ClCompile Include="Encoding.cpp" />
     <ClCompile Include="FileSpecification.cpp" />
+    <ClCompile Include="FoundLine.cpp" />
+    <ClCompile Include="GblParameter.cpp" />
     <ClCompile Include="GblResult.cpp" />
+    <ClCompile Include="GblStatement.cpp" />
     <ClCompile Include="IlfFile.cpp" />
     <ClCompile Include="IniFile.cpp" />
     <ClCompile Include="irbis.cpp" />

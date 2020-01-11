@@ -838,11 +838,38 @@ public:
 
 //=========================================================
 
+/// \brief Одна строка из списка найденных записей.
 class PLUSIRBIS_EXPORTS FoundLine final
 {
 public:
-    Mfn mfn {0};
-    String description;
+    Mfn mfn {0};         ///< MFN найденной записи.
+    String description;  ///< Опциональный текст, например, результат расформатирования записи.
+
+    FoundLine() = default;
+    FoundLine(Mfn mfn_, const String &description_) : mfn(mfn_), description(description_) {}
+    FoundLine(const FoundLine &other) = default;
+    FoundLine(FoundLine &&other) = default;
+    FoundLine& operator = (const FoundLine &other) = default;
+    FoundLine& operator = (FoundLine &&other) = default;
+    ~FoundLine() = default;
+};
+
+//=========================================================
+
+/// \brief Параметр глобальной корректировки.
+class PLUSIRBIS_EXPORTS GblParameter final
+{
+public:
+    /// Наименование параметра, которое появится в названии столбца, задающего параметр.
+    String title;
+
+    /// Значение параметра или пусто, если пользователю
+    /// предлагается задать его значение перед выполнением
+    /// корректировки. В этой строке можно задать имя файла
+    /// меню (с расширением MNU) или имя рабочего листа подполей
+    /// (с расширением Wss), которые будут поданы для выбора
+    /// значения параметра.
+    String value;
 };
 
 //=========================================================
@@ -856,33 +883,51 @@ public:
 
 //=========================================================
 
+/// \brief Оператор глобальной корректировки.
 class PLUSIRBIS_EXPORTS GblStatement final
 {
 public:
-    String command;
-    String parameter1;
-    String parameter2;
-    String format1;
-    String format2;
+    String command;    ///< Команда, например, ADD или DEL.
+    String parameter1; ///< Первый параметр, как правило, спецификация поля/подполя.
+    String parameter2; ///< Второй параметр, как правило, спецификация повторения.
+    String format1;    ///< Первый формат, например, выражение для замены.
+    String format2;    ///< Второй формат, например, заменяющее выражение.
+
+    GblStatement() = default;
+    GblStatement(const GblStatement &other) = default;
+    GblStatement(GblStatement &&other) = default;
+    GblStatement& operator = (const GblStatement &other) = default;
+    GblStatement& operator = (GblStatement &&other) = default;
+    ~GblStatement() = default;
 };
 
 //=========================================================
 
+/// \brief Настройки для глобальной корректировки.
 class PLUSIRBIS_EXPORTS GblSettings final
 {
 public:
-    bool actualize { false };
-    bool autoin { false };
-    String database;
-    String fileName;
-    Mfn firstRecord { 0 };
-    bool formalControl { false };
-    Mfn maxMfn { 0 };
-    std::vector<int> mfnList;
-    Mfn minMfn { 0 };
-    Mfn numberOfRecords { 0 };
-    String searchExpression;
-    std::vector<GblStatement> statements;
+    bool actualize { false };             ///< Надо ли актуализировать записи?
+    bool autoin { false };                ///< Надо ли запускать `autoin.gbl`?
+    String database;                      ///< Имя базы данных.
+    String fileName;                      ///< Имя файла глобальной корректировки.
+    Mfn firstRecord { 0 };                ///< Mfn первой записи.
+    bool formalControl { false };         ///< Применять формальный контроль?
+    Mfn maxMfn { 0 };                     ///< Максимальный MFN.
+    MfnList mfnList;                      ///< Список MFN для обработки.
+    Mfn minMfn { 0 };                     ///< Минимальный MFN. 0 означает "все записи в базе".
+    Mfn numberOfRecords { 0 };            ///< Количество записей, подлежащих обработке.
+    String searchExpression;              ///< Выражение для прямого поиска по словарю.
+    String sequentialSearch;              ///< Выражение для последовательного поиска.
+    std::vector<GblStatement> statements; ///< Вектор операторов.
+    std::vector<GblParameter> parameters; ///< Вектор параметров.
+
+    GblSettings() = default;
+    GblSettings(const GblSettings &other) = default;
+    GblSettings(GblSettings &&other) = default;
+    GblSettings& operator = (const GblSettings &other) = default;
+    GblSettings& operator = (GblSettings &&other) = default;
+    ~GblSettings() = default;
 };
 
 //=========================================================
@@ -1577,14 +1622,23 @@ public:
 
 //=========================================================
 
+/// \brief Информация о термине поискового словаря.
 class PLUSIRBIS_EXPORTS TermInfo final
 {
 public:
-    int count { 0 };
-    std::wstring text;
+    int count { 0 }; ///< Количество ссылок на данный термин.
+    String text;     ///< Значение поискового термина.
+
+    TermInfo() = default;
+    TermInfo(int count_, const String text_) : count(count_), text(text_) {}
+    TermInfo(const TermInfo &other) = default;
+    TermInfo(TermInfo &&other) = default;
+    TermInfo& operator = (const TermInfo &other) = default;
+    TermInfo& operator = (TermInfo &&other) = default;
+    ~TermInfo() = default;
 
     static std::vector<TermInfo> parse(const StringList &lines);
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================
@@ -1679,30 +1733,47 @@ public:
 
 //=========================================================
 
+/// \brief Узел дерева TRE-файла.
 class PLUSIRBIS_EXPORTS TreeNode final
 {
 public:
-    String value;
-    std::vector<TreeNode> children;
-    int level { 0 };
+    String value; ///< Значение, хранящееся в узле.
+    std::vector<TreeNode> children; ///< Дочерние узлы.
+    int level { 0 }; ///< Уровень вложенности узла (отслеживается автоматически).
+
+    TreeNode() = default;
+    TreeNode(const String &value_) : value(value_) {}
+    TreeNode(const TreeNode &other) = default;
+    TreeNode(TreeNode &&other) = default;
+    TreeNode& operator = (const TreeNode &other) = default;
+    TreeNode& operator = (TreeNode &&other) = default;
+    ~TreeNode() = default;
 
     TreeNode& add(const String &name);
 };
 
 //=========================================================
 
+/// \brief Информация о зарегистрированном пользователе системы (по данным client_m.mnu).
 class PLUSIRBIS_EXPORTS UserInfo final
 {
 public:
-    std::wstring number;
-    std::wstring name;
-    std::wstring password;
-    std::wstring cataloger;
-    std::wstring reader;
-    std::wstring circulation;
-    std::wstring acquisitions;
-    std::wstring provision;
-    std::wstring administrator;
+    String number;        ///< Номер по порядку в списке.
+    String name;          ///< Логин.
+    String password;      ///< Пароль.
+    String cataloger;     ///< Доступность АРМ Каталогизатор.
+    String reader;        ///< Доступность АРМ Читатель.
+    String circulation;   ///< Доступность АРМ Книговыдача.
+    String acquisitions;  ///< Доступность АРМ Комплектатор.
+    String provision;     ///< Доступность АРМ Книгообеспеченность.
+    String administrator; ///< Доступность АРМ Администратор.
+
+    UserInfo() = default;
+    UserInfo(const UserInfo &other) = default;
+    UserInfo(UserInfo &&other) = default;
+    UserInfo& operator = (const UserInfo &other) = default;
+    UserInfo& operator = (UserInfo &&other) = default;
+    ~UserInfo() = default;
 
     String toString() const;
     static std::vector<UserInfo> parse(const StringList &lines);
@@ -1718,16 +1789,24 @@ public:
 
 //=========================================================
 
+/// \brief Информация о версии ИРБИС-сервера
 class PLUSIRBIS_EXPORTS Version final
 {
 public:
-    std::wstring organization; // на кого приобретен
-    std::wstring version; // собственно версия, например, 64.2008.1
-    int maxClients { 0 }; // максимальное количество подключений
-    int connectedClients { 0 }; // текущее количество подключений
+    String organization;        ///< На какое юридическое лицо приобретен сервер.
+    String version;             ///< Собственно версия сервера. Например, 64.2008.1.
+    int maxClients { 0 };       ///< Максимальное количество одновременных подключений.
+    int connectedClients { 0 }; ///< Текущее количество подключений.
+
+    Version() = default;
+    Version(const Version &other) = default;
+    Version(Version &&other) = default;
+    Version& operator = (const Version &other) = default;
+    Version& operator = (Version &&other) = default;
+    ~Version() = default;
 
     void parse(ServerResponse &response);
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================

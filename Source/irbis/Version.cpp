@@ -11,6 +11,8 @@
 
 namespace irbis {
 
+/// \brief Разбор ответа сервера.
+/// \param response Ответ сервера.
 void Version::parse(ServerResponse &response)
 {
     const auto lines = response.readRemainingAnsiLines();
@@ -26,12 +28,14 @@ void Version::parse(ServerResponse &response)
     }
 }
 
-std::wstring Version::toString() const
+/// \brief Строковое представление.
+/// \return Строковое представление.
+String Version::toString() const
 {
-    return std::wstring(L"organization=") + organization +
-        L", version=" + version +
-        L", maxClients=" + std::to_wstring(maxClients) +
-        L", connectedClients=" + std::to_wstring(connectedClients);
+    return String(L"organization=") + this->organization +
+        L", version=" + this->version +
+        L", maxClients=" + std::to_wstring(this->maxClients) +
+        L", connectedClients=" + std::to_wstring(this->connectedClients);
 }
 
 }

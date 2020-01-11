@@ -14,7 +14,7 @@
 
 namespace irbis {
 
-RecordField& RecordField::add(wchar_t subFieldCode, const String &subFieldValue)
+RecordField& RecordField::add(Char subFieldCode, const String &subFieldValue)
 {
     this->subfields.emplace_back(subFieldCode, subFieldValue);
     return *this;
@@ -30,11 +30,9 @@ RecordField& RecordField::clear()
 
 RecordField RecordField::clone() const
 {
-    RecordField result;
-    result.tag = this->tag;
-    result.value = this->value;
+    RecordField result (this->tag, this->value);
     for (const auto &sub : this->subfields) {
-        result.subfields.push_back(sub.clone());
+        result.subfields.emplace_back(sub.code, sub.value);
     }
 
     return result;
@@ -72,7 +70,7 @@ bool RecordField::empty() const noexcept
     return !this->tag || (this->value.empty() && this->subfields.empty());
 }
 
-SubField* RecordField::getFirstSubfield(wchar_t code) const noexcept
+SubField* RecordField::getFirstSubfield(Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
@@ -83,7 +81,7 @@ SubField* RecordField::getFirstSubfield(wchar_t code) const noexcept
     return nullptr;
 }
 
-std::wstring RecordField::getFirstSubfieldValue(wchar_t code) const noexcept
+std::wstring RecordField::getFirstSubfieldValue(Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {

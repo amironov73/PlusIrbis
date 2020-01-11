@@ -5,6 +5,14 @@
 
 namespace irbis {
 
+/// \class TermInfo
+/// Максимальная длина поискового термина - 255 байт
+/// (не символов, а байт!).
+/// Термины хранятся в словаре в кодировке UTF-8.
+
+/// \brief Разбор ответа сервера.
+/// \param lines Ответ сервера.
+/// \return Вектор терминов.
 std::vector<TermInfo> TermInfo::parse(const StringList &lines)
 {
     std::vector<TermInfo> result;
@@ -25,9 +33,10 @@ std::vector<TermInfo> TermInfo::parse(const StringList &lines)
 
 }
 
-std::wstring TermInfo::toString() const
+/// \brief Текстовое представление термина.
+String TermInfo::toString() const
 {
-    return std::to_wstring(this->count) + std::wstring(L"#")  + this->text;
+    return std::to_wstring(this->count) + String (L"#")  + this->text;
 }
 
 }

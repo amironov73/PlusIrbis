@@ -20,10 +20,11 @@ static String formatPair(const String &prefix, const String &value, const String
     return prefix + L"=" + value + L";";
 }
 
+/// \brief Формирование текстового представления настроек пользователя.
 String UserInfo::toString() const
 {
-    return name + L"\r\n"
-        + password + L"\r\n"
+    return this->name + L"\r\n"
+        + this->password + L"\r\n"
         + formatPair(L"C", this->cataloger,     L"irbisc.ini")
         + formatPair(L"R", this->reader,        L"irbisr.ini")
         + formatPair(L"B", this->circulation,   L"irbisb.ini")
@@ -32,6 +33,9 @@ String UserInfo::toString() const
         + formatPair(L"A", this->administrator, L"irbisa.ini");
 }
 
+/// \brief Разбор ответа сервера.
+/// \param lines Строки с ответом сервера.
+/// \return Вектор пользовательских настроек.
 std::vector<UserInfo> UserInfo::parse(const StringList &lines)
 {
     std::vector<UserInfo> result;
