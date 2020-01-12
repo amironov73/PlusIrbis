@@ -7,8 +7,6 @@
 
 // ReSharper disable StringLiteralTypo
 
-// #pragma comment (lib, "irbis.lib")
-
 int main()
 {
     setlocale(LC_ALL, ""); // for cyrillic output

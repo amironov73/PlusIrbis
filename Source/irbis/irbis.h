@@ -226,59 +226,104 @@ public:
 
     Span() = default;
     Span(T *ptr_, size_t length_) : ptr(ptr_), length(length_) {}
+    Span(const T *ptr_, size_t length_) : ptr(const_cast<T*>(ptr_)), length(length_) {}
     Span(const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
     Span(const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
 
-    static Span<T> fromString(const T*ptr) noexcept
+    /// \brief Спан из ASCIIZ-строки.
+    /// \param ptr Указатель на начало строки.
+    /// \return Полученный спан.
+    static Span<T> fromString(const T *ptr) noexcept
     {
         size_t length = 0;
-        while (*ptr) {
-            ++ptr;
+        const T* p = ptr;
+        while (*p) {
+            ++p;
             length++;
         }
 
         return Span<T> (const_cast<T*>(ptr), length);
     }
 
+    /// \brief Сырой указатель на данные.
+    /// \return Сырой указатель.
     T* data() const noexcept { return this->ptr; }
+
+    /// \brief Константный сырой указатель на данные.
+    /// \return Сырой указатель.
+    const T* cdata() const noexcept { return this->ptr; }
+
+    /// \brief Пустой спан?
+    /// \return `true` если пустой.
     bool empty() const noexcept { return this->length == 0; }
+
+    /// \brief Длина данных в элементах.
+    /// \return Длина.
     size_t size() const noexcept { return this->length; }
 
+    /// \brief Оператор индексирования.
+    /// \param offset Смещение.
+    /// \return Ссылка на элемент с указанным смещением.
     T& operator[](ptrdiff_t offset) const noexcept { return this->ptr[offset]; }
+
+    /// \brief Содержит ли спан указанный элемент.
+    /// \param val Искомое значение.
+    /// \return `true` если содержит.
     bool contains(const T &val) const
     {
-        for (const auto &item : this) {
+        for(const auto &item : *this) {
             if (item == val) {
                 return true;
             }
         }
         return false;
     }
+
+    /// \brief Заполнение спана указанным значением.
+    /// \param val Значение для заполнения.
+    /// \return this.
     Span<T>& fill(const T &val) noexcept
     {
-        for(size_t ofs = 0; ofs < this->length; ofs++) {
+        for(size_t ofs = 0; ofs < this->length; ++ofs) {
             this->ptr[ofs] = val;
         }
         return *this;
     }
+
+    /// \brief Поиск указанного значения в спане с начала.
+    /// \param val Искомое значение.
+    /// \return Индекс первого вхождения найденного элемента,
+    /// либо отрицательное значение.
     ptrdiff_t indexOf(const T &val) const
     {
-        for (size_t i = 0; i < this->length; i++) {
+        for (size_t i = 0; i < this->length; ++i) {
             if (this->ptr[i] == val) {
                 return static_cast<ptrdiff_t >(i);
             }
         }
         return -1;
     }
+
+    /// \brief Поиск указанного значения в спане с конца.
+    /// \param val Искомое значение.
+    /// \return Индекс последнего вхождения найденного элемента,
+    /// либо отрицательное значение.
     ptrdiff_t lastIndexOf(const T &val) const
     {
-        for (ptrdiff_t i = static_cast<ptrdiff_t>(this->length - 1); i >= 0; i++) {
+        for (ptrdiff_t i = static_cast<ptrdiff_t>(this->length - 1); i >= 0; --i) {
             if (this->ptr[i] == val) {
                 return i;
             }
         }
         return -1;
     }
+
+    /// \brief Срез спана.
+    /// \param start Смещение начала спана.
+    /// \param length Длина среза.
+    /// \return Срез.
+    ///
+    /// Копирования данных не происходит.
     Span<T> slice(ptrdiff_t start, ptrdiff_t length=-1) const noexcept
     {
         if (length == -1) {
@@ -292,11 +337,25 @@ public:
         return Span<T>(this->ptr + start, length);
     }
 
+    /// \brief Сырой указатель на начало спана.
+    /// \return Указатель.
     T* begin() const noexcept { return &this->ptr[0]; }
+
+    /// \brief Константный сырой указатель на начало спана.
+    /// \return Указатель.
     const T* cbegin() const noexcept { return &this->ptr[0]; }
+
+    /// \brief Сырой указатель за концом спана.
+    /// \return Указатель.
     T* end() const noexcept { return &this->ptr[this->length]; }
+
+    /// \brief Константный сырой указатель за концом спана.
+    /// \return Указатель.
     const T* cend() const noexcept { return &this->ptr[this->length]; }
 
+    /// \brief Конверсия в строку.
+    /// \return Строка.
+    /// \warning Копирует данные из спана!
     std::basic_string<T> toString() const
     {
         std::basic_string<T> result;
@@ -306,6 +365,10 @@ public:
         }
         return result;
     }
+
+    /// \brief Конверсия в вектор.
+    /// \return Вектор.
+    /// \warning Копирует данные из спана!
     std::vector<T> toVector() const
     {
         std::vector<T> result;
@@ -316,6 +379,185 @@ public:
 
         return result;
     }
+
+    /// \brief Совпадает ли начало спана с другим спаном?
+    /// \param prefix Префикс.
+    /// \return `true` если совпадает.
+    bool startsWith(const Span<T> prefix) const
+    {
+        if (prefix.size() > this->size()) {
+            return false;
+        }
+
+        auto p1 = this->cbegin();
+        auto p2 = prefix.cbegin(), e2 = prefix.cend();
+
+        while (p2 < e2) {
+            if (*p1 != *p2) {
+                return false;
+            }
+            ++p1; ++p2;
+        }
+
+        return true;
+    }
+
+    /// \brief Совпадает ли конец спана с другим спаном?
+    /// \param suffix Суффикс.
+    /// \return `true` если совпадает.
+    bool endsWith(const Span<T> suffix) const
+    {
+        if (suffix.size() > this->size()) {
+            return false;
+        }
+
+        auto p1 = this->cend() - suffix.size();
+        auto p2 = suffix.cbegin(), e2 = suffix.cend();
+
+        while (p2 < e2) {
+            if (*p1 != *p2) {
+                return false;
+            }
+            ++p1; ++p2;
+        }
+
+        return true;
+    }
+
+    /// \brief Поэлементное сравнение двух спанов.
+    /// \param other Другой спан.
+    /// \return Результат сравнения: 0 если все элементы совпадают.
+    int compare(const Span<T> other) const
+    {
+        auto size = this->size();
+        if (other.size() < size) {
+            size = other.size();
+        }
+
+        auto p1 = this->cbegin(), e2 = this->cbegin() + size;
+        auto p2 = other.cbegin();
+
+        while (p1 < e2) {
+            const int result = *p1 - *p2;
+            if (result != 0) {
+                return result;
+            }
+            ++p1; ++p2;
+        }
+
+        if (this->size() == other.size()) {
+            return 0;
+        }
+
+        if (this->size() > other.size()) {
+            return 1;
+        }
+
+        return -1;
+    }
+
+    /// \brief Разбиение текста на фрагменты.
+    /// \param delimiter Символ-разделитель.
+    /// \return Вектор спанов.
+    ///
+    /// Пустые фрагменты не включаются в результат.
+    std::vector<Span<T>> split(T delimiter) const
+    {
+        std::vector<Span<T>> result;
+        auto start = this->cbegin(), current = start, end = this->cend();
+
+        while (start < end) {
+            while (current < end) {
+                if (*current == delimiter) {
+                    break;
+                }
+                ++current;
+            }
+            if (current != start) {
+                result.emplace_back(start, current - start);
+            }
+            start = ++current;
+        }
+
+        return result;
+    }
+
+    /// \brief Разбиение текста на фрагменты.
+    /// \param delimiter Символ-разделитель.
+    /// \param nelem Максимальное количество элементов
+    /// \return Вектор спанов.
+    ///
+    /// Пустые фрагменты не включаются в результат.
+    std::vector<Span<T>> split(T delimiter, int nelem) const
+    {
+        std::vector<Span<T>> result;
+        auto start = this->cbegin(), current = start, end = this->cend();
+
+        --nelem;
+        while (nelem > 0 && start < end) {
+            while (current < end) {
+                if (*current == delimiter) {
+                    break;
+                }
+                ++current;
+            }
+            if (current != start) {
+                result.emplace_back(start, current - start);
+            }
+            start = ++current;
+            --nelem;
+        }
+        if (nelem <= 0 && start < end)
+        {
+            result.emplace_back(start, end - start);
+        }
+
+
+        return result;
+    }
+
+    /// \brief Быстрый и грязный разбор спана как целого числа.
+    /// \return Результат разбора.
+    ///
+    /// \warning Мусор на входе -- мусор на выходе!
+    PLUSIRBIS_EXPORTS int32_t parseInt32() const noexcept
+    {
+        int32_t result = 0;
+        auto p = this->cbegin(), e = this->cend();
+        while (p < e) {
+            result = result * 10 + (*p - '0');
+            ++p;
+        }
+
+        return result;
+    }
+
+    /// \brief Быстрый и грязный разбор спана как целого числа.
+    /// \return Результат разбора.
+    ///
+    /// \warning Мусор на входе -- мусор на выходе!
+    PLUSIRBIS_EXPORTS int64_t parseInt64() const noexcept
+    {
+        int64_t result = 0;
+        auto p = this->cbegin(), e = this->cend();
+        while (p < e) {
+            result = result * 10 + (*p - '0');
+            ++p;
+        }
+
+        return result;
+    }
+
+    /// \brief Дамп спана в некий поток.
+    /// \param stream Поток для вывода.
+    void dump(std::ostream & stream) const
+    {
+        stream << "Size: " << this->size() << std::endl;
+        for (const auto &item : *this) {
+            stream << item << " ";
+        }
+        stream << std::endl;
+    }
 };
 
 using CSpan = Span<char>;
@@ -324,22 +566,12 @@ using BSpan = Span<Byte>;
 
 PLUSIRBIS_EXPORTS bool sameString(CSpan first, CSpan second);
 PLUSIRBIS_EXPORTS bool sameString(WSpan first, WSpan second);
-PLUSIRBIS_EXPORTS bool startsWith(CSpan text, CSpan prefix);
-PLUSIRBIS_EXPORTS bool startsWith(WSpan text, WSpan prefix);
-PLUSIRBIS_EXPORTS bool endsWith(CSpan text, CSpan suffix);
-PLUSIRBIS_EXPORTS bool endsWith(WSpan text, WSpan suffix);
-PLUSIRBIS_EXPORTS int compare(CSpan first, CSpan second);
-PLUSIRBIS_EXPORTS int compare(WSpan first, WSpan second);
 PLUSIRBIS_EXPORTS CSpan trimStart(CSpan text);
 PLUSIRBIS_EXPORTS WSpan trimStart(WSpan text);
 PLUSIRBIS_EXPORTS CSpan trimEnd(CSpan text);
 PLUSIRBIS_EXPORTS WSpan trimEnd(WSpan text);
 PLUSIRBIS_EXPORTS CSpan trim(CSpan text);
 PLUSIRBIS_EXPORTS WSpan trim(WSpan text);
-PLUSIRBIS_EXPORTS std::vector<CSpan> split(CSpan text, char c);
-PLUSIRBIS_EXPORTS std::vector<WSpan> split(WSpan text, Char c);
-PLUSIRBIS_EXPORTS std::vector<CSpan> split(CSpan text, char c, int nelem);
-PLUSIRBIS_EXPORTS std::vector<WSpan> split(WSpan text, Char c, int nelem);
 PLUSIRBIS_EXPORTS CSpan toupper(CSpan text);
 PLUSIRBIS_EXPORTS WSpan toupper(WSpan text);
 PLUSIRBIS_EXPORTS CSpan tolower(CSpan text);

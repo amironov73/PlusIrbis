@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -14,6 +14,10 @@
 
 namespace irbis {
 
+/// \brief Совпадают ли спаны с точностью до регистра?
+/// \param first Первый спан.
+/// \param second Второй спан.
+/// \return `true` если спаны равны.
 bool sameString(CSpan first, CSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
@@ -27,6 +31,10 @@ bool sameString(CSpan first, CSpan second)
     return true;
 }
 
+/// \brief Совпадают ли спаны с точностью до регистра?
+/// \param first Первый спан.
+/// \param second Второй спан.
+/// \return `true` если спаны равны.
 bool sameString(WSpan first, WSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
@@ -40,60 +48,12 @@ bool sameString(WSpan first, WSpan second)
     return true;
 }
 
-bool startsWith(CSpan text, CSpan prefix)
-{
-    auto p1 = text.cbegin(), e1 = text.cend();
-    auto p2 = prefix.cbegin(), e2 = prefix.cend();
 
-    while (p2 < e2) {
-        if (p1 >= e1 || *p1 != *p2) {
-            return false;
-        }
-        ++p1; ++p2;
-    }
-
-    return true;
-}
-
-bool startsWith(WSpan text, WSpan prefix)
-{
-    auto p1 = text.cbegin(), e1 = text.cend();
-    auto p2 = prefix.cbegin(), e2 = prefix.cend();
-
-    while (p2 < e2) {
-        if (p1 >= e1 || *p1 != *p2) {
-            return false;
-        }
-        ++p1; ++p2;
-    }
-
-    return true;
-}
-
-bool endsWith(CSpan text, CSpan suffix)
-{
-    // TODO implement
-    return false;
-}
-
-bool endsWith(WSpan text, WSpan suffix)
-{
-    // TODO implement
-    return false;
-}
-
-int compare(CSpan first, CSpan second)
-{
-    // TODO implement
-    return -1;
-}
-
-int compare(WSpan first, WSpan second)
-{
-    // TODO implement
-    return -1;
-}
-
+/// \brief Удаление пробельных элементов из начала спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны начальные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 CSpan trimStart(CSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
@@ -106,6 +66,11 @@ CSpan trimStart(CSpan text)
     return CSpan (const_cast<char*>(p1), e1 - p1);
 }
 
+/// \brief Удаление пробельных элементов из начала спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны начальные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 WSpan trimStart(WSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
@@ -118,6 +83,11 @@ WSpan trimStart(WSpan text)
     return WSpan (const_cast<Char*>(p1), e1 - p1);
 }
 
+/// \brief Удаление пробельных элементов из конца спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны конечные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 CSpan trimEnd(CSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
@@ -130,6 +100,11 @@ CSpan trimEnd(CSpan text)
     return CSpan (const_cast<char*>(p1), e1 - p1 + 1);
 }
 
+/// \brief Удаление пробельных элементов из конца спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны конечные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 WSpan trimEnd(WSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
@@ -142,76 +117,74 @@ WSpan trimEnd(WSpan text)
     return WSpan (const_cast<Char*>(p1), e1 - p1 + 1);
 }
 
+/// \brief Удаление пробельных элементов из начала и конца спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны начальные и конечные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 CSpan trim(CSpan text)
 {
     return trimStart(trimEnd(text));
 }
 
+/// \brief Удаление пробельных элементов из начала и конца спана.
+/// \param text Проверяемый спан.
+/// \return Спан, из которого убраны начальные и конечные пробелы.
+///
+/// Данные остаются неизменными, создаётся слайс.
 WSpan trim(WSpan text)
 {
     return trimStart(trimEnd(text));
 }
 
-std::vector<CSpan> split(CSpan text, char c)
-{
-    std::vector<CSpan> result;
-    // TODO implement
-    return result;
-}
-
-std::vector<WSpan> split(WSpan text, Char c)
-{
-    std::vector<WSpan> result;
-    // TODO implement
-    return result;
-}
-
-std::vector<CSpan> split(CSpan text, char c, int nelem)
-{
-    std::vector<CSpan> result;
-    // TODO implement
-    return result;
-}
-
-std::vector<WSpan> split(WSpan text, Char c, int nelem)
-{
-    std::vector<WSpan> result;
-    // TODO implement
-    return result;
-}
-
+/// \brief Перевод текста в спане в верхний регистр "по месту".
+/// \param text Текст, подлежащий преобразованию.
+/// \return Тот же спан, но уже с преобразованным текстом.
 CSpan toupper(CSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
         *p = static_cast<char>(::toupper(*p));
+        ++p;
     }
     return text;
 }
 
+/// \brief Перевод текста в спане в верхний регистр "по месту".
+/// \param text Текст, подлежащий преобразованию.
+/// \return Тот же спан, но уже с преобразованным текстом.
 WSpan toupper(WSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
         *p = static_cast<char>(::towupper(*p));
+        ++p;
     }
     return text;
 }
 
+/// \brief Перевод текста в спане в нижний регистр "по месту".
+/// \param text Текст, подлежащий преобразованию.
+/// \return Тот же спан, но уже с преобразованным текстом.
 CSpan tolower(CSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
         *p = static_cast<char>(::tolower(*p));
+        ++p;
     }
     return text;
 }
 
+/// \brief Перевод текста в спане в нижний регистр "по месту".
+/// \param text Текст, подлежащий преобразованию.
+/// \return Тот же спан, но уже с преобразованным текстом.
 WSpan tolower(WSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
         *p = static_cast<char>(::towlower(*p));
+        ++p;
     }
     return text;
 }
