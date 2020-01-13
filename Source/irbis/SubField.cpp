@@ -12,6 +12,15 @@
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
+/*!
+    \class irbis::SubField
+
+    Регистр символов для кода подполя не учитывается.
+
+    Как правило, код подполя является арабской цифрой либо латинской буквой.
+    Но по факту может оказаться любой печатный символ.
+*/
+
 namespace irbis {
 
 /// \brief Клонирование подполя.

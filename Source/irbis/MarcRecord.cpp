@@ -12,8 +12,39 @@
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
+/*!
+    \class irbis::MarcRecord
+
+    \var irbis::MarcRecord::mfn
+
+    Для вновь созданных в памяти и пока не сохраненных
+    на сервере записей равен 0.
+    Устанавливается автоматически сервером при сохранении записи в базе данных.
+
+    \var  irbis::MarcRecord::status
+
+    Для вновь созданных в памяти и пока не сохраненных
+    на сервере записей равен 0.
+
+    \var  irbis::MarcRecord::version
+
+    Для вновь созданных в памяти и пока не сохраненных
+    на сервере записей равен 0. Сервер увеличивает номер версии автоматически
+    при сохранении записи в базе данных.
+
+    \var  irbis::MarcRecord::database
+
+    Для вновь созданных в памяти и пока не сохраненных
+    на сервере записей имя базы данных пустое. Устанавливается автоматически
+    в момент считывания записи из базы данных.
+*/
+
 namespace irbis {
 
+/// \brief Добавление в конец записи поля с указанными меткой и значением.
+/// \param tag Метка добавляемого поля.
+/// \param value Значение поля (может быть пустым).
+/// \return Вновь созданное поле.
 RecordField& MarcRecord::add(int tag, const String &value)
 {
     this->fields.emplace_back(tag, value);
@@ -152,7 +183,7 @@ MarcRecord& MarcRecord::reset() noexcept
     this->mfn = 0;
     this->status = 0;
     this->version = 0;
-    this->database = String();
+    this->database.clear();
 
     return *this;
 }
@@ -160,7 +191,7 @@ MarcRecord& MarcRecord::reset() noexcept
 bool MarcRecord::verify(bool throwOnError) const
 {
     bool result = true;
-    for (const RecordField &field : fields) {
+    for (const RecordField &field : this->fields) {
         if (!field.verify(throwOnError)) {
             result = false;
         }

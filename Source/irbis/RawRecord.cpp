@@ -12,6 +12,12 @@
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
+/*!
+    \class irbis::RawRecord
+
+    "Сырая" запись нужна для экономии усилий на распаковку-запаковку.
+*/
+
 namespace irbis {
 
 PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record)
@@ -39,7 +45,7 @@ String RawRecord::encode(const String &delimiter = IrbisText::IrbisDelimiter) co
     result.append(std::to_wstring(version));
     result.append(delimiter);
 
-    for (const String &field : fields) {
+    for (const auto &field : fields) {
         result.append(field).append(delimiter);
 
     }

@@ -6,17 +6,25 @@
 #include <iterator>
 #include <sstream>
 
-///
-/// \file irbis.cpp
-/// \brief Утилиты, используемые в PlusIrbis.
-///
+/*!
 
-///
-/// \mainpage Универсальный клиент для системы ИРБИС64.
-///
-/// Универсальный программный клиент для автоматизированной
-/// библиотечно-информационной системы ИРБИС64 на языке С++.
-///
+    \file
+    \brief Утилиты, используемые в PlusIrbis.
+
+
+
+    \mainpage Универсальный клиент для системы ИРБИС64.
+
+    Универсальный программный клиент для автоматизированной
+    библиотечно-информационной системы ИРБИС64 на языке С++.
+    Соответствует стандарту C++ 11.
+
+    Не требует библиотек, кроме стандартной.
+    Не полагается на `irbis64_client.dll`.
+
+    Все функции и классы располагаются в пространстве имен `irbis::`.
+
+*/
 
 namespace irbis {
 
@@ -27,7 +35,7 @@ namespace irbis {
 /// иначе false.
 bool sameChar(Char first, Char second) noexcept
 {
-    return towupper(first) == towupper(second);
+    return ::towupper(first) == ::towupper(second);
 }
 
 /// \brief Сравнение двух строк с точностью до регистра символов.
@@ -89,6 +97,10 @@ bool contains(const String &text, Char c)
 }
 
 /// \brief Заменяет все вхождения одной подстроки на другую.
+/// \param text Текст для обработки.
+/// \param from Заменяемый текст.
+/// \param to Заменяющий текст.
+/// \return Обработанный текст.
 std::string replace(const std::string &text, const std::string &from, const std::string &to)
 {
     std::string result = text;
@@ -105,10 +117,14 @@ std::string replace(const std::string &text, const std::string &from, const std:
     return result;
 }
 
-// Заменяет все вхождения одной подстроки на другую.
-std::wstring replace(const std::wstring &text, const std::wstring &from, const std::wstring &to)
+/// \brief Заменяет все вхождения одной подстроки на другую.
+/// \param text Текст для обработки.
+/// \param from Заменяемый текст.
+/// \param to Заменяющий текст.
+/// \return Обработанный текст.
+String replace(const String &text, const String &from, const String &to)
 {
-    std::wstring result = text;
+    String result = text;
     size_t index = 0;
     while (true) {
         index = text.find(from, index);
@@ -123,28 +139,87 @@ std::wstring replace(const std::wstring &text, const std::wstring &from, const s
 }
 
 /// \brief Удаление пробельных символов в начале строки.
-std::wstring PLUSIRBIS_EXPORTS trimStart(const std::wstring &text)
+/// \param text Текст для обработки.
+/// \return Обработанный текст.
+String PLUSIRBIS_EXPORTS trimStart(const String &text)
 {
-    // TODO implement
-    return text;
+    auto length = text.length();
+    size_t i = 0;
+    for (; i < length; ++i) {
+        if (!::isspace(text[i])) {
+            break;
+        }
+    }
+
+    if (i == 0) {
+        return text;
+    }
+
+    if (i == length) {
+        return String();
+    }
+
+    return text.substr(i);
 }
 
 /// \brief Удаление пробельных символов в конце строки.
-std::wstring PLUSIRBIS_EXPORTS trimEnd(const std::wstring &text)
+/// \param text Текст для обработки.
+/// \return Обработанный текст.
+String PLUSIRBIS_EXPORTS trimEnd(const String &text)
 {
-    // TODO implement
-    return text;
+    auto length = text.length();
+    auto i = static_cast<ptrdiff_t >(length - 1);
+    for (; i >= 0; --i) {
+        if (!::isspace(text[i])) {
+            break;
+        }
+    }
+
+    if (i == static_cast<ptrdiff_t>(length - 1)) {
+        return text;
+    }
+
+    if (i < 0) {
+        return String();
+    }
+
+    return text.substr(0, i + 1);
 }
 
 /// \brief Удаление пробельных символов в начале и в конце строки.
-std::wstring trim(const std::wstring &text)
+/// \param text Текст для обработки.
+/// \return Обработанный текст.
+String trim(const String &text)
 {
-    // TODO implement
-    return text;
+    auto length = static_cast<ptrdiff_t>(text.length());
+    ptrdiff_t start = 0, end = static_cast<ptrdiff_t>(length - 1);
+    for (; start < length; ++start) {
+        if (!::isspace(text[start])) {
+            break;
+        }
+    }
+
+    for (; end >= 0; --end) {
+        if (!::isspace(text[end])) {
+            break;
+        }
+    }
+
+    if (end - start <= 0) {
+        return String ();
+    }
+
+    if (end - start == length - 1) {
+        return text;
+    }
+
+    return text.substr(start, end - start + 1);
 }
 
 /// \brief Выдаёт текстовое описание ошибки по её коду.
-std::wstring describeError(int errorCode)
+/// \param errorCode Код ошибки, полученный из Connection::lastError.
+/// \return Текстовое описание проблемы.
+String describeError(int errorCode)
 {
     if (errorCode >= 0) {
         return L"Нет ошибки";

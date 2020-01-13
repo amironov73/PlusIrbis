@@ -12,6 +12,17 @@
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
+/*!
+
+    \class irbis::RecordField
+
+    В большинстве случаев метки поля попадают в диапазон от 1 до 999,
+    но на практике могут оказаться любым натуральным числом в диапазоне
+    от 1 до 2 147 483 647‬.
+
+ */
+
+
 namespace irbis {
 
 RecordField& RecordField::add(Char subFieldCode, const String &subFieldValue)

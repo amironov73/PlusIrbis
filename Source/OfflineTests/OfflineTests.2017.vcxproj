@@ -59,8 +59,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DateTest.cpp" />
     <ClCompile Include="EncodingTest.cpp" />
     <ClCompile Include="FormatTest.cpp" />
+    <ClCompile Include="IrbisTest.cpp" />
     <ClCompile Include="MarcRecordTest.cpp" />
     <ClCompile Include="RecordFieldTest.cpp" />
     <ClCompile Include="ResultTest.cpp" />

@@ -7,7 +7,7 @@
 
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 
-#include <chrono>
+#include <ctime>
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
@@ -97,6 +97,7 @@ class ClientSocket;
 class Connection;
 class ConnectionFactory;
 class DatabaseInfo;
+class Date;
 class DirectAccess64;
 class EmbeddedField;
 class Encoding;
@@ -111,7 +112,6 @@ class IlfFile;
 class IniFile;
 class IniLine;
 class IniSection;
-class IrbisDate;
 class IrbisException;
 class IrbisText;
 class Iso2709;
@@ -520,7 +520,7 @@ public:
     /// \return Результат разбора.
     ///
     /// \warning Мусор на входе -- мусор на выходе!
-    PLUSIRBIS_EXPORTS int32_t parseInt32() const noexcept
+    int32_t parseInt32() const noexcept
     {
         int32_t result = 0;
         auto p = this->cbegin(), e = this->cend();
@@ -536,7 +536,7 @@ public:
     /// \return Результат разбора.
     ///
     /// \warning Мусор на входе -- мусор на выходе!
-    PLUSIRBIS_EXPORTS int64_t parseInt64() const noexcept
+    int64_t parseInt64() const noexcept
     {
         int64_t result = 0;
         auto p = this->cbegin(), e = this->cend();
@@ -548,16 +548,16 @@ public:
         return result;
     }
 
-    /// \brief Дамп спана в некий поток.
-    /// \param stream Поток для вывода.
-    void dump(std::ostream & stream) const
-    {
-        stream << "Size: " << this->size() << std::endl;
-        for (const auto &item : *this) {
-            stream << item << " ";
-        }
-        stream << std::endl;
-    }
+//    /// \brief Дамп спана в некий поток.
+//    /// \param stream Поток для вывода.
+//    void dump(std::ostream & stream) const
+//    {
+//        stream << "Size: " << this->size() << std::endl;
+//        for (const auto &item : *this) {
+//            stream << item << " ";
+//        }
+//        stream << std::endl;
+//    }
 };
 
 using CSpan = Span<char>;
@@ -1049,23 +1049,29 @@ public:
 
 //=========================================================
 
+/// \brief Спецификация имени файла.
 class PLUSIRBIS_EXPORTS FileSpecification final
 {
 public:
-    bool binaryFile { false };
-    int path { 0 };
-    String database;
-    String filename;
-    String content;
+    bool binaryFile { false }; ///< Признак двоичного файла.
+    int path { 0 };            ///< Код пути.
+    String database;           ///< Имя базы данных (если необходимо).
+    String filename;           ///< Имя файла (обязательно).
+    String content;            ///< Содержимое файла (если необходимо).
 
-    FileSpecification() = default;
+    FileSpecification() = default; ///< Конструктор по умолчанию.
     FileSpecification(int path, const String &filename);
     FileSpecification(int path, const String &database, const String &filename);
+    FileSpecification(const FileSpecification &other) = default; ///< Конструктор копирования.
+    FileSpecification(FileSpecification &&other) = default; ///< Конструктор перемещения.
+    FileSpecification& operator = (const FileSpecification &other); ///< Оператор копирования.
+    FileSpecification& operator = (FileSpecification &&other); ///< Оператор перемещения.
+    ~FileSpecification() = default; ///< Деструктор.
 
-    static FileSpecification parse(const std::wstring &text);
+    static FileSpecification parse(const String &text);
     bool verify(bool throwException) const;
 
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================
@@ -1164,54 +1170,61 @@ public:
 
 //=========================================================
 
+/// \brief Запись в ILF-файле. Хранит информацию об одном ресурсе.
 class PLUSIRBIS_EXPORTS IlfEntry final
 {
 public:
-    String date;
-    String name;
-    String description;
-    String data;
-    int position { 0 };
-    int number { 0 };
-    int dataLength { 0 };
-    short flags { 0 };
-    bool deleted { false };
+    String date;               ///< Дата создания.
+    String name;               ///< Имя ресурса.
+    String description;        ///< Описание в произвольной форме.
+    String data;               ///< Собственно данные.
+    uint32_t position { 0 };   ///< Смещение данных от начала файла, байты.
+    uint32_t number { 0 };     ///< Порядковый номер ресурса.
+    uint32_t dataLength { 0 }; ///< Длина данных в байтах.
+    short flags { 0 };         ///< Флаги.
+    bool deleted { false };    ///< Признак удаленной записи.
 };
 
 //=========================================================
 
+/// \brief Обертка над ILF-файлом.
 class PLUSIRBIS_EXPORTS IlfFile final
 {
 public:
-    const static std::string MagicString;
+    const static std::string MagicString; ///< Магическая строка в заголовке файла.
 
-    std::vector<IlfEntry> entries;
-    int unknown1 { 0 };
-    int slotCount { 0 };
-    int entryCount { 0 };
-    int writeCount { 0 };
-    int deleteCount { 0 };
-
-    IlfFile();
+    std::vector<IlfEntry> entries; ///< Вектор записей.
+    uint32_t unknown1 { 0 };       ///< Неизвестно.
+    uint32_t slotCount { 0 };      ///< Количество слотов для хранения записей.
+    uint32_t entryCount { 0 };     ///< Количество записей.
+    uint32_t writeCount { 0 };     ///< Количество модификаций записей.
+    uint32_t deleteCount { 0 };    ///< Количество удаленных записей.
 
     void readLocalFile(const String &fileName);
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS IrbisDate final
+/// \brief Специфичная для ИРБИС дата.
+class PLUSIRBIS_EXPORTS Date final
 {
 public:
-    String text;
-    std::chrono::system_clock::time_point date;
+    String text;    ///< Текстовое представление в формате YYYYMMDD.
+    struct tm date; ///< Разбиение даты на компоненты.
 
-    explicit IrbisDate(const std::wstring &text);
-    explicit IrbisDate(std::chrono::system_clock::time_point date);
+    Date() = default;                               ///< Конструктор перемещения.
+    Date(int year, int month, int day);
+    explicit Date(const String &text_);
+    explicit Date(const struct tm *date_);
+    Date(const Date &other) = default;              ///< Конструктор копирования.
+    Date(Date &&other) = default;                   ///< Конструктор перемещения.
+    Date& operator = (const Date &other) = default; ///< Оператор копирования.
+    Date& operator = (Date &&other) = default;      ///< Оператор перемещения.
+    ~Date() = default;                              ///< Деструктор.
 
-    static std::chrono::system_clock::time_point convert(const std::wstring &text);
-    static std::wstring convert(const std::chrono::system_clock::time_point &date);
-    static std::wstring today();
-    static IrbisDate* safeParse(const std::wstring &text);
+    static String convert(const struct tm *date);
+    static bool parse(const String &text, struct tm *date);
+    static Date today();
 };
 
 //=========================================================
@@ -1268,21 +1281,22 @@ public:
 
 //=========================================================
 
+/// \brief Библиографическая запись. Состоит из произвольного количества полей.
 class PLUSIRBIS_EXPORTS MarcRecord final
 {
 public:
-    Mfn mfn { 0u };
-    Flag status { 0u };
-    unsigned int version { 0u };
-    String database;
-    std::list<RecordField> fields;
+    Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
+    Flag status { 0u };            ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };   ///< Номер версии записи.
+    String database;               ///< Имя базы данных.
+    std::list<RecordField> fields; ///< Список полей.
 
-    MarcRecord() = default;
-    MarcRecord(const MarcRecord &other) = default;
-    MarcRecord(MarcRecord &&other) = default;
-    MarcRecord& operator = (const MarcRecord &other) = default;
-    MarcRecord& operator = (MarcRecord &&other) = default;
-    ~MarcRecord() = default;
+    MarcRecord() = default;                                     ///< Конструктор по умолчанию.
+    MarcRecord(const MarcRecord &other) = default;              ///< Конструктор копирования.
+    MarcRecord(MarcRecord &&other) = default;                   ///< Конструктор перемещения.
+    MarcRecord& operator = (const MarcRecord &other) = default; ///< Оператор копирования.
+    MarcRecord& operator = (MarcRecord &&other) = default;      ///< Оператор перемещения.
+    ~MarcRecord() = default;                                    ///< Деструктор.
 
     RecordField& add(int tag, const String &value);
     MarcRecord clone() const;
