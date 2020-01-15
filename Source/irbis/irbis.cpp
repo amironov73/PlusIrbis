@@ -291,6 +291,30 @@ int fastParse32(const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const CSpan text)
+{
+    auto result = 0;
+    const size_t length = text.length;
+    for (size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text[offset] - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+int fastParse32(const WSpan text)
+{
+    auto result = 0;
+    const size_t length = text.length;
+    for (size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text[offset] - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
 unsigned int fastParseUnsigned32(const String &text)
 {
     auto result = 0u;

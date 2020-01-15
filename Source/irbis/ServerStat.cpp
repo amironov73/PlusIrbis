@@ -10,9 +10,19 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
+/*!
+    \class irbis::ServerStat
+
+    \details Содержит информацию о клиентах,
+        подключенных к серверу в данный момент.
+
+    \note Неперемещаемый класс.
+ */
+
 namespace irbis {
 
 /// \brief Разбор ответа сервера.
+/// \param response Ответ сервера.
 void ServerStat::parse(ServerResponse &response)
 {
     this->totalCommandCount = response.readInteger();
@@ -23,7 +33,8 @@ void ServerStat::parse(ServerResponse &response)
     }
 
     for (auto i = 0; i < this->clientCount; i++) {
-        ClientInfo client;
+        this->runningClients.emplace_back();
+        auto client = this->runningClients.back();
         client.number = response.readAnsi();
         client.ipAddress = response.readAnsi();
         client.port = response.readAnsi();
@@ -34,8 +45,6 @@ void ServerStat::parse(ServerResponse &response)
         client.acknowledged = response.readAnsi();
         client.lastCommand = response.readAnsi();
         client.commandNumber = response.readAnsi();
-
-        this->runningClients.push_back(client);
     }
 }
 

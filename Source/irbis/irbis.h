@@ -224,9 +224,9 @@ public:
     T *ptr;              ///< Указатель на начала куска.
     size_t length { 0 }; ///< Длина куска в элементах.
 
-    Span() = default;
-    Span(T *ptr_, size_t length_) : ptr(ptr_), length(length_) {}
-    Span(const T *ptr_, size_t length_) : ptr(const_cast<T*>(ptr_)), length(length_) {}
+    Span() = default; ///< Конструктор по умолчанию.
+    Span(T *ptr_, size_t length_) noexcept : ptr(ptr_), length(length_) {}
+    Span(const T *ptr_, size_t length_) noexcept : ptr(const_cast<T*>(ptr_)), length(length_) {}
     Span(const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
     Span(const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
 
@@ -1661,8 +1661,6 @@ enum RecordStatus : unsigned int
 /// \brief Построитель запросов.
 class PLUSIRBIS_EXPORTS Search final
 {
-    String _buffer;
-
 public:
     static Search all();
     Search& and_(const String &text);
@@ -1688,6 +1686,9 @@ public:
     String toString() const noexcept;
     static String wrap(const String &text);
     static String wrap(const Search &item);
+
+private:
+    String _buffer;
 };
 
 Search keyword(const String &value1);
@@ -1713,11 +1714,11 @@ class PLUSIRBIS_EXPORTS SearchParameters final
 public:
     String searchExpression;        ///< Выражение для поиска по словарю.
     String database;                ///< Имя базы данных.
-    int32_t firstRecord { 1 };      ///< Индекс первой требуемой записи.
+    Mfn firstRecord { 1 };          ///< Индекс первой требуемой записи.
     String formatSpecification;     ///< Формат для расформатирования записей.
-    int32_t maxMfn { 0 };           ///< Максимальный MFN.
-    int32_t minMfn { 0 };           ///< Минимальный MFN.
-    int32_t numberOfRecords { 0 };  ///< Общее число требуемых записей.
+    Mfn maxMfn { 0 };               ///< Максимальный MFN.
+    Mfn minMfn { 0 };               ///< Минимальный MFN.
+    Mfn numberOfRecords { 0 };      ///< Общее число требуемых записей.
     String sequentialSpecification; ///< Выражение для последовательного поиска.
     String filterSpecification;     ///< Выражение для локальной фильтрации.
 };
@@ -1747,12 +1748,6 @@ public:
 /// \brief Ответ сервера на клиентский запрос.
 class PLUSIRBIS_EXPORTS ServerResponse final
 {
-    Connection *_connection;
-    bool _success;
-    size_t _position;
-    Bytes _content;
-    void _write(const Byte *bytes, size_t size);
-
 public:
     String command;       ///< Код команды (дублирует клиентский запрос).
     int clientId;         ///< Идентификатор клиента (дублирует клиентский запрос).
@@ -1783,6 +1778,13 @@ public:
     StringList readRemainingUtfLines();
     String readRemainingUtfText();
     String readUtf();
+
+private:
+    Connection *_connection;
+    bool _success;
+    size_t _position;
+    Bytes _content;
+    void _write(const Byte *bytes, size_t size);
 };
 
 //=========================================================
@@ -1889,54 +1891,61 @@ public:
 
 //=========================================================
 
+/// \brief Параметры извлечения терминов из поискового словаря.
 class PLUSIRBIS_EXPORTS TermParameters final
 {
 public:
-    String database;
-    int numberOfTerms { 0 };
-    bool reverseOrder { false };
-    String startTerm;
-    String format;
+    String database;              ///< Имя базы данных.
+    Mfn numberOfTerms { 0 };      ///< Количество извлекаемых терминов.
+    bool reverseOrder { false };  ///< Выдавать термины в обратном порядке?
+    String startTerm;             ///< Стартовый термин.
+    String format;                ///< Спецификация формата (опционально).
 };
 
 //=========================================================
 
+/// \brief Постинг термина.
 class PLUSIRBIS_EXPORTS TermPosting final
 {
 public:
-    int mfn { 0 };
-    int tag { 0 };
-    int occurrence { 0 };
-    int count { 0 };
+    Mfn mfn { 0 };
+    Mfn tag { 0 };
+    Mfn occurrence { 0 };
+    Mfn count { 0 };
     String text;
 
     static std::vector<TermPosting> parse(const StringList &lines);
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================
 
+/// \brief Навигация по тексту.
 class PLUSIRBIS_EXPORTS TextNavigator final
 {
-private:
-    std::size_t _column, _length, _line, _position;
-    const String &_text;
-
 public:
     const static Char EOT;
 
-    explicit TextNavigator(const String &text);
-    TextNavigator(const TextNavigator &other);
+    TextNavigator(const Char* text, std::size_t length) noexcept;
+    TextNavigator(WSpan text) noexcept;
+    TextNavigator(const String &text) noexcept;
+    TextNavigator(const TextNavigator &other) noexcept;
     TextNavigator(TextNavigator&&) = delete;
     TextNavigator& operator = (const TextNavigator &) = delete;
     TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
 
-    inline std::size_t column()   const noexcept { return this->_column; }
-    inline std::size_t line()     const noexcept { return this->_line; }
-    inline std::size_t length()   const noexcept { return this->_length; }
-    inline std::size_t position() const noexcept { return this->_position; }
-    inline bool eot() const noexcept { return this->_position >= this->_length; }
+    std::size_t column()   const noexcept;
+    std::size_t line()     const noexcept;
+    std::size_t length()   const noexcept;
+    std::size_t position() const noexcept;
+    Char* begin()          const noexcept;
+    const Char* cbegin()   const noexcept;
+    Char* current()        const noexcept;
+    const Char* ccurrent() const noexcept;
+    Char* end()            const noexcept;
+    const Char* cend()     const noexcept;
+    bool eot() const noexcept;
 
     Char at(std::size_t position) const noexcept;
     Char front() const noexcept;
@@ -1946,25 +1955,29 @@ public:
     TextNavigator& move(std::ptrdiff_t distance) noexcept;
     Char peekChar() const noexcept;
     Char readChar() noexcept;
-    String peekString(std::size_t length);
-    String peekTo(Char stopChar);
-    String peekUntil(Char stopChar);
-    String readLine();
+    WSpan peekString(std::size_t length) const noexcept;
+    WSpan peekTo(Char stopChar) const noexcept;
+    WSpan peekUntil(Char stopChar) const noexcept;
+    WSpan readLine() noexcept;
     bool isControl() const noexcept;
     bool isDigit() const noexcept;
     bool isLetter() const noexcept;
     bool isWhitespace() const noexcept;
-    String readInteger();
-    String readString(std::size_t length);
-    String readTo(Char stopChar);
-    String readUntil(Char stopChar);
-    String readWhile(Char goodChar);
-    String readWord();
-    String recentText(std::ptrdiff_t length) const;
-    String remainingText() const;
-    TextNavigator& skipWhitespace();
-    TextNavigator& skipPunctuation();
-    String substr(std::size_t offset, std::size_t length) const;
+    WSpan readInteger() noexcept;
+    WSpan readString(std::size_t length) noexcept;
+    WSpan readTo(Char stopChar) noexcept;
+    WSpan readUntil(Char stopChar) noexcept;
+    WSpan readWhile(Char goodChar) noexcept;
+    WSpan readWord() noexcept;
+    WSpan recentText(std::ptrdiff_t length) const noexcept;
+    WSpan remainingText() const noexcept;
+    TextNavigator& skipWhitespace() noexcept;
+    TextNavigator& skipPunctuation() noexcept;
+    WSpan substr(std::size_t offset, std::size_t length) const noexcept;
+
+private:
+    std::size_t _column, _length, _line, _position;
+    const Char *_text;
 };
 
 //=========================================================
@@ -2115,6 +2128,8 @@ PLUSIRBIS_EXPORTS String trim(const String &text);
 PLUSIRBIS_EXPORTS String describeError(int errorCode);
 
 PLUSIRBIS_EXPORTS int fastParse32(const String &text);
+PLUSIRBIS_EXPORTS int fastParse32(CSpan text);
+PLUSIRBIS_EXPORTS int fastParse32(WSpan text);
 PLUSIRBIS_EXPORTS int fastParse32(const Char *text);
 PLUSIRBIS_EXPORTS int fastParse32(const Char *text, size_t length);
 PLUSIRBIS_EXPORTS int fastParse32(const std::string &text);

@@ -54,9 +54,8 @@ FileSpecification FileSpecification::parse(const String &text)
 {
     TextNavigator navigator(text);
     const auto path = fastParse32(navigator.readTo('.'));
-
-    const auto database = navigator.readTo('.');
-    auto fileName = navigator.remainingText();
+    const auto database = navigator.readTo('.').toString();
+    auto fileName = navigator.remainingText().toString();
     const auto binaryFile = fileName[0] == L'@';
     if (binaryFile) {
         fileName = fileName.substr(1);

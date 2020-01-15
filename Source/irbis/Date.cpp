@@ -43,10 +43,8 @@ Date::Date(const struct tm *date_)
 /// \return Текстовое представление даты.
 String Date::convert(const struct tm *date)
 {
-    auto t1 = std::time(nullptr);
-    auto t2 = std::localtime(&t1);
     Char buf[10];
-    std::wcsftime(buf, sizeof(buf)/ sizeof(buf[0]), L"%Y%m%d", t2);
+    std::wcsftime(buf, sizeof(buf)/ sizeof(buf[0]), L"%Y%m%d", date);
     return String(buf);
 }
 
