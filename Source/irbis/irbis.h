@@ -221,10 +221,10 @@ template<class T>
 class Span final
 {
 public:
-    T *ptr;              ///< Указатель на начала куска.
+    T *ptr { nullptr };  ///< Указатель на начала куска.
     size_t length { 0 }; ///< Длина куска в элементах.
 
-    Span() = default; ///< Конструктор по умолчанию.
+    Span() : ptr(nullptr), length(0) {}; ///< Конструктор по умолчанию.
     Span(T *ptr_, size_t length_) noexcept : ptr(ptr_), length(length_) {}
     Span(const T *ptr_, size_t length_) noexcept : ptr(const_cast<T*>(ptr_)), length(length_) {}
     Span(const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
@@ -269,9 +269,9 @@ public:
     /// \brief Содержит ли спан указанный элемент.
     /// \param val Искомое значение.
     /// \return `true` если содержит.
-    bool contains(const T &val) const
+    bool contains(const T val) const noexcept
     {
-        for(const auto &item : *this) {
+        for(const auto item : *this) {
             if (item == val) {
                 return true;
             }
@@ -282,7 +282,7 @@ public:
     /// \brief Заполнение спана указанным значением.
     /// \param val Значение для заполнения.
     /// \return this.
-    Span<T>& fill(const T &val) noexcept
+    Span<T>& fill(const T val) noexcept
     {
         for(size_t ofs = 0; ofs < this->length; ++ofs) {
             this->ptr[ofs] = val;
@@ -294,7 +294,7 @@ public:
     /// \param val Искомое значение.
     /// \return Индекс первого вхождения найденного элемента,
     /// либо отрицательное значение.
-    ptrdiff_t indexOf(const T &val) const
+    ptrdiff_t indexOf(const T val) const noexcept
     {
         for (size_t i = 0; i < this->length; ++i) {
             if (this->ptr[i] == val) {
@@ -308,7 +308,7 @@ public:
     /// \param val Искомое значение.
     /// \return Индекс последнего вхождения найденного элемента,
     /// либо отрицательное значение.
-    ptrdiff_t lastIndexOf(const T &val) const
+    ptrdiff_t lastIndexOf(const T val) const noexcept
     {
         for (ptrdiff_t i = static_cast<ptrdiff_t>(this->length - 1); i >= 0; --i) {
             if (this->ptr[i] == val) {
@@ -383,7 +383,7 @@ public:
     /// \brief Совпадает ли начало спана с другим спаном?
     /// \param prefix Префикс.
     /// \return `true` если совпадает.
-    bool startsWith(const Span<T> prefix) const
+    bool startsWith(const Span<T> prefix) const noexcept
     {
         if (prefix.size() > this->size()) {
             return false;
@@ -405,7 +405,7 @@ public:
     /// \brief Совпадает ли конец спана с другим спаном?
     /// \param suffix Суффикс.
     /// \return `true` если совпадает.
-    bool endsWith(const Span<T> suffix) const
+    bool endsWith(const Span<T> suffix) const noexcept
     {
         if (suffix.size() > this->size()) {
             return false;
@@ -547,35 +547,132 @@ public:
 
         return result;
     }
-
-//    /// \brief Дамп спана в некий поток.
-//    /// \param stream Поток для вывода.
-//    void dump(std::ostream & stream) const
-//    {
-//        stream << "Size: " << this->size() << std::endl;
-//        for (const auto &item : *this) {
-//            stream << item << " ";
-//        }
-//        stream << std::endl;
-//    }
 };
 
-using CSpan = Span<char>;
-using WSpan = Span<Char>;
-using BSpan = Span<Byte>;
+template <class T>
+inline bool operator == (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) == 0;
+}
 
-PLUSIRBIS_EXPORTS bool sameString(CSpan first, CSpan second);
-PLUSIRBIS_EXPORTS bool sameString(WSpan first, WSpan second);
-PLUSIRBIS_EXPORTS CSpan trimStart(CSpan text);
-PLUSIRBIS_EXPORTS WSpan trimStart(WSpan text);
-PLUSIRBIS_EXPORTS CSpan trimEnd(CSpan text);
-PLUSIRBIS_EXPORTS WSpan trimEnd(WSpan text);
-PLUSIRBIS_EXPORTS CSpan trim(CSpan text);
-PLUSIRBIS_EXPORTS WSpan trim(WSpan text);
-PLUSIRBIS_EXPORTS CSpan toupper(CSpan text);
-PLUSIRBIS_EXPORTS WSpan toupper(WSpan text);
-PLUSIRBIS_EXPORTS CSpan tolower(CSpan text);
-PLUSIRBIS_EXPORTS WSpan tolower(WSpan text);
+template <class T>
+inline bool operator == (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) == 0;
+}
+
+template <class T>
+inline bool operator == (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) == 0;
+}
+
+template <class T>
+inline bool operator != (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) != 0;
+}
+
+template <class T>
+inline bool operator != (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) != 0;
+}
+
+template <class T>
+inline bool operator != (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) != 0;
+}
+
+template <class T>
+inline bool operator < (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) < 0;
+}
+
+template <class T>
+inline bool operator < (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) < 0;
+}
+
+template <class T>
+inline bool operator < (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) < 0;
+}
+
+template <class T>
+inline bool operator <= (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) <= 0;
+}
+
+template <class T>
+inline bool operator <= (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) <= 0;
+}
+
+template <class T>
+inline bool operator <= (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) <= 0;
+}
+
+template <class T>
+inline bool operator > (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) > 0;
+}
+
+template <class T>
+inline bool operator > (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) > 0;
+}
+
+template <class T>
+inline bool operator > (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) > 0;
+}
+
+template <class T>
+inline bool operator >= (const Span<T> left, const Span<T> right)
+{
+    return left.compare(right) >= 0;
+}
+
+template <class T>
+inline bool operator >= (const Span<T> left, const std::basic_string<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) >= 0;
+}
+
+template <class T>
+inline bool operator >= (const Span<T> left, const std::vector<T> &right)
+{
+    return left.compare(Span<T>(right.data(), right.size())) >= 0;
+}
+
+using CharSpan = Span<char>;
+using WideSpan = Span<Char>;
+using ByteSpan = Span<Byte>;
+
+PLUSIRBIS_EXPORTS bool sameString(CharSpan first, CharSpan second);
+PLUSIRBIS_EXPORTS bool sameString(WideSpan first, WideSpan second);
+PLUSIRBIS_EXPORTS CharSpan trimStart(CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trimStart(WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan trimEnd(CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trimEnd(WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan trim(CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trim(WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan toupper(CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan toupper(WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan tolower(CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan tolower(WideSpan text);
 
 //=========================================================
 
@@ -1927,7 +2024,7 @@ public:
     const static Char EOT;
 
     TextNavigator(const Char* text, std::size_t length) noexcept;
-    TextNavigator(WSpan text) noexcept;
+    TextNavigator(WideSpan text) noexcept;
     TextNavigator(const String &text) noexcept;
     TextNavigator(const TextNavigator &other) noexcept;
     TextNavigator(TextNavigator&&) = delete;
@@ -1955,25 +2052,25 @@ public:
     TextNavigator& move(std::ptrdiff_t distance) noexcept;
     Char peekChar() const noexcept;
     Char readChar() noexcept;
-    WSpan peekString(std::size_t length) const noexcept;
-    WSpan peekTo(Char stopChar) const noexcept;
-    WSpan peekUntil(Char stopChar) const noexcept;
-    WSpan readLine() noexcept;
+    WideSpan peekString(std::size_t length) const noexcept;
+    WideSpan peekTo(Char stopChar) const noexcept;
+    WideSpan peekUntil(Char stopChar) const noexcept;
+    WideSpan readLine() noexcept;
     bool isControl() const noexcept;
     bool isDigit() const noexcept;
     bool isLetter() const noexcept;
     bool isWhitespace() const noexcept;
-    WSpan readInteger() noexcept;
-    WSpan readString(std::size_t length) noexcept;
-    WSpan readTo(Char stopChar) noexcept;
-    WSpan readUntil(Char stopChar) noexcept;
-    WSpan readWhile(Char goodChar) noexcept;
-    WSpan readWord() noexcept;
-    WSpan recentText(std::ptrdiff_t length) const noexcept;
-    WSpan remainingText() const noexcept;
+    WideSpan readInteger() noexcept;
+    WideSpan readString(std::size_t length) noexcept;
+    WideSpan readTo(Char stopChar) noexcept;
+    WideSpan readUntil(Char stopChar) noexcept;
+    WideSpan readWhile(Char goodChar) noexcept;
+    WideSpan readWord() noexcept;
+    WideSpan recentText(std::ptrdiff_t length) const noexcept;
+    WideSpan remainingText() const noexcept;
     TextNavigator& skipWhitespace() noexcept;
     TextNavigator& skipPunctuation() noexcept;
-    WSpan substr(std::size_t offset, std::size_t length) const noexcept;
+    WideSpan substr(std::size_t offset, std::size_t length) const noexcept;
 
 private:
     std::size_t _column, _length, _line, _position;
@@ -2128,8 +2225,8 @@ PLUSIRBIS_EXPORTS String trim(const String &text);
 PLUSIRBIS_EXPORTS String describeError(int errorCode);
 
 PLUSIRBIS_EXPORTS int fastParse32(const String &text);
-PLUSIRBIS_EXPORTS int fastParse32(CSpan text);
-PLUSIRBIS_EXPORTS int fastParse32(WSpan text);
+PLUSIRBIS_EXPORTS int fastParse32(CharSpan text);
+PLUSIRBIS_EXPORTS int fastParse32(WideSpan text);
 PLUSIRBIS_EXPORTS int fastParse32(const Char *text);
 PLUSIRBIS_EXPORTS int fastParse32(const Char *text, size_t length);
 PLUSIRBIS_EXPORTS int fastParse32(const std::string &text);

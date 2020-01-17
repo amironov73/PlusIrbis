@@ -27,7 +27,7 @@ namespace irbis {
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-bool sameString(CSpan first, CSpan second)
+bool sameString(CharSpan first, CharSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
@@ -44,7 +44,7 @@ bool sameString(CSpan first, CSpan second)
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-bool sameString(WSpan first, WSpan second)
+bool sameString(WideSpan first, WideSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
@@ -63,7 +63,7 @@ bool sameString(WSpan first, WSpan second)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CSpan trimStart(CSpan text)
+CharSpan trimStart(CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -72,7 +72,7 @@ CSpan trimStart(CSpan text)
         }
         ++p1;
     }
-    return CSpan (const_cast<char*>(p1), e1 - p1);
+    return CharSpan (const_cast<char*>(p1), e1 - p1);
 }
 
 /// \brief Удаление пробельных элементов из начала спана.
@@ -80,7 +80,7 @@ CSpan trimStart(CSpan text)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WSpan trimStart(WSpan text)
+WideSpan trimStart(WideSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -89,7 +89,7 @@ WSpan trimStart(WSpan text)
         }
         ++p1;
     }
-    return WSpan (const_cast<Char*>(p1), e1 - p1);
+    return WideSpan (const_cast<Char*>(p1), e1 - p1);
 }
 
 /// \brief Удаление пробельных элементов из конца спана.
@@ -97,7 +97,7 @@ WSpan trimStart(WSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CSpan trimEnd(CSpan text)
+CharSpan trimEnd(CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -106,7 +106,7 @@ CSpan trimEnd(CSpan text)
         }
         --e1;
     }
-    return CSpan (const_cast<char*>(p1), e1 - p1 + 1);
+    return CharSpan (const_cast<char*>(p1), e1 - p1 + 1);
 }
 
 /// \brief Удаление пробельных элементов из конца спана.
@@ -114,7 +114,7 @@ CSpan trimEnd(CSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WSpan trimEnd(WSpan text)
+WideSpan trimEnd(WideSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -123,7 +123,7 @@ WSpan trimEnd(WSpan text)
         }
         --e1;
     }
-    return WSpan (const_cast<Char*>(p1), e1 - p1 + 1);
+    return WideSpan (const_cast<Char*>(p1), e1 - p1 + 1);
 }
 
 /// \brief Удаление пробельных элементов из начала и конца спана.
@@ -131,7 +131,7 @@ WSpan trimEnd(WSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CSpan trim(CSpan text)
+CharSpan trim(CharSpan text)
 {
     return trimStart(trimEnd(text));
 }
@@ -141,7 +141,7 @@ CSpan trim(CSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WSpan trim(WSpan text)
+WideSpan trim(WideSpan text)
 {
     return trimStart(trimEnd(text));
 }
@@ -149,7 +149,7 @@ WSpan trim(WSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CSpan toupper(CSpan text)
+CharSpan toupper(CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -162,7 +162,7 @@ CSpan toupper(CSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WSpan toupper(WSpan text)
+WideSpan toupper(WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -175,7 +175,7 @@ WSpan toupper(WSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CSpan tolower(CSpan text)
+CharSpan tolower(CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -188,7 +188,7 @@ CSpan tolower(CSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WSpan tolower(WSpan text)
+WideSpan tolower(WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {

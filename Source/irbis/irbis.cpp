@@ -291,7 +291,7 @@ int fastParse32(const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const CSpan text)
+int fastParse32(const CharSpan text)
 {
     auto result = 0;
     const size_t length = text.length;
@@ -303,7 +303,7 @@ int fastParse32(const CSpan text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const WSpan text)
+int fastParse32(const WideSpan text)
 {
     auto result = 0;
     const size_t length = text.length;

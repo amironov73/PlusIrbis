@@ -32,7 +32,7 @@ TextNavigator::TextNavigator(const Char* text, std::size_t length) noexcept
 }
 
 // \brief Конструктор.
-TextNavigator::TextNavigator(WSpan text) noexcept
+TextNavigator::TextNavigator(WideSpan text) noexcept
 {
     this->_text = text.data();
     this->_length = text.size();
@@ -195,9 +195,9 @@ Char TextNavigator::readChar() noexcept
 }
 
 /// \brief Подглядывание строки вплоть до указанной длины.
-WSpan TextNavigator::peekString(std::size_t length) const noexcept
+WideSpan TextNavigator::peekString(std::size_t length) const noexcept
 {
-    WSpan result ( this->_text + this->_position, 0);
+    WideSpan result (this->_text + this->_position, 0);
     if (this->eot()) {
         return result;
     }
@@ -214,9 +214,9 @@ WSpan TextNavigator::peekString(std::size_t length) const noexcept
 }
 
 /// \brief Подглядывание вплоть до указанного символа (включая его).
-WSpan TextNavigator::peekTo (Char stopChar) const noexcept
+WideSpan TextNavigator::peekTo (Char stopChar) const noexcept
 {
-    WSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->_text + this->_position, 0);
     const auto length = this->_length - this->_position;
     for (std::size_t i = 0; i < length; ++i) {
         const auto c = this->lookAhead(i);
@@ -230,9 +230,9 @@ WSpan TextNavigator::peekTo (Char stopChar) const noexcept
 }
 
 /// \brief Подглядывание вплоть до указанного символа (не включая его).
-WSpan TextNavigator::peekUntil(Char stopChar) const noexcept
+WideSpan TextNavigator::peekUntil(Char stopChar) const noexcept
 {
-    WSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->_text + this->_position, 0);
     const auto length = this->_length - this->_position;
     for (std::size_t i = 0; i < length; ++i) {
         const auto c = this->lookAhead(i);
@@ -246,9 +246,9 @@ WSpan TextNavigator::peekUntil(Char stopChar) const noexcept
 }
 
 /// \brief Считывание строки.
-WSpan TextNavigator::readLine() noexcept
+WideSpan TextNavigator::readLine() noexcept
 {
-    WSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->_text + this->_position, 0);
     if (this->eot()) {
         return result;
     }
@@ -307,9 +307,9 @@ bool TextNavigator::isWhitespace() const noexcept
     return std::iswspace(c);
 }
 
-WSpan TextNavigator::readInteger() noexcept
+WideSpan TextNavigator::readInteger() noexcept
 {
-    WSpan result { this->_text, 0 };
+    WideSpan result {this->_text, 0 };
 
     while (this->isDigit()) {
         ++result.length;
@@ -319,9 +319,9 @@ WSpan TextNavigator::readInteger() noexcept
     return result;
 }
 
-WSpan TextNavigator::readString(std::size_t length) noexcept
+WideSpan TextNavigator::readString(std::size_t length) noexcept
 {
-    WSpan result { this->_text + this->_position, 0 };
+    WideSpan result {this->_text + this->_position, 0 };
     if (this->eot()) {
         return result;
     }
@@ -338,9 +338,9 @@ WSpan TextNavigator::readString(std::size_t length) noexcept
     return result;
 }
 
-WSpan TextNavigator::readTo(Char stopChar) noexcept
+WideSpan TextNavigator::readTo(Char stopChar) noexcept
 {
-    WSpan result { this->_text + this->_position, 0 };
+    WideSpan result {this->_text + this->_position, 0 };
 
     if (this->eot()) {
         return result;
@@ -361,9 +361,9 @@ WSpan TextNavigator::readTo(Char stopChar) noexcept
     return result;
 }
 
-WSpan TextNavigator::readUntil(Char stopChar) noexcept
+WideSpan TextNavigator::readUntil(Char stopChar) noexcept
 {
-    WSpan result { this->_text + this->_position, 0 };
+    WideSpan result {this->_text + this->_position, 0 };
 
     if (this->eot()) {
         return result;
@@ -383,9 +383,9 @@ WSpan TextNavigator::readUntil(Char stopChar) noexcept
     return result;
 }
 
-WSpan TextNavigator::readWhile (Char goodChar) noexcept
+WideSpan TextNavigator::readWhile (Char goodChar) noexcept
 {
-    WSpan result { this->_text + this->_position, 0 };
+    WideSpan result {this->_text + this->_position, 0 };
 
     while (true) {
         const auto c = this->peekChar();
@@ -400,9 +400,9 @@ WSpan TextNavigator::readWhile (Char goodChar) noexcept
     return result;
 }
 
-WSpan TextNavigator::readWord() noexcept
+WideSpan TextNavigator::readWord() noexcept
 {
-    WSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->_text + this->_position, 0);
 
     while (true) {
         const auto c = this->peekChar();
@@ -417,16 +417,16 @@ WSpan TextNavigator::readWord() noexcept
     return result;
 }
 
-WSpan TextNavigator::remainingText() const noexcept
+WideSpan TextNavigator::remainingText() const noexcept
 {
     if (this->eot()) {
-        return WSpan (this->_text + this->_position, 0);
+        return WideSpan (this->_text + this->_position, 0);
     }
 
     return this->substr(this->_position, this->_length - this->_position);
 }
 
-WSpan TextNavigator::recentText (std::ptrdiff_t length) const noexcept
+WideSpan TextNavigator::recentText (std::ptrdiff_t length) const noexcept
 {
     std::ptrdiff_t start = this->_position - length;
     if (start < 0) {
@@ -472,7 +472,7 @@ TextNavigator& TextNavigator::skipPunctuation() noexcept
     return *this;
 }
 
-WSpan TextNavigator::substr (std::size_t offset, std::size_t length) const noexcept
+WideSpan TextNavigator::substr (std::size_t offset, std::size_t length) const noexcept
 {
     return {this->_text + offset, length };
 }

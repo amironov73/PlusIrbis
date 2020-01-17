@@ -19,7 +19,7 @@ namespace OfflineTests
         TEST_METHOD(constructor_2)
         {
             int numbers[] { 1, 2, 3 };
-            const Span<int> span(numbers, 3 );
+            const Span<int> span(numbers, 3);
             Assert::IsFalse(span.empty());
             Assert::IsTrue(3 == span.size());
         }
@@ -274,8 +274,8 @@ namespace OfflineTests
 
         TEST_METHOD(trimStart_1)
         {
-            const CSpan span = CSpan::fromString("  Hello!");
-            const CSpan trimmed = trimStart(span);
+            const CharSpan span = CharSpan::fromString("  Hello!");
+            const CharSpan trimmed = trimStart(span);
 
             Assert::IsTrue(trimmed[0] == 'H');
             Assert::IsTrue(trimmed.length == 6);
@@ -283,8 +283,8 @@ namespace OfflineTests
 
         TEST_METHOD(trimStart_2)
         {
-            const WSpan span = WSpan::fromString(L"  Hello!");
-            const WSpan trimmed = trimStart(span);
+            const WideSpan span = WideSpan::fromString(L"  Hello!");
+            const WideSpan trimmed = trimStart(span);
 
             Assert::IsTrue(trimmed[0] == L'H');
             Assert::IsTrue(trimmed.length == 6);
@@ -292,24 +292,24 @@ namespace OfflineTests
 
         TEST_METHOD(trimEnd_1)
         {
-            const CSpan span = CSpan::fromString("Hello!  ");
-            const CSpan trimmed = trimEnd(span);
+            const CharSpan span = CharSpan::fromString("Hello!  ");
+            const CharSpan trimmed = trimEnd(span);
 
             Assert::IsTrue(trimmed.length == 6);
         }
 
         TEST_METHOD(trimEnd_2)
         {
-            const WSpan span = WSpan::fromString(L"Hello!  ");
-            const WSpan trimmed = trimEnd(span);
+            const WideSpan span = WideSpan::fromString(L"Hello!  ");
+            const WideSpan trimmed = trimEnd(span);
 
             Assert::IsTrue(trimmed.length == 6);
         }
 
         TEST_METHOD(trim_1)
         {
-            const CSpan span = CSpan::fromString("  Hello!  ");
-            const CSpan trimmed = trim(span);
+            const CharSpan span = CharSpan::fromString("  Hello!  ");
+            const CharSpan trimmed = trim(span);
 
             Assert::IsTrue(trimmed[0] == 'H');
             Assert::IsTrue(trimmed.length == 6);
@@ -317,8 +317,8 @@ namespace OfflineTests
 
         TEST_METHOD(trim_2)
         {
-            const WSpan span = WSpan::fromString(L"  Hello!  ");
-            const WSpan trimmed = trim(span);
+            const WideSpan span = WideSpan::fromString(L"  Hello!  ");
+            const WideSpan trimmed = trim(span);
 
             Assert::IsTrue(trimmed[0] == L'H');
             Assert::IsTrue(trimmed.length == 6);
@@ -327,7 +327,7 @@ namespace OfflineTests
         TEST_METHOD(toupper_1)
         {
             char chars[] { 'H', 'e', 'l', 'l', 'o' };
-            const CSpan span(chars, sizeof(chars)/sizeof(chars[0]));
+            const CharSpan span(chars, sizeof(chars)/sizeof(chars[0]));
             toupper(span);
             Assert::IsTrue(chars[0] == 'H');
             Assert::IsTrue(chars[1] == 'E');
@@ -339,7 +339,7 @@ namespace OfflineTests
         TEST_METHOD(toupper_2)
         {
             Char chars[] { L'H', L'e', L'l', L'l', L'o' };
-            const WSpan span(chars, sizeof(chars)/sizeof(chars[0]));
+            const WideSpan span(chars, sizeof(chars)/sizeof(chars[0]));
             toupper(span);
             Assert::IsTrue(chars[0] == L'H');
             Assert::IsTrue(chars[1] == L'E');
@@ -351,7 +351,7 @@ namespace OfflineTests
         TEST_METHOD(tolower_1)
         {
             char chars[] { 'H', 'e', 'l', 'l', 'o' };
-            const CSpan span(chars, sizeof(chars)/sizeof(chars[0]));
+            const CharSpan span(chars, sizeof(chars)/sizeof(chars[0]));
             tolower(span);
             Assert::IsTrue(chars[0] == 'h');
             Assert::IsTrue(chars[1] == 'e');
@@ -363,7 +363,7 @@ namespace OfflineTests
         TEST_METHOD(tolower_2)
         {
             Char chars[] { L'H', L'e', L'l', L'l', L'o' };
-            const WSpan span(chars, sizeof(chars)/sizeof(chars[0]));
+            const WideSpan span(chars, sizeof(chars)/sizeof(chars[0]));
             tolower(span);
             Assert::IsTrue(chars[0] == L'h');
             Assert::IsTrue(chars[1] == L'e');
@@ -374,8 +374,8 @@ namespace OfflineTests
 
         TEST_METHOD(split_1)
         {
-            const CSpan span = CSpan::fromString("Hello,world,here");
-            std::vector<CSpan> parts = span.split(',');
+            const CharSpan span = CharSpan::fromString("Hello,world,here");
+            std::vector<CharSpan> parts = span.split(',');
             Assert::IsTrue(parts.size() == 3);
             Assert::IsTrue(parts[0].toString() == "Hello");
             Assert::IsTrue(parts[1].toString() == "world");
@@ -384,8 +384,8 @@ namespace OfflineTests
 
         TEST_METHOD(split_2)
         {
-            const WSpan span = WSpan::fromString(L"Hello,world,here");
-            std::vector<WSpan> parts = span.split(L',');
+            const WideSpan span = WideSpan::fromString(L"Hello,world,here");
+            std::vector<WideSpan> parts = span.split(L',');
             Assert::IsTrue(parts.size() == 3);
             Assert::IsTrue(parts[0].toString() == L"Hello");
             Assert::IsTrue(parts[1].toString() == L"world");
@@ -394,8 +394,8 @@ namespace OfflineTests
 
         TEST_METHOD(split_3)
         {
-            const CSpan span = CSpan::fromString("Hello,world,here");
-            std::vector<CSpan> parts = span.split(',', 2);
+            const CharSpan span = CharSpan::fromString("Hello,world,here");
+            std::vector<CharSpan> parts = span.split(',', 2);
             Assert::IsTrue(parts.size() == 2);
             Assert::IsTrue(parts[0].toString() == "Hello");
             Assert::IsTrue(parts[1].toString() == "world,here");
@@ -403,50 +403,50 @@ namespace OfflineTests
 
         TEST_METHOD(parseInt32_1)
         {
-            Assert::IsTrue(CSpan::fromString("").parseInt32() == 0);
-            Assert::IsTrue(CSpan::fromString("0").parseInt32() == 0);
-            Assert::IsTrue(CSpan::fromString("1").parseInt32() == 1);
-            Assert::IsTrue(CSpan::fromString("12").parseInt32() == 12);
-            Assert::IsTrue(CSpan::fromString("123").parseInt32() == 123);
-            Assert::IsTrue(CSpan::fromString("1234").parseInt32() == 1234);
-            Assert::IsTrue(CSpan::fromString("12345").parseInt32() == 12345);
-            Assert::IsTrue(CSpan::fromString("123456").parseInt32() == 123456);
+            Assert::IsTrue(CharSpan::fromString("").parseInt32() == 0);
+            Assert::IsTrue(CharSpan::fromString("0").parseInt32() == 0);
+            Assert::IsTrue(CharSpan::fromString("1").parseInt32() == 1);
+            Assert::IsTrue(CharSpan::fromString("12").parseInt32() == 12);
+            Assert::IsTrue(CharSpan::fromString("123").parseInt32() == 123);
+            Assert::IsTrue(CharSpan::fromString("1234").parseInt32() == 1234);
+            Assert::IsTrue(CharSpan::fromString("12345").parseInt32() == 12345);
+            Assert::IsTrue(CharSpan::fromString("123456").parseInt32() == 123456);
         }
 
         TEST_METHOD(parseInt32_2)
         {
-            Assert::IsTrue(WSpan::fromString(L"").parseInt32() == 0);
-            Assert::IsTrue(WSpan::fromString(L"0").parseInt32() == 0);
-            Assert::IsTrue(WSpan::fromString(L"1").parseInt32() == 1);
-            Assert::IsTrue(WSpan::fromString(L"12").parseInt32() == 12);
-            Assert::IsTrue(WSpan::fromString(L"123").parseInt32() == 123);
-            Assert::IsTrue(WSpan::fromString(L"1234").parseInt32() == 1234);
-            Assert::IsTrue(WSpan::fromString(L"12345").parseInt32() == 12345);
-            Assert::IsTrue(WSpan::fromString(L"123456").parseInt32() == 123456);
+            Assert::IsTrue(WideSpan::fromString(L"").parseInt32() == 0);
+            Assert::IsTrue(WideSpan::fromString(L"0").parseInt32() == 0);
+            Assert::IsTrue(WideSpan::fromString(L"1").parseInt32() == 1);
+            Assert::IsTrue(WideSpan::fromString(L"12").parseInt32() == 12);
+            Assert::IsTrue(WideSpan::fromString(L"123").parseInt32() == 123);
+            Assert::IsTrue(WideSpan::fromString(L"1234").parseInt32() == 1234);
+            Assert::IsTrue(WideSpan::fromString(L"12345").parseInt32() == 12345);
+            Assert::IsTrue(WideSpan::fromString(L"123456").parseInt32() == 123456);
         }
 
         TEST_METHOD(parseInt64_1)
         {
-            Assert::IsTrue(CSpan::fromString("").parseInt64() == 0);
-            Assert::IsTrue(CSpan::fromString("0").parseInt64() == 0);
-            Assert::IsTrue(CSpan::fromString("1").parseInt64() == 1);
-            Assert::IsTrue(CSpan::fromString("12").parseInt64() == 12);
-            Assert::IsTrue(CSpan::fromString("123").parseInt64() == 123);
-            Assert::IsTrue(CSpan::fromString("1234").parseInt64() == 1234);
-            Assert::IsTrue(CSpan::fromString("12345").parseInt64() == 12345);
-            Assert::IsTrue(CSpan::fromString("123456").parseInt64() == 123456);
+            Assert::IsTrue(CharSpan::fromString("").parseInt64() == 0);
+            Assert::IsTrue(CharSpan::fromString("0").parseInt64() == 0);
+            Assert::IsTrue(CharSpan::fromString("1").parseInt64() == 1);
+            Assert::IsTrue(CharSpan::fromString("12").parseInt64() == 12);
+            Assert::IsTrue(CharSpan::fromString("123").parseInt64() == 123);
+            Assert::IsTrue(CharSpan::fromString("1234").parseInt64() == 1234);
+            Assert::IsTrue(CharSpan::fromString("12345").parseInt64() == 12345);
+            Assert::IsTrue(CharSpan::fromString("123456").parseInt64() == 123456);
         }
 
         TEST_METHOD(parseInt64_2)
         {
-            Assert::IsTrue(WSpan::fromString(L"").parseInt64() == 0);
-            Assert::IsTrue(WSpan::fromString(L"0").parseInt64() == 0);
-            Assert::IsTrue(WSpan::fromString(L"1").parseInt64() == 1);
-            Assert::IsTrue(WSpan::fromString(L"12").parseInt64() == 12);
-            Assert::IsTrue(WSpan::fromString(L"123").parseInt64() == 123);
-            Assert::IsTrue(WSpan::fromString(L"1234").parseInt64() == 1234);
-            Assert::IsTrue(WSpan::fromString(L"12345").parseInt64() == 12345);
-            Assert::IsTrue(WSpan::fromString(L"123456").parseInt64() == 123456);
+            Assert::IsTrue(WideSpan::fromString(L"").parseInt64() == 0);
+            Assert::IsTrue(WideSpan::fromString(L"0").parseInt64() == 0);
+            Assert::IsTrue(WideSpan::fromString(L"1").parseInt64() == 1);
+            Assert::IsTrue(WideSpan::fromString(L"12").parseInt64() == 12);
+            Assert::IsTrue(WideSpan::fromString(L"123").parseInt64() == 123);
+            Assert::IsTrue(WideSpan::fromString(L"1234").parseInt64() == 1234);
+            Assert::IsTrue(WideSpan::fromString(L"12345").parseInt64() == 12345);
+            Assert::IsTrue(WideSpan::fromString(L"123456").parseInt64() == 123456);
         }
     };
 }
