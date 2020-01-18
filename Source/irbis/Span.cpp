@@ -57,7 +57,6 @@ bool sameString(WideSpan first, WideSpan second)
     return true;
 }
 
-
 /// \brief Удаление пробельных элементов из начала спана.
 /// \param text Проверяемый спан.
 /// \return Спан, из которого убраны начальные пробелы.

@@ -295,6 +295,7 @@
     <ClCompile Include="GblStatement.cpp" />
     <ClCompile Include="IlfFile.cpp" />
     <ClCompile Include="IniFile.cpp" />
+    <ClCompile Include="IO.cpp" />
     <ClCompile Include="irbis.cpp" />
     <ClCompile Include="IrbisText.cpp" />
     <ClCompile Include="Iso2709.cpp" />

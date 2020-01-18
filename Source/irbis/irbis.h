@@ -1306,8 +1306,8 @@ public:
 class PLUSIRBIS_EXPORTS Date final
 {
 public:
-    String text;    ///< Текстовое представление в формате YYYYMMDD.
-    struct tm date; ///< Разбиение даты на компоненты.
+    String text;          ///< Текстовое представление в формате YYYYMMDD.
+    struct tm date { 0 }; ///< Разбиение даты на компоненты.
 
     Date() = default;                               ///< Конструктор перемещения.
     Date(int year, int month, int day);
@@ -1322,6 +1322,21 @@ public:
     static String convert(const struct tm *date);
     static bool parse(const String &text, struct tm *date);
     static Date today();
+};
+
+//=========================================================
+
+/// \brief Утилиты для ввода-вывода.
+class PLUSIRBIS_EXPORTS IO final
+{
+public:
+
+    IO() = delete;
+
+    static bool readInt32 (FILE* file, uint32_t *value);
+    static bool readInt64 (FILE* file, uint64_t *value);
+    static bool writeInt32 (FILE* file, uint32_t value);
+    static bool writeInt64 (FILE* file, uint64_t value);
 };
 
 //=========================================================
