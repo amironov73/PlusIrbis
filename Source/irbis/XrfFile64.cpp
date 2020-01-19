@@ -17,34 +17,64 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
+/*!
+    \class irbis::XrfFile64
+
+    \details Файл перекрестных ссылок XRF представляет собой
+    таблицу ссылок на записи файла документов.
+
+    Нулевая ссылка соответствует записи файла документов
+    с номером 1, первая – 2  и т. д.
+
+    \warning Объекты данного типа -- неперемещаемые и некопируемые!
+
+ */
+
 namespace irbis {
 
-XrfFile64::XrfFile64(const std::wstring &fileName, DirectAccessMode mode)
+/// \brief Конструктор.
+/// \param fileName Имя файла.
+/// \param mode Режим доступа.
+XrfFile64::XrfFile64(const String &fileName, DirectAccessMode mode)
 {
-    throw NotImplementedException();
+    // TODO implement properly
+    auto ansiName = unicode_to_cp1251(fileName);
+    this->_file = fopen(ansiName.c_str(), "rb");
+    if (!this->_file) {
+        // TODO proper exception with message
+        throw IrbisException();
+    }
+    this->_fileName = fileName;
+    this->_mode = mode;
 }
 
+/// \brief Деструктор.
 XrfFile64::~XrfFile64()
 {
-    // TODO implement
+    if (this->_file) {
+        fclose(this->_file);
+        this->_file = nullptr;
+    }
 }
 
-unsigned long long int XrfFile64::getOffset(unsigned int mfn)
+Offset XrfFile64::getOffset(Mfn mfn) noexcept
 {
-    return static_cast<unsigned long long int>(XrfRecord64::RecordSize) * static_cast<unsigned long long int>(mfn - 1);
+    return static_cast<Offset>(XrfRecord64::RecordSize) * static_cast<Offset>(mfn - 1);
 }
 
-XrfRecord64 XrfFile64::readRecord(unsigned int mfn)
+XrfRecord64 XrfFile64::readRecord(Mfn mfn)
 {
-    // TODO lock
+    std::lock_guard<std::mutex> guard(this->_mutex);
 
-    const auto offset = getOffset(mfn);
-    // TODO handle truncation
-    fseek(this->_file, static_cast<long>(offset), SEEK_SET);
+    const auto offset = XrfFile64::getOffset(mfn);
+    // TODO handle the truncation
+    ::fseek(this->_file, static_cast<long>(offset), SEEK_SET);
     XrfRecord64 result;
     result.mfn = mfn;
-    //result.offset = read64bit(_stream);
-    //_stream >> result.status;
+    if (!IO::readInt64(this->_file, &result.offset)
+        || !IO::readInt32(this->_file, &result.status)) {
+        throw IrbisException();
+    }
 
     return result;
 }

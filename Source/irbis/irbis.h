@@ -169,6 +169,7 @@ using String = std::wstring;
 using Flag = std::uint32_t;
 using Mfn = std::uint32_t;
 using MfnList = std::vector<Mfn>;
+using Offset = std::uint64_t;
 using StringList = std::vector<String>;
 using SubFieldList = std::vector<SubField>;
 using RecordFieldList = std::vector<RecordField>;
@@ -2182,39 +2183,45 @@ public:
 
 //=========================================================
 
+/// \brief XRF-файл -- файл перекрестных ссылок.
 class PLUSIRBIS_EXPORTS XrfFile64 final
 {
-    std::wstring _fileName;
-    FILE *_file;
-
-    static unsigned long long int getOffset(unsigned int mfn);
-
 public:
 
-    XrfFile64(const std::wstring &fileName, DirectAccessMode mode);
+    XrfFile64(const String &fileName, DirectAccessMode mode);
     XrfFile64(const XrfFile64 &) = delete;
     XrfFile64(const XrfFile64 &&) = delete;
     XrfFile64& operator = (const XrfFile64 &) = delete;
     XrfFile64& operator = (const XrfFile64 &&) = delete;
     ~XrfFile64();
 
-    XrfRecord64 readRecord(unsigned int mfn);
+    XrfRecord64 readRecord(Mfn mfn);
+
+private:
+
+    String _fileName;
+    FILE *_file;
+    DirectAccessMode _mode;
+    std::mutex _mutex;
+
+    static Offset getOffset(Mfn mfn) noexcept;
 };
 
 //=========================================================
 
+/// \brief Запись в XRF-файле. Содержит смещение и флаги для записи в MST-файле.
 class PLUSIRBIS_EXPORTS XrfRecord64 final
 {
 public:
     const static int RecordSize;
 
-    unsigned int mfn { 0 };
-    long long offset { 0LL };
-    unsigned int status { 0 };
+    Mfn    mfn    { 0 }; ///< MFN записи.
+    Offset offset { 0 }; ///< Смещение записи в MST-файле.
+    Mfn    status { 0 }; ///< Статус записи (удалена, заблокирована и т.д.).
 
-    bool deleted() const;
-    bool locked() const;
-    std::wstring toString() const;
+    bool deleted() const noexcept;
+    bool locked() const noexcept;
+    String toString() const;
 };
 
 //=========================================================

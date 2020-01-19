@@ -22,6 +22,17 @@
 
 #endif
 
+/*!
+    \class irbis::IO
+
+    \details У ИРБИС64 довольно оригинальный формат записи целых чисел на диске.
+
+    32-битные целые записываются в сетевом формате (Big Endian).
+    64-битные записываются как пара 32-битных, причем сначала идет младшее,
+    затем старшее.
+
+ */
+
 namespace irbis {
 
 /// \brief Чтение беззнакового 32-битного целого в сетевом формате.
@@ -30,13 +41,12 @@ namespace irbis {
 /// \return Признак успешного выполнения операции.
 bool IO::readInt32 (FILE* file, uint32_t *value)
 {
-    auto buffer = (Byte*)(value);
-    if (::fread(buffer, 1, sizeof(uint32_t), file) != sizeof(uint32_t)) {
+    uint32_t buffer;
+    if (::fread((Byte*)&buffer, 1, sizeof(uint32_t), file) != sizeof(uint32_t)) {
         return false;
     }
 
-    *value = ntohl(*value);
-
+    *value = ntohl(buffer);
     return true;
 }
 
@@ -46,14 +56,15 @@ bool IO::readInt32 (FILE* file, uint32_t *value)
 /// \return Признак успешного выполнения операции.
 bool IO::readInt64 (FILE* file, uint64_t *value)
 {
-    auto buffer = (Byte*)value;
-    if (::fread(buffer, 1, sizeof(uint64_t), file) != sizeof(uint64_t)) {
+    uint32_t buffer[2];
+
+    if (::fread((Byte*)buffer, 1, sizeof(uint64_t), file) != sizeof(uint64_t)) {
         return false;
     }
 
-    auto ptr = (uint32_t*)value;
-    ptr[0] = ntohl(ptr[0]);
-    ptr[1] = ntohl(ptr[1]);
+    buffer[0] = ntohl(buffer[0]);
+    buffer[1] = ntohl(buffer[1]);
+    *value = (((uint64_t)buffer[1]) << 32) + ((uint64_t)buffer[0]);
 
     return true;
 }
@@ -65,8 +76,7 @@ bool IO::readInt64 (FILE* file, uint64_t *value)
 bool IO::writeInt32 (FILE* file, uint32_t value)
 {
     value = htonl(value);
-    auto buffer = (Byte*)(&value);
-    if (::fwrite(buffer, 1, sizeof(value), file) != sizeof(value)) {
+    if (::fwrite((Byte*)&value, 1, sizeof(value), file) != sizeof(value)) {
         return false;
     }
 
