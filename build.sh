@@ -1,6 +1,11 @@
 #! /bin/sh
 
-cmake -B ./build -D CMAKE_BUILD_TYPE=Release .
-cmake --build ./build --config Release 
-cmake --install ./build --config Release 
+mkdir build     2> /dev/null
+mkdir artifacts 2> /dev/null
+cd build || exit
 
+cmake -D CMAKE_BUILD_TYPE=Release ..
+cmake --build .
+cmake --install .
+
+cd ..
