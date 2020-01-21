@@ -1,3 +1,6 @@
+cmake_minimum_required(VERSION 2.8)
+set(CMAKE_CXX_STANDARD 11)
+
 project(safeTests)
 
 FILE(GLOB CppFiles
@@ -9,3 +12,5 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} irbis)
+
+install(TARGETS safeTests DESTINATION ${ARTIFACTS})

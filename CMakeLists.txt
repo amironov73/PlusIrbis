@@ -13,17 +13,3 @@ include_directories(${PROJECT_SOURCE_DIR}/third)
 add_subdirectory(libs)
 add_subdirectory(tests)
 add_subdirectory(apps)
-
-# gather artifacts
-install(TARGETS
-    irbis
-    hello
-    safeTests
-    onlineTests
-    DESTINATION ${ARTIFACTS}
-)
-
-install(FILES
-    ${irbis_SOURCE_DIR}/include/irbis.h
-    DESTINATION ${ARTIFACTS}
-)

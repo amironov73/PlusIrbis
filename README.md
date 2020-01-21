@@ -6,8 +6,9 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * MacOS X 10.14 (64-bit);
 * 32-bit and 64-bit Linux (CentOS 7/8);
 * MSVS 2015/2017/2019 Community Edition on Windows;
-* GCC 4.8 and higher both on Windows and Linux/OS X;
-* Clang compiler 9 both on Windows and Linux/OS X.
+* CMake 2.8 or higher on Linux.
+* GCC 4.8 or higher both on Windows and Linux/OS X;
+* Clang compiler 9 both on Windows and Linux.
 
 ### Example
 
