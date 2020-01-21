@@ -19,6 +19,6 @@ script:
  - sudo update-alternatives --install /usr/bin/gcc-ar gcc-ar /usr/bin/gcc-ar-7 60
  - sudo update-alternatives --install /usr/bin/gcc-ranlib gcc-ranlib /usr/bin/gcc-ranlib-7 60
  - sudo update-alternatives --install /usr/bin/x86_64-linux-gnu-gcc x86_64-linux-gnu-gcc /usr/bin/x86_64-linux-gnu-gcc-7 60
- - cd Source/irbis
- - cmake .
- - make
+ - cmake -B ./build -D CMAKE_BUILD_TYPE=Release .
+ - cmake --build ./build --config Release 
+ - cmake --install ./build --config Release 

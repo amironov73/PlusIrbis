@@ -1,21 +1,14 @@
 version: 1.0.{build}
-configuration:
-  - Debug
-  - DebugDll
-  - Release
-  - ReleaseDll
-  - ReleaseStatic
+configuration: Debug
 platform: x64
 image: Visual Studio 2017
 
 build:
-  project: Source\PlusIrbis.2017.sln
+  project: PlusIrbis.2017.sln
 
 after_build:
-- cmd: Utils\doxygen
+  - cmd: utils\doxygen
 
 artifacts:
-  - path: Source\x64
-    name: Binaries
   - path: doxygen\html
     name: HtmlDocs
