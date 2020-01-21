@@ -339,6 +339,9 @@ ASALocalRun/
 # Doxygen
 doxygen/
 
+# library files
+*.a
+
 # CMake
 cmake-build-debug/
 compile_commands.json

@@ -199,16 +199,19 @@ public:
     }
 
     /// \brief Формирование результата успешного выполнения.
-    static Result Success(T value)
+    static Result Success (T value)
     {
-        Result result { true, value };
+        Result result;
+        result.success = true;
+        result.result = value;
         return result;
     }
 
     /// \brief Формирование признака ошибки.
     static Result Failure (const String &message)
     {
-        Result result { false };
+        Result result;
+        result.success = false;
         result.errorMessage = message;
         return result;
     }
