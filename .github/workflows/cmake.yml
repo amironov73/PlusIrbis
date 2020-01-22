@@ -11,3 +11,5 @@ jobs:
     - uses: actions/checkout@v1
     - name: make
       run: source ./build.sh
+    - name: tests
+      run: ./artifacts/safeTests
