@@ -6,10 +6,10 @@ TEST_CASE("TextNavigator_constructor_1", "[navigator]")
     const irbis::String hello = L"Hello, world!";
     const irbis::TextNavigator navigator(hello);
     CHECK_FALSE(navigator.eot());
-    CHECK(navigator.line() == size_t(1));
-    CHECK(navigator.column() == size_t(1));
-    CHECK(navigator.position() == size_t(0));
-    CHECK(navigator.length() == size_t(13));
+    CHECK(navigator.line() == std::size_t(1));
+    CHECK(navigator.column() == std::size_t(1));
+    CHECK(navigator.position() == std::size_t(0));
+    CHECK(navigator.length() == std::size_t(13));
 }
 
 TEST_CASE("TextNavigator_constructor_2", "[navigator]")
@@ -17,10 +17,10 @@ TEST_CASE("TextNavigator_constructor_2", "[navigator]")
     const irbis::String hello = L"Hello, world!";
     const irbis::TextNavigator navigator1(hello);
     const irbis::TextNavigator navigator2(navigator1);  // NOLINT(performance-unnecessary-copy-initialization)
-    CHECK(navigator2.line() == size_t(1));
-    CHECK(navigator2.column() == size_t(1));
-    CHECK(navigator2.position() == size_t(0));
-    CHECK(navigator2.length() == size_t(13));
+    CHECK(navigator2.line() == std::size_t(1));
+    CHECK(navigator2.column() == std::size_t(1));
+    CHECK(navigator2.position() == std::size_t(0));
+    CHECK(navigator2.length() == std::size_t(13));
 }
 
 TEST_CASE("TextNavigator_at_1", "[navigator]")

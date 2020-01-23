@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <cstring>
 #include <sys/stat.h>
@@ -26,7 +27,7 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
     }
 
     // а затем и ее остаток
-    const auto recordLength = static_cast<const size_t>(fastParse32((const char *) marker, LengthOfLength));
+    const auto recordLength = static_cast<const std::size_t>(fastParse32((const char *) marker, LengthOfLength));
     Byte *record = new Byte[recordLength];
     const auto need = recordLength - LengthOfLength;
     if (fread(record + LengthOfLength, 1, need, device) != need) {
@@ -54,8 +55,8 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
         }
 
         int tag = fastParse32((const char*)(record + directory), 3);
-        const auto fieldLength = static_cast<const size_t>(fastParse32((const char *) (record + directory + 3), 4)); //-V112
-        const auto fieldOffset = static_cast<const size_t>(baseAddress +
+        const auto fieldLength = static_cast<const std::size_t>(fastParse32((const char *) (record + directory + 3), 4)); //-V112
+        const auto fieldOffset = static_cast<const std::size_t>(baseAddress +
                                                              fastParse32((const char *) (record + directory + 7), 5));
         RecordField field;
         field.tag = tag;
@@ -70,9 +71,9 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
             // Может содержать подполя
 
             // Пропускаем индикаторы
-            size_t start = fieldOffset + indicatorLength;
-            const size_t stop = fieldOffset + fieldLength - indicatorLength + 1;
-            size_t position = start;
+            std::size_t start = fieldOffset + indicatorLength;
+            const std::size_t stop = fieldOffset + fieldLength - indicatorLength + 1;
+            std::size_t position = start;
 
             // Ищем значение поля до первого разделителя
             while (position < stop) {
@@ -111,7 +112,7 @@ MarcRecord* Iso2709::readRecord(FILE *device, const Encoding *encoding)
     return result;
 }
 
-static void encode(Byte *bytes, size_t pos, size_t len, size_t val) {
+static void encode(Byte *bytes, std::size_t pos, std::size_t len, std::size_t val) {
     len--;
     for (pos += len; len >= 0; len--) {
         bytes[pos] = static_cast<Byte>(val % 10 + '0');
@@ -120,10 +121,10 @@ static void encode(Byte *bytes, size_t pos, size_t len, size_t val) {
     }
 }
 
-static size_t encode(Byte *bytes, size_t pos, const std::wstring &str, const Encoding *encoding) {
+static std::size_t encode(Byte *bytes, std::size_t pos, const String &str, const Encoding *encoding) {
     if (!str.empty()) {
         auto encoded = encoding->fromUnicode(str);
-        for (size_t i = 0; i < encoded.size(); pos++, i++) {
+        for (std::size_t i = 0; i < encoded.size(); pos++, i++) {
             bytes[pos] = encoded[i];
         }
     }
@@ -131,7 +132,7 @@ static size_t encode(Byte *bytes, size_t pos, const std::wstring &str, const Enc
     return pos;
 }
 
-static size_t countBytes(const std::wstring &text, const Encoding *encoding) {
+static std::size_t countBytes(const String &text, const Encoding *encoding) {
     if (text.empty()) {
         return 0;
     }
@@ -141,9 +142,9 @@ static size_t countBytes(const std::wstring &text, const Encoding *encoding) {
 
 void Iso2709::writeRecord(FILE *device, const MarcRecord &record, const Encoding *encoding)
 {
-    size_t recordLength = MarkerLength;
-    size_t dictionaryLength = 1; // с учетом ограничителя справочника
-    std::vector<size_t > fieldLength(record.fields.size());
+    std::size_t recordLength = MarkerLength;
+    std::size_t dictionaryLength = 1; // с учетом ограничителя справочника
+    std::vector<std::size_t > fieldLength(record.fields.size());
 
     // Сначала подсчитываем общую длину
     for (const auto &field : record.fields) {
@@ -153,7 +154,7 @@ void Iso2709::writeRecord(FILE *device, const MarcRecord &record, const Encoding
             throw IrbisException();
         }
 
-        size_t fldlen = 0;
+        std::size_t fldlen = 0;
         if (field.tag < 10) {
             // В фиксированном поле не бывает подполей и индикаторов
             fldlen += countBytes(field.value, encoding);
@@ -188,9 +189,9 @@ void Iso2709::writeRecord(FILE *device, const MarcRecord &record, const Encoding
     }
 
     // Приступаем к кодированию
-    size_t dictionaryPosition = MarkerLength;
-    const size_t baseAddress = MarkerLength + dictionaryLength;
-    size_t currentAddress = baseAddress;
+    std::size_t dictionaryPosition = MarkerLength;
+    const std::size_t baseAddress = MarkerLength + dictionaryLength;
+    std::size_t currentAddress = baseAddress;
     Byte *bytes = new Byte[recordLength];
     memset(bytes, ' ', recordLength);
 

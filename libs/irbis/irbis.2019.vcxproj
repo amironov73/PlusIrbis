@@ -278,6 +278,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include/irbis.h" />
+    <ClInclude Include="include\irbis_private.h" />
+    <ClInclude Include="include\irbis_version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/AlphabetTable.cpp" />
@@ -291,6 +293,7 @@
     <ClCompile Include="src/DirectAccess.cpp" />
     <ClCompile Include="src/EmbeddedField.cpp" />
     <ClCompile Include="src/Encoding.cpp" />
+    <ClCompile Include="src/File.cpp" />
     <ClCompile Include="src/FileSpecification.cpp" />
     <ClCompile Include="src/FoundLine.cpp" />
     <ClCompile Include="src/GblParameter.cpp" />

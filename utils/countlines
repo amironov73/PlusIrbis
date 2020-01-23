@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo Files: `find libs/irbis/ -name '*.cpp' | wc -l`
+echo Lines: `find libs/irbis/ -name '*.cpp' -exec cat {} \; | wc -l`
+echo Bytes: `find libs/irbis/ -name '*.cpp' -exec cat {} \; | wc -c`

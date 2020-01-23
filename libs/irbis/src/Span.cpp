@@ -48,7 +48,7 @@ bool sameString(WideSpan first, WideSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
-        if (::towupper(*p1) != ::toupper(*p2)) {
+        if (::towupper (*p1) != ::toupper (*p2)) {
             return false;
         }
         ++p1; ++p2;
@@ -71,7 +71,7 @@ CharSpan trimStart(CharSpan text)
         }
         ++p1;
     }
-    return CharSpan (const_cast<char*>(p1), e1 - p1);
+    return { const_cast<char*>(p1), static_cast<std::size_t> (e1 - p1) };
 }
 
 /// \brief Удаление пробельных элементов из начала спана.
@@ -88,7 +88,7 @@ WideSpan trimStart(WideSpan text)
         }
         ++p1;
     }
-    return WideSpan (const_cast<Char*>(p1), e1 - p1);
+    return { const_cast<Char*>(p1), static_cast<std::size_t> (e1 - p1) };
 }
 
 /// \brief Удаление пробельных элементов из конца спана.
@@ -105,7 +105,7 @@ CharSpan trimEnd(CharSpan text)
         }
         --e1;
     }
-    return CharSpan (const_cast<char*>(p1), e1 - p1 + 1);
+    return { const_cast<char*>(p1), static_cast<std::size_t> (e1 - p1 + 1) };
 }
 
 /// \brief Удаление пробельных элементов из конца спана.
@@ -122,7 +122,7 @@ WideSpan trimEnd(WideSpan text)
         }
         --e1;
     }
-    return WideSpan (const_cast<Char*>(p1), e1 - p1 + 1);
+    return { const_cast<Char*>(p1), static_cast<std::size_t> (e1 - p1 + 1) };
 }
 
 /// \brief Удаление пробельных элементов из начала и конца спана.

@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <iostream>
 #include <iomanip>
@@ -28,9 +29,9 @@ ClientQuery::ClientQuery(const Connection &connection, const std::string &comman
 /// \brief Добавление информации к запросу.
 /// \param bytes Массив с информацией.
 /// \param size Количество байт.
-void ClientQuery::_write(const Byte *bytes, size_t size)
+void ClientQuery::_write(const Byte *bytes, std::size_t size)
 {
-    for (size_t i = 0; i < size; i++)     {
+    for (std::size_t i = 0; i < size; i++)     {
         this->_content.push_back(bytes[i]);
     }
 }
@@ -74,7 +75,7 @@ ClientQuery& ClientQuery::add(const MarcRecord &record, const String &delimiter=
 /// \warning Предполагается, что переданный текст в кодировке ANSI!
 ClientQuery& ClientQuery::addAnsi(const std::string &text)
 {
-    const size_t size = text.length();
+    const std::size_t size = text.length();
     if (!size)
     {
         return *this;
@@ -161,7 +162,7 @@ Bytes ClientQuery::encode() const
     result.reserve(this->_content.size() + 10);
     const auto prefix = std::to_string(this->_content.size());
     const auto ptr = prefix.c_str();
-    for (size_t i = 0; i < prefix.length(); i++) {
+    for (std::size_t i = 0; i < prefix.length(); i++) {
         result.push_back(static_cast<Byte>(ptr[i]));
     }
     result.push_back(0x0a);

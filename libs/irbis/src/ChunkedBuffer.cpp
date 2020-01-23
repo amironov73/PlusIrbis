@@ -2,15 +2,16 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <algorithm>
 #include <cstring>
 
 namespace irbis {
 
-const size_t ChunkedBuffer::DefaultChunkSize = 2048;
+const std::size_t ChunkedBuffer::DefaultChunkSize = 2048;
 
-ChunkedBuffer::ChunkedBuffer(size_t chunkSize)
+ChunkedBuffer::ChunkedBuffer(std::size_t chunkSize)
     : _first(nullptr), _current(nullptr), _last(nullptr),
       _chunkSize(chunkSize), _position(0), _read(0) {
 }
@@ -78,7 +79,7 @@ int ChunkedBuffer::peek() {
     return _current->data[_read];
 }
 
-size_t ChunkedBuffer::read(char *buffer, size_t offset, size_t count) {
+std::size_t ChunkedBuffer::read(char *buffer, std::size_t offset, std::size_t count) {
     if (!count) {
         return 0;
     }
@@ -87,9 +88,9 @@ size_t ChunkedBuffer::read(char *buffer, size_t offset, size_t count) {
         return 0;
     }
 
-    size_t total = 0;
+    std::size_t total = 0;
     do {
-        const size_t remaining = _current == _last
+        const std::size_t remaining = _current == _last
                 ? _position - _read
                 : _chunkSize - _read;
 
@@ -99,7 +100,7 @@ size_t ChunkedBuffer::read(char *buffer, size_t offset, size_t count) {
             }
         }
 
-        const size_t portion = std::min(count, static_cast<size_t>(remaining));
+        const std::size_t portion = std::min(count, static_cast<std::size_t>(remaining));
         std::memcpy(buffer + offset, _current->data + _read, portion);
         _read += portion;
         count -= portion;
@@ -132,7 +133,7 @@ void ChunkedBuffer::rewind() {
     _read = 0;
 }
 
-void ChunkedBuffer::write(const char *buffer, size_t offset, size_t count) {
+void ChunkedBuffer::write(const char *buffer, std::size_t offset, std::size_t count) {
     if (!count) {
         return;
     }
@@ -142,13 +143,13 @@ void ChunkedBuffer::write(const char *buffer, size_t offset, size_t count) {
     }
 
     do {
-         size_t free = _chunkSize - _position;
+         std::size_t free = _chunkSize - _position;
          if (!free) {
              _appendChunk();
              free = _chunkSize;
          }
 
-         const size_t portion = std::min(count, free);
+         const std::size_t portion = std::min(count, free);
          std::memcpy(_last->data + _position, buffer + offset, portion);
          _position += portion;
          count -= portion;

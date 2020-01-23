@@ -1,5 +1,7 @@
 @echo off
 
-"C:\Program Files\JetBrains\CLion\bin\cmake\win\bin\cmake.exe" -B ./build -D CMAKE_BUILD_TYPE=Release .
-"C:\Program Files\JetBrains\CLion\bin\cmake\win\bin\cmake.exe" --build ./build --config Release 
-"C:\Program Files\JetBrains\CLion\bin\cmake\win\bin\cmake.exe" --install ./build --config Release 
+SET CMAKE="C:\Program Files\JetBrains\CLion\bin\cmake\win\bin\cmake.exe"
+
+%CMAKE% -B ./build -D CMAKE_BUILD_TYPE=Release .
+%CMAKE% --build ./build --config Release 
+%CMAKE% --install ./build --config Release 

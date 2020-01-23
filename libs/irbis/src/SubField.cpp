@@ -52,7 +52,7 @@ bool SubField::empty() const noexcept
 /// \return Закодированное подполе.
 std::wstring SubField::toString() const
 {
-    return String (L"^") + code + value;
+    return String (L"^") + this->code + this->value;
 }
 
 /// \brief Проверка, является подполе полноценным (с кодом и значением).
@@ -60,7 +60,7 @@ std::wstring SubField::toString() const
 /// \return true, если с полем всё нормально.
 bool SubField::verify(bool throwOnError) const
 {
-    const bool result = (code != NoCode) && !value.empty();
+    const bool result = (this->code != NoCode) && !this->value.empty();
     if (!result && throwOnError) {
         throw VerificationException();
     }

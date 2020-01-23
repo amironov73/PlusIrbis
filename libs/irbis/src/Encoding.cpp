@@ -245,10 +245,10 @@ std::string unicode_to_cp1251(const String &text)
     return result;
 }
 
-void unicode_to_cp1251(Byte *dst, const Char *src, size_t size)
+void unicode_to_cp1251(Byte *dst, const Char *src, std::size_t size)
 {
     const Char *first = &_cp1251_from_unicode[0], *last = first + 256;
-    for (size_t i = 0; i < size; i++)
+    for (std::size_t i = 0; i < size; i++)
     {
         Char c = src[i];
         const std::ptrdiff_t index = std::lower_bound(first, last, c) - first;
@@ -291,7 +291,7 @@ std::string unicode_to_koi8r(const String &text)
 
 // Преобразует UCS-16 в UTF-8
 // Возвращает указатель на место после последнего преобразованного символа
-Byte* toUtf(Byte *dst, const Char *src, size_t length)
+Byte* toUtf(Byte *dst, const Char *src, std::size_t length)
 {
     while (length > 0)
     {
@@ -329,9 +329,9 @@ Byte* toUtf(Byte *dst, const Char *src, size_t length)
 }
 
 // Подсчитывает число байт, необходимых для размещения в UTF-8.
-size_t countUtf(const Char *src, size_t length)
+std::size_t countUtf(const Char *src, std::size_t length)
 {
-    size_t result = 0;
+    std::size_t result = 0;
 
     while (length > 0)
     {
@@ -365,7 +365,7 @@ size_t countUtf(const Char *src, size_t length)
 
 // Преобразует UTF-8 в UCS-16
 // Возвращает указатель на место после последнего преобразованного символа
-Char* fromUtf(Char *dst, const Byte *src, size_t length)
+Char* fromUtf(Char *dst, const Byte *src, std::size_t length)
 {
     const Byte *stop = src + length;
 
@@ -407,9 +407,9 @@ Char* fromUtf(Char *dst, const Byte *src, size_t length)
 }
 
 // Подсчитывает число Char, необходимых для размещения в UCS-16.
-size_t countUtf(const Byte *src, size_t length)
+std::size_t countUtf(const Byte *src, std::size_t length)
 {
-    size_t result = 0;
+    std::size_t result = 0;
 
     const Byte *stop = src + length;
 
@@ -443,7 +443,7 @@ size_t countUtf(const Byte *src, size_t length)
 }
 
 // Считывает строку UTF-8 вплоть до разделителя.
-const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &result)
+const Byte* fromUtf(const Byte *src, std::size_t &size, Byte stop, std::wstring &result)
 {
     const Byte *end = src;
     while (size && (*end != stop))
@@ -451,7 +451,7 @@ const Byte* fromUtf(const Byte *src, size_t &size, Byte stop, std::wstring &resu
         end++;
         size--;
     }
-    const size_t length = end - src;
+    const std::size_t length = end - src;
     if (length == 0)
     {
         result.clear();
@@ -493,7 +493,7 @@ String fromUtf(const std::string &text)
 // Записывает строку в UTF-8
 Byte* toUtf(Byte *dst, const String &text)
 {
-    const size_t length = text.length();
+    const std::size_t length = text.length();
     const Char *src = text.c_str();
     return toUtf(dst, src, length);
 }
@@ -529,22 +529,22 @@ Encoding* Encoding::ansi()
     return Encoding::_ansi;
 }
 
-std::wstring fromAnsi(const Byte *bytes, size_t count)
+String fromAnsi(const Byte *bytes, std::size_t count)
 {
     throw NotImplementedException();
 }
 
-std::wstring fromUtf(const Byte *bytes, size_t count)
+String fromUtf(const Byte *bytes, std::size_t count)
 {
     throw NotImplementedException();
 }
 
-std::vector<Byte> toAnsi(const std::wstring &text)
+Bytes toAnsi(const String &text)
 {
     throw NotImplementedException();
 }
 
-std::vector<Byte> Encoding::toUtf(const std::wstring &text)
+Bytes Encoding::toUtf(const String &text)
 {
     throw NotImplementedException();
 }

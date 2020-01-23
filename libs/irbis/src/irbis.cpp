@@ -2,6 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
+#include "irbis_version.h"
 
 #include <iterator>
 #include <sstream>
@@ -10,7 +12,6 @@
 
     \file
     \brief Утилиты, используемые в PlusIrbis.
-
 
 
     \mainpage Универсальный клиент для системы ИРБИС64.
@@ -32,17 +33,16 @@ namespace irbis {
 /// \return (major << 16) + minor.
 uint32_t libraryVersion() noexcept
 {
-    return (0x00 << 16) + 0x01;
+    return (IRBIS_VERSION_MAJOR << 16) + IRBIS_VERSION_MINOR;
 }
 
 /// \brief Версия библиотеки-клиента (строкой).
-/// \return "major.minor".
+/// \return "major.minor beta".
 std::string libraryVersionString()
 {
-    const auto version = libraryVersion();
-    const auto major = version >> 16u;
-    const auto minor = version & 0xFFFFu;
-    return std::to_string(major) + "." + std::to_string(minor);
+    return std::to_string(IRBIS_VERSION_MAJOR)
+        + "." + std::to_string(IRBIS_VERSION_MINOR)
+        + " " + IRBIS_VERSION_KIND;
 }
 
 /// \brief Сравнение двух символов с точностью до регистра.
@@ -121,7 +121,7 @@ bool contains(const String &text, Char c)
 std::string replace(const std::string &text, const std::string &from, const std::string &to)
 {
     std::string result = text;
-    size_t index = 0;
+    std::size_t index = 0;
     while (true) {
         index = text.find(from, index);
         if (index == std::string::npos) {
@@ -142,7 +142,7 @@ std::string replace(const std::string &text, const std::string &from, const std:
 String replace(const String &text, const String &from, const String &to)
 {
     String result = text;
-    size_t index = 0;
+    std::size_t index = 0;
     while (true) {
         index = text.find(from, index);
         if (index == std::string::npos) {
@@ -161,9 +161,9 @@ String replace(const String &text, const String &from, const String &to)
 String PLUSIRBIS_EXPORTS trimStart(const String &text)
 {
     auto length = text.length();
-    size_t i = 0;
+    std::size_t i = 0;
     for (; i < length; ++i) {
-        if (!::isspace(text[i])) {
+        if (!::iswspace(text[i])) {
             break;
         }
     }
@@ -185,14 +185,14 @@ String PLUSIRBIS_EXPORTS trimStart(const String &text)
 String PLUSIRBIS_EXPORTS trimEnd(const String &text)
 {
     auto length = text.length();
-    auto i = static_cast<ptrdiff_t >(length - 1);
+    auto i = static_cast<std::ptrdiff_t >(length - 1);
     for (; i >= 0; --i) {
-        if (!::isspace(text[i])) {
+        if (!::iswspace(text[i])) {
             break;
         }
     }
 
-    if (i == static_cast<ptrdiff_t>(length - 1)) {
+    if (i == static_cast<std::ptrdiff_t>(length - 1)) {
         return text;
     }
 
@@ -208,16 +208,16 @@ String PLUSIRBIS_EXPORTS trimEnd(const String &text)
 /// \return Обработанный текст.
 String trim(const String &text)
 {
-    auto length = static_cast<ptrdiff_t>(text.length());
-    ptrdiff_t start = 0, end = static_cast<ptrdiff_t>(length - 1);
+    auto length = static_cast<std::ptrdiff_t>(text.length());
+    std::ptrdiff_t start = 0, end = static_cast<std::ptrdiff_t>(length - 1);
     for (; start < length; ++start) {
-        if (!::isspace(text[start])) {
+        if (!::iswspace(text[start])) {
             break;
         }
     }
 
     for (; end >= 0; --end) {
-        if (!::isspace(text[end])) {
+        if (!::iswspace(text[end])) {
             break;
         }
     }
@@ -299,8 +299,8 @@ String describeError(int errorCode)
 int fastParse32(const String &text)
 {
     auto result = 0;
-    const size_t length = text.length();
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
     }
 
@@ -311,8 +311,8 @@ int fastParse32(const String &text)
 int fastParse32(const CharSpan text)
 {
     auto result = 0;
-    const size_t length = text.length;
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length;
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text[offset] - '0';
     }
 
@@ -323,8 +323,8 @@ int fastParse32(const CharSpan text)
 int fastParse32(const WideSpan text)
 {
     auto result = 0;
-    const size_t length = text.length;
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length;
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text[offset] - '0';
     }
 
@@ -335,8 +335,8 @@ int fastParse32(const WideSpan text)
 unsigned int fastParseUnsigned32(const String &text)
 {
     auto result = 0u;
-    const size_t length = text.length();
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
     }
 
@@ -368,7 +368,7 @@ unsigned int fastParseUnsigned32(const Char *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const Char *text, size_t length)
+int fastParse32(const Char *text, std::size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -381,7 +381,7 @@ int fastParse32(const Char *text, size_t length)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32(const Char *text, size_t length)
+unsigned int fastParseUnsigned32(const Char *text, std::size_t length)
 {
     auto result = 0u;
     while (length > 0) {
@@ -397,8 +397,8 @@ unsigned int fastParseUnsigned32(const Char *text, size_t length)
 int fastParse32(const std::string &text)
 {
     auto result = 0;
-    const size_t length = text.length();
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
     }
 
@@ -409,8 +409,8 @@ int fastParse32(const std::string &text)
 unsigned int fastParseUnsigned32(const std::string &text)
 {
     auto result = 0u;
-    const size_t length = text.length();
-    for (size_t offset = 0; offset < length; offset++) {
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
         result = result * 10 + text.at(offset) - '0';
     }
 
@@ -434,7 +434,7 @@ int fastParse32(const char *text)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-int fastParse32(const char *text, size_t length)
+int fastParse32(const char *text, std::size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -451,7 +451,7 @@ int fastParse32(const char *text, size_t length)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-unsigned int fastParseUnsigned32(const char *text, size_t length)
+unsigned int fastParseUnsigned32(const char *text, std::size_t length)
 {
     auto result = 0u;
     while (length > 0) {
@@ -535,7 +535,7 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const st
 /// \param list
 /// \param index
 /// \return
-std::wstring safeAt(const StringList &list, size_t index)
+std::wstring safeAt(const StringList &list, std::size_t index)
 {
     if (index >= list.size())
     {
@@ -554,8 +554,8 @@ StringList maxSplit(const String &text, Char separator, int count)
 {
     std::vector<std::wstring> result;
 
-    size_t position = 0;
-    const size_t length = text.length();
+    std::size_t position = 0;
+    const std::size_t length = text.length();
     while ((count > 1) && (position < length)) {
         const auto index = text.find(separator, position);
         if (index != std::wstring::npos) {
@@ -618,7 +618,7 @@ std::vector<std::string> split(const std::string &text, const std::string &delim
 {
     std::vector<std::string> result;
     std::string token;
-    size_t start = 0, end;
+    std::size_t start = 0, end;
     while ((end = text.find(delimiter, start)) != std::string::npos)
     {
         token = text.substr(start, end - start);
@@ -643,7 +643,7 @@ StringList split(const String &text, const String &delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
-    size_t start = 0, end;
+    std::size_t start = 0, end;
     while ((end = text.find(delimiter, start)) != std::string::npos)
     {
         token = text.substr(start, end - start);
@@ -677,8 +677,8 @@ String removeComments(const String &text)
 
     std::wstring result;
     Char state = 0;
-    size_t index = 0;
-    const size_t length = text.length();
+    std::size_t index = 0;
+    const std::size_t length = text.length();
     while (index < length) {
         Char c = text.at(index);
 
@@ -732,13 +732,13 @@ String removeComments(const String &text)
 std::wstring prepareFormat(const std::wstring &text)
 {
     std::wstring text2 = removeComments(text);
-    const size_t length = text2.length();
+    const std::size_t length = text2.length();
     if (length == 0) {
         return text2;
     }
 
     bool flag = false;
-    for (size_t i = 0; i  < length; i++) {
+    for (std::size_t i = 0; i  < length; i++) {
         if (text2.at(i) < ' ') {
             flag = true;
             break;
@@ -749,8 +749,8 @@ std::wstring prepareFormat(const std::wstring &text)
         return text2;
     }
 
-    std::wstring result;
-    for (size_t i = 0; i < length; i++) {
+    String result;
+    for (std::size_t i = 0; i < length; i++) {
         const Char c = text.at(i);
         if (c >= ' ') {
             result.push_back(c);

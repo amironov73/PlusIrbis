@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <cstdarg>
 
@@ -139,7 +140,7 @@ std::string ServerResponse::getRemaining()
     const auto size = this->_content.size();
     if (this->_position < size) {
         const auto data = reinterpret_cast<const char*>(_content.data() + this->_position);
-        size_t remaining = size - this->_position;
+        std::size_t remaining = size - this->_position;
         // Убираем переводы строки в конце.
         while (remaining > 0) {
             const auto c = data[remaining-1];
@@ -239,14 +240,14 @@ bool ServerResponse::success() const
     return this->_success;
 }
 
-void ServerResponse::_write(const Byte *bytes, size_t size)
+void ServerResponse::_write(const Byte *bytes, std::size_t size)
 {
     const auto newSize = this->_content.size() + size;
     if (this->_content.capacity() < newSize) {
         this->_content.reserve(newSize);
     }
 
-    for (size_t i = 0; i < size; i++) {
+    for (std::size_t i = 0; i < size; i++) {
         this->_content.push_back(bytes[i]);
     }
 }

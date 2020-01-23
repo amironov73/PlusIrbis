@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <algorithm>
 
@@ -82,7 +83,7 @@ bool IniSection::containsKey(const String &key) const noexcept
 /// если строка не найдена.
 std::ptrdiff_t IniSection::getIndex(const String &key) const noexcept
 {
-    for (size_t i=0; i < this->lines.size(); i++) {
+    for (std::size_t i=0; i < this->lines.size(); i++) {
         if (sameString(this->lines[i].key, key)) {
             return i;
         }
@@ -246,7 +247,7 @@ void IniFile::notModified()
 /// \return Индекс секции либо отрицательное число, если секция не найдена.
 std::ptrdiff_t IniFile::getIndex(const String &name) const noexcept
 {
-    for (size_t i = 0; i < this->sections.size(); i++) {
+    for (std::size_t i = 0; i < this->sections.size(); i++) {
         if (sameString(this->sections[i].name, name)) {
             return i;
         }

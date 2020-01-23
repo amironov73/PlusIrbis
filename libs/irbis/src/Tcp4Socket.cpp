@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #ifdef  IRBIS_WINDOWS
 
@@ -110,7 +111,7 @@ void Tcp4Socket::close()
     closesocket(internals->socket);
 }
 
-void Tcp4Socket::send(const Byte *buffer, size_t size)
+void Tcp4Socket::send(const Byte *buffer, std::size_t size)
 {
     auto *internals = static_cast<TcpInternals*>(this->_impl);
     const auto ptr = reinterpret_cast<const char*>(buffer);
@@ -118,12 +119,12 @@ void Tcp4Socket::send(const Byte *buffer, size_t size)
     ::send(internals->socket, ptr, size2, 0);
 }
 
-size_t Tcp4Socket::receive(Byte *buffer, size_t size)
+std::size_t Tcp4Socket::receive(Byte *buffer, std::size_t size)
 {
     auto *internals = static_cast<TcpInternals*>(this->_impl);
     const auto ptr = reinterpret_cast<char*>(buffer);
     const auto size2 = static_cast<int>(size);
-    const size_t result = ::recv(internals->socket, ptr, size2, 0);
+    const std::size_t result = ::recv(internals->socket, ptr, size2, 0);
     return result;
 }
 

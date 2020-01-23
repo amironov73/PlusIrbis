@@ -1,0 +1,3 @@
+﻿#define IRBIS_VERSION_MAJOR 0
+#define IRBIS_VERSION_MINOR 1
+#define IRBIS_VERSION_KIND  "alpha"

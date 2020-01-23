@@ -11,8 +11,8 @@
 
 namespace irbis {
 
-static size_t arrangeLevel(std::vector<TreeNode> &list, int level, size_t index, size_t count) {
-    size_t next = index + 1;
+static std::size_t arrangeLevel(std::vector<TreeNode> &list, int level, std::size_t index, std::size_t count) {
+    std::size_t next = index + 1;
     int level2 = level + 1;
 
     TreeNode &parent = list[index];
@@ -33,11 +33,11 @@ static size_t arrangeLevel(std::vector<TreeNode> &list, int level, size_t index,
 }
 
 static void arrangeLevel(std::vector<TreeNode> &list, int level) {
-    size_t count = list.size();
-    size_t index = 0;
+    std::size_t count = list.size();
+    std::size_t index = 0;
 
     while (index < count) {
-        size_t next = arrangeLevel(list, level, index, count);
+        std::size_t next = arrangeLevel(list, level, index, count);
         index = next;
     }
 }

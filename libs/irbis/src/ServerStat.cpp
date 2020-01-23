@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -34,7 +35,7 @@ void ServerStat::parse(ServerResponse &response)
 
     for (auto i = 0; i < this->clientCount; i++) {
         this->runningClients.emplace_back();
-        auto client = this->runningClients.back();
+        auto &client = this->runningClients.back();
         client.number = response.readAnsi();
         client.ipAddress = response.readAnsi();
         client.port = response.readAnsi();

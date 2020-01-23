@@ -2,10 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 namespace irbis {
 
-MemoryChunk::MemoryChunk(const size_t size)
+MemoryChunk::MemoryChunk(const std::size_t size)
 {
     data = static_cast<char*>(malloc(size));
     next = nullptr;

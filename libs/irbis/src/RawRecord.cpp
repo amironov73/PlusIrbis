@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <iomanip>
 #include <iostream>
@@ -73,7 +74,7 @@ void RawRecord::parseSingle(const StringList &lines)
     }
 
     fields.clear();
-    for (size_t i = 2; i < lines.size(); i++) {
+    for (std::size_t i = 2; i < lines.size(); i++) {
         fields.push_back(lines[i]);
     }
 }

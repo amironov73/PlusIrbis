@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <iomanip>
 #include <iostream>
@@ -81,7 +82,7 @@ void MarcRecord::decode(const StringList &lines)
     this->version = fastParseUnsigned32(safeAt(secondLine, 1));
 
     // fields
-    for (size_t i = 2; i < lines.size(); i++) {
+    for (std::size_t i = 2; i < lines.size(); i++) {
         const auto line = lines[i];
         if (!line.empty()) {
             RecordField field;

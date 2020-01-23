@@ -1,5 +1,6 @@
 #include "catch.hpp"
 #include "irbis.h"
+#include "irbis_private.h"
 
 // ReSharper disable StringLiteralTypo
 

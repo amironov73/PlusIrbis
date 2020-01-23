@@ -434,7 +434,7 @@ WideSpan TextNavigator::recentText (std::ptrdiff_t length) const noexcept
         start = 0;
     }
 
-    if (static_cast<size_t>(start) >= this->_length) {
+    if (static_cast<std::size_t>(start) >= this->_length) {
         start = 0;
         length = 0;
     }
