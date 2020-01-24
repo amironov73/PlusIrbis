@@ -13,4 +13,9 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
+if(IRBIS_MINGW)
+    target_link_libraries(${PROJECT_NAME} libws2_32.a)
+#   target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++)
+endif(IRBIS_MINGW)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

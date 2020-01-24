@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 set(CMAKE_CXX_STANDARD 11)
 
+if(IRBIS_MINGW)
+    add_definitions(-DIRBIS_MINGW)
+endif(IRBIS_MINGW)
+
 project(PlusIrbis)
 
 # where artifacts will be gathered

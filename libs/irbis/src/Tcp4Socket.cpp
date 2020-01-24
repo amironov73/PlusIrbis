@@ -4,14 +4,16 @@
 #include "irbis.h"
 #include "irbis_private.h"
 
-#ifdef  IRBIS_WINDOWS
+#if defined(IRBIS_WINDOWS) || defined(IRBIS_MINGW)
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <winsock2.h>
 #include <windows.h>
 
+#ifdef IRBIS_WINDOWS
 #pragma comment (lib, "ws2_32.lib")
+#endif
 
 #else
 
