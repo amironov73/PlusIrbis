@@ -67,7 +67,7 @@
     <ClCompile Include="src\ResultTest.cpp" />
     <ClCompile Include="src\SpanTest.cpp" />
     <ClCompile Include="src\SubFieldTest.cpp" />
-    <ClCompile Include="src\tests.cpp" />
+    <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextNavigatorTest.cpp" />
     <ClCompile Include="src\UtilsTest.cpp" />
   </ItemGroup>

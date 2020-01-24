@@ -922,6 +922,7 @@ public:
     MarcRecord readRecord(Mfn mfn);
     MarcRecord readRecord(const String &databaseName, Mfn mfn);
     MarcRecord readRecord(const String &databaseName, Mfn mfn, int version);
+    std::vector<MarcRecord> readRecords(const MfnList &mfnList);
     std::vector<SearchScenario> readSearchScenario(const FileSpecification &specification);
     std::vector<TermInfo> readTerms(const String &startTerm, int numberOfTerms);
     std::vector<TermInfo> readTerms(const TermParameters &parameters);
@@ -944,6 +945,7 @@ public:
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
     bool writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
+    bool writeRecords(std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile(const FileSpecification &specification);
 };
 
@@ -1027,6 +1029,7 @@ public:
 
 //=========================================================
 
+/// \brief Простая абстракция кодировки символов.
 class PLUSIRBIS_EXPORTS Encoding // abstract
 {
     static Encoding *_ansi;
@@ -1036,7 +1039,7 @@ public:
     Encoding() = default;
     virtual ~Encoding() = default;
 
-    virtual std::vector<Byte> fromUnicode(const String &text) const = 0;
+    virtual Bytes fromUnicode(const String &text) const = 0;
     virtual String toUnicode(const Byte *bytes, std::size_t count) const = 0;
 
     static Encoding* ansi();
@@ -1045,6 +1048,24 @@ public:
     static Bytes toAnsi(const String &text);
     static Bytes toUtf(const String &text);
     static Encoding* utf();
+};
+
+class PLUSIRBIS_EXPORTS Cp1251Encoding final
+    : public Encoding
+{
+public:
+
+    virtual Bytes fromUnicode(const String &text) const override;
+    virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
+};
+
+class PLUSIRBIS_EXPORTS Utf8Encoding final
+    : public Encoding
+{
+public:
+
+    virtual Bytes fromUnicode(const String &text) const override;
+    virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
 };
 
 //=========================================================
@@ -2011,6 +2032,9 @@ public:
 
 PLUSIRBIS_EXPORTS uint32_t libraryVersion() noexcept;
 PLUSIRBIS_EXPORTS std::string libraryVersionString();
+
+PLUSIRBIS_EXPORTS std::string wide2string(const String &s);
+PLUSIRBIS_EXPORTS String string2wide(const std::string &s);
 
 }
 

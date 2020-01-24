@@ -51,8 +51,8 @@ File::File(const std::string &name, const std::string &mode)
 File::File(const String &name, const String &mode)
     : _stream(nullptr)
 {
-    const auto ansiName = unicode_to_cp1251(name);
-    const auto ansiMode = unicode_to_cp1251(mode);
+    const auto ansiName = wide2string(name);
+    const auto ansiMode = wide2string(mode);
     this->_stream = ::fopen(ansiName.c_str(), ansiMode.c_str());
     if (!this->_stream) {
         // TODO более информативное сообщение

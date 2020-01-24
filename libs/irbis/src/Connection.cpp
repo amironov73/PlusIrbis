@@ -834,6 +834,16 @@ MarcRecord Connection::readRecord(const String &databaseName, Mfn mfn, int versi
     return result;
 }
 
+/// \brief Считывание нескольких записей за один раз.
+/// \param mfnList Вектор MFN.
+/// \return Вектор прочитанных записей.
+std::vector<MarcRecord> Connection::readRecords (const MfnList &mfnList)
+{
+    // TODO implement
+    std::vector<MarcRecord> result;
+    return result;
+}
+
 std::vector<SearchScenario> Connection::readSearchScenario(const FileSpecification &specification)
 {
     std::vector<SearchScenario> result;
@@ -1211,6 +1221,11 @@ bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, 
     return true;
 }
 
+bool Connection::writeRecords(std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse)
+{
+    // TODO implement
+    return false;
+}
 
 int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {

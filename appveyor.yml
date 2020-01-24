@@ -1,5 +1,5 @@
 version: 1.0.{build}
-configuration: Debug
+configuration: Release
 platform: x64
 image: Visual Studio 2017
 
@@ -10,5 +10,7 @@ after_build:
   - cmd: utils\doxygen
 
 artifacts:
+  - path: x64
+    name: Binaries
   - path: doxygen\html
     name: HtmlDocs
