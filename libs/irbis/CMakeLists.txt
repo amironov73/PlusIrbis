@@ -22,5 +22,5 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
-install(TARGETS irbis DESTINATION ${ARTIFACTS})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
 install(FILES ${PROJECT_SOURCE_DIR}/include/irbis.h DESTINATION ${ARTIFACTS})

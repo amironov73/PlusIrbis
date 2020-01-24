@@ -536,8 +536,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include/irbis.h" />
-    <ClInclude Include="include\irbis_private.h" />
-    <ClInclude Include="include\irbis_version.h" />
+    <ClInclude Include="include/irbis_private.h" />
+    <ClInclude Include="include/irbis_version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/AlphabetTable.cpp" />

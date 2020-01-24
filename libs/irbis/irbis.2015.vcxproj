@@ -68,8 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include/irbis.h" />
-    <ClInclude Include="include\irbis_private.h" />
-    <ClInclude Include="include\irbis_version.h" />
+    <ClInclude Include="include/irbis_private.h" />
+    <ClInclude Include="include/irbis_version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src/AlphabetTable.cpp" />
@@ -127,6 +127,10 @@
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
+    <ClCompile Include="src\Encoding.cp1251.cpp" />
+    <ClCompile Include="src\Encoding.cp866.cpp" />
+    <ClCompile Include="src\Encoding.koi8r.cpp" />
+    <ClCompile Include="src\Encoding.utf8.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{670717F6-1EB6-4BE8-8F8D-F13F44DA30D4}</ProjectGuid>

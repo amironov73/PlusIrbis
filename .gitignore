@@ -346,6 +346,7 @@ doxygen/
 
 # CMake
 cmake-build-debug/
+cmake-build-release/
 compile_commands.json
 *.dylib
 Makefile

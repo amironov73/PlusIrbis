@@ -9,6 +9,8 @@ build:
 after_build:
   - cmd: utils\doxygen
 
+test_script: tests.cmd
+
 artifacts:
   - path: x64
     name: Binaries

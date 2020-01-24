@@ -13,4 +13,4 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
-install(TARGETS onlineTests DESTINATION ${ARTIFACTS})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
