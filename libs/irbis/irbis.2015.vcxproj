@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDllXP|Win32">
@@ -66,6 +66,7 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <!-- BEGIN -->
   <ItemGroup>
     <ClInclude Include="include/irbis.h" />
     <ClInclude Include="include/irbis_private.h" />
@@ -83,6 +84,10 @@
     <ClCompile Include="src/DirectAccess.cpp" />
     <ClCompile Include="src/EmbeddedField.cpp" />
     <ClCompile Include="src/Encoding.cpp" />
+    <ClCompile Include="src/Encoding.cp1251.cpp" />
+    <ClCompile Include="src/Encoding.cp866.cpp" />
+    <ClCompile Include="src/Encoding.koi8r.cpp" />
+    <ClCompile Include="src/Encoding.utf8.cpp" />
     <ClCompile Include="src/File.cpp" />
     <ClCompile Include="src/FileSpecification.cpp" />
     <ClCompile Include="src/FoundLine.cpp" />
@@ -108,6 +113,7 @@
     <ClCompile Include="src/NumberChunk.cpp" />
     <ClCompile Include="src/OptFile.cpp" />
     <ClCompile Include="src/ParFile.cpp" />
+    <ClCompile Include="src/Phantom.cpp" />
     <ClCompile Include="src/ProcessInfo.cpp" />
     <ClCompile Include="src/RawRecord.cpp" />
     <ClCompile Include="src/RecordField.cpp" />
@@ -127,11 +133,8 @@
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
-    <ClCompile Include="src\Encoding.cp1251.cpp" />
-    <ClCompile Include="src\Encoding.cp866.cpp" />
-    <ClCompile Include="src\Encoding.koi8r.cpp" />
-    <ClCompile Include="src\Encoding.utf8.cpp" />
   </ItemGroup>
+  <!-- END -->
   <PropertyGroup Label="Globals">
     <ProjectGuid>{670717F6-1EB6-4BE8-8F8D-F13F44DA30D4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

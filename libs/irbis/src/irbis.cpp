@@ -760,5 +760,14 @@ std::wstring prepareFormat(const std::wstring &text)
     return result;
 }
 
+bool isWindows()
+{
+#ifdef IRBIS_WINDOWS
+    return true;
+#else
+    return false;
+#endif
+}
+
 }
 

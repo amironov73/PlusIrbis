@@ -287,8 +287,6 @@ PLUSIRBIS_EXPORTS String trimStart(const String &text);
 PLUSIRBIS_EXPORTS String trimEnd(const String &text);
 PLUSIRBIS_EXPORTS String trim(const String &text);
 
-PLUSIRBIS_EXPORTS String describeError(int errorCode);
-
 PLUSIRBIS_EXPORTS int fastParse32(const String &text);
 PLUSIRBIS_EXPORTS int fastParse32(CharSpan text);
 PLUSIRBIS_EXPORTS int fastParse32(WideSpan text);
@@ -334,17 +332,18 @@ PLUSIRBIS_EXPORTS std::string new_unicode_to_cp1251(const String &text);
 PLUSIRBIS_EXPORTS std::string new_toUtf(const String &text);
 PLUSIRBIS_EXPORTS String new_fromUtf(const std::string &text);
 
-PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const Char *src, std::size_t length);
-PLUSIRBIS_EXPORTS Char* fromUtf(Char *dst, const Byte *src, std::size_t length);
-PLUSIRBIS_EXPORTS std::size_t countUtf(const Char *src, std::size_t length);
-PLUSIRBIS_EXPORTS std::size_t countUtf(const Byte *src, std::size_t length);
-PLUSIRBIS_EXPORTS const Byte* fromUtf(const Byte *src, std::size_t &size, Byte stop, String &result);
-PLUSIRBIS_EXPORTS Byte* toUtf(Byte *dst, const String &text);
-PLUSIRBIS_EXPORTS String fromUtf(const std::string &text);
-PLUSIRBIS_EXPORTS std::string toUtf(const String &text);
+PLUSIRBIS_EXPORTS Byte* toUtf (Byte *dst, const Char *src, std::size_t length);
+PLUSIRBIS_EXPORTS Char* fromUtf (Char *dst, const Byte *src, std::size_t length);
+PLUSIRBIS_EXPORTS std::size_t countUtf (const Char *src, std::size_t length);
+PLUSIRBIS_EXPORTS std::size_t countUtf (const Byte *src, std::size_t length);
+PLUSIRBIS_EXPORTS const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result);
+PLUSIRBIS_EXPORTS Byte* toUtf (Byte *dst, const String &text);
+PLUSIRBIS_EXPORTS String fromUtf (const std::string &text);
+PLUSIRBIS_EXPORTS std::string toUtf (const String &text);
+PLUSIRBIS_EXPORTS String fromUtf (ByteSpan span);
 
-PLUSIRBIS_EXPORTS String removeComments(const String &text);
-PLUSIRBIS_EXPORTS String prepareFormat(const String &text);
+PLUSIRBIS_EXPORTS String removeComments (const String &text);
+PLUSIRBIS_EXPORTS String prepareFormat (const String &text);
 
 }
 

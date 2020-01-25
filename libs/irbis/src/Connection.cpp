@@ -86,6 +86,8 @@ bool Connection::connect()
         return true;
     }
 
+    this->lastError = 0;
+
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
     std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
     std::uniform_int_distribution<> dis(100000, 900000);
@@ -95,26 +97,34 @@ bool Connection::connect()
     ClientQuery query(*this, "A");
     query.addAnsi(this->username).newLine()
             .addAnsi(this->password);
-    ServerResponse response(*this, query);
-    if (!response.success()) {
+
+    try {
+        ServerResponse response(*this, query);
+        if (!response.success()) {
+            return false;
+        }
+
+        response.getReturnCode();
+        if (response.returnCode == -3337) {
+            // клиент с данным идентификатором уже зарегистрирован
+            goto AGAIN;
+        }
+
+        if (response.returnCode < 0) {
+            return false;
+        }
+
+        this->_connected = true;
+        this->serverVersion = response.serverVersion;
+        this->interval = response.readInteger();
+        const auto lines = response.readRemainingAnsiLines();
+        this->iniFile.parse(lines);
+    }
+    catch (...) {
+        this->lastError = -100002;
         return false;
     }
 
-    response.getReturnCode();
-    if (response.returnCode == -3337) {
-        // клиент с данным идентификатором уже зарегистрирован
-        goto AGAIN;
-    }
-
-    if (response.returnCode < 0) {
-        return false;
-    }
-
-    this->_connected = true;
-    this->serverVersion = response.serverVersion;
-    this->interval = response.readInteger();
-    const auto lines = response.readRemainingAnsiLines();
-    this->iniFile.parse(lines);
     return true;
 }
 
@@ -230,8 +240,17 @@ bool Connection::execute(ClientQuery &query)
         return false;
     }
 
-    ServerResponse response(*this, query);
-    return response.checkReturnCode();
+    bool result = false;
+
+    try {
+        ServerResponse response(*this, query);
+        result = response.checkReturnCode();
+    }
+    catch (...) {
+        // Do nothing
+    }
+
+    return result;
 }
 
 // /// \brief Асинхронный вариант execute.

@@ -1529,6 +1529,49 @@ public:
 
 //=========================================================
 
+/// \brief Невладеющее подполе.
+class PLUSIRBIS_EXPORTS PhantomSubField final
+{
+public:
+
+    /// \brief Одноисмвольный код подполя.
+    Char code { L'\0' };
+    ByteSpan value; ///< Значение подполя (может быть пустым).
+
+    SubField materialize() const;
+};
+
+//=========================================================
+
+/// \brief Невладеющее поле.
+class PLUSIRBIS_EXPORTS PhantomField final
+{
+public:
+
+    int tag { 0 };
+    ByteSpan value;
+    std::list<PhantomSubField> subfields;
+
+    RecordField materialize() const;
+};
+
+//=========================================================
+
+/// \brief Невладеющая запись.
+class PLUSIRBIS_EXPORTS PhantomRecord final
+{
+public:
+
+    Mfn mfn { 0u };                 ///< MFN (порядковый номер в базе) записи.
+    Flag status { 0u };             ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };    ///< Номер версии записи.
+    std::list<PhantomField> fields; ///< Список полей.
+
+    MarcRecord materialize() const;
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS PostingParameters final
 {
 public:
@@ -2035,6 +2078,10 @@ PLUSIRBIS_EXPORTS std::string libraryVersionString();
 
 PLUSIRBIS_EXPORTS std::string wide2string(const String &s);
 PLUSIRBIS_EXPORTS String string2wide(const std::string &s);
+
+PLUSIRBIS_EXPORTS bool isWindows();
+
+PLUSIRBIS_EXPORTS String describeError(int errorCode);
 
 }
 

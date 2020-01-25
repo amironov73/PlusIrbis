@@ -211,6 +211,16 @@ String fromUtf(const std::string &text)
     return result;
 }
 
+/// \brief Преобразует диапазон байт в Unicode-строку.
+String fromUtf (ByteSpan span)
+{
+    const auto size = countUtf(span.ptr, span.length);
+    String result;
+    result.resize(size);
+    fromUtf(const_cast<Char*>(result.data()), span.ptr, span.length);
+    return result;
+}
+
 // Записывает строку в UTF-8
 Byte* toUtf(Byte *dst, const String &text)
 {
