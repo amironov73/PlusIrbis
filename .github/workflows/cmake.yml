@@ -13,3 +13,7 @@ jobs:
       run: source ./build.sh
     - name: tests
       run: ./artifacts/safeTests
+    - uses: actions/upload-artifact@v1
+      with:
+        name: treasure
+        path: artifacts
