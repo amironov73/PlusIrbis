@@ -5,6 +5,7 @@
 int main()
 {
     setlocale(LC_ALL, ""); // for cyrillic output
+    std::wcout.imbue (std::locale(""));
 
     std::cout << "Client version: " << irbis::libraryVersionString() << std::endl;
     std::cout << "Running on " << (irbis::isWindows() ? "Windows" : "UNIX") << std::endl;
@@ -18,10 +19,10 @@ int main()
         connection.password = L"secret";
         const auto isConnected = connection.connect();
         if (!isConnected) {
-            std::cout << "Not connected!" << std::endl;
-            std::cout << "Error code: " << connection.lastError << std::endl;
-            std::cout << "Error description: "
-                << irbis::wide2string(irbis::describeError(connection.lastError)) << std::endl;
+            std::wcout << L"Not connected!" << std::endl;
+            std::wcout << L"Error code: " << connection.lastError << std::endl;
+            std::wcout << L"Error description: "
+                << irbis::describeError(connection.lastError) << std::endl;
             return -1;
         }
 

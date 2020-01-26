@@ -3,6 +3,11 @@ set(CMAKE_CXX_STANDARD 11)
 
 project(hello)
 
+if(MSVC)
+    message("Visual C++ detected")
+    add_compile_options(/UTF-8)
+endif(MSVC)
+
 FILE(GLOB CppFiles
     ${PROJECT_SOURCE_DIR}/src/*.cpp
 )

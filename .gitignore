@@ -355,3 +355,6 @@ CMakeCache.txt
 cmake_install.cmake
 CMakeFiles/
 *.tasks
+
+# temporary test data
+temp/

@@ -3,7 +3,12 @@ set(CMAKE_CXX_STANDARD 11)
 
 project(irbis)
 
-add_definitions(-DPLUSIRBIS_LIBRARY -D_CRT_SECURE_NO_WARNINGS)
+if(MSVC)
+    add_compile_options(/UTF-8)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif(MSVC)
+
+add_definitions(-DPLUSIRBIS_LIBRARY)
 
 FILE(GLOB HeaderFiles
     ${PROJECT_SOURCE_DIR}/include/*.h

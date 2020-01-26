@@ -34,6 +34,8 @@ public:
     File& operator = (File &&other) = delete;
     ~File();
 
+    FILE* getStream() const noexcept { return this->_stream; }
+
     std::size_t read(Byte *buffer, std::size_t count);
     int64_t seek(int64_t position);
     int64_t tell();
@@ -159,6 +161,17 @@ public:
     static bool readInt64 (FILE* file, uint64_t *value);
     static bool writeInt32 (FILE* file, uint32_t value);
     static bool writeInt64 (FILE* file, uint64_t value);
+    static void createDirectory (const String &dir);
+    static String getCurrentDirectory();
+    static void setCurrentDirectory (const String &dir);
+    static String getExtension (const String &path);
+    static String getFileName (const String &path);
+    static String getDirectory (const String &path);
+    static String& convertSlashes (String &path) noexcept;
+    static String combinePath (const String &path1, const String &path2);
+    static bool directoryExist (const String &path);
+    static bool fileExist (const String &path);
+    static void deleteFile (const String &path);
 };
 
 //=========================================================
