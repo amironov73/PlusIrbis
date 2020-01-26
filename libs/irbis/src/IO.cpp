@@ -5,6 +5,7 @@
 #include "irbis_private.h"
 
 #include <cstdio>
+#include <cstring>
 #include <sys/stat.h>
 
 #ifdef  IRBIS_WINDOWS
@@ -123,7 +124,7 @@ String IO::getCurrentDirectory()
 
     char buf [FILENAME_MAX];
     memset (buf, 0, sizeof (buf));
-    if (!::getcwd (sizeof (buf), buf)) {
+    if (!::getcwd (buf, sizeof (buf))) {
         throw IrbisException();
     }
     return string2wide (std::string (buf));
@@ -324,7 +325,7 @@ void IO::createDirectory (const String &dir)
 
 #else
 
-    std::string narrow = irbis::wide2string(path);
+    std::string narrow = irbis::wide2string(dir);
     if (::mkdir(narrow.c_str(), 0755) < 0) {
         throw IrbisException();
     }
