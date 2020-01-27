@@ -131,3 +131,23 @@ TEST_CASE("IO_writeInt64_1", "[io]")
     uint64_t value { 0x00000000015E34BCull };
     CHECK (irbis::IO::writeInt64 (file.getStream(), value));
 }
+
+TEST_CASE("IO_trimLeadingSlashes_1", "[io]")
+{
+    irbis::String path(L"//some/path/");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == L"some/path/");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == L"some/path/");
+    path = L"\\\\some\\path\\";
+    CHECK(irbis::IO::trimLeadingSlashes(path) == L"some\\path\\");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == L"some\\path\\");
+}
+
+TEST_CASE("IO_trimTrailingingSlashes_1", "[io]")
+{
+    irbis::String path(L"//some/path/");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == L"//some/path");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == L"//some/path");
+    path = L"\\\\some\\path\\";
+    CHECK(irbis::IO::trimTrailingSlashes(path) == L"\\\\some\\path");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == L"\\\\some\\path");
+}

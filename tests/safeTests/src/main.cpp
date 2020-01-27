@@ -55,9 +55,17 @@ irbis::String whereIbis()
     return result;
 }
 
+/// \brief Где у нас временная директория.
+/// \return Путь ко временной папке.
+irbis::String whereTemp()
+{
+    return irbis::IO::getTempDirectory();
+}
+
 TEST_CASE("where am i", "[env]")
 {
     std::wcout << L"current: " << irbis::IO::getCurrentDirectory() << std::endl;
+    std::wcout << L"temp:    " << whereTemp() << std::endl;
     std::wcout << L"tests:   " << whereTestData() << std::endl;
     std::wcout << L"Datai:   " << whereDatai()    << std::endl;
     std::wcout << L"IBIS:    " << whereIbis()     << std::endl;

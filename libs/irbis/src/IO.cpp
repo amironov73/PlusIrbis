@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstring>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 #ifdef  IRBIS_WINDOWS
 
@@ -14,6 +15,7 @@
 
 #include <winsock2.h>
 #include <windows.h>
+#include <io.h>
 
 #pragma comment (lib, "ws2_32.lib")
 
@@ -25,6 +27,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 #endif
 
@@ -280,7 +283,16 @@ String& IO::convertSlashes (String &path) noexcept
 String IO::combinePath (const String &path1, const String &path2)
 {
     // TODO implement properly
-    return path1 + L"/" + path2;
+
+    if (path1.empty()) {
+        return path2;
+    }
+    if (path2.empty()) {
+        return path1;
+    }
+    auto p1 = path1;
+    trimTrailingSlashes(p1);
+    return p1 + L"/" + path2;
 }
 
 /// \brief Существует ли указанная директория?
@@ -311,9 +323,13 @@ bool IO::fileExist (const String &path)
 
 /// \brief Создание директории с указанным именем.
 /// \param dir Имя директории.
-void IO::createDirectory (const String &dir)
+/// \param createNew Выбрасывать исключение, если директория уже существует.
+void IO::createDirectory (const String &dir, bool createNew)
 {
-    if (directoryExist(dir)) {
+    if (IO::directoryExist(dir)) {
+        if (createNew) {
+            throw IrbisException();
+        }
         return;
     }
 
@@ -333,26 +349,131 @@ void IO::createDirectory (const String &dir)
 #endif
 }
 
+/// \brief Удаление файла с указанным именем.
+/// \param path Имя файла.
 void IO::deleteFile (const String &path)
 {
-    if (!fileExist(path)) {
+    if (!IO::fileExist(path)) {
         return;
     }
 
 #ifdef IRBIS_WINDOWS
 
-    if (!::DeleteFileW(path.c_str())) {
+    if (!::DeleteFileW (path.c_str())) {
         throw IrbisException();
     }
 
 #else
 
-    std::string narrow = irbis::wide2string(path);
-    if (::remove(narrow.c_str()) < 0) {
+    std::string narrow = irbis::wide2string (path);
+    if (::remove (narrow.c_str()) < 0) {
         throw IrbisException();
     }
 
 #endif
+}
+
+/// \brief Создание файла с указанным именем.
+/// \param path Имя файла.
+/// \param createNew Выбрасывать исключение, если файл уже существует.
+void IO::createFile (const String &path, bool createNew)
+{
+    if (createNew) {
+        if (IO::fileExist (path)) {
+            throw IrbisException();
+        }
+    }
+
+#ifdef IRBIS_WINDOWS
+
+    const auto handle = ::CreateFileW
+        (
+            path.c_str(),
+            GENERIC_READ|GENERIC_WRITE,
+            0,
+            nullptr,
+            CREATE_ALWAYS,
+            FILE_ATTRIBUTE_NORMAL,
+            0
+        );
+    if (handle == INVALID_HANDLE_VALUE) {
+        throw IrbisException();
+    }
+    ::CloseHandle(handle);
+
+#else
+
+    std::string narrow = irbis::wide2string (path);
+    auto fd = ::creat(narrow.c_str(), S_IREAD|S_IWRITE);
+    if (fd < 0) {
+        throw IrbisException();
+    }
+    ::close(fd);
+
+#endif
+}
+
+/// \brief Получение временной директории.
+/// \return Путь к временной директории.
+String IO::getTempDirectory()
+{
+#ifdef IRBIS_WINDOWS
+
+    wchar_t buffer[FILENAME_MAX];
+    ::memset(buffer, 0, sizeof(buffer));
+    if (!::GetTempPathW(FILENAME_MAX, buffer)) {
+        throw IrbisException();
+    }
+    return String(buffer);
+
+#else
+
+    const char *result = ::getenv("TMPDIR");
+    if (!result) {
+        result = ::getenv("TEMPDIR");
+    }
+    if (!result) {
+        result = ::getenv("TMP");
+    }
+    if (!result) {
+        result = ::getenv("TEMP");
+    }
+    if (!result) {
+        throw IrbisException();
+    }
+    return irbis::string2wide(result);
+
+#endif
+}
+
+/// \brief Удаляет начальные слэши в пути.
+/// \param path Путь для обработки.
+/// \return Обработанный путь.
+String& IO::trimLeadingSlashes (String &path)
+{
+    while (!path.empty()) {
+        const auto c = path.front();
+        if (c != '/' && c != '\\') {
+            break;
+        }
+        path.erase(path.begin());
+    }
+    return path;
+}
+
+/// \brief Удаляет конечные слэши в пути.
+/// \param path Путь для обработки.
+/// \return Обработанный путь.
+String& IO::trimTrailingSlashes (String &path)
+{
+    while (!path.empty()) {
+        const auto c = path.back();
+        if (c != '/' && c != '\\') {
+            break;
+        }
+        path.erase(path.end() - 1);
+    }
+    return path;
 }
 
 }

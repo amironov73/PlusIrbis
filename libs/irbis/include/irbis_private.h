@@ -24,22 +24,22 @@ class PLUSIRBIS_EXPORTS File final
 {
 public:
 
-    File(FILE *stream);
-    File(const char *name, const char *mode);
-    File(const std::string &name, const std::string &mode);
-    File(const String &name, const String &mode);
-    File(const File &other) = delete;
-    File(File &&other) = delete;
+    File (FILE *stream);
+    File (const char *name, const char *mode);
+    File (const std::string &name, const std::string &mode);
+    File (const String &name, const String &mode);
+    File (const File &other) = delete;
+    File (File &&other) = delete;
     File& operator = (const File &other) = delete;
     File& operator = (File &&other) = delete;
     ~File();
 
     FILE* getStream() const noexcept { return this->_stream; }
 
-    std::size_t read(Byte *buffer, std::size_t count);
-    int64_t seek(int64_t position);
+    std::size_t read (Byte *buffer, std::size_t count);
+    int64_t seek (int64_t position);
     int64_t tell();
-    std::size_t write(const Byte *buffer, std::size_t count);
+    std::size_t write (const Byte *buffer, std::size_t count);
 
 private:
 
@@ -161,7 +161,7 @@ public:
     static bool readInt64 (FILE* file, uint64_t *value);
     static bool writeInt32 (FILE* file, uint32_t value);
     static bool writeInt64 (FILE* file, uint64_t value);
-    static void createDirectory (const String &dir);
+    static void createDirectory (const String &dir, bool createNew = false);
     static String getCurrentDirectory();
     static void setCurrentDirectory (const String &dir);
     static String getExtension (const String &path);
@@ -172,6 +172,10 @@ public:
     static bool directoryExist (const String &path);
     static bool fileExist (const String &path);
     static void deleteFile (const String &path);
+    static void createFile (const String &path, bool createNew = false);
+    static String getTempDirectory();
+    static String& trimLeadingSlashes (String &path);
+    static String& trimTrailingSlashes (String &path);
 };
 
 //=========================================================

@@ -24,7 +24,6 @@
 
  */
 
-
 namespace irbis {
 
 /// \brief Размер одной записи в XRF-файле.
@@ -48,8 +47,7 @@ bool XrfRecord64::locked() const noexcept
 /// \return Строковое представление.
 String XrfRecord64::toString() const
 {
-    return String(L"MFN=") + std::to_wstring(this->mfn)
-        + String(L", offset=") + std::to_wstring(this->offset)
+    return String(L", offset=") + std::to_wstring(this->offset)
         + String(L", status:=") + std::to_wstring(this->status);
 }
 

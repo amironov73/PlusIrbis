@@ -102,6 +102,7 @@ class Date;
 class DirectAccess64;
 class EmbeddedField;
 class Encoding;
+class File;
 class FileSpecification;
 class Format;
 class FoundLine;
@@ -2033,19 +2034,23 @@ class PLUSIRBIS_EXPORTS XrfFile64 final
 {
 public:
 
-    XrfFile64(const String &fileName, DirectAccessMode mode);
-    XrfFile64(const XrfFile64 &) = delete;
-    XrfFile64(const XrfFile64 &&) = delete;
+    XrfFile64 (const String &fileName, DirectAccessMode mode);
+    XrfFile64 (const XrfFile64 &) = delete;
+    XrfFile64 (const XrfFile64 &&) = delete;
     XrfFile64& operator = (const XrfFile64 &) = delete;
     XrfFile64& operator = (const XrfFile64 &&) = delete;
     ~XrfFile64();
 
-    XrfRecord64 readRecord(Mfn mfn);
+    void close();
+    XrfRecord64 readRecord (Mfn mfn);
+    void writeRecord (Mfn mfn, XrfRecord64 record);
+
+    static XrfFile64 create (const String &fileName);
 
 private:
 
     String _fileName;
-    FILE *_file;
+    File *_file;
     DirectAccessMode _mode;
     std::mutex _mutex;
 
@@ -2060,7 +2065,6 @@ class PLUSIRBIS_EXPORTS XrfRecord64 final
 public:
     const static int RecordSize;
 
-    Mfn    mfn    { 0 }; ///< MFN записи.
     Offset offset { 0 }; ///< Смещение записи в MST-файле.
     Mfn    status { 0 }; ///< Статус записи (удалена, заблокирована и т.д.).
 
