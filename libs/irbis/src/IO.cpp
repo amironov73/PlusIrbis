@@ -439,7 +439,10 @@ String IO::getTempDirectory()
         result = ::getenv("TEMP");
     }
     if (!result) {
-        throw IrbisException();
+        // The Filesystem Hierarchy Standard version 3.0 says:
+        // The /tmp directory must be made available for programs
+        // that require temporary files.
+        result = "/tmp";
     }
     return irbis::string2wide(result);
 
