@@ -100,7 +100,7 @@ TEST_CASE("IO_convertSlashes_2", "[io]")
 
 #else
 
-    std::string s(L"\\path\\to\\file");
+    std::string s("\\path\\to\\file");
     CHECK(irbis::IO::convertSlashes(s) == "/path/to/file");
 
 #endif
