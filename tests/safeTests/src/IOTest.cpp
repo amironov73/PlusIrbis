@@ -7,19 +7,36 @@
 
 TEST_CASE("IO_getCurrentDirectory_1", "[io]")
 {
-    const irbis::String dir = irbis::IO::getCurrentDirectory();
+    const auto dir = irbis::IO::getCurrentDirectory();
+    CHECK(!dir.empty());
+}
+
+TEST_CASE("IO_getCurrentDirectory_2", "[io]")
+{
+    const auto dir = irbis::IO::getCurrentDirectoryNarrow();
     CHECK(!dir.empty());
 }
 
 TEST_CASE("IO_getExtension_1", "[io]")
 {
     CHECK(irbis::IO::getExtension(L"").empty());
+    CHECK(irbis::IO::getExtension(L".").empty());
     CHECK(irbis::IO::getExtension(L"file.ext") == L".ext");
     CHECK(irbis::IO::getExtension(L"file.ext2.ext1") == L".ext1");
     CHECK(irbis::IO::getExtension(L"file.").empty());
     CHECK(irbis::IO::getExtension(L"file_ext").empty());
     CHECK(irbis::IO::getExtension(L"dir.ext/file").empty());
-    CHECK(irbis::IO::getExtension(L"").empty());
+}
+
+TEST_CASE("IO_getExtension_2", "[io]")
+{
+    CHECK(irbis::IO::getExtension("").empty());
+    CHECK(irbis::IO::getExtension(".").empty());
+    CHECK(irbis::IO::getExtension("file.ext") == ".ext");
+    CHECK(irbis::IO::getExtension("file.ext2.ext1") == ".ext1");
+    CHECK(irbis::IO::getExtension("file.").empty());
+    CHECK(irbis::IO::getExtension("file_ext").empty());
+    CHECK(irbis::IO::getExtension("dir.ext/file").empty());
 }
 
 TEST_CASE("IO_getFileName_1", "[io]")
@@ -33,6 +50,19 @@ TEST_CASE("IO_getFileName_1", "[io]")
     CHECK(irbis::IO::getFileName(L"\\file.ext") == L"file.ext");
     CHECK(irbis::IO::getFileName(L"file.ext") == L"file.ext");
     CHECK(irbis::IO::getFileName(L"file.ext") == L"file.ext");
+}
+
+TEST_CASE("IO_getFileName_2", "[io]")
+{
+    CHECK(irbis::IO::getFileName("").empty());
+    CHECK(irbis::IO::getFileName("dir/subdir/file.ext") == "file.ext");
+    CHECK(irbis::IO::getFileName("dir\\subdir\\file.ext") == "file.ext");
+    CHECK(irbis::IO::getFileName("dir/subdir/").empty());
+    CHECK(irbis::IO::getFileName("dir\\subdir\\").empty());
+    CHECK(irbis::IO::getFileName("/file.ext") == "file.ext");
+    CHECK(irbis::IO::getFileName("\\file.ext") == "file.ext");
+    CHECK(irbis::IO::getFileName("file.ext") == "file.ext");
+    CHECK(irbis::IO::getFileName("file.ext") == "file.ext");
 }
 
 TEST_CASE("IO_getDirectory_1", "[io]")
@@ -61,9 +91,37 @@ TEST_CASE("IO_convertSlashes_1", "[io]")
 #endif
 }
 
+TEST_CASE("IO_convertSlashes_2", "[io]")
+{
+#ifdef IRBIS_WINDOWS
+
+    std::string s("/path/to/file");
+    CHECK(irbis::IO::convertSlashes(s) == "\\path\\to\\file");
+
+#else
+
+    std::string s(L"\\path\\to\\file");
+    CHECK(irbis::IO::convertSlashes(s) == "/path/to/file");
+
+#endif
+}
+
 TEST_CASE("IO_combinePath_1", "[io]")
 {
+#ifdef IRBIS_WINDOWS
+    CHECK(irbis::IO::combinePath(L"dir", L"subdir") == L"dir\\subdir");
+#else
     CHECK(irbis::IO::combinePath(L"dir", L"subdir") == L"dir/subdir");
+#endif
+}
+
+TEST_CASE("IO_combinePath_2", "[io]")
+{
+#ifdef IRBIS_WINDOWS
+    CHECK(irbis::IO::combinePath("dir", "subdir") == "dir\\subdir");
+#else
+    CHECK(irbis::IO::combinePath("dir", "subdir") == "dir/subdir");
+#endif
 }
 
 TEST_CASE("IO_readInt32_1", "[io]")
@@ -142,6 +200,16 @@ TEST_CASE("IO_trimLeadingSlashes_1", "[io]")
     CHECK(irbis::IO::trimLeadingSlashes(path) == L"some\\path\\");
 }
 
+TEST_CASE("IO_trimLeadingSlashes_2", "[io]")
+{
+    std::string path("//some/path/");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == "some/path/");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == "some/path/");
+    path = R"(\\some\path\)";
+    CHECK(irbis::IO::trimLeadingSlashes(path) == "some\\path\\");
+    CHECK(irbis::IO::trimLeadingSlashes(path) == "some\\path\\");
+}
+
 TEST_CASE("IO_trimTrailingingSlashes_1", "[io]")
 {
     irbis::String path(L"//some/path/");
@@ -150,4 +218,36 @@ TEST_CASE("IO_trimTrailingingSlashes_1", "[io]")
     path = L"\\\\some\\path\\";
     CHECK(irbis::IO::trimTrailingSlashes(path) == L"\\\\some\\path");
     CHECK(irbis::IO::trimTrailingSlashes(path) == L"\\\\some\\path");
+}
+
+TEST_CASE("IO_trimTrailingingSlashes_2", "[io]")
+{
+    std::string path("//some/path/");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == "//some/path");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == "//some/path");
+    path = R"(\\some\path\)";
+    CHECK(irbis::IO::trimTrailingSlashes(path) == "\\\\some\\path");
+    CHECK(irbis::IO::trimTrailingSlashes(path) == "\\\\some\\path");
+}
+
+TEST_CASE("IO_getFileSize_1", "[io]")
+{
+    auto path = whereTestData();
+    REQUIRE(!path.empty());
+    path = irbis::IO::combinePath(path, L"TEST1.ISO");
+    irbis::IO::convertSlashes(path);
+    REQUIRE(irbis::IO::fileExist(path));
+    const auto size = irbis::IO::getFileSize(path);
+    CHECK(size == 78096ull);
+}
+
+TEST_CASE("IO_getFileSize_2", "[io]")
+{
+    auto path = irbis::wide2string(whereTestData());
+    REQUIRE(!path.empty());
+    path = irbis::IO::combinePath(path, "TEST1.ISO");
+    irbis::IO::convertSlashes(path);
+    REQUIRE(irbis::IO::fileExist(path));
+    const auto size = irbis::IO::getFileSize(path);
+    CHECK(size == 78096ull);
 }

@@ -162,20 +162,37 @@ public:
     static bool writeInt32 (FILE* file, uint32_t value);
     static bool writeInt64 (FILE* file, uint64_t value);
     static void createDirectory (const String &dir, bool createNew = false);
+    static void createDirectory (const std::string &dir, bool createNew = false);
     static String getCurrentDirectory();
+    static std::string getCurrentDirectoryNarrow();
     static void setCurrentDirectory (const String &dir);
+    static void setCurrentDirectory (const std::string &dir);
     static String getExtension (const String &path);
+    static std::string getExtension (const std::string &path);
     static String getFileName (const String &path);
+    static std::string getFileName (const std::string &path);
     static String getDirectory (const String &path);
+    static std::string getDirectory (const std::string &path);
     static String& convertSlashes (String &path) noexcept;
+    static std::string& convertSlashes (std::string &path) noexcept;
     static String combinePath (const String &path1, const String &path2);
+    static std::string combinePath (const std::string &path1, const std::string &path2);
     static bool directoryExist (const String &path);
+    static bool directoryExist (const std::string &path);
     static bool fileExist (const String &path);
+    static bool fileExist (const std::string &path);
     static void deleteFile (const String &path);
+    static void deleteFile (const std::string &path);
     static void createFile (const String &path, bool createNew = false);
+    static void createFile (const std::string &path, bool createNew = false);
     static String getTempDirectory();
+    static std::string getTempDirectoryNarrow();
     static String& trimLeadingSlashes (String &path);
+    static std::string& trimLeadingSlashes (std::string &path);
     static String& trimTrailingSlashes (String &path);
+    static std::string& trimTrailingSlashes (std::string &path);
+    static uint64_t getFileSize (const String &path);
+    static uint64_t getFileSize (const std::string &path);
 };
 
 //=========================================================
