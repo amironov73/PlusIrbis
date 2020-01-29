@@ -303,6 +303,127 @@ public:
 
 //=========================================================
 
+/// \brief Навигация по диапазону байт.
+class PLUSIRBIS_EXPORTS ByteNavigator final
+{
+public:
+    const static int EOT;
+
+    ByteNavigator() noexcept;
+    ByteNavigator (ByteSpan data) noexcept; // NOLINT(google-explicit-constructor)
+    ByteNavigator (const ByteNavigator &other) = default;
+    ByteNavigator (ByteNavigator &&other) = default;
+    ByteNavigator& operator = (const ByteNavigator &other) = default;
+    ByteNavigator& operator = (ByteNavigator &&other) = default;
+
+    std::size_t position() const noexcept;
+    std::size_t size()     const noexcept;
+    Byte* begin()          const noexcept;
+    const Byte* cbegin()   const noexcept;
+    Byte* current()        const noexcept;
+    const Byte* ccurrent() const noexcept;
+    Byte* end()            const noexcept;
+    const Byte* cend()     const noexcept;
+    bool eot()             const noexcept;
+
+    int at(std::size_t position) const noexcept;
+    ByteSpan remaining() const noexcept;
+    int front() const noexcept;
+    int back() const noexcept;
+    int lookAhead(std::ptrdiff_t distance = 1) const noexcept;
+    int lookBehind(std::ptrdiff_t distance = 1) const noexcept;
+    ByteNavigator& move(std::ptrdiff_t distance) noexcept;
+    int peekByte() const noexcept;
+    int readByte() noexcept;
+    ByteSpan peekString(std::size_t length) const noexcept;
+    ByteSpan peekTo(Byte stop) const noexcept;
+    ByteSpan peekUntil(Byte stop) const noexcept;
+    ByteSpan readLine() noexcept;
+    bool isControl() const noexcept;
+    bool isDigit() const noexcept;
+    bool isLetter() const noexcept;
+    bool isWhitespace() const noexcept;
+    ByteSpan readInteger() noexcept;
+    ByteSpan readString(std::size_t length) noexcept;
+    ByteSpan readTo(Byte stopByte) noexcept;
+    ByteSpan readUntil(Byte stopByte) noexcept;
+    ByteSpan readWhile(Byte goodByte) noexcept;
+    ByteSpan readWord() noexcept;
+    ByteSpan recent(std::ptrdiff_t length) const noexcept;
+    ByteNavigator& skipWhitespace() noexcept;
+    ByteNavigator& skipPunctuation() noexcept;
+    ByteNavigator& skipLine() noexcept;
+    ByteSpan slice(std::ptrdiff_t offset, std::size_t length) const noexcept;
+
+private:
+    ByteSpan _data;
+    std::size_t _position { 0u };
+};
+
+//=========================================================
+
+/// \brief Навигация по тексту.
+class PLUSIRBIS_EXPORTS TextNavigator final
+{
+public:
+    const static Char EOT;
+
+    TextNavigator(const Char* text, std::size_t length) noexcept;
+    TextNavigator(WideSpan text) noexcept; // NOLINT(google-explicit-constructor)
+    TextNavigator(const String &text) noexcept; // NOLINT(google-explicit-constructor)
+    TextNavigator(const TextNavigator &other) noexcept;
+    TextNavigator(TextNavigator&&) = delete;
+    TextNavigator& operator = (const TextNavigator &) = delete;
+    TextNavigator& operator = (TextNavigator &&) = delete;
+    ~TextNavigator() = default;
+
+    std::size_t column()   const noexcept;
+    std::size_t line()     const noexcept;
+    std::size_t length()   const noexcept;
+    std::size_t position() const noexcept;
+    Char* begin()          const noexcept;
+    const Char* cbegin()   const noexcept;
+    Char* current()        const noexcept;
+    const Char* ccurrent() const noexcept;
+    Char* end()            const noexcept;
+    const Char* cend()     const noexcept;
+    bool eot()             const noexcept;
+
+    Char at(std::size_t position) const noexcept;
+    Char front() const noexcept;
+    Char back() const noexcept;
+    Char lookAhead(std::ptrdiff_t distance = 1) const noexcept;
+    Char lookBehind(std::ptrdiff_t distance = 1) const noexcept;
+    TextNavigator& move(std::ptrdiff_t distance) noexcept;
+    Char peekChar() const noexcept;
+    Char readChar() noexcept;
+    WideSpan peekString(std::size_t length) const noexcept;
+    WideSpan peekTo(Char stopChar) const noexcept;
+    WideSpan peekUntil(Char stopChar) const noexcept;
+    WideSpan readLine() noexcept;
+    bool isControl() const noexcept;
+    bool isDigit() const noexcept;
+    bool isLetter() const noexcept;
+    bool isWhitespace() const noexcept;
+    WideSpan readInteger() noexcept;
+    WideSpan readString(std::size_t length) noexcept;
+    WideSpan readTo(Char stopChar) noexcept;
+    WideSpan readUntil(Char stopChar) noexcept;
+    WideSpan readWhile(Char goodChar) noexcept;
+    WideSpan readWord() noexcept;
+    WideSpan recentText(std::ptrdiff_t length) const noexcept;
+    WideSpan remainingText() const noexcept;
+    TextNavigator& skipWhitespace() noexcept;
+    TextNavigator& skipPunctuation() noexcept;
+    WideSpan substr(std::ptrdiff_t offset, std::size_t length) const noexcept;
+
+private:
+    std::size_t _column, _length, _line, _position;
+    const Char *_text;
+};
+
+//=========================================================
+
 // Utilities
 
 PLUSIRBIS_EXPORTS bool sameChar(Char first, Char second) noexcept;

@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
 
 #include <cwctype>
 
@@ -148,6 +149,7 @@ Char TextNavigator::back() const noexcept
 /// \brief Заглядывание вперед на указанное количество символов.
 Char TextNavigator::lookAhead(std::ptrdiff_t distance) const noexcept
 {
+    // TODO some checks
     const auto newPosition = this->_position + distance;
     return this->at(newPosition);
 }
@@ -155,18 +157,17 @@ Char TextNavigator::lookAhead(std::ptrdiff_t distance) const noexcept
 /// \brief Заглядывание назад на указанное количество символов.
 Char TextNavigator::lookBehind(std::ptrdiff_t distance) const noexcept
 {
+    // TODO some checks
     const auto newPosition = this->_position - distance;
-
     return this->at(newPosition);
 }
 
+/// \brief Перемещение по тексту вперёд/назад.
 TextNavigator& TextNavigator::move(std::ptrdiff_t distance) noexcept
 {
     // TODO Some checks
-
     this->_position += distance;
     this->_column += distance;
-
     return *this;
 }
 
@@ -176,7 +177,7 @@ Char TextNavigator::peekChar() const noexcept
     return this->at(this->_position);
 }
 
-/// \brief Считываем текущий символ.
+/// \brief Считываем текущий символ. Двигаемся вперёд по тексту.
 Char TextNavigator::readChar() noexcept
 {
     if (this->eot()) {
@@ -197,7 +198,7 @@ Char TextNavigator::readChar() noexcept
 /// \brief Подглядывание строки вплоть до указанной длины.
 WideSpan TextNavigator::peekString(std::size_t length) const noexcept
 {
-    WideSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->ccurrent(), 0);
     if (this->eot()) {
         return result;
     }
@@ -216,7 +217,7 @@ WideSpan TextNavigator::peekString(std::size_t length) const noexcept
 /// \brief Подглядывание вплоть до указанного символа (включая его).
 WideSpan TextNavigator::peekTo (Char stopChar) const noexcept
 {
-    WideSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->ccurrent(), 0);
     const auto length = this->_length - this->_position;
     for (std::size_t i = 0; i < length; ++i) {
         const auto c = this->lookAhead(i);
@@ -232,7 +233,7 @@ WideSpan TextNavigator::peekTo (Char stopChar) const noexcept
 /// \brief Подглядывание вплоть до указанного символа (не включая его).
 WideSpan TextNavigator::peekUntil(Char stopChar) const noexcept
 {
-    WideSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->ccurrent(), 0);
     const auto length = this->_length - this->_position;
     for (std::size_t i = 0; i < length; ++i) {
         const auto c = this->lookAhead(i);
@@ -248,7 +249,7 @@ WideSpan TextNavigator::peekUntil(Char stopChar) const noexcept
 /// \brief Считывание строки.
 WideSpan TextNavigator::readLine() noexcept
 {
-    WideSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->ccurrent(), 0);
     if (this->eot()) {
         return result;
     }
@@ -265,7 +266,7 @@ WideSpan TextNavigator::readLine() noexcept
 
     result = this->substr(start, this->_position - start);
     if (!this->eot()) {
-        Char c = this->peekChar();
+        auto c = this->peekChar();
         if (c == '\r') {
             this->readChar();
             c = this->peekChar();
@@ -279,13 +280,15 @@ WideSpan TextNavigator::readLine() noexcept
     return result;
 }
 
+/// \brief Управляющий символ?
 bool TextNavigator::isControl() const noexcept
 {
     const Char c = this->peekChar();
 
-    return (c > 0) && (c < ' ');
+    return (c > 0) && (c < L' ');
 }
 
+/// \brief Цифра?
 bool TextNavigator::isDigit() const noexcept
 {
     const Char c = this->peekChar();
@@ -293,6 +296,7 @@ bool TextNavigator::isDigit() const noexcept
     return std::iswdigit(c);
 }
 
+/// \brief Буква?
 bool TextNavigator::isLetter() const noexcept
 {
     const Char c = this->peekChar();
@@ -300,6 +304,7 @@ bool TextNavigator::isLetter() const noexcept
     return std::iswalpha(c);
 }
 
+/// \brief Пробельный символ?
 bool TextNavigator::isWhitespace() const noexcept
 {
     const Char c = this->peekChar();
@@ -307,6 +312,7 @@ bool TextNavigator::isWhitespace() const noexcept
     return std::iswspace(c);
 }
 
+/// \brief Чтение целого числа без знака.
 WideSpan TextNavigator::readInteger() noexcept
 {
     WideSpan result {this->_text, 0 };
@@ -327,7 +333,7 @@ WideSpan TextNavigator::readString(std::size_t length) noexcept
     }
 
     for (std::size_t i = 0; i < length; ++i) {
-        const Char c = this->readChar();
+        const auto c = this->readChar();
         if (c == EOT) {
             break;
         }
@@ -340,7 +346,7 @@ WideSpan TextNavigator::readString(std::size_t length) noexcept
 
 WideSpan TextNavigator::readTo(Char stopChar) noexcept
 {
-    WideSpan result {this->_text + this->_position, 0 };
+    WideSpan result {this->ccurrent(), 0 };
 
     if (this->eot()) {
         return result;
@@ -356,14 +362,13 @@ WideSpan TextNavigator::readTo(Char stopChar) noexcept
         end = this->_position;
     }
 
-    result = this->substr(start, end - start);
-
+    result = this->substr (start, end - start);
     return result;
 }
 
 WideSpan TextNavigator::readUntil(Char stopChar) noexcept
 {
-    WideSpan result {this->_text + this->_position, 0 };
+    WideSpan result {this->ccurrent(), 0 };
 
     if (this->eot()) {
         return result;
@@ -385,7 +390,7 @@ WideSpan TextNavigator::readUntil(Char stopChar) noexcept
 
 WideSpan TextNavigator::readWhile (Char goodChar) noexcept
 {
-    WideSpan result {this->_text + this->_position, 0 };
+    WideSpan result {this->ccurrent(), 0 };
 
     while (true) {
         const auto c = this->peekChar();
@@ -402,7 +407,7 @@ WideSpan TextNavigator::readWhile (Char goodChar) noexcept
 
 WideSpan TextNavigator::readWord() noexcept
 {
-    WideSpan result (this->_text + this->_position, 0);
+    WideSpan result (this->ccurrent(), 0);
 
     while (true) {
         const auto c = this->peekChar();
@@ -420,7 +425,7 @@ WideSpan TextNavigator::readWord() noexcept
 WideSpan TextNavigator::remainingText() const noexcept
 {
     if (this->eot()) {
-        return WideSpan { this->_text + this->_position, 0 };
+        return WideSpan { this->ccurrent(), 0 };
     }
 
     return this->substr(this->_position, this->_length - this->_position);
