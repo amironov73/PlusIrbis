@@ -14,7 +14,7 @@
 //-V::801
 
 /*!
-    \class irbis::BinaryNavigator
+    \class irbis::ByteNavigator
  */
 
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
@@ -69,7 +69,6 @@ const Byte* ByteNavigator::cbegin() const noexcept
 /// \return Указатель.
 Byte* ByteNavigator::current() const noexcept
 {
-    assert(!this->eot());
     return this->begin() + this->_position;
 }
 
@@ -77,7 +76,6 @@ Byte* ByteNavigator::current() const noexcept
 /// \return Указатель.
 const Byte* ByteNavigator::ccurrent() const noexcept
 {
-    assert(!this->eot());
     return this->_data.cbegin() + this->_position;
 }
 
@@ -115,7 +113,7 @@ int ByteNavigator::at(std::size_t position) const noexcept
 ByteSpan ByteNavigator::remaining() const noexcept
 {
     if (this->eot()) {
-        return {this->ccurrent(), 0};
+        return {};
     }
     return this->_data.slice(this->_position);
 }
@@ -171,12 +169,11 @@ int ByteNavigator::readByte() noexcept
 /// \brief Подглядывание строки вплоть до указанной длины.
 ByteSpan ByteNavigator::peekString(std::size_t length) const noexcept
 {
-    ByteSpan result (this->ccurrent(), 0);
-
     if (this->eot()) {
-        return result;
+        return {};
     }
 
+    ByteSpan result (this->ccurrent(), 0);
     for (std::size_t i = 0; i < length; ++i) {
         const auto c = this->lookAhead(i);
         if ((c == EOT) || (c == '\r') || (c == '\n')) {
@@ -284,17 +281,19 @@ bool ByteNavigator::isWhitespace() const noexcept
 
 ByteSpan ByteNavigator::readInteger() noexcept
 {
-    ByteSpan result {this->current(), 0 };
+    if (this->eot()) {
+        return {};
+    }
 
+    ByteSpan result {this->current(), 0 };
     while (this->isDigit()) {
         ++result.length;
         this->readByte();
     }
-
     return result;
 }
 
-ByteSpan ByteNavigator::readString(std::size_t length) noexcept
+ByteSpan ByteNavigator::readString (std::size_t length) noexcept
 {
     ByteSpan result {this->current(), 0 };
     if (this->eot()) {
@@ -310,7 +309,7 @@ ByteSpan ByteNavigator::readString(std::size_t length) noexcept
     return result;
 }
 
-ByteSpan ByteNavigator::readTo(Byte stopByte) noexcept
+ByteSpan ByteNavigator::readTo (Byte stopByte) noexcept
 {
     ByteSpan result {this->ccurrent(), 0 };
     if (this->eot()) {
@@ -320,16 +319,19 @@ ByteSpan ByteNavigator::readTo(Byte stopByte) noexcept
     auto end = this->_position;
     while (true) {
         const auto c = this->readByte();
-        if ((c == EOT) || (c == stopByte)) {
+        if (c == EOT) {
             break;
         }
         end = this->_position;
+        if (c == stopByte) {
+            break;
+        }
     }
     result = this->slice (start, end - start);
     return result;
 }
 
-ByteSpan ByteNavigator::readUntil(Byte stopByte) noexcept
+ByteSpan ByteNavigator::readUntil (Byte stopByte) noexcept
 {
     ByteSpan result {this->ccurrent(), 0 };
     if (this->eot()) {
@@ -347,7 +349,7 @@ ByteSpan ByteNavigator::readUntil(Byte stopByte) noexcept
     return result;
 }
 
-ByteSpan ByteNavigator::readWhile(Byte goodByte) noexcept
+ByteSpan ByteNavigator::readWhile (Byte goodByte) noexcept
 {
     ByteSpan result {this->ccurrent(), 0 };
     while (true) {
@@ -452,6 +454,10 @@ ByteNavigator& ByteNavigator::skipLine() noexcept
 
 ByteSpan ByteNavigator::slice(std::ptrdiff_t offset, std::size_t length) const noexcept
 {
+    if (this->size() == 0) {
+        return {};
+    }
+
     // TODO some checks
     return {this->cbegin() + offset, length };
 }

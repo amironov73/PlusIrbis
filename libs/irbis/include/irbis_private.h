@@ -325,11 +325,11 @@ public:
     Byte* end()            const noexcept;
     const Byte* cend()     const noexcept;
     bool eot()             const noexcept;
+    int front()            const noexcept;
+    int back()             const noexcept;
 
     int at(std::size_t position) const noexcept;
     ByteSpan remaining() const noexcept;
-    int front() const noexcept;
-    int back() const noexcept;
     int lookAhead(std::ptrdiff_t distance = 1) const noexcept;
     int lookBehind(std::ptrdiff_t distance = 1) const noexcept;
     ByteNavigator& move(std::ptrdiff_t distance) noexcept;
@@ -388,10 +388,10 @@ public:
     Char* end()            const noexcept;
     const Char* cend()     const noexcept;
     bool eot()             const noexcept;
+    Char front()           const noexcept;
+    Char back()            const noexcept;
 
     Char at(std::size_t position) const noexcept;
-    Char front() const noexcept;
-    Char back() const noexcept;
     Char lookAhead(std::ptrdiff_t distance = 1) const noexcept;
     Char lookBehind(std::ptrdiff_t distance = 1) const noexcept;
     TextNavigator& move(std::ptrdiff_t distance) noexcept;
