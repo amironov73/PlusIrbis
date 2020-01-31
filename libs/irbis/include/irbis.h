@@ -213,7 +213,7 @@ public:
     static Result Failure (const String &message)
     {
         Result result;
-        result.success = false;
+        result.success = false; //-V1048
         result.errorMessage = message;
         return result;
     }
@@ -326,21 +326,21 @@ public:
 
     /// \brief Срез спана.
     /// \param start Смещение начала спана.
-    /// \param length Длина среза.
+    /// \param length_ Длина среза.
     /// \return Срез.
     ///
     /// Копирования данных не происходит.
-    Span<T> slice(std::ptrdiff_t start, std::ptrdiff_t length=-1) const noexcept
+    Span<T> slice(std::ptrdiff_t start, std::ptrdiff_t length_=-1) const noexcept
     {
-        if (length == -1) {
-            length = this->length - start;
+        if (length_ == -1) {
+            length_ = this->length - start;
         }
 
-        if (length < 0) {
-            length = 0;
+        if (length_ < 0) {
+            length_ = 0;
         }
 
-        return Span<T>(this->ptr + start, length);
+        return Span<T>(this->ptr + start, length_);
     }
 
     /// \brief Сырой указатель на начало спана.
@@ -1875,68 +1875,6 @@ public:
 
     static std::vector<TermPosting> parse(const StringList &lines);
     String toString() const;
-};
-
-//=========================================================
-
-/// \brief Навигация по тексту.
-class PLUSIRBIS_EXPORTS TextNavigator final
-{
-public:
-    const static Char EOT;
-
-    TextNavigator(const Char* text, std::size_t length) noexcept;
-    TextNavigator(WideSpan text) noexcept;
-    TextNavigator(const String &text) noexcept;
-    TextNavigator(const TextNavigator &other) noexcept;
-    TextNavigator(TextNavigator&&) = delete;
-    TextNavigator& operator = (const TextNavigator &) = delete;
-    TextNavigator& operator = (TextNavigator &&) = delete;
-    ~TextNavigator() = default;
-
-    std::size_t column()   const noexcept;
-    std::size_t line()     const noexcept;
-    std::size_t length()   const noexcept;
-    std::size_t position() const noexcept;
-    Char* begin()          const noexcept;
-    const Char* cbegin()   const noexcept;
-    Char* current()        const noexcept;
-    const Char* ccurrent() const noexcept;
-    Char* end()            const noexcept;
-    const Char* cend()     const noexcept;
-    bool eot() const noexcept;
-
-    Char at(std::size_t position) const noexcept;
-    Char front() const noexcept;
-    Char back() const noexcept;
-    Char lookAhead(std::ptrdiff_t distance = 1) const noexcept;
-    Char lookBehind(std::ptrdiff_t distance = 1) const noexcept;
-    TextNavigator& move(std::ptrdiff_t distance) noexcept;
-    Char peekChar() const noexcept;
-    Char readChar() noexcept;
-    WideSpan peekString(std::size_t length) const noexcept;
-    WideSpan peekTo(Char stopChar) const noexcept;
-    WideSpan peekUntil(Char stopChar) const noexcept;
-    WideSpan readLine() noexcept;
-    bool isControl() const noexcept;
-    bool isDigit() const noexcept;
-    bool isLetter() const noexcept;
-    bool isWhitespace() const noexcept;
-    WideSpan readInteger() noexcept;
-    WideSpan readString(std::size_t length) noexcept;
-    WideSpan readTo(Char stopChar) noexcept;
-    WideSpan readUntil(Char stopChar) noexcept;
-    WideSpan readWhile(Char goodChar) noexcept;
-    WideSpan readWord() noexcept;
-    WideSpan recentText(std::ptrdiff_t length) const noexcept;
-    WideSpan remainingText() const noexcept;
-    TextNavigator& skipWhitespace() noexcept;
-    TextNavigator& skipPunctuation() noexcept;
-    WideSpan substr(std::ptrdiff_t offset, std::size_t length) const noexcept;
-
-private:
-    std::size_t _column, _length, _line, _position;
-    const Char *_text;
 };
 
 //=========================================================
