@@ -24,7 +24,7 @@ class PLUSIRBIS_EXPORTS File final
 {
 public:
 
-    File (FILE *stream);
+    File (FILE *stream); // NOLINT(google-explicit-constructor)
     File (const char *name, const char *mode);
     File (const std::string &name, const std::string &mode);
     File (const String &name, const String &mode);
@@ -34,12 +34,16 @@ public:
     File& operator = (File &&other) = delete;
     ~File();
 
-    FILE* getStream() const noexcept { return this->_stream; }
+    FILE* getStream() const noexcept;
+    bool eof() const;
 
     std::size_t read (Byte *buffer, std::size_t count);
     int64_t seek (int64_t position);
     int64_t tell();
     std::size_t write (const Byte *buffer, std::size_t count);
+    int readChar ();
+    std::string readLine ();
+    static std::string readAllBytes (const String &fileName);
 
 private:
 
@@ -197,7 +201,8 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS IrbisText final
+/// \brief Специфичная для ИРБИС работа с текстом.
+class PLUSIRBIS_EXPORTS Text final
 {
 public:
     const static char CrLf[];
@@ -208,16 +213,18 @@ public:
     const static String UnixDelimiter;
     const static String SearchDelimiter;
 
-    static String fromIrbisToDos(String &text);
-    static String fromIrbisToUnix(String &text);
-    static String fromDosToIrbis(String &text);
-    static String fromDosToUnix(String &text);
+    static String fromIrbisToDos (String &text);
+    static String fromIrbisToUnix (String &text);
+    static String fromDosToIrbis (String &text);
+    static String fromUnixToIrbis (String &text);
+    static String fromDosToUnix (String &text);
+    static String fromUnixToDos (String &text);
     static StringList fromFullDelimiter (const String &text);
     static StringList fromShortDelimiter (const String &text);
-    static String readAllAnsi(const String &filename);
-    static String readAllUtf(const String &filename);
-    static StringList readAnsiLines(const String &filename);
-    static StringList readUtfLines(const String &filename);
+    static String readAllAnsi (const String &filename);
+    static String readAllUtf (const String &filename);
+    static StringList readAnsiLines (const String &filename);
+    static StringList readUtfLines (const String &filename);
 };
 
 //=========================================================

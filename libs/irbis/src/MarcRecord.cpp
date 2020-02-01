@@ -97,7 +97,7 @@ bool MarcRecord::deleted() const noexcept
     return (this->status & RecordStatus::Deleted) != 0u;
 }
 
-String MarcRecord::encode(const String &delimiter = IrbisText::IrbisDelimiter) const
+String MarcRecord::encode(const String &delimiter = Text::IrbisDelimiter) const
 {
     String result = std::to_wstring(this->mfn) + L"#"
             + std::to_wstring(this->status) + delimiter

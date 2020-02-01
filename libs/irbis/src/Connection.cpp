@@ -302,7 +302,7 @@ String Connection::formatRecord(const String &format, const MarcRecord &record)
     query.addAnsi(this->database).newLine()
             .addAnsi(prepared).newLine()
             .add(-2).newLine()
-            .add(record, IrbisText::UnixDelimiter);
+            .add(record, Text::UnixDelimiter);
 
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
@@ -489,7 +489,7 @@ StringList Connection::listFiles(const FileSpecification &specification)
     ServerResponse response(*this, query);
     const auto lines = response.readRemainingAnsiLines();
     for (const auto &line : lines) {
-        auto converted = IrbisText::fromFullDelimiter(line);
+        auto converted = Text::fromFullDelimiter(line);
         for (const auto &item : converted) {
             if (!item.empty()) {
                 result.push_back(item);
@@ -519,7 +519,7 @@ StringList Connection::listFiles(const std::vector<FileSpecification> &specifica
     ServerResponse response(*this, query);
     const auto lines = response.readRemainingAnsiLines();
     for (const auto &line : lines) {
-        auto converted = IrbisText::fromFullDelimiter(line);
+        auto converted = Text::fromFullDelimiter(line);
         for (const auto &item : converted) {
             if (!item.empty()) {
                 result.push_back(item);
@@ -928,7 +928,7 @@ String Connection::readTextFile(const FileSpecification &specification)
     }
 
     result = response.readAnsi();
-    result = IrbisText::fromIrbisToDos(result);
+    result = Text::fromIrbisToDos(result);
 
     return result;
 }
@@ -953,7 +953,7 @@ StringList Connection::readTextFiles(std::vector<FileSpecification> specificatio
 
     const auto lines = response.readRemainingAnsiLines();
     for (std::wstring line : lines) {
-        result.push_back(IrbisText::fromIrbisToDos(line));
+        result.push_back(Text::fromIrbisToDos(line));
     }
 
     return result;
@@ -975,7 +975,7 @@ StringList Connection::readTextLines(const FileSpecification &specification)
     }
 
     const auto text = response.readAnsi();
-    result = IrbisText::fromFullDelimiter(text);
+    result = Text::fromFullDelimiter(text);
 
     return result;
 }
@@ -1169,7 +1169,7 @@ int Connection::writeRecord(MarcRecord &record, bool lockFlag = false, bool actu
     query.addAnsi (db).newLine();
     query.add (lockFlag).newLine();
     query.add (actualize).newLine();
-    query.addUtf (record.encode(IrbisText::IrbisDelimiter)).newLine();
+    query.addUtf (record.encode(Text::IrbisDelimiter)).newLine();
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
         return 0;
@@ -1211,8 +1211,8 @@ bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, 
     query.add (actualize).newLine();
     for (const auto record : records) {
         const auto db = iif (record->database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
-        query.addAnsi (db).addAnsi (IrbisText::IrbisDelimiter)
-            .addUtf (record->encode(IrbisText::IrbisDelimiter)).newLine();
+        query.addAnsi (db).addAnsi (Text::IrbisDelimiter)
+            .addUtf (record->encode(Text::IrbisDelimiter)).newLine();
     }
     ServerResponse response (*this, query);
     if (!response.success()) {
@@ -1232,7 +1232,7 @@ bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, 
             auto record = records[i];
             record->fields.clear();
             record->database = iif (record->database, this->database);
-            const auto recordLines = IrbisText::fromFullDelimiter(line);
+            const auto recordLines = Text::fromFullDelimiter(line);
             record->decode(recordLines);
         }
     }
@@ -1257,7 +1257,7 @@ int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize,
     query.addAnsi(db).newLine();
     query.add(lockFlag).newLine();
     query.add(actualize).newLine();
-    query.addUtf(record.encode(IrbisText::IrbisDelimiter)).newLine();
+    query.addUtf(record.encode(Text::IrbisDelimiter)).newLine();
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
         return 0;

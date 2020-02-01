@@ -1,3 +1,6 @@
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
 #include "catch.hpp"
 #include "irbis.h"
 #include "irbis_private.h"
@@ -133,8 +136,8 @@ TEST_CASE("IO_readInt32_1", "[io]")
     REQUIRE (irbis::IO::fileExist (path));
     irbis::File file (path, L"rb");
     uint32_t value { 0u };
-    REQUIRE(irbis::IO::readInt32 (file.getStream(), &value));
-    CHECK(value == 0x015E34BCu);
+    REQUIRE (irbis::IO::readInt32 (file.getStream(), &value));
+    CHECK (value == 0x015E34BCu);
 }
 
 TEST_CASE("IO_readInt64_1", "[io]")

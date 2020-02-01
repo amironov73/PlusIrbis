@@ -123,14 +123,13 @@ std::string replace(const std::string &text, const std::string &from, const std:
     std::string result = text;
     std::size_t index = 0;
     while (true) {
-        index = text.find(from, index);
+        index = result.find (from, index);
         if (index == std::string::npos) {
             break;
         }
-        result.replace(index, to.length(), to);
+        result.replace(index, from.length(), to);
         index += to.length();
     }
-
     return result;
 }
 
@@ -144,14 +143,13 @@ String replace(const String &text, const String &from, const String &to)
     String result = text;
     std::size_t index = 0;
     while (true) {
-        index = text.find(from, index);
+        index = result.find (from, index);
         if (index == std::string::npos) {
             break;
         }
-        result.replace(index, to.length(), to);
+        result.replace (index, from.length(), to);
         index += to.length();
     }
-
     return result;
 }
 
@@ -610,51 +608,47 @@ StringList split(const String &text, Char delimiter)
     return result;
 }
 
-///
-/// \param text
-/// \param delimiter
-/// \return
-std::vector<std::string> split(const std::string &text, const std::string &delimiter)
+/// \brief Разбиение на строки по разделителю.
+/// \param text Текст, подлежащий разбиению.
+/// \param delimiter Разделитель.
+/// \return Вектор строк. Включает, кроме прочего, пустые строки.
+std::vector<std::string> split (const std::string &text, const std::string &delimiter)
 {
     std::vector<std::string> result;
     std::string token;
     std::size_t start = 0, end;
-    while ((end = text.find(delimiter, start)) != std::string::npos)
-    {
-        token = text.substr(start, end - start);
-        result.push_back(token);
+    while ((end = text.find (delimiter, start)) != std::string::npos) {
+        token = text.substr (start, end - start);
+        result.push_back (token);
         start = end + delimiter.length();
     }
 
-    if (start < text.length())
-    {
-        token = text.substr(start, std::string::npos);
+    if (start < text.length()) {
+        token = text.substr (start, std::string::npos);
         result.push_back(token);
     }
 
     return result;
 }
 
-///
-/// \param text
-/// \param delimiter
-/// \return
-StringList split(const String &text, const String &delimiter)
+/// \brief Разбиение строки по разделителям.
+/// \param text Текст, подлежащий разбиению.
+/// \param delimiter Разделитель.
+/// \return Вектор строк. Включает, кроме прочего, пустые строки.
+StringList split (const String &text, const String &delimiter)
 {
-    std::vector<std::wstring> result;
-    std::wstring token;
+    StringList result;
+    String token;
     std::size_t start = 0, end;
-    while ((end = text.find(delimiter, start)) != std::string::npos)
-    {
+    while ((end = text.find (delimiter, start)) != std::string::npos) {
         token = text.substr(start, end - start);
         result.push_back(token);
         start = end + delimiter.length();
     }
 
-    if (start < text.length())
-    {
-        token = text.substr(start, std::string::npos);
-        result.push_back(token);
+    if (start < text.length()) {
+        token = text.substr (start, std::string::npos);
+        result.push_back (token);
     }
 
     return result;
@@ -662,20 +656,20 @@ StringList split(const String &text, const String &delimiter)
 
 //=========================================================
 
-///
+/// \brief Удаление из формата комментариев.
 /// \param text
 /// \return
-String removeComments(const String &text)
+String removeComments (const String &text)
 {
     if (text.empty()) {
         return text;
     }
 
-    if (!contains(text, L"/*")) {
+    if (!contains (text, L"/*")) {
         return text;
     }
 
-    std::wstring result;
+    String result;
     Char state = 0;
     std::size_t index = 0;
     const std::size_t length = text.length();
@@ -726,12 +720,12 @@ String removeComments(const String &text)
     return result;
 }
 
-///
+/// \brief Подготовка формата к отсылке на сервер.
 /// \param text
 /// \return
-std::wstring prepareFormat(const std::wstring &text)
+std::wstring prepareFormat (const std::wstring &text)
 {
-    std::wstring text2 = removeComments(text);
+    String text2 = removeComments (text);
     const std::size_t length = text2.length();
     if (length == 0) {
         return text2;
