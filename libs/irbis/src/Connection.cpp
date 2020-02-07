@@ -1158,7 +1158,7 @@ bool Connection::updateUserList(const std::vector<UserInfo> &users)
     return this->execute(query);
 }
 
-int Connection::writeRecord(MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false)
+int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     if (!this->_checkConnection()) {
         return 0;

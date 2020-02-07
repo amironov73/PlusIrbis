@@ -102,6 +102,7 @@ class Date;
 class DirectAccess64;
 class EmbeddedField;
 class Encoding;
+class Exemplar;
 class File;
 class FileSpecification;
 class Format;
@@ -115,7 +116,7 @@ class IniFile;
 class IniLine;
 class IniSection;
 class IrbisException;
-class IrbisText;
+class Isbn;
 class Iso2709;
 class Encoding;
 class MarcRecord;
@@ -152,6 +153,7 @@ class TableDefinition;
 class TermInfo;
 class TermParameters;
 class TermPosting;
+class Text;
 class TextNavigator;
 class TreeFile;
 class TreeNode;
@@ -231,23 +233,22 @@ public:
     size_t length { 0 }; ///< Длина куска в элементах.
 
     Span() : ptr(nullptr), length(0) {}; ///< Конструктор по умолчанию.
-    Span(T *ptr_, std::size_t length_) noexcept : ptr(ptr_), length(length_) {}
-    Span(const T *ptr_, std::size_t length_) noexcept : ptr(const_cast<T*>(ptr_)), length(length_) {}
-    Span(const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
-    Span(const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
+    Span (T *ptr_, std::size_t length_) noexcept : ptr(ptr_), length(length_) {}
+    Span (const T *ptr_, std::size_t length_) noexcept : ptr(const_cast<T*>(ptr_)), length(length_) {}
+    Span (const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
+    Span (const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
 
     /// \brief Спан из ASCIIZ-строки.
     /// \param ptr Указатель на начало строки.
     /// \return Полученный спан.
-    static Span<T> fromString(const T *ptr) noexcept
+    static Span<T> fromString (const T *ptr) noexcept
     {
         std::size_t length = 0;
-        const T* p = ptr;
+        const T *p = ptr;
         while (*p) {
             ++p;
-            length++;
+            ++length;
         }
-
         return Span<T> (const_cast<T*>(ptr), length);
     }
 
@@ -275,7 +276,7 @@ public:
     /// \brief Содержит ли спан указанный элемент.
     /// \param val Искомое значение.
     /// \return `true` если содержит.
-    bool contains(const T val) const noexcept
+    bool contains (const T val) const noexcept
     {
         for(const auto item : *this) {
             if (item == val) {
@@ -288,7 +289,7 @@ public:
     /// \brief Заполнение спана указанным значением.
     /// \param val Значение для заполнения.
     /// \return this.
-    Span<T>& fill(const T val) noexcept
+    Span<T>& fill (const T val) noexcept
     {
         for(std::size_t ofs = 0; ofs < this->length; ++ofs) {
             this->ptr[ofs] = val;
@@ -300,7 +301,7 @@ public:
     /// \param val Искомое значение.
     /// \return Индекс первого вхождения найденного элемента,
     /// либо отрицательное значение.
-    std::ptrdiff_t indexOf(const T val) const noexcept
+    std::ptrdiff_t indexOf (const T val) const noexcept
     {
         for (std::size_t i = 0; i < this->length; ++i) {
             if (this->ptr[i] == val) {
@@ -330,7 +331,7 @@ public:
     /// \return Срез.
     ///
     /// Копирования данных не происходит.
-    Span<T> slice(std::ptrdiff_t start, std::ptrdiff_t length_=-1) const noexcept
+    Span<T> slice (std::ptrdiff_t start, std::ptrdiff_t length_=-1) const noexcept
     {
         if (length_ == -1) {
             length_ = this->length - start;
@@ -389,7 +390,7 @@ public:
     /// \brief Совпадает ли начало спана с другим спаном?
     /// \param prefix Префикс.
     /// \return `true` если совпадает.
-    bool startsWith(const Span<T> prefix) const noexcept
+    bool startsWith (const Span<T> prefix) const noexcept
     {
         if (prefix.size() > this->size()) {
             return false;
@@ -411,7 +412,7 @@ public:
     /// \brief Совпадает ли конец спана с другим спаном?
     /// \param suffix Суффикс.
     /// \return `true` если совпадает.
-    bool endsWith(const Span<T> suffix) const noexcept
+    bool endsWith (const Span<T> suffix) const noexcept
     {
         if (suffix.size() > this->size()) {
             return false;
@@ -434,7 +435,7 @@ public:
     /// \param other Диапазон для сравнения.
     /// \return Результат сравнения:
     /// 0 если все элементы совпадают.
-    int compare(const Span<T> other) const
+    int compare (const Span<T> other) const
     {
         auto size = this->size();
         if (other.size() < size) {
@@ -468,7 +469,7 @@ public:
     /// \return Вектор спанов.
     ///
     /// Пустые фрагменты не включаются в результат.
-    std::vector<Span<T>> split(T delimiter) const
+    std::vector<Span<T>> split (T delimiter) const
     {
         std::vector<Span<T>> result;
         auto start = this->cbegin(), current = start, end = this->cend();
@@ -495,7 +496,7 @@ public:
     /// \return Вектор спанов.
     ///
     /// Пустые фрагменты не включаются в результат.
-    std::vector<Span<T>> split(T delimiter, int nelem) const
+    std::vector<Span<T>> split (T delimiter, int nelem) const
     {
         std::vector<Span<T>> result;
         auto start = this->cbegin(), current = start, end = this->cend();
@@ -944,7 +945,8 @@ public:
     bool updateIniFile(const StringList &lines);
     bool updateUserList(const std::vector<UserInfo> &users);
     int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
-    int writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
+    int writeRecord(MarcRecord &record, bool lockFlag = false,
+            bool actualize = true, bool dontParseResponse = false);
     bool writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     bool writeRecords(std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile(const FileSpecification &specification);
@@ -1067,6 +1069,49 @@ public:
 
     virtual Bytes fromUnicode(const String &text) const override;
     virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
+};
+
+//=========================================================
+
+/// \brief Сведения об экземпляре документа (поле 910).
+class PLUSIRBIS_EXPORTS Exemplar final
+{
+public:
+    static const int TAG = 910;
+
+    String status;
+    String number;
+    String date;
+    String place;
+    String collection;
+    String shelf;
+    String price;
+    String barcode;
+    String amount;
+    String purpose;
+    String coefficient;
+    String offBalance;
+    String ksuNumber1;
+    String actNumber1;
+    String channel;
+    String onHand;
+    String actNumber2;
+    String writeOff;
+    String completion;
+    String actNumber3;
+    String moving;
+    String newPlace;
+    String checkedDate;
+    String checkedAmount;
+    String realPlace;
+    String bindingIndex;
+    String bindingNumber;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field) const;
+    void parse (const RecordField &field_);
+    static std::vector<Exemplar> parse (const MarcRecord &record);
 };
 
 //=========================================================
@@ -1264,10 +1309,20 @@ enum IrbisPath : unsigned int
 
 //=========================================================
 
+/// \brief Международный стандартный книжный номер.
+class PLUSIRBIS_EXPORTS Isbn final
+{
+public:
+    static bool check978 (WideSpan isbn) noexcept;
+    static bool checkControlDigit (WideSpan isbn) noexcept;
+};
+
+//=========================================================
+
 class PLUSIRBIS_EXPORTS Iso2709 final
 {
 public:
-    static const int MarkerLength = 24;
+    static const int  MarkerLength = 24;
     static const char RecordDelimiter = 0x1D;
     static const char FieldDelimiter = 0x1E;
     static const char SubFieldDelimiter = 0x1F;
@@ -1640,14 +1695,16 @@ public:
     RecordField& operator = (RecordField &&other) = default;
     ~RecordField() = default;
 
-    RecordField& add(Char code, const String &value = L"");
+    RecordField& add (Char code, const String &value = L"");
     RecordField& clear();
     RecordField clone() const;
-    void decode(const String &line);
+    void decode (const String &line);
     bool empty() const noexcept;
-    SubField* getFirstSubfield(Char code) const noexcept;
-    String getFirstSubfieldValue(Char code) const noexcept;
-    bool verify(bool throwOnError) const;
+    SubField* getFirstSubfield( Char code) const noexcept;
+    String getFirstSubfieldValue (Char code) const noexcept;
+    RecordField& removeSubfield (Char code);
+    RecordField& setSubfield (Char code, const String &newValue);
+    bool verify (bool throwOnError) const;
     String toString() const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field);

@@ -4,6 +4,7 @@
 #include "irbis.h"
 #include "irbis_private.h"
 
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 
@@ -93,7 +94,7 @@ SubField* RecordField::getFirstSubfield(Char code) const noexcept
     return nullptr;
 }
 
-std::wstring RecordField::getFirstSubfieldValue(Char code) const noexcept
+String RecordField::getFirstSubfieldValue(Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
@@ -102,6 +103,32 @@ std::wstring RecordField::getFirstSubfieldValue(Char code) const noexcept
     }
 
     return String();
+}
+
+RecordField& RecordField::removeSubfield (Char code)
+{
+    std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
+            [code] (SubField &sf) { return sf.code == code; }
+            );
+
+    return *this;
+}
+
+RecordField& RecordField::setSubfield (Char code, const String &newValue)
+{
+    if (newValue.empty()) {
+        this->removeSubfield (code);
+        return *this;
+    }
+
+    auto *subField = this->getFirstSubfield (code);
+    if (!subField) {
+        this->add(code, newValue);
+    }
+    else {
+        subField->value = newValue;
+    }
+    return *this;
 }
 
 bool RecordField::verify(bool throwOnError) const

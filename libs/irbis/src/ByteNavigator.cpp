@@ -15,6 +15,9 @@
 
 /*!
     \class irbis::ByteNavigator
+
+    \warning Служебный класс.
+    Предназначен для поддержки инфраструктуры `PlusIrbis`.
  */
 
 namespace irbis {
@@ -769,13 +772,46 @@ ByteNavigator& ByteNavigator::fill (Byte value) noexcept
     return *this;
 }
 
+/// \brief Поиск указанного байта, начиная с текущей позиции.
+/// \param value Искомый байт.
+/// \return Смещение в байтах от текущей позиции найденного байта, либо `EOT`, если байт не найден.
 int ByteNavigator::find (Byte value) const noexcept
 {
+    if (this->eot()) {
+        return EOT;
+    }
+
+    for (auto ptr = this->ccurrent(); ptr < this->cend(); ++ptr) {
+        if (*ptr == value) {
+            return static_cast<int> (ptr - this->ccurrent());
+        }
+    }
+
     return EOT;
 }
 
+/// \brief Поиск указанной последовательности байтов, начиная с текущей позиции.
+/// \param array Искомая последовательность байтов.
+/// \return Смещение в байтах от текущей позиции начала найденной позиции, либо `EOT`, если последовательность не найдена.
 int ByteNavigator::find (ByteSpan array) const noexcept
 {
+    if (this->eot() || array.empty()) {
+        return EOT;
+    }
+
+    for (auto ptr = this->ccurrent(); ptr < this->cend(); ++ptr) {
+        bool found = true;
+        for (std::ptrdiff_t offset = 0; offset < array.size(); ++offset) {
+            if (ptr[offset] != array[offset]) {
+                found = false;
+                break;
+            }
+        }
+        if (found) {
+            return static_cast<int> (ptr - this->ccurrent());
+        }
+    }
+
     return EOT;
 }
 

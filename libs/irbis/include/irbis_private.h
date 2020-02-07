@@ -19,6 +19,28 @@ namespace irbis
 
 //=========================================================
 
+/// \brief Простая освобождалка памяти.
+template <typename T>
+class PLUSIRBIS_EXPORTS PointerGuard final
+{
+public:
+    PointerGuard (T *ptr, bool needFree = true) : _pointer(ptr), _needFree(needFree) {}; // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
+    PointerGuard (const PointerGuard &other) = delete;
+    PointerGuard (PointerGuard &&other) = delete;
+    PointerGuard& operator = (const PointerGuard &other) = delete;
+    PointerGuard& operator = (PointerGuard &&other) = delete;
+    ~PointerGuard() { if (this->_needFree) delete this->_pointer; }
+
+    T* pointer() { return this->_pointer; }
+    T& operator[] (std::ptrdiff_t offset) { return this->_pointer[offset]; }
+
+private:
+    T* _pointer;
+    bool _needFree;
+};
+
+//=========================================================
+
 /// \brief Простая обертка над файлом.
 class PLUSIRBIS_EXPORTS File final
 {

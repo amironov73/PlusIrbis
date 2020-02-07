@@ -7,8 +7,8 @@ int main()
     setlocale(LC_ALL, ""); // for cyrillic output
     std::wcout.imbue (std::locale(""));
 
-    std::cout << "Client version: " << irbis::libraryVersionString() << std::endl;
-    std::cout << "Running on " << (irbis::isWindows() ? "Windows" : "UNIX") << std::endl;
+    std::wcout << L"Client version: " << irbis::string2wide(irbis::libraryVersionString()) << std::endl;
+    std::wcout << L"Running on " << irbis::string2wide(irbis::isWindows() ? "Windows" : "UNIX") << std::endl;
 
     try {
 
