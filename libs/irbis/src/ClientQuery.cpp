@@ -73,7 +73,7 @@ ClientQuery& ClientQuery::add(const MarcRecord &record, const String &delimiter=
 /// \param text Добавляемый текст.
 /// \return `this`.
 /// \warning Предполагается, что переданный текст в кодировке ANSI!
-ClientQuery& ClientQuery::addAnsi(const std::string &text)
+ClientQuery& ClientQuery::addAnsi (const std::string &text)
 {
     const std::size_t size = text.length();
     if (!size)

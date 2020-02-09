@@ -46,9 +46,9 @@ namespace irbis {
 /// \param tag Метка добавляемого поля.
 /// \param value Значение поля (может быть пустым).
 /// \return Вновь созданное поле.
-RecordField& MarcRecord::add(int tag, const String &value)
+RecordField& MarcRecord::add (int tag, const String &value)
 {
-    this->fields.emplace_back(tag, value);
+    this->fields.emplace_back (tag, value);
     return this->fields.back();
 }
 
@@ -66,7 +66,7 @@ MarcRecord MarcRecord::clone() const
     return result;
 }
 
-void MarcRecord::decode(const StringList &lines)
+void MarcRecord::decode (const StringList &lines)
 {
     if (lines.size() < 2) {
         return;
@@ -97,7 +97,7 @@ bool MarcRecord::deleted() const noexcept
     return (this->status & RecordStatus::Deleted) != 0u;
 }
 
-String MarcRecord::encode(const String &delimiter = Text::IrbisDelimiter) const
+String MarcRecord::encode (const String &delimiter) const
 {
     String result = std::to_wstring(this->mfn) + L"#"
             + std::to_wstring(this->status) + delimiter
@@ -106,11 +106,10 @@ String MarcRecord::encode(const String &delimiter = Text::IrbisDelimiter) const
         result.append(field.toString());
         result.append(delimiter);
     }
-
     return result;
 }
 
-String MarcRecord::fm(int tag, Char code = 0) const noexcept
+String MarcRecord::fm (int tag, Char code) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
@@ -125,11 +124,10 @@ String MarcRecord::fm(int tag, Char code = 0) const noexcept
             }
         }
     }
-
     return String();
 }
 
-StringList MarcRecord::fma(int tag, Char code) const
+StringList MarcRecord::fma (int tag, Char code) const
 {
     StringList result;
     for (const auto &field : this->fields) {
@@ -149,11 +147,10 @@ StringList MarcRecord::fma(int tag, Char code) const
             }
         }
     }
-
     return result;
 }
 
-RecordField* MarcRecord::getField(int tag, int occurrence = 0) const noexcept
+RecordField* MarcRecord::getField (int tag, int occurrence) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
@@ -162,11 +159,10 @@ RecordField* MarcRecord::getField(int tag, int occurrence = 0) const noexcept
             }
         }
     }
-
     return nullptr;
 }
 
-std::vector<RecordField*> MarcRecord::getFields(int tag) const
+std::vector<RecordField*> MarcRecord::getFields (int tag) const
 {
     std::vector<RecordField*> result;
     for (const auto &field : this->fields) {
@@ -175,7 +171,6 @@ std::vector<RecordField*> MarcRecord::getFields(int tag) const
             result.push_back(ptr);
         }
     }
-
     return result;
 }
 
@@ -185,19 +180,17 @@ MarcRecord& MarcRecord::reset() noexcept
     this->status = 0;
     this->version = 0;
     this->database.clear();
-
     return *this;
 }
 
-bool MarcRecord::verify(bool throwOnError) const
+bool MarcRecord::verify (bool throwOnError) const
 {
     bool result = true;
-    for (const RecordField &field : this->fields) {
+    for (const auto &field : this->fields) {
         if (!field.verify(throwOnError)) {
             result = false;
         }
     }
-
     if (!result && throwOnError) {
         throw VerificationException();
     }

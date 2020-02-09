@@ -265,25 +265,52 @@ bool Connection::execute(ClientQuery &query)
 /// \param format Спецификация формата.
 /// \param mfn MFN записи, подлежащей расформатированию.
 /// \return Результат расформатирования.
-String Connection::formatRecord(const String &format, Mfn mfn)
+String Connection::formatRecord (const String &format, Mfn mfn)
 {
     if (!this->_checkConnection()) {
         return L"";
     }
 
-    const auto prepared = prepareFormat(format);
-    ClientQuery query(*this, "G");
-    query.addAnsi(this->database).newLine()
-            .addAnsi(prepared).newLine()
-            .add(1).newLine()
-            .add(mfn);
+    const auto prepared = prepareFormat (format);
+    ClientQuery query (*this, "G");
+    query.addAnsi (this->database).newLine()
+            .addAnsi (prepared).newLine()
+            .add (1).newLine()
+            .add (mfn);
 
-    ServerResponse response(*this, query);
+    ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
         return L"";
     }
 
     const auto result = response.readRemainingUtfText();
+    return result;
+}
+
+/// \brief Форматирование записи на сервере по её MFN.
+/// \param format Спецификация формата.
+/// \param mfn MFN записи, подлежащей расформатированию.
+/// \return Результат расформатирования.
+std::string Connection::formatRecordUtf (const std::string &format, Mfn mfn)
+{
+    if (!this->_checkConnection()) {
+        return std::string();
+    }
+
+    // TODO prepare format
+    // const auto prepared = prepareFormat (format);
+    ClientQuery query (*this, "G");
+    query.addAnsi (this->database).newLine()
+            .addAnsi("!").addAnsi (format).newLine()
+            .add (1).newLine()
+            .add (mfn);
+
+    ServerResponse response (*this, query);
+    if (!response.checkReturnCode()) {
+        return "";
+    }
+
+    const auto result = response.getRemaining();
     return result;
 }
 
@@ -338,15 +365,15 @@ DatabaseInfo Connection::getDatabaseInfo(const String &databaseName)
 /// \brief Получение максимального MFN для базы данных с указанным именем.
 /// \param databaseName Имя базы данных.
 /// \return Максимальный MFN. 0 или отрицательное число означают ошибку.
-Mfn Connection::getMaxMfn(const String &databaseName)
+Mfn Connection::getMaxMfn (const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return 0;
     }
 
-    ClientQuery query(*this, "O");
-    query.addAnsi(databaseName);
-    ServerResponse response(*this, query);
+    ClientQuery query (*this, "O");
+    query.addAnsi (databaseName);
+    ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
         return 0;
     }
@@ -360,7 +387,6 @@ Mfn Connection::getMaxMfn(const String &databaseName)
 ServerStat Connection::getServerStat()
 {
     ServerStat result;
-
     if (!this->_checkConnection()) {
         return result;
     }
@@ -371,7 +397,7 @@ ServerStat Connection::getServerStat()
         return result;
     }
 
-    result.parse(response);
+    result.parse (response);
     return result;
 }
 
@@ -380,15 +406,14 @@ ServerStat Connection::getServerStat()
 Version Connection::getServerVersion()
 {
     Version result;
-
     if (!this->_checkConnection()) {
         return result;
     }
 
-    ClientQuery query(*this, "1");
-    ServerResponse response(*this, query);
+    ClientQuery query (*this, "1");
+    ServerResponse response (*this, query);
     response.checkReturnCode();
-    result.parse(response);
+    result.parse (response);
 
     return result;
 }
@@ -399,7 +424,6 @@ Version Connection::getServerVersion()
 std::vector<UserInfo> Connection::getUserList()
 {
     std::vector<UserInfo> result;
-
     if (!this->_checkConnection()) {
         return result;
     }
@@ -411,7 +435,7 @@ std::vector<UserInfo> Connection::getUserList()
     }
 
     const auto lines = response.readRemainingAnsiLines();
-    result = UserInfo::parse(lines);
+    result = UserInfo::parse (lines);
 
     return result;
 }
@@ -613,23 +637,22 @@ bool Connection::noOp() {
 /// \brief Разбор строки подключения.
 /// \param connectionString Строка подключения.
 /// \throw IrbisException Ошибка в структуре строки подключения.
-void Connection::parseConnectionString(const String &connectionString) {
-    const auto items = split(connectionString, L";");
+void Connection::parseConnectionString (const String &connectionString) {
+    const auto items = split (connectionString, L";");
     for (auto &item : items) {
-        auto parts = maxSplit(item, '=', 2);
+        auto parts = maxSplit(item, L'=', 2);
         if (parts.size() != 2) {
             throw IrbisException();
         }
-        auto name = toLower(parts[0]);
+        auto name = toLower (parts[0]);
         const auto value = parts[1];
         if (name.empty() || value.empty()) {
             throw IrbisException();
         }
-
         if (name == L"host" || name == L"server" || name == L"address") {
             this->host = value;
         } else if (name == L"port") {
-            this->port = (short) fastParse32(value);
+            this->port = (short) fastParse32 (value);
         } else if (name == L"user" || name == L"username"
                    || name == L"name" || name == L"login") {
             this->username = value;
@@ -638,7 +661,41 @@ void Connection::parseConnectionString(const String &connectionString) {
         } else if (name == L"db" || name == L"catalog" || name == L"database") {
             this->database = value;
         } else if (name == L"arm" || name == L"workstation") {
-            this->workstation = value.at(0);
+            this->workstation = value.at (0);
+        } else {
+            throw IrbisException();
+        }
+    }
+}
+
+/// \brief Разбор строки подключения.
+/// \param connectionString Строка подключения.
+/// \throw IrbisException Ошибка в структуре строки подключения.
+void Connection::parseConnectionStringUtf (const std::string &connectionString) {
+    const auto items = split (connectionString, ";");
+    for (auto &item : items) {
+        auto parts = maxSplit (item, '=', 2);
+        if (parts.size() != 2) {
+            throw IrbisException();
+        }
+        auto name = toLower (parts[0]);
+        const auto value = parts[1];
+        if (name.empty() || value.empty()) {
+            throw IrbisException();
+        }
+        if (name == "host" || name == "server" || name == "address") {
+            this->host = fromUtf (value);
+        } else if (name == "port") {
+            this->port = (short) fastParse32 (value);
+        } else if (name == "user" || name == "username"
+                   || name == "name" || name == "login") {
+            this->username = fromUtf (value);
+        } else if (name == "pwd" || name == "password") {
+            this->password = fromUtf (value);
+        } else if (name == "db" || name == "catalog" || name == "database") {
+            this->database = fromUtf (value);
+        } else if (name == "arm" || name == "workstation") {
+            this->workstation = value.at (0);
         } else {
             throw IrbisException();
         }
@@ -659,7 +716,7 @@ String Connection::popDatabase()
 /// \brief Расформатирование таблицы в RTF.
 /// \param definition Определение таблицы.
 /// \return Результат расформатирования.
-String Connection::printTable(const TableDefinition &definition)
+String Connection::printTable (const TableDefinition &definition)
 {
     if (!this->_checkConnection()) {
         return L"";
@@ -687,7 +744,7 @@ String Connection::printTable(const TableDefinition &definition)
 /// \brief Запоминание имени текущей базы данных для последующего возврата к ней.
 /// \param newDatabase Имя базы данных, устанавливаемой в качестве текущей.
 /// \return Имя базы данных, использовавшейся в качестве текущей.
-String Connection::pushDatabase(const String &newDatabase)
+String Connection::pushDatabase (const String &newDatabase)
 {
     const auto result = this->database;
     _databaseStack.push_back(newDatabase);
@@ -696,7 +753,7 @@ String Connection::pushDatabase(const String &newDatabase)
     return result;
 }
 
-Bytes Connection::readBinaryFile(const FileSpecification &specification)
+Bytes Connection::readBinaryFile (const FileSpecification &specification)
 {
     Bytes result;
 
@@ -707,7 +764,7 @@ Bytes Connection::readBinaryFile(const FileSpecification &specification)
     return result;
 }
 
-IniFile Connection::readIniFile(const FileSpecification &specification)
+IniFile Connection::readIniFile (const FileSpecification &specification)
 {
     const auto lines = this->readTextLines(specification);
     IniFile result;
@@ -716,7 +773,7 @@ IniFile Connection::readIniFile(const FileSpecification &specification)
     return result;
 }
 
-MenuFile Connection::readMenuFile(const FileSpecification &specification)
+MenuFile Connection::readMenuFile (const FileSpecification &specification)
 {
     const auto lines = this->readTextLines(specification);
     MenuFile result;
@@ -725,7 +782,7 @@ MenuFile Connection::readMenuFile(const FileSpecification &specification)
     return result;
 }
 
-std::vector<TermPosting> Connection::readPostings(const PostingParameters &parameters)
+std::vector<TermPosting> Connection::readPostings (const PostingParameters &parameters)
 {
     std::vector<TermPosting> result;
 
@@ -758,7 +815,7 @@ std::vector<TermPosting> Connection::readPostings(const PostingParameters &param
     return result;
 }
 
-RawRecord Connection::readRawRecord(Mfn mfn)
+RawRecord Connection::readRawRecord (Mfn mfn)
 {
     RawRecord result;
 
@@ -780,7 +837,47 @@ RawRecord Connection::readRawRecord(Mfn mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(Mfn mfn)
+MarcRecord Connection::readRecord (Mfn mfn)
+{
+    MarcRecord result;
+    if (!this->_checkConnection()) {
+        return result;
+    }
+
+    ClientQuery query (*this, "C");
+    query.addAnsi (this->database).newLine()
+            .add(mfn);
+
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode (4, -201, -600, -602, -603)) {
+        const auto lines = response.readRemainingUtfLines();
+        result.decode (lines);
+        result.database = this->database;
+    }
+    return result;
+}
+
+UtfRecord Connection::readRecordUtf (Mfn mfn)
+{
+    UtfRecord result;
+    if (!this->_checkConnection()) {
+        return result;
+    }
+
+    ClientQuery query (*this, "C");
+    query.addAnsi (this->database).newLine()
+            .add (mfn);
+
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode (4, -201, -600, -602, -603)) {
+        const auto lines = response.readRemainingLinesUtf();
+        result.decode (lines);
+        result.database = toUtf (this->database);
+    }
+    return result;
+}
+
+MarcRecord Connection::readRecord (const String &databaseName, Mfn mfn)
 {
     MarcRecord result;
 
@@ -788,12 +885,12 @@ MarcRecord Connection::readRecord(Mfn mfn)
         return result;
     }
 
-    ClientQuery query(*this, "C");
-    query.addAnsi(this->database).newLine()
-            .add(mfn);
+    ClientQuery query (*this, "C");
+    query.addAnsi (databaseName).newLine()
+            .add (mfn);
 
-    ServerResponse response(*this, query);
-    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode (4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.decode(lines);
         result.database = this->database;
@@ -802,52 +899,29 @@ MarcRecord Connection::readRecord(Mfn mfn)
     return result;
 }
 
-MarcRecord Connection::readRecord(const String &databaseName, Mfn mfn)
+MarcRecord Connection::readRecord (const String &databaseName, Mfn mfn, int version)
 {
     MarcRecord result;
-
     if (!this->_checkConnection()) {
         return result;
     }
 
-    ClientQuery query(*this, "C");
-    query.addAnsi(databaseName).newLine()
-            .add(mfn);
+    ClientQuery query (*this, "C");
+    query.addAnsi (databaseName).newLine()
+            .add (mfn).newLine()
+            .add (version);
 
-    ServerResponse response(*this, query);
-    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
+    ServerResponse response (*this, query);
+    if (response.checkReturnCode (4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
-        result.decode(lines);
-        result.database = this->database;
-    }
-
-    return result;
-}
-
-MarcRecord Connection::readRecord(const String &databaseName, Mfn mfn, int version)
-{
-    MarcRecord result;
-
-    if (!this->_checkConnection()) {
-        return result;
-    }
-
-    ClientQuery query(*this, "C");
-    query.addAnsi(databaseName).newLine()
-            .add(mfn).newLine()
-            .add(version);
-
-    ServerResponse response(*this, query);
-    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
-        const auto lines = response.readRemainingUtfLines();
-        result.decode(lines);
+        result.decode (lines);
         result.database = this->database;
     }
 
     if (version) {
         // TODO unlockRecord
         MfnList records { mfn };
-        this->unlockRecords(databaseName, records);
+        this->unlockRecords (databaseName, records);
     }
 
     return result;
@@ -912,10 +986,9 @@ std::vector<TermInfo> Connection::readTerms(const TermParameters &parameters)
     return result;
 }
 
-String Connection::readTextFile(const FileSpecification &specification)
+String Connection::readTextFile (const FileSpecification &specification)
 {
-    std::wstring result;
-
+    String result;
     if (!this->_checkConnection()) {
         return result;
     }
@@ -933,7 +1006,27 @@ String Connection::readTextFile(const FileSpecification &specification)
     return result;
 }
 
-StringList Connection::readTextFiles(std::vector<FileSpecification> specifications)
+std::string Connection::readAnsiFile (const FileSpecification &specification)
+{
+    std::string result;
+    if (!this->_checkConnection()) {
+        return result;
+    }
+
+    ClientQuery query (*this, "L");
+    query.add (specification);
+    ServerResponse response (*this, query);
+    if (!response.success()) {
+        return result;
+    }
+
+    result = response.getLine();
+    result = Text::fromIrbisToUnix (result);
+
+    return result;
+}
+
+StringList Connection::readTextFiles (std::vector<FileSpecification> &specifications)
 {
     StringList result;
 
@@ -959,7 +1052,7 @@ StringList Connection::readTextFiles(std::vector<FileSpecification> specificatio
     return result;
 }
 
-StringList Connection::readTextLines(const FileSpecification &specification)
+StringList Connection::readTextLines (const FileSpecification &specification)
 {
     StringList result;
 
@@ -975,8 +1068,7 @@ StringList Connection::readTextLines(const FileSpecification &specification)
     }
 
     const auto text = response.readAnsi();
-    result = Text::fromFullDelimiter(text);
-
+    result = Text::fromFullDelimiter (text);
     return result;
 }
 
@@ -1022,7 +1114,7 @@ String Connection::requireTextFile(const FileSpecification &specification)
     return result;
 }
 
-MfnList Connection::search(const Search &search)
+MfnList Connection::search (const Search &search)
 {
     SearchParameters parameters;
     parameters.database = this->database;
@@ -1033,7 +1125,7 @@ MfnList Connection::search(const Search &search)
     return this->search(parameters);
 }
 
-MfnList Connection::search(const String &expression)
+MfnList Connection::search (const String &expression)
 {
     SearchParameters parameters;
     parameters.database = this->database;
@@ -1044,7 +1136,7 @@ MfnList Connection::search(const String &expression)
     return this->search(parameters);
 }
 
-MfnList Connection::search(const SearchParameters &parameters)
+MfnList Connection::search (const SearchParameters &parameters)
 {
     MfnList result;
 
@@ -1093,7 +1185,7 @@ String Connection::toConnectionString() const
            + L";";
 }
 
-bool Connection::truncateDatabase(const String &databaseName)
+bool Connection::truncateDatabase (const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1104,7 +1196,7 @@ bool Connection::truncateDatabase(const String &databaseName)
     return execute(query);
 }
 
-bool Connection::unlockDatabase(const String &databaseName)
+bool Connection::unlockDatabase (const String &databaseName)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1115,7 +1207,7 @@ bool Connection::unlockDatabase(const String &databaseName)
     return execute(query);
 }
 
-bool Connection::unlockRecords(const String &databaseName, const MfnList &mfnList)
+bool Connection::unlockRecords (const String &databaseName, const MfnList &mfnList)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1130,21 +1222,21 @@ bool Connection::unlockRecords(const String &databaseName, const MfnList &mfnLis
     return execute(query);
 }
 
-bool Connection::updateIniFile(const StringList &lines)
+bool Connection::updateIniFile (const StringList &lines)
 {
     if (!this->_checkConnection()) {
         return false;
     }
 
-    ClientQuery query(*this, "8");
+    ClientQuery query (*this, "8");
     for (const auto &line : lines) {
-        query.addAnsi(line).newLine();
+        query.addAnsi (line).newLine();
     }
 
-    return execute(query);
+    return execute (query);
 }
 
-bool Connection::updateUserList(const std::vector<UserInfo> &users)
+bool Connection::updateUserList (const std::vector<UserInfo> &users)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1152,13 +1244,13 @@ bool Connection::updateUserList(const std::vector<UserInfo> &users)
 
     ClientQuery query (*this, "+7");
     for (const auto &user : users) {
-        query.addAnsi(user.toString()).newLine();
+        query.addAnsi (user.toString()).newLine();
     }
 
     return this->execute(query);
 }
 
-int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
+int Connection::writeRecord (MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     if (!this->_checkConnection()) {
         return 0;
@@ -1191,7 +1283,7 @@ int Connection::writeRecord(MarcRecord &record, bool lockFlag, bool actualize, b
     return response.returnCode;
 }
 
-bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse)
+bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     if (!this->_checkConnection()) {
         return false;
@@ -1240,13 +1332,13 @@ bool Connection::writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, 
     return true;
 }
 
-bool Connection::writeRecords(std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse)
+bool Connection::writeRecords (std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     // TODO implement
     return false;
 }
 
-int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
+int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     if (!this->_checkConnection()) {
         return 0;
@@ -1279,7 +1371,7 @@ int Connection::writeRawRecord(RawRecord &record, bool lockFlag, bool actualize,
     return response.returnCode;
 }
 
-void Connection::writeTextFile(const FileSpecification &specification)
+void Connection::writeTextFile (const FileSpecification &specification)
 {
     ClientQuery query(*this, "L");
     query.add(specification);

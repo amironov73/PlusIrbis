@@ -13,14 +13,14 @@ namespace irbis {
 /// \param query Полностью сформированный клиентский запрос.
 ///
 /// Вычитывает ответ сервера до конца и сохраняет его во внутреннем буфере.
-ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
+ServerResponse::ServerResponse (Connection &connection, ClientQuery &query)
 {
-    std::lock_guard<std::mutex> guard(connection._mutex);
+    std::lock_guard<std::mutex> guard (connection._mutex);
 
     this->_connection = &connection;
-    this->returnCode = 0;
-    this->_success = false;
-    this->_position = 0;
+    this->returnCode  = 0;
+    this->_success    = false;
+    this->_position   = 0;
 
     // Read the response
     auto &socket = *connection.socket;
@@ -31,7 +31,7 @@ ServerResponse::ServerResponse(Connection &connection, ClientQuery &query)
     auto encoded    = query.encode();
     const auto data = encoded.data();
     const auto size = encoded.size();
-    socket.send(data, size);
+    socket.send (data, size);
 
     Byte buffer[2048];
     while(true) {
@@ -190,7 +190,7 @@ int ServerResponse::readInteger()
 StringList ServerResponse::readRemainingAnsiLines()
 {
     const auto text = this->readRemainingAnsiText();
-    return split(text, '\n');
+    return split (text, '\n');
 }
 
 /// \brief Чтение оставшегося текста в кодировке ANSI.
@@ -198,28 +198,36 @@ StringList ServerResponse::readRemainingAnsiLines()
 std::wstring ServerResponse::readRemainingAnsiText()
 {
     const auto line = this->getRemaining();
-    return cp1251_to_unicode(line);
+    return cp1251_to_unicode (line);
 }
 
 /// \brief Чтение оставшихся строк в кодировке UTF-8.
 /// \return Вектор прочитанных строк.
 StringList ServerResponse::readRemainingUtfLines()
 {
-    // const auto text = readRemainingUtfText();
-    // return split(text, '\n');
-
     StringList result;
     while (!this->eot()) {
         const auto line = readUtf();
-        result.push_back(line);
+        result.push_back (line);
     }
+    return result;
+}
 
+/// \brief Чтение оставшихся строк в кодировке UTF-8.
+/// \return Вектор прочитанных строк.
+std::vector<std::string> ServerResponse::readRemainingLinesUtf()
+{
+    std::vector<std::string> result;
+    while (!this->eot()) {
+        const auto line = getLine();
+        result.push_back (line);
+    }
     return result;
 }
 
 /// \brief Чтение оставшегося текста в кодировке UTF-8.
 /// \return Прочитанный текст.
-std::wstring ServerResponse::readRemainingUtfText()
+String ServerResponse::readRemainingUtfText()
 {
     const auto line = getRemaining();
     return fromUtf(line);
@@ -227,7 +235,7 @@ std::wstring ServerResponse::readRemainingUtfText()
 
 /// \brief Чтение строки в кодировке UTF-8.
 /// \return Полученная строка. Если достигнут конец ответа, строка будет пустой.
-std::wstring ServerResponse::readUtf()
+String ServerResponse::readUtf()
 {
     const auto line = this->getLine();
     return fromUtf(line);

@@ -35,7 +35,7 @@ SubField SubField::clone() const
 
 /// \brief Декодирование подполя из клиентского представления.
 /// \param line Строка с клиентским представлением (не должна быть пустой).
-void SubField::decode(const String &line)
+void SubField::decode (const String &line)
 {
     this->code = line[0];
     this->value = line.substr(1);
@@ -64,7 +64,6 @@ bool SubField::verify(bool throwOnError) const
     if (!result && throwOnError) {
         throw VerificationException();
     }
-
     return result;
 }
 

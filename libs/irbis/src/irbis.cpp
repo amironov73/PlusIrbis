@@ -73,12 +73,23 @@ bool sameString(const String &first, const String &second) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toLower(String &text) noexcept
+String toLower (String &text) noexcept
 {
     for (auto &i : text) {
         i = ::tolower(i);
     }
+    return text;
+}
 
+/// \brief Преобразование строки к нижнему регистру.
+/// \param text Текст, подлежащий трансформации.
+/// \return Возвращает преобразованную строку.
+/// \warning Трансформация осуществляется "по месту"!
+std::string toLower (std::string &text) noexcept
+{
+    for (auto &i : text) {
+        i = ::tolower(i);
+    }
     return text;
 }
 
@@ -91,7 +102,18 @@ String toUpper(String &text) noexcept
     for (auto &i : text) {
         i = ::toupper(i);
     }
+    return text;
+}
 
+/// \brief Преобразование строки к верхнему регистру.
+/// \param text Текст, подлежащий трансформации.
+/// \return Возвращает преобразованную строку.
+/// \warning Трансформация осуществляется "по месту"!
+std::string toUpper(std::string &text) noexcept
+{
+    for (auto &i : text) {
+        i = ::toupper(i);
+    }
     return text;
 }
 
@@ -533,13 +555,23 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const st
 /// \param list
 /// \param index
 /// \return
-std::wstring safeAt(const StringList &list, std::size_t index)
+String safeAt (const StringList &list, std::size_t index)
 {
-    if (index >= list.size())
-    {
+    if (index >= list.size()) {
         return std::wstring();
     }
+    return list.at(index);
+}
 
+///
+/// \param list
+/// \param index
+/// \return
+std::string safeAt (const std::vector<std::string> &list, std::size_t index)
+{
+    if (index >= list.size()) {
+        return std::string();
+    }
     return list.at(index);
 }
 
@@ -548,10 +580,9 @@ std::wstring safeAt(const StringList &list, std::size_t index)
 /// \param separator
 /// \param count
 /// \return
-StringList maxSplit(const String &text, Char separator, int count)
+StringList maxSplit (const String &text, Char separator, int count)
 {
-    std::vector<std::wstring> result;
-
+    StringList result;
     std::size_t position = 0;
     const std::size_t length = text.length();
     while ((count > 1) && (position < length)) {
@@ -565,13 +596,37 @@ StringList maxSplit(const String &text, Char separator, int count)
         }
         count--;
     }
-
     if (position < length) {
         result.push_back(text.substr(position));
     }
-
     return result;
+}
 
+///
+/// \param text
+/// \param separator
+/// \param count
+/// \return
+std::vector<std::string> maxSplit (const std::string &text, char separator, int count)
+{
+    std::vector<std::string> result;
+    std::size_t position = 0;
+    const std::size_t length = text.length();
+    while ((count > 1) && (position < length)) {
+        const auto index = text.find(separator, position);
+        if (index != std::wstring::npos) {
+            result.push_back(text.substr(position, index - position));
+            position = index + 1;
+        } else {
+            result.push_back(text.substr(position));
+            break;
+        }
+        count--;
+    }
+    if (position < length) {
+        result.push_back(text.substr(position));
+    }
+    return result;
 }
 
 ///

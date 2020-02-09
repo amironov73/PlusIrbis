@@ -27,7 +27,7 @@
 
 namespace irbis {
 
-RecordField& RecordField::add(Char subFieldCode, const String &subFieldValue)
+RecordField& RecordField::add (Char subFieldCode, const String &subFieldValue)
 {
     this->subfields.emplace_back(subFieldCode, subFieldValue);
     return *this;
@@ -37,7 +37,6 @@ RecordField& RecordField::clear()
 {
     value.clear();
     subfields.clear();
-
     return *this;
 }
 
@@ -45,35 +44,32 @@ RecordField RecordField::clone() const
 {
     RecordField result (this->tag, this->value);
     for (const auto &sub : this->subfields) {
-        result.subfields.emplace_back(sub.code, sub.value);
+        result.subfields.emplace_back (sub.code, sub.value);
     }
-
     return result;
 }
 
-void RecordField::decode(const String &line)
+void RecordField::decode (const String &line)
 {
-    const auto parts = maxSplit(line, L'#', 2);
-    this->tag = fastParse32(parts[0]);
+    const auto parts = maxSplit (line, L'#', 2);
+    this->tag = fastParse32 (parts[0]);
     if (parts.size() == 1 || parts[1].empty()) {
         return;
     }
-
     const auto body = parts[1];
     StringList all;
     if (body[0] == L'^') {
-        all = split(body, L'^');
+        all = split (body, L'^');
     } else {
-        const auto parts2 = maxSplit(body, L'#', 2);
+        const auto parts2 = maxSplit (body, L'#', 2);
         this->value = parts2[0];
-        all = split(parts2[1], L'^');
+        all = split (parts2[1], L'^');
     }
-
     for (const auto &one : all) {
         if (!one.empty()) {
             SubField subField;
-            subField.decode(one);
-            this->subfields.push_back(subField);
+            subField.decode (one);
+            this->subfields.push_back (subField);
         }
     }
 }
@@ -83,25 +79,23 @@ bool RecordField::empty() const noexcept
     return !this->tag || (this->value.empty() && this->subfields.empty());
 }
 
-SubField* RecordField::getFirstSubfield(Char code) const noexcept
+SubField* RecordField::getFirstSubfield (Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
-            return const_cast<SubField*>(&one);
+            return const_cast<SubField*> (&one);
         }
     }
-
     return nullptr;
 }
 
-String RecordField::getFirstSubfieldValue(Char code) const noexcept
+String RecordField::getFirstSubfieldValue (Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar(one.code, code)) {
             return one.value;
         }
     }
-
     return String();
 }
 
@@ -120,10 +114,9 @@ RecordField& RecordField::setSubfield (Char code, const String &newValue)
         this->removeSubfield (code);
         return *this;
     }
-
     auto *subField = this->getFirstSubfield (code);
     if (!subField) {
-        this->add(code, newValue);
+        this->add (code, newValue);
     }
     else {
         subField->value = newValue;
@@ -131,16 +124,15 @@ RecordField& RecordField::setSubfield (Char code, const String &newValue)
     return *this;
 }
 
-bool RecordField::verify(bool throwOnError) const
+bool RecordField::verify (bool throwOnError) const
 {
     bool result = tag > 0;
-
     if (result) {
         if (subfields.empty()) {
             result = !value.empty();
         }
         else {
-            for (const SubField &sub : subfields) {
+            for (const auto &sub : subfields) {
                 if (!sub.verify(throwOnError)) {
                     result = false;
                     break;
@@ -148,11 +140,9 @@ bool RecordField::verify(bool throwOnError) const
             }
         }
     }
-
     if (!result && throwOnError) {
         throw VerificationException();
     }
-
     return result;
 }
 
@@ -163,7 +153,6 @@ String RecordField::toString() const
     for (const auto &sub : subfields) {
         result += sub.toString();
     }
-
     return result;
 }
 

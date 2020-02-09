@@ -158,6 +158,9 @@ class TextNavigator;
 class TreeFile;
 class TreeNode;
 class UserInfo;
+class UtfField;
+class UtfRecord;
+class UtfSubField;
 class VerificationException;
 class Version;
 class XrfFile64;
@@ -883,73 +886,77 @@ public:
     Connection& operator=(Connection&&) = delete;
     ~Connection();
 
-    bool actualizeDatabase(const String &databaseName);
-    bool actualizeRecord(const String &databaseName, int mfn);
+    bool actualizeDatabase (const String &databaseName);
+    bool actualizeRecord (const String &databaseName, int mfn);
     bool connect();
     // std::future<bool> connectAsync();
-    bool createDatabase(const String &databaseName, const String &description, bool readerAccess);
-    bool createDictionary(const String &databaseName);
-    bool deleteDatabase(const String &databaseName);
-    bool deleteRecord(int mfn);
+    bool createDatabase (const String &databaseName, const String &description, bool readerAccess);
+    bool createDictionary (const String &databaseName);
+    bool deleteDatabase (const String &databaseName);
+    bool deleteRecord (int mfn);
     bool connected() const noexcept { return this->_connected; }
     void disconnect();
     // std::future<void> disconnectAsync();
-    bool execute(ClientQuery &query);
+    bool execute (ClientQuery &query);
     // std::future<bool> executeAsync(ClientQuery &query);
-    String formatRecord(const String &format, Mfn mfn);
-    String formatRecord(const String &format, const MarcRecord &record);
-    DatabaseInfo getDatabaseInfo(const String &databaseName);
-    Mfn getMaxMfn(const String &databaseName);
-    GblResult globalCorrection(const GblSettings &settings);
+    String formatRecord (const String &format, Mfn mfn);
+    std::string formatRecordUtf (const std::string &format, Mfn mfn);
+    String formatRecord (const String &format, const MarcRecord &record);
+    DatabaseInfo getDatabaseInfo (const String &databaseName);
+    Mfn getMaxMfn (const String &databaseName);
+    GblResult globalCorrection (const GblSettings &settings);
     ServerStat getServerStat();
     Version getServerVersion();
     std::vector<UserInfo> getUserList();
-    std::vector<DatabaseInfo> listDatabases(const IniFile &iniFile, const String &defaultFileName);
-    std::vector<DatabaseInfo> listDatabases(const FileSpecification &specification);
-    StringList listFiles(const FileSpecification &specification);
-    StringList listFiles(const std::vector<FileSpecification> &specifications);
+    std::vector<DatabaseInfo> listDatabases (const IniFile &iniFile, const String &defaultFileName);
+    std::vector<DatabaseInfo> listDatabases (const FileSpecification &specification);
+    StringList listFiles (const FileSpecification &specification);
+    StringList listFiles (const std::vector<FileSpecification> &specifications);
     std::vector<ProcessInfo> listProcesses();
-    StringList listTerms(const String &prefix);
+    StringList listTerms (const String &prefix);
     bool noOp();
     // std::future<bool> noOpAsync();
-    void parseConnectionString(const String &connectionString);
+    void parseConnectionStringUtf (const std::string &connectionString);
+    void parseConnectionString (const String &connectionString);
     String popDatabase();
-    String printTable(const TableDefinition &definition);
-    String pushDatabase(const String &newDatabase);
-    Bytes readBinaryFile(const FileSpecification &specification);
-    IniFile readIniFile(const FileSpecification &specification);
-    MenuFile readMenuFile(const FileSpecification &specification);
+    String printTable (const TableDefinition &definition);
+    String pushDatabase (const String &newDatabase);
+    Bytes readBinaryFile (const FileSpecification &specification);
+    IniFile readIniFile (const FileSpecification &specification);
+    MenuFile readMenuFile (const FileSpecification &specification);
     std::vector<TermPosting> readPostings(const PostingParameters &parameters);
-    RawRecord readRawRecord(Mfn mfn);
-    MarcRecord readRecord(Mfn mfn);
-    MarcRecord readRecord(const String &databaseName, Mfn mfn);
-    MarcRecord readRecord(const String &databaseName, Mfn mfn, int version);
-    std::vector<MarcRecord> readRecords(const MfnList &mfnList);
-    std::vector<SearchScenario> readSearchScenario(const FileSpecification &specification);
-    std::vector<TermInfo> readTerms(const String &startTerm, int numberOfTerms);
-    std::vector<TermInfo> readTerms(const TermParameters &parameters);
-    String readTextFile(const FileSpecification &specification);
-    StringList readTextFiles(std::vector<FileSpecification> specifications);
-    StringList  readTextLines(const FileSpecification &specification);
-    bool reloadDictionary(const String &databaseName);
-    bool reloadMasterFile(const String &databaseName);
+    RawRecord readRawRecord (Mfn mfn);
+    MarcRecord readRecord (Mfn mfn);
+    UtfRecord readRecordUtf (Mfn mfn);
+    MarcRecord readRecord (const String &databaseName, Mfn mfn);
+    MarcRecord readRecord (const String &databaseName, Mfn mfn, int version);
+    std::vector<MarcRecord> readRecords (const MfnList &mfnList);
+    std::vector<SearchScenario> readSearchScenario (const FileSpecification &specification);
+    std::vector<TermInfo> readTerms (const String &startTerm, int numberOfTerms);
+    std::vector<TermInfo> readTerms (const TermParameters &parameters);
+    String readTextFile (const FileSpecification &specification);
+    std::string readAnsiFile (const FileSpecification &specification);
+    StringList readTextFiles (std::vector<FileSpecification> &specifications);
+    StringList  readTextLines (const FileSpecification &specification);
+    bool reloadDictionary (const String &databaseName);
+    bool reloadMasterFile (const String &databaseName);
     bool restartServer();
-    String requireTextFile(const FileSpecification &specification);
-    MfnList search(const Search &search);
-    MfnList search(const String &expression);
-    MfnList search(const SearchParameters &parameters);
+    String requireTextFile (const FileSpecification &specification);
+    MfnList search (const Search &search);
+    MfnList search (const String &expression);
+    MfnList search (const SearchParameters &parameters);
     String toConnectionString() const;
-    bool truncateDatabase(const String &databaseName);
-    bool unlockDatabase(const String &databaseName);
-    bool unlockRecords(const String &databaseName, const MfnList &mfnList);
-    bool updateIniFile(const StringList &lines);
-    bool updateUserList(const std::vector<UserInfo> &users);
-    int writeRawRecord(RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
-    int writeRecord(MarcRecord &record, bool lockFlag = false,
+    bool truncateDatabase (const String &databaseName);
+    bool unlockDatabase (const String &databaseName);
+    bool unlockRecords (const String &databaseName, const MfnList &mfnList);
+    bool updateIniFile (const StringList &lines);
+    bool updateUserList (const std::vector<UserInfo> &users);
+    int writeRawRecord (RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
+    int writeRecord (MarcRecord &record, bool lockFlag = false,
             bool actualize = true, bool dontParseResponse = false);
-    bool writeRecords(std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
-    bool writeRecords(std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse);
-    void writeTextFile(const FileSpecification &specification);
+    bool writeRecords (std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
+    bool writeRecords (std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse);
+    void writeTextFile (const FileSpecification &specification);
 };
 
 //=========================================================
@@ -1350,17 +1357,17 @@ public:
     MarcRecord& operator = (MarcRecord &&other) = default;      ///< Оператор перемещения.
     ~MarcRecord() = default;                                    ///< Деструктор.
 
-    RecordField& add(int tag, const String &value);
+    RecordField& add (int tag, const String &value);
     MarcRecord clone() const;
-    void decode(const StringList &lines);
+    void decode (const StringList &lines);
     bool deleted() const noexcept;
-    String encode(const String &delimiter) const;
-    String fm(int tag, Char code) const noexcept;
-    StringList fma(int tag, Char code) const;
-    RecordField* getField(int tag, int occurrence) const noexcept;
-    std::vector<RecordField*> getFields(int tag) const;
+    String encode (const String &delimiter = L"\u001F\u001E") const;
+    String fm (int tag, Char code = 0) const noexcept;
+    StringList fma (int tag, Char code = 0) const;
+    RecordField* getField (int tag, int occurrence = 0) const noexcept;
+    std::vector<RecordField*> getFields (int tag) const;
     MarcRecord& reset() noexcept;
-    bool verify(bool throwOnError) const;
+    bool verify (bool throwOnError) const;
 
     friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
 };
@@ -1990,6 +1997,100 @@ public:
 
     String toString() const;
     static std::vector<UserInfo> parse(const StringList &lines);
+};
+
+//=========================================================
+
+/// \brief UTF-версия RecordField.
+class PLUSIRBIS_EXPORTS UtfField final
+{
+public:
+    int tag { 0 };
+    std::string value;
+    std::list<UtfSubField> subfields;
+
+    UtfField() = default;
+    UtfField (int tag, const std::string &value = "") : tag(tag), value(value) {}
+    UtfField (const UtfField &other) = default;
+    UtfField (UtfField &&other) = default;
+    UtfField& operator = (const UtfField &other) = default;
+    UtfField& operator = (UtfField &&other) = default;
+    ~UtfField() = default;
+
+    UtfField& add (char code, const std::string &value = "");
+    UtfField& clear();
+    UtfField clone() const;
+    void decode (const std::string &line);
+    bool empty() const noexcept;
+    UtfSubField* getFirstSubfield (char code) const noexcept;
+    std::string getFirstSubfieldValue (char code) const noexcept;
+    UtfField& removeSubfield (char code);
+    UtfField& setSubfield (char code, const std::string &newValue);
+    bool verify (bool throwOnError) const;
+    std::string toString() const;
+
+    RecordField materialize() const;
+};
+
+//=========================================================
+
+/// \brief UTF-версия MarcRecord.
+class PLUSIRBIS_EXPORTS UtfRecord final
+{
+public:
+    Mfn mfn { 0u };               ///< MFN (порядковый номер в базе) записи.
+    Flag status { 0u };           ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };  ///< Номер версии записи.
+    std::list<UtfField> fields;   ///< Список полей.
+    std::string database;         ///< База данных.
+
+    UtfRecord() = default;                                    ///< Конструктор по умолчанию.
+    UtfRecord (const UtfRecord &other) = default;             ///< Конструктор копирования.
+    UtfRecord (UtfRecord &&other) = default;                  ///< Конструктор перемещения.
+    UtfRecord& operator = (const UtfRecord &other) = default; ///< Оператор копирования.
+    UtfRecord& operator = (UtfRecord &&other) = default;      ///< Оператор перемещения.
+    ~UtfRecord() = default;                                   ///< Деструктор.
+
+    UtfField& add (int tag, const std::string &value);
+    UtfRecord clone() const;
+    void decode (const std::vector<std::string> &lines);
+    bool deleted() const noexcept;
+    std::string encode (const std::string &delimiter = "\x1F\x1E") const;
+    std::string fm (int tag, char code = 0) const noexcept;
+    std::vector<std::string> fma (int tag, char code = 0) const;
+    UtfField* getField (int tag, int occurrence = 0) const noexcept;
+    std::vector<UtfField*> getFields (int tag) const;
+    UtfRecord& reset() noexcept;
+    bool verify (bool throwOnError) const;
+
+    MarcRecord materialize() const;
+};
+
+//=========================================================
+
+/// \brief UTF-версия SubField.
+class PLUSIRBIS_EXPORTS UtfSubField final
+{
+public:
+    /// \brief Одноисмвольный код подполя.
+    char code { '\0' };
+    std::string value; ///< Значение подполя (может быть пустым).
+
+    UtfSubField() = default;
+    UtfSubField (char code, const std::string &value = "") : code(code), value(value) {}
+    UtfSubField (const UtfSubField &other) = default;
+    UtfSubField (UtfSubField &&other) = default;
+    UtfSubField& operator = (const UtfSubField &other) = default;
+    UtfSubField& operator = (UtfSubField &&other) = default;
+    ~UtfSubField() = default;
+
+    UtfSubField clone() const;
+    void decode (const std::string &line);
+    bool empty() const noexcept;
+    bool verify (bool throwOnError) const;
+    std::string toString() const;
+
+    SubField materialize() const;
 };
 
 //=========================================================

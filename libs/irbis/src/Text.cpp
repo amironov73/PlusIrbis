@@ -39,6 +39,14 @@ String Text::fromIrbisToDos (String &text)
     return replace (text, IrbisDelimiter, MsDosDelimiter);
 }
 
+/// \brief Замена разделителей текста с ИРБИС на MS-DOS.
+/// \param text Текст, подлежащий обработке.
+/// \return Обработанный `text`.
+std::string Text::fromIrbisToUnix (std::string &text)
+{
+    return replace (text, "\x1F\x1E", "\n");
+}
+
 /// \brief Замена разделителей текста с ИРБИС на UNIX.
 /// \param text Текст, подлежащий обработке.
 /// \return Обработанный `text`.

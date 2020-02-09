@@ -236,6 +236,7 @@ public:
     const static String SearchDelimiter;
 
     static String fromIrbisToDos (String &text);
+    static std::string fromIrbisToUnix (std::string &text);
     static String fromIrbisToUnix (String &text);
     static String fromDosToIrbis (String &text);
     static String fromUnixToIrbis (String &text);
@@ -298,6 +299,7 @@ public:
     StringList readRemainingAnsiLines();
     String readRemainingAnsiText();
     StringList readRemainingUtfLines();
+    std::vector<std::string> readRemainingLinesUtf();
     String readRemainingUtfText();
     String readUtf();
 
@@ -475,7 +477,9 @@ PLUSIRBIS_EXPORTS bool sameChar(Char first, Char second) noexcept;
 PLUSIRBIS_EXPORTS bool sameString(const String &first, const String &second) noexcept;
 
 PLUSIRBIS_EXPORTS String toLower(String &text) noexcept;
-PLUSIRBIS_EXPORTS String toUpper(String &text) noexcept ;
+PLUSIRBIS_EXPORTS std::string toLower(std::string &text) noexcept;
+PLUSIRBIS_EXPORTS String toUpper(String &text) noexcept;
+PLUSIRBIS_EXPORTS std::string toUpper(std::string &text) noexcept;
 
 PLUSIRBIS_EXPORTS bool contains(const String &text, const String &fragment);
 PLUSIRBIS_EXPORTS bool contains(const String &text, Char c);
@@ -508,12 +512,14 @@ PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2, const std::string &s3);
 PLUSIRBIS_EXPORTS const String& iif(const String& s1, const String &s2, const String &s3);
 
-PLUSIRBIS_EXPORTS std::wstring safeAt(const StringList &list, std::size_t index);
+PLUSIRBIS_EXPORTS std::string safeAt (const std::vector<std::string> &list, std::size_t index);
+PLUSIRBIS_EXPORTS String safeAt (const StringList &list, std::size_t index);
 
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, char delimiter);
 PLUSIRBIS_EXPORTS StringList split(const String &text, Char delimiter);
 PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, const std::string &delimiter);
 PLUSIRBIS_EXPORTS StringList split(const String &text, const String &delimiter);
+PLUSIRBIS_EXPORTS std::vector<std::string> maxSplit(const std::string &text, char separator, int count);
 PLUSIRBIS_EXPORTS StringList maxSplit(const String &text, Char separator, int count);
 
 PLUSIRBIS_EXPORTS String cp866_to_unicode(const std::string &text);
