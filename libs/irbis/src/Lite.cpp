@@ -12,15 +12,15 @@
 
 /*!
 
-    \file UtfRecord.cpp
+    \file Lite.cpp
 
     UTF-версии записи, поля и подполя.
 
-    \class irbis::UtfRecord
+    \class irbis::LiteRecord
 
-    \class irbis::UtfField
+    \class irbis::LiteField
 
-    \class irbis::UtfSubField
+    \class irbis::LiteSubField
 
  */
 
@@ -30,15 +30,15 @@ namespace irbis {
 /// \param tag Метка добавляемого поля.
 /// \param value Значение поля (может быть пустым).
 /// \return Вновь созданное поле.
-UtfField& UtfRecord::add (int tag, const std::string &value)
+LiteField& LiteRecord::add (int tag, const std::string &value)
 {
     this->fields.emplace_back (tag, value);
     return this->fields.back();
 }
 
-UtfRecord UtfRecord::clone() const
+LiteRecord LiteRecord::clone() const
 {
-    UtfRecord result;
+    LiteRecord result;
     result.mfn = this->mfn;
     result.status = this->status;
     result.version = this->version;
@@ -49,7 +49,7 @@ UtfRecord UtfRecord::clone() const
     return result;
 }
 
-void UtfRecord::decode (const std::vector<std::string> &lines)
+void LiteRecord::decode (const std::vector<std::string> &lines)
 {
     if (lines.size() < 2) {
         return;
@@ -68,19 +68,19 @@ void UtfRecord::decode (const std::vector<std::string> &lines)
     for (std::size_t i = 2; i < lines.size(); i++) {
         const auto line = lines[i];
         if (!line.empty()) {
-            UtfField field;
+            LiteField field;
             field.decode(line);
             this->fields.push_back(field);
         }
     }
 }
 
-bool UtfRecord::deleted() const noexcept
+bool LiteRecord::deleted() const noexcept
 {
     return (this->status & RecordStatus::Deleted) != 0u;
 }
 
-std::string UtfRecord::encode (const std::string &delimiter) const
+std::string LiteRecord::encode (const std::string &delimiter) const
 {
     std::string result = std::to_string(this->mfn) + "#"
                     + std::to_string(this->status) + delimiter
@@ -92,7 +92,7 @@ std::string UtfRecord::encode (const std::string &delimiter) const
     return result;
 }
 
-std::string UtfRecord::fm (int tag, char code) const noexcept
+std::string LiteRecord::fm (int tag, char code) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
@@ -110,7 +110,7 @@ std::string UtfRecord::fm (int tag, char code) const noexcept
     return std::string();
 }
 
-std::vector<std::string> UtfRecord::fma (int tag, char code) const
+std::vector<std::string> LiteRecord::fma (int tag, char code) const
 {
     std::vector<std::string> result;
     for (const auto &field : this->fields) {
@@ -133,24 +133,24 @@ std::vector<std::string> UtfRecord::fma (int tag, char code) const
     return result;
 }
 
-UtfField* UtfRecord::getField (int tag, int occurrence) const noexcept
+LiteField* LiteRecord::getField (int tag, int occurrence) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
             if (!occurrence) {
-                return const_cast<UtfField*> (&field);
+                return const_cast<LiteField*> (&field);
             }
         }
     }
     return nullptr;
 }
 
-std::vector<UtfField*> UtfRecord::getFields (int tag) const
+std::vector<LiteField*> LiteRecord::getFields (int tag) const
 {
-    std::vector<UtfField*> result;
+    std::vector<LiteField*> result;
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
-            auto ptr = const_cast<UtfField*>(&field);
+            auto ptr = const_cast<LiteField*>(&field);
             result.push_back(ptr);
         }
     }
@@ -158,7 +158,7 @@ std::vector<UtfField*> UtfRecord::getFields (int tag) const
     return result;
 }
 
-UtfRecord& UtfRecord::reset() noexcept
+LiteRecord& LiteRecord::reset() noexcept
 {
     this->mfn = 0;
     this->status = 0;
@@ -167,7 +167,7 @@ UtfRecord& UtfRecord::reset() noexcept
     return *this;
 }
 
-bool UtfRecord::verify (bool throwOnError) const
+bool LiteRecord::verify (bool throwOnError) const
 {
     bool result = true;
     for (const auto &field : this->fields) {
@@ -181,7 +181,7 @@ bool UtfRecord::verify (bool throwOnError) const
     return result;
 }
 
-MarcRecord UtfRecord::materialize() const
+MarcRecord LiteRecord::materialize() const
 {
     MarcRecord result;
     result.mfn = this->mfn;
@@ -196,29 +196,29 @@ MarcRecord UtfRecord::materialize() const
 
 //=========================================================
 
-UtfField& UtfField::add (char subFieldCode, const std::string &subFieldValue)
+LiteField& LiteField::add (char subFieldCode, const std::string &subFieldValue)
 {
     this->subfields.emplace_back(subFieldCode, subFieldValue);
     return *this;
 }
 
-UtfField& UtfField::clear()
+LiteField& LiteField::clear()
 {
-    value.clear();
-    subfields.clear();
+    this->value.clear();
+    this->subfields.clear();
     return *this;
 }
 
-UtfField UtfField::clone() const
+LiteField LiteField::clone() const
 {
-    UtfField result (this->tag, this->value);
+    LiteField result (this->tag, this->value);
     for (const auto &sub : this->subfields) {
         result.subfields.emplace_back (sub.code, sub.value);
     }
     return result;
 }
 
-void UtfField::decode (const std::string &line)
+void LiteField::decode (const std::string &line)
 {
     const auto parts = maxSplit (line, '#', 2);
     this->tag = fastParse32(parts[0]);
@@ -236,29 +236,29 @@ void UtfField::decode (const std::string &line)
     }
     for (const auto &one : all) {
         if (!one.empty()) {
-            UtfSubField subField;
+            LiteSubField subField;
             subField.decode(one);
             this->subfields.push_back (subField);
         }
     }
 }
 
-bool UtfField::empty() const noexcept
+bool LiteField::empty() const noexcept
 {
     return !this->tag || (this->value.empty() && this->subfields.empty());
 }
 
-UtfSubField* UtfField::getFirstSubfield (char code) const noexcept
+LiteSubField* LiteField::getFirstSubfield (char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar (one.code, code)) {
-            return const_cast<UtfSubField*> (&one);
+            return const_cast<LiteSubField*> (&one);
         }
     }
     return nullptr;
 }
 
-std::string UtfField::getFirstSubfieldValue (char code) const noexcept
+std::string LiteField::getFirstSubfieldValue (char code) const noexcept
 {
     for (const auto &one : this->subfields) {
         if (sameChar (one.code, code)) {
@@ -268,16 +268,16 @@ std::string UtfField::getFirstSubfieldValue (char code) const noexcept
     return std::string();
 }
 
-UtfField& UtfField::removeSubfield (char code)
+LiteField& LiteField::removeSubfield (char code)
 {
     std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
-                    [code] (UtfSubField &sf) { return sf.code == code; }
+                    [code] (LiteSubField &sf) { return sf.code == code; }
     );
 
     return *this;
 }
 
-UtfField& UtfField::setSubfield (char code, const std::string &newValue)
+LiteField& LiteField::setSubfield (char code, const std::string &newValue)
 {
     if (newValue.empty()) {
         this->removeSubfield (code);
@@ -293,7 +293,7 @@ UtfField& UtfField::setSubfield (char code, const std::string &newValue)
     return *this;
 }
 
-bool UtfField::verify (bool throwOnError) const
+bool LiteField::verify (bool throwOnError) const
 {
     bool result = tag > 0;
     if (result) {
@@ -315,7 +315,7 @@ bool UtfField::verify (bool throwOnError) const
     return result;
 }
 
-std::string UtfField::toString() const
+std::string LiteField::toString() const
 {
     std::string result = std::to_string(tag)
                     + "#" + value;
@@ -325,7 +325,7 @@ std::string UtfField::toString() const
     return result;
 }
 
-RecordField UtfField::materialize() const
+RecordField LiteField::materialize() const
 {
     RecordField result (this->tag, fromUtf(this->value));
     for (const auto &sub : this->subfields) {
@@ -338,9 +338,9 @@ RecordField UtfField::materialize() const
 
 /// \brief Клонирование подполя.
 /// \return Точная копия подполя.
-UtfSubField UtfSubField::clone() const
+LiteSubField LiteSubField::clone() const
 {
-    UtfSubField result;
+    LiteSubField result;
     result.code = this->code;
     result.value = this->value;
     return result;
@@ -348,15 +348,15 @@ UtfSubField UtfSubField::clone() const
 
 /// \brief Декодирование подполя из клиентского представления.
 /// \param line Строка с клиентским представлением (не должна быть пустой).
-void UtfSubField::decode (const std::string &line)
+void LiteSubField::decode (const std::string &line)
 {
     this->code = line[0];
-    this->value = line.substr(1);
+    this->value = line.substr (1);
 }
 
 /// \brief Пустое подполе?
 /// \return true, если подполе пустое.
-bool UtfSubField::empty() const noexcept
+bool LiteSubField::empty() const noexcept
 {
     return code == 0 || value.empty();
 }
@@ -364,7 +364,7 @@ bool UtfSubField::empty() const noexcept
 /// \brief Проверка, является подполе полноценным (с кодом и значением).
 /// \param throwOnError Бросать исключение, если подполе не полноценное.
 /// \return true, если с полем всё нормально.
-bool UtfSubField::verify (bool throwOnError) const
+bool LiteSubField::verify (bool throwOnError) const
 {
     const bool result = (this->code != 0) && !this->value.empty();
     if (!result && throwOnError) {
@@ -375,14 +375,14 @@ bool UtfSubField::verify (bool throwOnError) const
 
 /// \brief Кодирование подполя в клиентское (строковое) представление.
 /// \return Закодированное подполе.
-std::string UtfSubField::toString() const
+std::string LiteSubField::toString() const
 {
     return std::string ("^") + this->code + this->value;
 }
 
 /// \brief Превращение в полноценное подполе.
 /// \return Полноценное подполе.
-SubField UtfSubField::materialize() const
+SubField LiteSubField::materialize() const
 {
     return SubField (this->code, fromUtf(this->value));
 }

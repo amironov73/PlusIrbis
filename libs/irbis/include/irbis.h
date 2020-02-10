@@ -118,7 +118,9 @@ class IniSection;
 class IrbisException;
 class Isbn;
 class Iso2709;
-class Encoding;
+class LiteField;
+class LiteRecord;
+class LiteSubField;
 class MarcRecord;
 class MarcRecordList;
 class MemoryChunk;
@@ -136,6 +138,9 @@ class NumberText;
 class OptFile;
 class OptLine;
 class ParFile;
+class PhantomField;
+class PhantomRecord;
+class PhantomSubField;
 class PostingParameters;
 class ProcessInfo;
 class ProtocolText;
@@ -158,9 +163,6 @@ class TextNavigator;
 class TreeFile;
 class TreeNode;
 class UserInfo;
-class UtfField;
-class UtfRecord;
-class UtfSubField;
 class VerificationException;
 class Version;
 class XrfFile64;
@@ -900,7 +902,7 @@ public:
     bool execute (ClientQuery &query);
     // std::future<bool> executeAsync(ClientQuery &query);
     String formatRecord (const String &format, Mfn mfn);
-    std::string formatRecordUtf (const std::string &format, Mfn mfn);
+    std::string formatRecordLite (const std::string &format, Mfn mfn);
     String formatRecord (const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo (const String &databaseName);
     Mfn getMaxMfn (const String &databaseName);
@@ -927,7 +929,7 @@ public:
     std::vector<TermPosting> readPostings(const PostingParameters &parameters);
     RawRecord readRawRecord (Mfn mfn);
     MarcRecord readRecord (Mfn mfn);
-    UtfRecord readRecordUtf (Mfn mfn);
+    LiteRecord readLiteRecord (Mfn mfn);
     MarcRecord readRecord (const String &databaseName, Mfn mfn);
     MarcRecord readRecord (const String &databaseName, Mfn mfn, int version);
     std::vector<MarcRecord> readRecords (const MfnList &mfnList);
@@ -1598,8 +1600,22 @@ class PLUSIRBIS_EXPORTS PhantomSubField final
 public:
 
     /// \brief Одноисмвольный код подполя.
-    Char code { L'\0' };
+    Byte code { '\0' };
     ByteSpan value; ///< Значение подполя (может быть пустым).
+
+    PhantomSubField() = default;
+    PhantomSubField (Byte code_, ByteSpan value_) : code(code_), value(value_) {}
+    PhantomSubField (const PhantomSubField &other) = default;
+    PhantomSubField (PhantomSubField &&other) = default;
+    PhantomSubField& operator = (const PhantomSubField &other) = default;
+    PhantomSubField& operator = (PhantomSubField &&other) = default;
+    ~PhantomSubField() = default;
+
+    PhantomSubField clone() const;
+    void decode (ByteSpan line);
+    bool empty() const noexcept;
+    bool verify (bool throwOnError) const;
+    std::string toString() const;
 
     SubField materialize() const;
 };
@@ -1615,6 +1631,26 @@ public:
     ByteSpan value;
     std::list<PhantomSubField> subfields;
 
+    PhantomField() = default;
+    PhantomField (int tag_, ByteSpan value_) : tag(tag_), value(value_) {}
+    PhantomField (const PhantomField &other) = default;
+    PhantomField (PhantomField &&other) = default;
+    PhantomField& operator = (const PhantomField &other) = default;
+    PhantomField& operator = (PhantomField &&other) = default;
+    ~PhantomField() = default;
+
+    PhantomField& add (Byte code, ByteSpan value);
+    PhantomField& clear();
+    PhantomField clone() const;
+    void decode (ByteSpan line);
+    bool empty() const noexcept;
+    PhantomSubField* getFirstSubfield (Byte code) const noexcept;
+    ByteSpan getFirstSubfieldValue (Byte code) const noexcept;
+    PhantomField& removeSubfield (Byte code);
+    PhantomField& setSubfield (Byte code, ByteSpan newValue);
+    bool verify (bool throwOnError) const;
+    std::string toString() const;
+
     RecordField materialize() const;
 };
 
@@ -1624,11 +1660,30 @@ public:
 class PLUSIRBIS_EXPORTS PhantomRecord final
 {
 public:
-
     Mfn mfn { 0u };                 ///< MFN (порядковый номер в базе) записи.
     Flag status { 0u };             ///< Статус записи. Представляет собой набор флагов.
     unsigned int version { 0u };    ///< Номер версии записи.
     std::list<PhantomField> fields; ///< Список полей.
+    std::string database;           ///< База данных.
+
+    PhantomRecord() = default;                                        ///< Конструктор по умолчанию.
+    PhantomRecord (const PhantomRecord &other) = default;             ///< Конструктор копирования.
+    PhantomRecord (PhantomRecord &&other) = default;                  ///< Конструктор перемещения.
+    PhantomRecord& operator = (const PhantomRecord &other) = default; ///< Оператор копирования.
+    PhantomRecord& operator = (PhantomRecord &&other) = default;      ///< Оператор перемещения.
+    ~PhantomRecord() = default;                                       ///< Деструктор.
+
+    PhantomField& add (int tag, ByteSpan value);
+    PhantomRecord clone() const;
+    void decode (const std::vector<ByteSpan> &lines);
+    bool deleted() const noexcept;
+    void encode (ByteSpan buffer, ByteSpan delimiter) const;
+    std::string fm (int tag, Byte code = 0) const noexcept;
+    std::vector<std::string> fma (int tag, char code = 0) const;
+    PhantomField* getField (int tag, int occurrence = 0) const noexcept;
+    std::vector<PhantomField*> getFields (int tag) const;
+    PhantomRecord& reset() noexcept;
+    bool verify (bool throwOnError) const;
 
     MarcRecord materialize() const;
 };
@@ -1695,9 +1750,9 @@ public:
     std::list<SubField> subfields;
 
     RecordField() = default;
-    RecordField(int tag, const String &value = L"") : tag(tag), value(value) {}
-    RecordField(const RecordField &other) = default;
-    RecordField(RecordField &&other) = default;
+    RecordField (int tag, const String &value = L"") : tag(tag), value(value) {}
+    RecordField (const RecordField &other) = default;
+    RecordField (RecordField &&other) = default;
     RecordField& operator = (const RecordField &other) = default;
     RecordField& operator = (RecordField &&other) = default;
     ~RecordField() = default;
@@ -1735,13 +1790,13 @@ public:
 /// \brief Статус записи.
 enum RecordStatus : unsigned int
 {
-    LogicallyDeleted = 1u, ///< Запись логически удалена.
-    PhysicallyDeleted = 2u, ///< Запись физически удалена.
+    LogicallyDeleted = 1u,                          ///< Запись логически удалена.
+    PhysicallyDeleted = 2u,                         ///< Запись физически удалена.
     Deleted = LogicallyDeleted | PhysicallyDeleted, ///< Запись удалена.
-    Absent = 4u, ///< Запись отсутствует.
-    NonActualized = 8u, ///< Не актуализирована.
-    Last = 32u, ///< Последняя версия записи.
-    Locked = 64u ///< Запись заблокирована.
+    Absent = 4u,                                    ///< Запись отсутствует.
+    NonActualized = 8u,                             ///< Не актуализирована.
+    Last = 32u,                                     ///< Последняя версия записи.
+    Locked = 64u                                    ///< Запись заблокирована.
 };
 
 //=========================================================
@@ -1751,48 +1806,48 @@ class PLUSIRBIS_EXPORTS Search final
 {
 public:
     static Search all();
-    Search& and_(const String &text);
-    Search& and_(const String &text1, const String &text2);
-    Search& and_(const String &text1, const String &text2, const String &text3);
-    Search& and_(const Search &item);
-    Search& and_(const Search &item1, const Search &item2);
-    Search& and_(const Search &item1, const Search &item2, const Search &item3);
-    static Search equals(const String &prefix, const String &text);
-    static Search equals(const String &prefix, const String &text1, const String &text2);
-    static Search equals(const String &prefix, const String &text1, const String &text2, const String &text3);
-    static bool needWrap(const String &text) noexcept;
-    Search& not_(const String &text);
-    Search& not_(const Search &item);
-    Search& or_(const String &text);
-    Search& or_(const String &text1, const String &text2);
-    Search& or_(const String &text1, const String &text2, const String &text3);
-    Search& or_(const Search &item);
-    Search& or_(const Search &item1, const Search &item2);
-    Search& or_(const Search &item1, const Search &item2, const Search &item3);
-    Search& sameField(const String &text);
-    Search& sameRepeat(const String &text);
+    Search& and_ (const String &text);
+    Search& and_ (const String &text1, const String &text2);
+    Search& and_ (const String &text1, const String &text2, const String &text3);
+    Search& and_ (const Search &item);
+    Search& and_ (const Search &item1, const Search &item2);
+    Search& and_ (const Search &item1, const Search &item2, const Search &item3);
+    static Search equals (const String &prefix, const String &text);
+    static Search equals (const String &prefix, const String &text1, const String &text2);
+    static Search equals (const String &prefix, const String &text1, const String &text2, const String &text3);
+    static bool needWrap (const String &text) noexcept;
+    Search& not_ (const String &text);
+    Search& not_ (const Search &item);
+    Search& or_ (const String &text);
+    Search& or_ (const String &text1, const String &text2);
+    Search& or_ (const String &text1, const String &text2, const String &text3);
+    Search& or_ (const Search &item);
+    Search& or_ (const Search &item1, const Search &item2);
+    Search& or_ (const Search &item1, const Search &item2, const Search &item3);
+    Search& sameField (const String &text);
+    Search& sameRepeat (const String &text);
     String toString() const noexcept;
-    static String wrap(const String &text);
-    static String wrap(const Search &item);
+    static String wrap (const String &text);
+    static String wrap (const Search &item);
 
 private:
     String _buffer;
 };
 
-Search keyword(const String &value1);
-Search author(const String &value1);
-Search title(const String &value1);
-Search publisher(const String &value1);
-Search place(const String &value1);
-Search subject(const String &value1);
-Search language(const String &value1);
-Search year(const String &value1);
-Search magazine(const String &value1);
-Search documentKind(const String &value1);
-Search udc(const String &value1);
-Search bbk(const String &value1);
-Search rzn(const String &value1);
-Search mhr(const String &value1);
+Search keyword (const String &value1);
+Search author (const String &value1);
+Search title (const String &value1);
+Search publisher (const String &value1);
+Search place (const String &value1);
+Search subject (const String &value1);
+Search language (const String &value1);
+Search year (const String &value1);
+Search magazine (const String &value1);
+Search documentKind (const String &value1);
+Search udc (const String &value1);
+Search bbk (const String &value1);
+Search rzn (const String &value1);
+Search mhr (const String &value1);
 
 //=========================================================
 
@@ -1841,7 +1896,7 @@ public:
     int clientCount { 0 }; ///< Число клиентов, подключенных в данный момент.
     int totalCommandCount { 0 }; ///< Общее количество команд, выполненных сервером с момента запуска.
 
-    void parse(ServerResponse &response);
+    void parse (ServerResponse &response);
 };
 
 //=========================================================
@@ -2002,30 +2057,30 @@ public:
 //=========================================================
 
 /// \brief UTF-версия RecordField.
-class PLUSIRBIS_EXPORTS UtfField final
+class PLUSIRBIS_EXPORTS LiteField final
 {
 public:
     int tag { 0 };
     std::string value;
-    std::list<UtfSubField> subfields;
+    std::list<LiteSubField> subfields;
 
-    UtfField() = default;
-    UtfField (int tag, const std::string &value = "") : tag(tag), value(value) {}
-    UtfField (const UtfField &other) = default;
-    UtfField (UtfField &&other) = default;
-    UtfField& operator = (const UtfField &other) = default;
-    UtfField& operator = (UtfField &&other) = default;
-    ~UtfField() = default;
+    LiteField() = default;
+    LiteField (int tag_, const std::string &value_ = "") : tag(tag_), value(value_) {}
+    LiteField (const LiteField &other) = default;
+    LiteField (LiteField &&other) = default;
+    LiteField& operator = (const LiteField &other) = default;
+    LiteField& operator = (LiteField &&other) = default;
+    ~LiteField() = default;
 
-    UtfField& add (char code, const std::string &value = "");
-    UtfField& clear();
-    UtfField clone() const;
+    LiteField& add (char code, const std::string &value = "");
+    LiteField& clear();
+    LiteField clone() const;
     void decode (const std::string &line);
     bool empty() const noexcept;
-    UtfSubField* getFirstSubfield (char code) const noexcept;
+    LiteSubField* getFirstSubfield (char code) const noexcept;
     std::string getFirstSubfieldValue (char code) const noexcept;
-    UtfField& removeSubfield (char code);
-    UtfField& setSubfield (char code, const std::string &newValue);
+    LiteField& removeSubfield (char code);
+    LiteField& setSubfield (char code, const std::string &newValue);
     bool verify (bool throwOnError) const;
     std::string toString() const;
 
@@ -2035,32 +2090,32 @@ public:
 //=========================================================
 
 /// \brief UTF-версия MarcRecord.
-class PLUSIRBIS_EXPORTS UtfRecord final
+class PLUSIRBIS_EXPORTS LiteRecord final
 {
 public:
-    Mfn mfn { 0u };               ///< MFN (порядковый номер в базе) записи.
-    Flag status { 0u };           ///< Статус записи. Представляет собой набор флагов.
-    unsigned int version { 0u };  ///< Номер версии записи.
-    std::list<UtfField> fields;   ///< Список полей.
-    std::string database;         ///< База данных.
+    Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
+    Flag status { 0u };            ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };   ///< Номер версии записи.
+    std::list<LiteField> fields;   ///< Список полей.
+    std::string database;          ///< База данных.
 
-    UtfRecord() = default;                                    ///< Конструктор по умолчанию.
-    UtfRecord (const UtfRecord &other) = default;             ///< Конструктор копирования.
-    UtfRecord (UtfRecord &&other) = default;                  ///< Конструктор перемещения.
-    UtfRecord& operator = (const UtfRecord &other) = default; ///< Оператор копирования.
-    UtfRecord& operator = (UtfRecord &&other) = default;      ///< Оператор перемещения.
-    ~UtfRecord() = default;                                   ///< Деструктор.
+    LiteRecord() = default;                                     ///< Конструктор по умолчанию.
+    LiteRecord (const LiteRecord &other) = default;             ///< Конструктор копирования.
+    LiteRecord (LiteRecord &&other) = default;                  ///< Конструктор перемещения.
+    LiteRecord& operator = (const LiteRecord &other) = default; ///< Оператор копирования.
+    LiteRecord& operator = (LiteRecord &&other) = default;      ///< Оператор перемещения.
+    ~LiteRecord() = default;                                    ///< Деструктор.
 
-    UtfField& add (int tag, const std::string &value);
-    UtfRecord clone() const;
+    LiteField& add (int tag, const std::string &value);
+    LiteRecord clone() const;
     void decode (const std::vector<std::string> &lines);
     bool deleted() const noexcept;
     std::string encode (const std::string &delimiter = "\x1F\x1E") const;
     std::string fm (int tag, char code = 0) const noexcept;
     std::vector<std::string> fma (int tag, char code = 0) const;
-    UtfField* getField (int tag, int occurrence = 0) const noexcept;
-    std::vector<UtfField*> getFields (int tag) const;
-    UtfRecord& reset() noexcept;
+    LiteField* getField (int tag, int occurrence = 0) const noexcept;
+    std::vector<LiteField*> getFields (int tag) const;
+    LiteRecord& reset() noexcept;
     bool verify (bool throwOnError) const;
 
     MarcRecord materialize() const;
@@ -2069,22 +2124,22 @@ public:
 //=========================================================
 
 /// \brief UTF-версия SubField.
-class PLUSIRBIS_EXPORTS UtfSubField final
+class PLUSIRBIS_EXPORTS LiteSubField final
 {
 public:
     /// \brief Одноисмвольный код подполя.
     char code { '\0' };
     std::string value; ///< Значение подполя (может быть пустым).
 
-    UtfSubField() = default;
-    UtfSubField (char code, const std::string &value = "") : code(code), value(value) {}
-    UtfSubField (const UtfSubField &other) = default;
-    UtfSubField (UtfSubField &&other) = default;
-    UtfSubField& operator = (const UtfSubField &other) = default;
-    UtfSubField& operator = (UtfSubField &&other) = default;
-    ~UtfSubField() = default;
+    LiteSubField() = default;
+    LiteSubField (char code_, const std::string &value_ = "") : code(code_), value(value_) {}
+    LiteSubField (const LiteSubField &other) = default;
+    LiteSubField (LiteSubField &&other) = default;
+    LiteSubField& operator = (const LiteSubField &other) = default;
+    LiteSubField& operator = (LiteSubField &&other) = default;
+    ~LiteSubField() = default;
 
-    UtfSubField clone() const;
+    LiteSubField clone() const;
     void decode (const std::string &line);
     bool empty() const noexcept;
     bool verify (bool throwOnError) const;

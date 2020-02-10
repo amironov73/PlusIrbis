@@ -291,7 +291,7 @@ String Connection::formatRecord (const String &format, Mfn mfn)
 /// \param format Спецификация формата.
 /// \param mfn MFN записи, подлежащей расформатированию.
 /// \return Результат расформатирования.
-std::string Connection::formatRecordUtf (const std::string &format, Mfn mfn)
+std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
 {
     if (!this->_checkConnection()) {
         return std::string();
@@ -857,9 +857,9 @@ MarcRecord Connection::readRecord (Mfn mfn)
     return result;
 }
 
-UtfRecord Connection::readRecordUtf (Mfn mfn)
+LiteRecord Connection::readLiteRecord (Mfn mfn)
 {
-    UtfRecord result;
+    LiteRecord result;
     if (!this->_checkConnection()) {
         return result;
     }

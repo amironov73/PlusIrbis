@@ -571,6 +571,7 @@
     <ClCompile Include="src/irbis.cpp" />
     <ClCompile Include="src/Text.cpp" />
     <ClCompile Include="src/Iso2709.cpp" />
+    <ClCompile Include="src/Lite.cpp" />
     <ClCompile Include="src/MarcRecord.cpp" />
     <ClCompile Include="src/MemoryChunk.cpp" />
     <ClCompile Include="src/MenuEntry.cpp" />
@@ -601,7 +602,6 @@
     <ClCompile Include="src/TreeFile.cpp" />
     <ClCompile Include="src/TreeNode.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
-    <ClCompile Include="src/UtfRecord.cpp" />
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
