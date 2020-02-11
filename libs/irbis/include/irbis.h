@@ -100,6 +100,8 @@ class ConnectionFactory;
 class DatabaseInfo;
 class Date;
 class DirectAccess64;
+class Ean13;
+class Ean8;
 class EmbeddedField;
 class Encoding;
 class Exemplar;
@@ -673,18 +675,18 @@ using CharSpan = Span<char>;
 using WideSpan = Span<Char>;
 using ByteSpan = Span<Byte>;
 
-PLUSIRBIS_EXPORTS bool sameString(CharSpan first, CharSpan second);
-PLUSIRBIS_EXPORTS bool sameString(WideSpan first, WideSpan second);
-PLUSIRBIS_EXPORTS CharSpan trimStart(CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trimStart(WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan trimEnd(CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trimEnd(WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan trim(CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trim(WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan toupper(CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan toupper(WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan tolower(CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan tolower(WideSpan text);
+PLUSIRBIS_EXPORTS bool sameString (CharSpan first, CharSpan second);
+PLUSIRBIS_EXPORTS bool sameString (WideSpan first, WideSpan second);
+PLUSIRBIS_EXPORTS CharSpan trimStart (CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trimStart (WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan trimEnd (CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trimEnd (WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan trim (CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan trim (WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan toupper (CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan toupper (WideSpan text);
+PLUSIRBIS_EXPORTS CharSpan tolower (CharSpan text);
+PLUSIRBIS_EXPORTS WideSpan tolower (WideSpan text);
 
 //=========================================================
 
@@ -723,6 +725,30 @@ public:
         : _fileName(fileName)
     {
     }
+};
+
+//=========================================================
+
+/// \brief Штрих-код длиной 13 символов.
+class PLUSIRBIS_EXPORTS Ean13 final
+{
+public:
+    static char computeCheckDigit (CharSpan text);
+    static Char computeCheckDigit (WideSpan text);
+    static bool checkControlDigit (CharSpan text);
+    static bool checkControlDigit (WideSpan text);
+};
+
+//=========================================================
+
+/// \brief Штрих-код длиной 8 символов.
+class PLUSIRBIS_EXPORTS Ean8 final
+{
+public:
+    static char computeCheckDigit (CharSpan text);
+    static Char computeCheckDigit (WideSpan text);
+    static bool checkControlDigit (CharSpan text);
+    static bool checkControlDigit (WideSpan text);
 };
 
 //=========================================================

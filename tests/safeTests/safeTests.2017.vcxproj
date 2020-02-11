@@ -61,6 +61,7 @@
   <ItemGroup>
     <ClCompile Include="src\ByteNavigatorTest.cpp" />
     <ClCompile Include="src\DateTest.cpp" />
+    <ClCompile Include="src\EanTest.cpp" />
     <ClCompile Include="src\EncodingTest.cpp" />
     <ClCompile Include="src\FormatTest.cpp" />
     <ClCompile Include="src\IOTest.cpp" />

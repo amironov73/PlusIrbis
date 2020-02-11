@@ -10,6 +10,7 @@
 #endif
 
 /*!
+    \file Isbn.cpp
 
     \class irbis::Isbn
 
