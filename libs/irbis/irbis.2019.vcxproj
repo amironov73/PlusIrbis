@@ -344,6 +344,7 @@
     <ClCompile Include="src/TextNavigator.cpp" />
     <ClCompile Include="src/TreeFile.cpp" />
     <ClCompile Include="src/TreeNode.cpp" />
+    <ClCompile Include="src/Upc.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />

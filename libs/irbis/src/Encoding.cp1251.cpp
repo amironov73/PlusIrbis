@@ -137,14 +137,44 @@ String Cp1251Encoding::toUnicode(const Byte *bytes, std::size_t count) const
 
 //=========================================================
 
-std::string wide2string(const String &s)
+/// \brief Преобразование строки из UTF16 в однобайтную русскую кодировку.
+/// \param s Текст для преобразования.
+/// \return Полученный результат.
+std::string wide2string (const String &s)
 {
     return unicode_to_cp1251(s);
 }
 
-String string2wide(const std::string &s)
+/// \brief Преобразование строки из однобайтной русской кодировки в UTF16.
+/// \param s Текст для преобразования.
+/// \return Полученный результат.
+String string2wide (const std::string &s)
 {
     return cp1251_to_unicode(s);
+}
+
+//=========================================================
+
+/// \brief Преобразование строки из однобайтовой русской кодировки в UTF8.
+/// \param s Текст для преобразования.
+/// \return Полученный результат.
+std::string toUtf (const std::string &s)
+{
+    // TODO реализовать оптимально
+    const auto temp = cp1251_to_unicode (s);
+    const auto result = toUtf (temp);
+    return result;
+}
+
+/// \brief Преобразование строки из UTF8 в однобайтовую русскую кодировку.
+/// \param s Текст для преобразования.
+/// \return Полученный результат.
+std::string toAnsi (const std::string &s)
+{
+    // TODO реализовать оптимально
+    const auto temp = fromUtf (s);
+    const auto result = unicode_to_cp1251 (temp);
+    return result;
 }
 
 }

@@ -74,6 +74,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\TextTest.cpp" />
     <ClCompile Include="src\TextNavigatorTest.cpp" />
+    <ClCompile Include="src\UpcTest.cpp" />
     <ClCompile Include="src\UtilsTest.cpp" />
     <ClCompile Include="src\XrfTest.cpp" />
   </ItemGroup>

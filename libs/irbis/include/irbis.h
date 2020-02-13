@@ -164,6 +164,7 @@ class Text;
 class TextNavigator;
 class TreeFile;
 class TreeNode;
+class Upc12;
 class UserInfo;
 class VerificationException;
 class Version;
@@ -1144,7 +1145,7 @@ public:
 
     RecordField *field { nullptr };
 
-    void applyTo (RecordField &field) const;
+    void applyTo (RecordField &field_) const;
     void parse (const RecordField &field_);
     static std::vector<Exemplar> parse (const MarcRecord &record);
 };
@@ -2184,7 +2185,19 @@ public:
 
 //=========================================================
 
-/// \brief Информация о версии ИРБИС-сервера
+/// \brief Американский штрих-код для товаров.
+class PLUSIRBIS_EXPORTS Upc12 final
+{
+public:
+    static char computeCheckDigit (CharSpan text);
+    static Char computeCheckDigit (WideSpan text);
+    static bool checkControlDigit (CharSpan text);
+    static bool checkControlDigit (WideSpan text);
+};
+
+//=========================================================
+
+/// \brief Информация о версии ИРБИС-сервера.
 class PLUSIRBIS_EXPORTS Version final
 {
 public:
@@ -2257,8 +2270,10 @@ public:
 PLUSIRBIS_EXPORTS uint32_t libraryVersion() noexcept;
 PLUSIRBIS_EXPORTS std::string libraryVersionString();
 
-PLUSIRBIS_EXPORTS std::string wide2string(const String &s);
-PLUSIRBIS_EXPORTS String string2wide(const std::string &s);
+PLUSIRBIS_EXPORTS std::string wide2string (const String &s);
+PLUSIRBIS_EXPORTS String string2wide (const std::string &s);
+PLUSIRBIS_EXPORTS std::string toUtf (const std::string &s);
+PLUSIRBIS_EXPORTS std::string toAnsi (const std::string &s);
 
 PLUSIRBIS_EXPORTS bool isWindows();
 

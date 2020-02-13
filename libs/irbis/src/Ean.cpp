@@ -59,8 +59,7 @@ char Ean13::computeCheckDigit (CharSpan text)
 {
     assert (text.size() >= 12);
     auto sum = 0;
-    for (auto i = 0; i < 12; i++)
-    {
+    for (auto i = 0; i < 12; i++) {
         sum = sum + (text[i] - '0') * coefficients[i];
     }
     auto result = static_cast<char> (10 - sum % 10 + '0');
@@ -74,8 +73,7 @@ Char Ean13::computeCheckDigit (WideSpan text)
 {
     assert (text.size() >= 12);
     auto sum = 0;
-    for (auto i = 0; i < 12; i++)
-    {
+    for (auto i = 0; i < 12; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i];
     }
     auto result = static_cast<Char> (10 - sum % 10 + L'0');
@@ -89,8 +87,7 @@ bool Ean13::checkControlDigit (CharSpan text)
 {
     assert (text.size() >= 13);
     auto sum = 0;
-    for (auto i = 0; i < 13; i++)
-    {
+    for (auto i = 0; i < 13; i++) {
         sum = sum + (text[i] - '0') * coefficients[i];
     }
     bool result = sum % 10 == 0;
@@ -104,8 +101,7 @@ bool Ean13::checkControlDigit (WideSpan text)
 {
     assert (text.size() >= 13);
     auto sum = 0;
-    for (auto i = 0; i < 13; i++)
-    {
+    for (auto i = 0; i < 13; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i];
     }
     bool result = sum % 10 == 0;
@@ -119,8 +115,7 @@ char Ean8::computeCheckDigit (CharSpan text)
 {
     assert (text.size() >= 7);
     auto sum = 0;
-    for (auto i = 0; i < 7; i++)
-    {
+    for (auto i = 0; i < 7; i++) {
         sum = sum + (text[i] - '0') * coefficients[i + 1];
     }
     auto result = static_cast<char> (10 - sum % 10 + '0');
@@ -134,8 +129,7 @@ Char Ean8::computeCheckDigit (WideSpan text)
 {
     assert (text.size() >= 7);
     auto sum = 0;
-    for (auto i = 0; i < 7; i++)
-    {
+    for (auto i = 0; i < 7; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i + 1];
     }
     auto result = static_cast<char> (10 - sum % 10 + L'0');
@@ -149,8 +143,7 @@ bool Ean8::checkControlDigit (CharSpan text)
 {
     assert (text.size() >= 8);
     auto sum = 0;
-    for (auto i = 0; i < 8; i++)
-    {
+    for (auto i = 0; i < 8; i++) {
         sum = sum + (text[i] - '0') * coefficients[i + 1];
     }
     bool result = sum % 10 == 0;
@@ -164,8 +157,7 @@ bool Ean8::checkControlDigit (WideSpan text)
 {
     assert (text.size() >= 8);
     auto sum = 0;
-    for (auto i = 0; i < 8; i++)
-    {
+    for (auto i = 0; i < 8; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i + 1];
     }
     bool result = sum % 10 == 0;

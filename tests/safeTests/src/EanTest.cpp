@@ -17,6 +17,7 @@ TEST_CASE("Ean13_checkControlDigit_1", "[ean]")
     CHECK (irbis::Ean13::checkControlDigit (irbis::CharSpan ("4600051000057")));
     CHECK (irbis::Ean13::checkControlDigit (irbis::WideSpan (L"4600051000057")));
 }
+
 TEST_CASE("Ean8_computeCheckDigit_1", "[ean]")
 {
     CHECK (irbis::Ean8::computeCheckDigit (irbis::CharSpan ("46009333")) == '3');

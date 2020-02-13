@@ -551,6 +551,12 @@ PLUSIRBIS_EXPORTS String fromUtf (ByteSpan span);
 PLUSIRBIS_EXPORTS String removeComments (const String &text);
 PLUSIRBIS_EXPORTS String prepareFormat (const String &text);
 
+template<typename T>
+bool isDigit(T c)
+{
+    return (c >= '0') && (c <= '9');
+}
+
 }
 
 //=========================================================
