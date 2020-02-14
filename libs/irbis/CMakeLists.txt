@@ -27,5 +27,9 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC ${PROJECT_SOURCE_DIR}/include
 )
 
+if(IRBIS_MINGW)
+    #add_compile_options(-static -static-libgcc -static-libstdc++)
+endif(IRBIS_MINGW)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
 install(FILES ${PROJECT_SOURCE_DIR}/include/irbis.h DESTINATION ${ARTIFACTS})

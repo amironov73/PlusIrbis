@@ -29,5 +29,9 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
+if(IRBIS_MINGW)
+    #add_compile_options(-static -static-libgcc -static-libstdc++)
+endif(IRBIS_MINGW)
+
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
 install(FILES ${PROJECT_SOURCE_DIR}/include/rfid.h DESTINATION ${ARTIFACTS})

@@ -14,7 +14,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} irbis rfid)
 
 if(IRBIS_MINGW)
-    target_link_libraries(${PROJECT_NAME} libws2_32.a)
+    target_link_libraries(${PROJECT_NAME} libws2_32.a libwinscard.a)
     #   target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++)
 endif(IRBIS_MINGW)
 
