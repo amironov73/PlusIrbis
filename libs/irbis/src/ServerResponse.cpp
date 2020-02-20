@@ -13,7 +13,7 @@ namespace irbis {
 /// \param query Полностью сформированный клиентский запрос.
 ///
 /// Вычитывает ответ сервера до конца и сохраняет его во внутреннем буфере.
-ServerResponse::ServerResponse (Connection &connection, ClientQuery &query)
+ServerResponse::ServerResponse (ConnectionBase &connection, ClientQuery &query)
 {
     std::lock_guard<std::mutex> guard (connection._mutex);
 

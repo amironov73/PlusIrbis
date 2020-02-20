@@ -879,21 +879,22 @@ public:
 
 //=========================================================
 
-/// \brief Подключение к серверу ИРБИС64.
-///
-/// Объекты данного типа неперемещаемые.
-class PLUSIRBIS_EXPORTS Connection final
+/// \brief Базовые функции подключения
+class PLUSIRBIS_EXPORTS ConnectionBase
 {
 private:
     bool _connected;
     StringList _databaseStack;
     std::mutex _mutex;
 
-    bool _checkConnection();
-
     friend class ServerResponse;
 
+protected:
+
+    bool _checkConnection();
+
 public:
+
     String host;          ///< Адрес сервера в виде строки.
     short port;           ///< Номер порта сервера.
     String username;      ///< Логин пользователя.
@@ -908,81 +909,137 @@ public:
     int interval { 0 };   ///< Интервал автоматического подтверждения.
     ClientSocket *socket; ///< Клиентский сокет.
 
-    Connection();
+    ConnectionBase();
+    ~ConnectionBase();
+
+    bool connect();
+    bool connected() const noexcept { return this->_connected; }
+    void disconnect();
+    bool execute (ClientQuery &query);
+    Mfn getMaxMfn (const String &databaseName);
+    bool noOp();
+    void parseConnectionString (const std::string &connectionString);
+    void parseConnectionString (const String &connectionString);
+    String popDatabase();
+    String pushDatabase (const String &newDatabase);
+    String toConnectionString() const;
+};
+
+/// \brief Функции работы с контекстом
+class PLUSIRBIS_EXPORTS ConnectionContext : public virtual ConnectionBase
+{
+public:
+    std::vector<DatabaseInfo> listDatabases (const IniFile &iniFile, const String &defaultFileName);
+    std::vector<DatabaseInfo> listDatabases (const FileSpecification &specification);
+    StringList listFiles (const FileSpecification &specification);
+    StringList listFiles (const std::vector<FileSpecification> &specifications);
+    Bytes readBinaryFile (const FileSpecification &specification);
+    IniFile readIniFile (const FileSpecification &specification);
+    MenuFile readMenuFile (const FileSpecification &specification);
+    String readTextFile (const FileSpecification &specification);
+    std::string readAnsiFile (const FileSpecification &specification);
+    StringList readTextFiles (std::vector<FileSpecification> &specifications);
+    StringList readTextLines (const FileSpecification &specification);
+};
+
+/// \brief Функции работы с поисковым индексом
+class PLUSIRBIS_EXPORTS ConnectionSearch : public virtual ConnectionBase
+{
+public:
+    StringList listTerms (const String &prefix);
+    std::vector<TermPosting> readPostings(const PostingParameters &parameters);
+    std::vector<TermInfo> readTerms (const String &startTerm, int numberOfTerms);
+    std::vector<TermInfo> readTerms (const TermParameters &parameters);
+    MfnList search (const Search &search);
+    MfnList search (const String &expression);
+    MfnList search (const SearchParameters &parameters);
+};
+
+/// \brief Администраторские функции
+class PLUSIRBIS_EXPORTS ConnectionAdmin : public virtual ConnectionBase
+{
+public:
+    bool createDatabase (const String &databaseName, const String &description, bool readerAccess);
+    bool createDictionary (const String &databaseName);
+    bool deleteDatabase (const String &databaseName);
+    ServerStat getServerStat();
+    Version getServerVersion();
+    std::vector<ProcessInfo> listProcesses();
+    bool reloadDictionary (const String &databaseName);
+    bool reloadMasterFile (const String &databaseName);
+    bool restartServer();
+    bool truncateDatabase (const String &databaseName);
+    bool unlockDatabase (const String &databaseName);
+    bool unlockRecords (const String &databaseName, const MfnList &mfnList);
+};
+
+/// \brief Функции работы с фантомными записями
+class PLUSIRBIS_EXPORTS ConnectionPhantom : public virtual ConnectionBase
+{
+public:
+    PhantomRecord readPhantomRecord (Mfn mfn);
+    int writePhantomRecord (PhantomRecord &record);
+};
+
+/// \brief Облегченные функции работы с записями
+class PLUSIRBIS_EXPORTS ConnectionLite : public virtual ConnectionBase
+{
+public:
+    LiteRecord readLiteRecord (Mfn mfn);
+};
+
+/// \brief Полноценные функции работы с записями
+class PLUSIRBIS_EXPORTS ConnectionFull : public virtual ConnectionBase
+{
+public:
+    bool deleteRecord (int mfn);
+    MarcRecord readRecord (Mfn mfn);
+    MarcRecord readRecord (const String &databaseName, Mfn mfn);
+    MarcRecord readRecord (const String &databaseName, Mfn mfn, int version);
+    std::vector<MarcRecord> readRecords (const MfnList &mfnList);
+    int writeRecord (MarcRecord &record, bool lockFlag = false,
+                     bool actualize = true, bool dontParseResponse = false);
+};
+
+/// \brief Подключение к серверу ИРБИС64.
+///
+/// Объекты данного типа неперемещаемые.
+class PLUSIRBIS_EXPORTS Connection final :
+    public virtual ConnectionContext,
+    public virtual ConnectionSearch,
+    public virtual ConnectionAdmin,
+    public virtual ConnectionPhantom,
+    public virtual ConnectionLite,
+    public virtual ConnectionFull
+{
+public:
+
+    Connection() = default;
     Connection(const Connection&) = delete;
     Connection(Connection&&) = delete;
     Connection& operator=(const Connection&) = delete;
     Connection& operator=(Connection&&) = delete;
-    ~Connection();
+    ~Connection() = default;
 
     bool actualizeDatabase (const String &databaseName);
     bool actualizeRecord (const String &databaseName, int mfn);
-    bool connect();
     // std::future<bool> connectAsync();
-    bool createDatabase (const String &databaseName, const String &description, bool readerAccess);
-    bool createDictionary (const String &databaseName);
-    bool deleteDatabase (const String &databaseName);
-    bool deleteRecord (int mfn);
-    bool connected() const noexcept { return this->_connected; }
-    void disconnect();
     // std::future<void> disconnectAsync();
-    bool execute (ClientQuery &query);
     // std::future<bool> executeAsync(ClientQuery &query);
     String formatRecord (const String &format, Mfn mfn);
     std::string formatRecordLite (const std::string &format, Mfn mfn);
     String formatRecord (const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo (const String &databaseName);
-    Mfn getMaxMfn (const String &databaseName);
     GblResult globalCorrection (const GblSettings &settings);
-    ServerStat getServerStat();
-    Version getServerVersion();
     std::vector<UserInfo> getUserList();
-    std::vector<DatabaseInfo> listDatabases (const IniFile &iniFile, const String &defaultFileName);
-    std::vector<DatabaseInfo> listDatabases (const FileSpecification &specification);
-    StringList listFiles (const FileSpecification &specification);
-    StringList listFiles (const std::vector<FileSpecification> &specifications);
-    std::vector<ProcessInfo> listProcesses();
-    StringList listTerms (const String &prefix);
-    bool noOp();
     // std::future<bool> noOpAsync();
-    void parseConnectionStringUtf (const std::string &connectionString);
-    void parseConnectionString (const String &connectionString);
-    String popDatabase();
     String printTable (const TableDefinition &definition);
-    String pushDatabase (const String &newDatabase);
-    Bytes readBinaryFile (const FileSpecification &specification);
-    IniFile readIniFile (const FileSpecification &specification);
-    MenuFile readMenuFile (const FileSpecification &specification);
-    std::vector<TermPosting> readPostings(const PostingParameters &parameters);
     RawRecord readRawRecord (Mfn mfn);
-    MarcRecord readRecord (Mfn mfn);
-    LiteRecord readLiteRecord (Mfn mfn);
-    MarcRecord readRecord (const String &databaseName, Mfn mfn);
-    MarcRecord readRecord (const String &databaseName, Mfn mfn, int version);
-    std::vector<MarcRecord> readRecords (const MfnList &mfnList);
     std::vector<SearchScenario> readSearchScenario (const FileSpecification &specification);
-    std::vector<TermInfo> readTerms (const String &startTerm, int numberOfTerms);
-    std::vector<TermInfo> readTerms (const TermParameters &parameters);
-    String readTextFile (const FileSpecification &specification);
-    std::string readAnsiFile (const FileSpecification &specification);
-    StringList readTextFiles (std::vector<FileSpecification> &specifications);
-    StringList  readTextLines (const FileSpecification &specification);
-    bool reloadDictionary (const String &databaseName);
-    bool reloadMasterFile (const String &databaseName);
-    bool restartServer();
     String requireTextFile (const FileSpecification &specification);
-    MfnList search (const Search &search);
-    MfnList search (const String &expression);
-    MfnList search (const SearchParameters &parameters);
-    String toConnectionString() const;
-    bool truncateDatabase (const String &databaseName);
-    bool unlockDatabase (const String &databaseName);
-    bool unlockRecords (const String &databaseName, const MfnList &mfnList);
     bool updateIniFile (const StringList &lines);
     bool updateUserList (const std::vector<UserInfo> &users);
     int writeRawRecord (RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse);
-    int writeRecord (MarcRecord &record, bool lockFlag = false,
-            bool actualize = true, bool dontParseResponse = false);
     bool writeRecords (std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     bool writeRecords (std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse);
     void writeTextFile (const FileSpecification &specification);

@@ -155,7 +155,7 @@ class PLUSIRBIS_EXPORTS ClientQuery final
     void _write(Byte byte);
 
 public:
-    ClientQuery(const Connection &connection, const std::string &commandCode);
+    ClientQuery(const ConnectionBase &connection, const std::string &commandCode);
     ClientQuery(ClientQuery &) = delete;
     ClientQuery(ClientQuery &&) = delete;
     ClientQuery& operator = (ClientQuery &) = delete;
@@ -279,7 +279,7 @@ public:
     int returnCode;       ///< Код возврата (бывает не у всех ответов).
     String serverVersion; ///< Версия сервера (в некоторых сценариях отсутствует).
 
-    ServerResponse(Connection &connection, ClientQuery &query);
+    ServerResponse(ConnectionBase &connection, ClientQuery &query);
     ServerResponse(ServerResponse &) = delete;
     ServerResponse(ServerResponse &&) = delete;
     ServerResponse& operator = (ServerResponse &) = delete;
@@ -304,7 +304,7 @@ public:
     String readUtf();
 
 private:
-    Connection *_connection;
+    ConnectionBase *_connection;
     bool _success;
     std::size_t _position;
     Bytes _content;

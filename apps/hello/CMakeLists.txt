@@ -1,15 +1,13 @@
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_STANDARD 11)
+###########################################################
+# PlusIrbis project
+# Alexey Mironov, 2018-2020
+###########################################################
 
+# simple example
 project(hello)
 
-if(MSVC)
-    message("Visual C++ detected")
-    add_compile_options(/UTF-8)
-endif(MSVC)
-
-FILE(GLOB CppFiles
-    ${PROJECT_SOURCE_DIR}/src/*.cpp
+set(CppFiles
+    src/main.cpp
 )
 
 add_executable(${PROJECT_NAME}
@@ -20,7 +18,6 @@ target_link_libraries(${PROJECT_NAME} irbis)
 
 if(IRBIS_MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
-#   target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++)
 endif(IRBIS_MINGW)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

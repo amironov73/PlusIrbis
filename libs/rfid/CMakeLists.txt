@@ -1,21 +1,16 @@
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_STANDARD 11)
+###########################################################
+# PlusIrbis project
+# Alexey Mironov, 2018-2020
+###########################################################
 
+# library for rfid reader interaction
 project(rfid)
-
-if(MSVC)
-    add_compile_options(/UTF-8)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif(MSVC)
 
 add_definitions(-DPLUSIRBIS_LIBRARY)
 
-FILE(GLOB HeaderFiles
-    ${PROJECT_SOURCE_DIR}/include/*.h
-)
-
-FILE(GLOB CppFiles
-    ${PROJECT_SOURCE_DIR}/src/*.cpp
+set(CppFiles
+    src/rfid.cpp
+    src/WinSmartCards.cpp
 )
 
 add_library(${PROJECT_NAME}
@@ -23,15 +18,6 @@ add_library(${PROJECT_NAME}
     ${CppFiles}
 )
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${PROJECT_SOURCE_DIR}/include
-)
-
 target_link_libraries(${PROJECT_NAME} irbis)
 
-if(IRBIS_MINGW)
-    #add_compile_options(-static -static-libgcc -static-libstdc++)
-endif(IRBIS_MINGW)
-
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
-install(FILES ${PROJECT_SOURCE_DIR}/include/rfid.h DESTINATION ${ARTIFACTS})

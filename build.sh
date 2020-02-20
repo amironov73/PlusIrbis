@@ -6,6 +6,6 @@ cd build || exit
 
 cmake -D CMAKE_BUILD_TYPE=Release .. || exit
 cmake --build . || exit
-cmake --install .
+cmake --build . --target install
 
 cd ..

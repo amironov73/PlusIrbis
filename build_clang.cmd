@@ -15,5 +15,9 @@ SET PATH=%CLANG_PATH%;%PATH%
 SET LIB=C:/Qt/Tools/mingw530_32/i686-w64-mingw32/lib
 
 %CMAKE% -B ./build -G "MinGW Makefiles" -D CMAKE_C_COMPILER=%CLANG_C% -D CMAKE_CXX_COMPILER=%CLANG_CPP% -D CMAKE_MAKE_PROGRAM=%MINGW_MAKE% -D CMAKE_LIBRARY_PATH=C:/Qt/Tools/mingw530_32/i686-w64-mingw32/lib -D CMAKE_BUILD_TYPE=Release .
-rem %CMAKE% --build ./build --config Release -j 2
-rem %CMAKE% --install ./build --config Release
+%CMAKE% --build ./build --config Release -j 2
+%CMAKE% --install ./build --config Release 
+
+copy "%MINGW_PATH2%\libgcc_s_dw2-1.dll"  artifacts
+copy "%MINGW_PATH2%\libstdc++-6.dll"     artifacts
+copy "%MINGW_PATH2%\libwinpthread-1.dll" artifacts

@@ -1,19 +1,35 @@
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_STANDARD 11)
+###########################################################
+# PlusIrbis project
+# Alexey Mironov, 2018-2020
+###########################################################
 
+# offline safe tests
 project(safeTests)
 
-if(MSVC)
-    add_compile_options(/UTF-8)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif(MSVC)
-
-FILE(GLOB CppFiles
-    ${PROJECT_SOURCE_DIR}/src/*.cpp
+set(CppFiles
+    src/ByteNavigatorTest.cpp
+    src/DateTest.cpp
+    src/EanTest.cpp
+    src/EncodingTest.cpp
+    src/ExemplarTest.cpp
+    src/FormatTest.cpp
+    src/IOTest.cpp
+    src/IsbnTest.cpp
+    src/main.cpp
+    src/MarcRecordTest.cpp
+    src/RecordFieldTest.cpp
+    src/ResultTest.cpp
+    src/SpanTest.cpp
+    src/SubFieldTest.cpp
+    src/TextNavigatorTest.cpp
+    src/TextTest.cpp
+    src/UpcTest.cpp
+    src/UtilsTest.cpp
+    src/XrfTest.cpp
 )
 
-FILE(GLOB HeaderFiles
-    ${PROJECT_SOURCE_DIR}/include/*.h
+set(HeaderFiles
+    include/safeTests.h
 )
 
 add_executable(${PROJECT_NAME}
@@ -22,14 +38,13 @@ add_executable(${PROJECT_NAME}
 )
 
 target_include_directories(${PROJECT_NAME}
-    PUBLIC ${PROJECT_SOURCE_DIR}/include
+    PRIVATE include
 )
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
 if(IRBIS_MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
-    #   target_link_libraries(${PROJECT_NAME} -static-libgcc -static-libstdc++)
 endif(IRBIS_MINGW)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

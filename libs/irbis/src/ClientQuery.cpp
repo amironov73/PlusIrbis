@@ -12,7 +12,7 @@ namespace irbis {
 /// \brief Конструктор клиентского запроса.
 /// \param connection Подключение, для которого формируется запрос.
 /// \param commandCode Код команды.
-ClientQuery::ClientQuery(const Connection &connection, const std::string &commandCode)
+ClientQuery::ClientQuery(const ConnectionBase &connection, const std::string &commandCode)
 {
     this->addAnsi(commandCode).newLine();
     this->addAnsi(connection.workstation).newLine();
