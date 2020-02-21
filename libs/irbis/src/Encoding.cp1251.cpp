@@ -117,7 +117,7 @@ Bytes Cp1251Encoding::fromUnicode(const String &text) const
 {
     const auto size = text.size();
     Bytes result;
-    result.reserve(size);
+    result.resize(size);
     unicode_to_cp1251(result.data(), text.data(), size);
     return result;
 }
@@ -125,7 +125,7 @@ Bytes Cp1251Encoding::fromUnicode(const String &text) const
 String Cp1251Encoding::toUnicode(const Byte *bytes, std::size_t count) const
 {
     String result;
-    result.reserve(count);
+    result.resize(count);
     for (; count > 0; --count, ++bytes) {
         const auto uc = static_cast<unsigned char>(*bytes);
         const Char wc = _cp1251_to_unicode[uc];
@@ -133,6 +133,11 @@ String Cp1251Encoding::toUnicode(const Byte *bytes, std::size_t count) const
     }
 
     return result;
+}
+
+std::size_t Cp1251Encoding::getSize (const String &text) const
+{
+    return text.size();
 }
 
 //=========================================================

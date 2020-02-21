@@ -1135,14 +1135,15 @@ public:
     Encoding() = default;
     virtual ~Encoding() = default;
 
-    virtual Bytes fromUnicode(const String &text) const = 0;
-    virtual String toUnicode(const Byte *bytes, std::size_t count) const = 0;
+    virtual Bytes fromUnicode   (const String &text) const = 0;
+    virtual String toUnicode    (const Byte *bytes, std::size_t count) const = 0;
+    virtual std::size_t getSize (const String &text) const = 0;
 
     static Encoding* ansi();
-    static String fromAnsi(const Byte *bytes, std::size_t count);
-    static String fromUtf(const Byte *bytes, std::size_t count);
-    static Bytes toAnsi(const String &text);
-    static Bytes toUtf(const String &text);
+    static String    fromAnsi (const Byte *bytes, std::size_t count);
+    static String    fromUtf  (const Byte *bytes, std::size_t count);
+    static Bytes     toAnsi   (const String &text);
+    static Bytes     toUtf    (const String &text);
     static Encoding* utf();
 };
 
@@ -1151,8 +1152,9 @@ class PLUSIRBIS_EXPORTS Cp1251Encoding final
 {
 public:
 
-    virtual Bytes fromUnicode(const String &text) const override;
-    virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
+    virtual Bytes fromUnicode (const String &text) const override;
+    virtual String toUnicode (const Byte *bytes, std::size_t count) const override;
+    virtual std::size_t getSize (const String &text) const override;
 };
 
 class PLUSIRBIS_EXPORTS Utf8Encoding final
@@ -1162,6 +1164,7 @@ public:
 
     virtual Bytes fromUnicode(const String &text) const override;
     virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
+    virtual std::size_t getSize (const String &text) const override;
 };
 
 //=========================================================
@@ -1219,18 +1222,17 @@ public:
     String filename;           ///< Имя файла (обязательно).
     String content;            ///< Содержимое файла (если необходимо).
 
-    FileSpecification() = default; ///< Конструктор по умолчанию.
-    FileSpecification(int path, const String &filename);
-    FileSpecification(int path, const String &database, const String &filename);
-    FileSpecification(const FileSpecification &other) = default; ///< Конструктор копирования.
-    FileSpecification(FileSpecification &&other) = default; ///< Конструктор перемещения.
-    FileSpecification& operator = (const FileSpecification &other); ///< Оператор копирования.
-    FileSpecification& operator = (FileSpecification &&other); ///< Оператор перемещения.
-    ~FileSpecification() = default; ///< Деструктор.
+    FileSpecification() = default;                                            ///< Конструктор по умолчанию.
+    FileSpecification (int path, const String &filename);
+    FileSpecification (int path, const String &database, const String &filename);
+    FileSpecification (const FileSpecification &other) = default;             ///< Конструктор копирования.
+    FileSpecification (FileSpecification &&other) = default;                  ///< Конструктор перемещения.
+    FileSpecification& operator = (const FileSpecification &other) = default; ///< Оператор копирования.
+    FileSpecification& operator = (FileSpecification &&other) = default;      ///< Оператор перемещения.
+    ~FileSpecification() = default;                                           ///< Деструктор.
 
-    static FileSpecification parse(const String &text);
-    bool verify(bool throwException) const;
-
+    static FileSpecification parse (const String &text);
+    bool verify (bool throwException) const;
     String toString() const;
 };
 
@@ -1272,11 +1274,12 @@ public:
 
 //=========================================================
 
+/// \brief Результат выполнения глобальной корректировки.
 class PLUSIRBIS_EXPORTS GblResult final
 {
 public:
 
-    void parse(const StringList &lines);
+    void parse (const StringList &lines);
 };
 
 //=========================================================
@@ -1360,7 +1363,7 @@ public:
     uint32_t writeCount { 0 };     ///< Количество модификаций записей.
     uint32_t deleteCount { 0 };    ///< Количество удаленных записей.
 
-    void readLocalFile(const String &fileName);
+    void readLocalFile (const String &fileName);
 };
 
 //=========================================================
@@ -1373,11 +1376,11 @@ public:
     struct tm date { 0 }; ///< Разбиение даты на компоненты.
 
     Date() = default;                               ///< Конструктор перемещения.
-    Date(int year, int month, int day);
-    explicit Date(const String &text_);
-    explicit Date(const struct tm *date_);
-    Date(const Date &other) = default;              ///< Конструктор копирования.
-    Date(Date &&other) = default;                   ///< Конструктор перемещения.
+    Date (int year, int month, int day);
+    explicit Date (const String &text_);
+    explicit Date (const struct tm *date_);
+    Date (const Date &other) = default;              ///< Конструктор копирования.
+    Date (Date &&other) = default;                   ///< Конструктор перемещения.
     Date& operator = (const Date &other) = default; ///< Оператор копирования.
     Date& operator = (Date &&other) = default;      ///< Оператор перемещения.
     ~Date() = default;                              ///< Деструктор.
@@ -1412,6 +1415,7 @@ public:
 
 //=========================================================
 
+/// \brief Ввод-вывод ISO 2709
 class PLUSIRBIS_EXPORTS Iso2709 final
 {
 public:
@@ -1420,8 +1424,8 @@ public:
     static const char FieldDelimiter = 0x1E;
     static const char SubFieldDelimiter = 0x1F;
 
-    static MarcRecord* readRecord(FILE *device, const Encoding *encoding);
-    static void writeRecord(FILE *device, const MarcRecord &record, const Encoding *encoding);
+    static MarcRecord* readRecord (File *device, const Encoding *encoding);
+    static void writeRecord (File *device, const MarcRecord &record, const Encoding *encoding);
 };
 
 //=========================================================
@@ -2087,7 +2091,7 @@ class PLUSIRBIS_EXPORTS TreeFile final
 public:
     std::vector<TreeNode> roots;
 
-    void parse(const StringList &lines);
+    void parse (const StringList &lines);
 };
 
 //=========================================================

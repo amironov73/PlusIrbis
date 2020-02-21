@@ -62,7 +62,7 @@ bool sameString(WideSpan first, WideSpan second)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan trimStart(CharSpan text)
+CharSpan trimStart (CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -79,7 +79,7 @@ CharSpan trimStart(CharSpan text)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan trimStart(WideSpan text)
+WideSpan trimStart (WideSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -96,7 +96,7 @@ WideSpan trimStart(WideSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan trimEnd(CharSpan text)
+CharSpan trimEnd (CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {

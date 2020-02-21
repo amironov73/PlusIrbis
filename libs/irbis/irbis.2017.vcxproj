@@ -559,10 +559,7 @@
     <ClCompile Include="src/Exemplar.cpp" />
     <ClCompile Include="src/File.cpp" />
     <ClCompile Include="src/FileSpecification.cpp" />
-    <ClCompile Include="src/FoundLine.cpp" />
-    <ClCompile Include="src/GblParameter.cpp" />
     <ClCompile Include="src/GblResult.cpp" />
-    <ClCompile Include="src/GblStatement.cpp" />
     <ClCompile Include="src/IlfFile.cpp" />
     <ClCompile Include="src/IniFile.cpp" />
     <ClCompile Include="src/IO.cpp" />
@@ -580,7 +577,6 @@
     <ClCompile Include="src/MstFile64.cpp" />
     <ClCompile Include="src/MstRecord64.cpp" />
     <ClCompile Include="src/MstRecordLeader64.cpp" />
-    <ClCompile Include="src/NewEncoding.cpp" />
     <ClCompile Include="src/NumberChunk.cpp" />
     <ClCompile Include="src/OptFile.cpp" />
     <ClCompile Include="src/ParFile.cpp" />

@@ -78,7 +78,7 @@ bool ServerResponse::eot() const
 /// \return Результат проверки: true означает успешное завершение операии.
 ///
 /// В любом случае у соединения выставляется значение поля lastError.
-bool ServerResponse::checkReturnCode(int nargs, ...)
+bool ServerResponse::checkReturnCode (int nargs, ...)
 {
     this->_connection->lastError = 0;
     if (!this->_success) {
@@ -90,16 +90,16 @@ bool ServerResponse::checkReturnCode(int nargs, ...)
     auto result = true;
 
     if (this->getReturnCode() < 0) {
-        va_start(args, nargs);
+        va_start (args, nargs);
         result = false;
         for(auto i = 0; i < nargs; i++) {
-            const int code = va_arg(args, int);
+            const int code = va_arg (args, int);
             if (code == this->returnCode) {
                 result = true;
                 break;
             }
         }
-        va_end(args);
+        va_end (args);
         this->_connection->lastError = this->returnCode;
     }
 
@@ -126,7 +126,7 @@ std::string ServerResponse::getLine()
             break;
         }
 
-        result.push_back(c);
+        result.push_back (c);
     }
 
     return result;
@@ -139,7 +139,7 @@ std::string ServerResponse::getRemaining()
     std::string result;
     const auto size = this->_content.size();
     if (this->_position < size) {
-        const auto data = reinterpret_cast<const char*>(_content.data() + this->_position);
+        const auto data = reinterpret_cast<const char*> (_content.data() + this->_position);
         std::size_t remaining = size - this->_position;
         // Убираем переводы строки в конце.
         while (remaining > 0) {
@@ -149,7 +149,7 @@ std::string ServerResponse::getRemaining()
             }
             remaining--;
         }
-        const std::string s2(data, remaining);
+        const std::string s2 (data, remaining);
         result = s2;
         this->_position = size;
     }
@@ -172,7 +172,7 @@ int ServerResponse::getReturnCode()
 std::wstring ServerResponse::readAnsi()
 {
     const auto line = this->getLine();
-    return cp1251_to_unicode(line);
+    return cp1251_to_unicode (line);
 }
 
 /// \brief Чтение целого числа.
@@ -182,7 +182,7 @@ std::wstring ServerResponse::readAnsi()
 int ServerResponse::readInteger()
 {
     const auto line = this->getLine();
-    return std::stoi(line);
+    return std::stoi (line);
 }
 
 /// \brief Чтение оставшихся строк в кодировке ANSI.
@@ -256,7 +256,7 @@ void ServerResponse::_write(const Byte *bytes, std::size_t size)
     }
 
     for (std::size_t i = 0; i < size; i++) {
-        this->_content.push_back(bytes[i]);
+        this->_content.push_back (bytes[i]);
     }
 }
 

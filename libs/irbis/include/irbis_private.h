@@ -31,7 +31,13 @@ public:
     PointerGuard& operator = (PointerGuard &&other) = delete;
     ~PointerGuard() { if (this->_needFree) delete this->_pointer; }
 
+    /// \brief Получение "сырого" указателя.
+    /// \return "Сырой" указатель.
     T* pointer() { return this->_pointer; }
+
+    /// \brief Доступ по индексу.
+    /// \param offset Индекс.
+    /// \return Ссылка на значение по индексу.
     T& operator[] (std::ptrdiff_t offset) { return this->_pointer[offset]; }
 
 private:
@@ -86,22 +92,22 @@ private:
 public:
     const static std::size_t DefaultChunkSize;
 
-    explicit ChunkedBuffer(std::size_t chunkSize = DefaultChunkSize);
-    ChunkedBuffer(const ChunkedBuffer &) = delete;
-    ChunkedBuffer(ChunkedBuffer &&) = delete;
+    explicit ChunkedBuffer (std::size_t chunkSize = DefaultChunkSize);
+    ChunkedBuffer (const ChunkedBuffer &) = delete;
+    ChunkedBuffer (ChunkedBuffer &&) = delete;
     ChunkedBuffer operator = (const ChunkedBuffer &) = delete;
     ChunkedBuffer operator = (ChunkedBuffer &&) = delete;
     ~ChunkedBuffer();
 
     bool eof() const;
     int peek();
-    std::size_t read(char *buffer, std::size_t offset, std::size_t count);
+    std::size_t read (char *buffer, std::size_t offset, std::size_t count);
     int readByte();
     //std::wstring readLine(QTextCodec *codec);
     void rewind();
-    void write(const char *buffer, std::size_t offset, std::size_t count);
+    void write (const char *buffer, std::size_t offset, std::size_t count);
     //void write(const std::wstring &text, QTextCodec *codec);
-    void writeByte(char value);
+    void writeByte (char value);
 };
 
 //=========================================================
@@ -117,8 +123,8 @@ public:
     short port { 6666 }; ///< Номер порта сервера.
 
     ClientSocket() = default;
-    ClientSocket(ClientSocket &) = delete;
-    ClientSocket(ClientSocket &&) = delete;
+    ClientSocket (ClientSocket &) = delete;
+    ClientSocket (ClientSocket &&) = delete;
     ClientSocket& operator = (ClientSocket &) = delete;
     ClientSocket& operator = (ClientSocket &&) = delete;
     virtual ~ClientSocket() = default;
@@ -129,7 +135,7 @@ public:
     /// \brief Отсылка данных на сервер.
     /// \param buffer Указатель на буфер с данными.
     /// \param size Размер данных в байтах.
-    virtual void send(const Byte *buffer, std::size_t size) = 0;
+    virtual void send (const Byte *buffer, std::size_t size) = 0;
 
     /// \brief Получение отвера от сервера (частями).
     /// \param buffer Буфер для размещения полученного ответа.
@@ -139,7 +145,7 @@ public:
     /// 0 означает, что сервер закончил передачу данных.
     /// Положительное число означает, что приём продолжается,
     /// и вызов нужно будет повторить для получения следующей порции.
-    virtual std::size_t receive(Byte *buffer, std::size_t size) = 0;
+    virtual std::size_t receive (Byte *buffer, std::size_t size) = 0;
 };
 
 //=========================================================
@@ -151,25 +157,25 @@ class PLUSIRBIS_EXPORTS ClientQuery final
 {
     std::vector<Byte> _content;
 
-    void _write(const Byte *bytes, std::size_t size);
-    void _write(Byte byte);
+    void _write (const Byte *bytes, std::size_t size);
+    void _write (Byte byte);
 
 public:
-    ClientQuery(const ConnectionBase &connection, const std::string &commandCode);
-    ClientQuery(ClientQuery &) = delete;
-    ClientQuery(ClientQuery &&) = delete;
+    ClientQuery (const ConnectionBase &connection, const std::string &commandCode);
+    ClientQuery (ClientQuery &) = delete;
+    ClientQuery (ClientQuery &&) = delete;
     ClientQuery& operator = (ClientQuery &) = delete;
     ClientQuery& operator = (ClientQuery &&) = delete;
     ~ClientQuery() = default;
 
-    ClientQuery& add(int value);
-    ClientQuery& add(const FileSpecification &specification);
-    ClientQuery& add(const MarcRecord &record, const std::wstring &delimiter);
-    ClientQuery& addAnsi(const std::string &text);
-    ClientQuery& addAnsi(const String &text);
-    bool addFormat(const String &format);
-    ClientQuery& addUtf(const String &text);
-    void dump(std::ostream &stream) const;
+    ClientQuery& add (int value);
+    ClientQuery& add (const FileSpecification &specification);
+    ClientQuery& add (const MarcRecord &record, const std::wstring &delimiter);
+    ClientQuery& addAnsi (const std::string &text);
+    ClientQuery& addAnsi (const String &text);
+    bool addFormat (const String &format);
+    ClientQuery& addUtf (const String &text);
+    void dump (std::ostream &stream) const;
     Bytes encode() const;
     ClientQuery& newLine();
 };
@@ -279,9 +285,9 @@ public:
     int returnCode;       ///< Код возврата (бывает не у всех ответов).
     String serverVersion; ///< Версия сервера (в некоторых сценариях отсутствует).
 
-    ServerResponse(ConnectionBase &connection, ClientQuery &query);
-    ServerResponse(ServerResponse &) = delete;
-    ServerResponse(ServerResponse &&) = delete;
+    ServerResponse (ConnectionBase &connection, ClientQuery &query);
+    ServerResponse (ServerResponse &) = delete;
+    ServerResponse (ServerResponse &&) = delete;
     ServerResponse& operator = (ServerResponse &) = delete;
     ServerResponse& operator = (ServerResponse &&) = delete;
     ~ServerResponse() = default;
@@ -415,11 +421,11 @@ class PLUSIRBIS_EXPORTS TextNavigator final
 public:
     const static Char EOT;
 
-    TextNavigator(const Char* text, std::size_t length) noexcept;
-    TextNavigator(WideSpan text) noexcept; // NOLINT(google-explicit-constructor)
-    TextNavigator(const String &text) noexcept; // NOLINT(google-explicit-constructor)
-    TextNavigator(const TextNavigator &other) noexcept;
-    TextNavigator(TextNavigator&&) = delete;
+    TextNavigator (const Char* text, std::size_t length) noexcept;
+    TextNavigator (WideSpan text) noexcept; // NOLINT(google-explicit-constructor)
+    TextNavigator (const String &text) noexcept; // NOLINT(google-explicit-constructor)
+    TextNavigator (const TextNavigator &other) noexcept;
+    TextNavigator (TextNavigator&&) = delete;
     TextNavigator& operator = (const TextNavigator &) = delete;
     TextNavigator& operator = (TextNavigator &&) = delete;
     ~TextNavigator() = default;
@@ -438,31 +444,31 @@ public:
     Char front()           const noexcept;
     Char back()            const noexcept;
 
-    Char at(std::size_t position) const noexcept;
-    Char lookAhead(std::ptrdiff_t distance = 1) const noexcept;
-    Char lookBehind(std::ptrdiff_t distance = 1) const noexcept;
-    TextNavigator& move(std::ptrdiff_t distance) noexcept;
+    Char at (std::size_t position) const noexcept;
+    Char lookAhead (std::ptrdiff_t distance = 1) const noexcept;
+    Char lookBehind (std::ptrdiff_t distance = 1) const noexcept;
+    TextNavigator& move (std::ptrdiff_t distance) noexcept;
     Char peekChar() const noexcept;
     Char readChar() noexcept;
-    WideSpan peekString(std::size_t length) const noexcept;
-    WideSpan peekTo(Char stopChar) const noexcept;
-    WideSpan peekUntil(Char stopChar) const noexcept;
+    WideSpan peekString (std::size_t length) const noexcept;
+    WideSpan peekTo (Char stopChar) const noexcept;
+    WideSpan peekUntil (Char stopChar) const noexcept;
     WideSpan readLine() noexcept;
     bool isControl() const noexcept;
     bool isDigit() const noexcept;
     bool isLetter() const noexcept;
     bool isWhitespace() const noexcept;
     WideSpan readInteger() noexcept;
-    WideSpan readString(std::size_t length) noexcept;
-    WideSpan readTo(Char stopChar) noexcept;
-    WideSpan readUntil(Char stopChar) noexcept;
-    WideSpan readWhile(Char goodChar) noexcept;
-    WideSpan readWord() noexcept;
-    WideSpan recentText(std::ptrdiff_t length) const noexcept;
+    WideSpan readString (std::size_t length) noexcept;
+    WideSpan readTo (Char stopChar) noexcept;
+    WideSpan readUntil (Char stopChar) noexcept;
+    WideSpan readWhile (Char goodChar) noexcept;
+    WideSpan readWord () noexcept;
+    WideSpan recentText (std::ptrdiff_t length) const noexcept;
     WideSpan remainingText() const noexcept;
     TextNavigator& skipWhitespace() noexcept;
     TextNavigator& skipPunctuation() noexcept;
-    WideSpan substr(std::ptrdiff_t offset, std::size_t length) const noexcept;
+    WideSpan substr (std::ptrdiff_t offset, std::size_t length) const noexcept;
 
 private:
     std::size_t _column, _length, _line, _position;
@@ -473,39 +479,39 @@ private:
 
 // Utilities
 
-PLUSIRBIS_EXPORTS bool sameChar(Char first, Char second) noexcept;
-PLUSIRBIS_EXPORTS bool sameString(const String &first, const String &second) noexcept;
+PLUSIRBIS_EXPORTS bool sameChar   (Char first, Char second) noexcept;
+PLUSIRBIS_EXPORTS bool sameString (const String &first, const String &second) noexcept;
 
-PLUSIRBIS_EXPORTS String toLower(String &text) noexcept;
-PLUSIRBIS_EXPORTS std::string toLower(std::string &text) noexcept;
-PLUSIRBIS_EXPORTS String toUpper(String &text) noexcept;
-PLUSIRBIS_EXPORTS std::string toUpper(std::string &text) noexcept;
+PLUSIRBIS_EXPORTS String toLower      (String &text)      noexcept;
+PLUSIRBIS_EXPORTS std::string toLower (std::string &text) noexcept;
+PLUSIRBIS_EXPORTS String toUpper      (String &text)      noexcept;
+PLUSIRBIS_EXPORTS std::string toUpper (std::string &text) noexcept;
 
-PLUSIRBIS_EXPORTS bool contains(const String &text, const String &fragment);
-PLUSIRBIS_EXPORTS bool contains(const String &text, Char c);
+PLUSIRBIS_EXPORTS bool contains (const String &text, const String &fragment);
+PLUSIRBIS_EXPORTS bool contains (const String &text, Char c);
 
-PLUSIRBIS_EXPORTS std::string replace(const std::string &text, const std::string &from, const std::string &to);
-PLUSIRBIS_EXPORTS String replace(const String &text, const String &from, const String &to);
+PLUSIRBIS_EXPORTS std::string replace (const std::string &text, const std::string &from, const std::string &to);
+PLUSIRBIS_EXPORTS String replace      (const String &text, const String &from, const String &to);
 
-PLUSIRBIS_EXPORTS String trimStart(const String &text);
-PLUSIRBIS_EXPORTS String trimEnd(const String &text);
-PLUSIRBIS_EXPORTS String trim(const String &text);
+PLUSIRBIS_EXPORTS String trimStart (const String &text);
+PLUSIRBIS_EXPORTS String trimEnd   (const String &text);
+PLUSIRBIS_EXPORTS String trim      (const String &text);
 
-PLUSIRBIS_EXPORTS int fastParse32(const String &text);
-PLUSIRBIS_EXPORTS int fastParse32(CharSpan text);
-PLUSIRBIS_EXPORTS int fastParse32(WideSpan text);
-PLUSIRBIS_EXPORTS int fastParse32(const Char *text);
-PLUSIRBIS_EXPORTS int fastParse32(const Char *text, std::size_t length);
-PLUSIRBIS_EXPORTS int fastParse32(const std::string &text);
-PLUSIRBIS_EXPORTS int fastParse32(const char *text);
-PLUSIRBIS_EXPORTS int fastParse32(const char *text, std::size_t length);
+PLUSIRBIS_EXPORTS int fastParse32 (const String &text);
+PLUSIRBIS_EXPORTS int fastParse32 (CharSpan text);
+PLUSIRBIS_EXPORTS int fastParse32 (WideSpan text);
+PLUSIRBIS_EXPORTS int fastParse32 (const Char *text);
+PLUSIRBIS_EXPORTS int fastParse32 (const Char *text, std::size_t length);
+PLUSIRBIS_EXPORTS int fastParse32 (const std::string &text);
+PLUSIRBIS_EXPORTS int fastParse32 (const char *text);
+PLUSIRBIS_EXPORTS int fastParse32 (const char *text, std::size_t length);
 
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const String &text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const Char *text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const Char *text, std::size_t length);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const std::string &text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const char *text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32(const char *text, std::size_t length);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const String &text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const Char *text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const Char *text, std::size_t length);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const std::string &text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const char *text);
+PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const char *text, std::size_t length);
 
 PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2);
 PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
@@ -552,10 +558,7 @@ PLUSIRBIS_EXPORTS String removeComments (const String &text);
 PLUSIRBIS_EXPORTS String prepareFormat (const String &text);
 
 template<typename T>
-bool isDigit(T c)
-{
-    return (c >= '0') && (c <= '9');
-}
+bool isDigit(T c)  { return (c >= '0') && (c <= '9'); }
 
 }
 

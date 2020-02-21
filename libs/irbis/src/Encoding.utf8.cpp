@@ -190,7 +190,7 @@ const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &resu
     return end;
 }
 
-String fromUtf(const std::string &text)
+String fromUtf (const std::string &text)
 {
     const auto srcSize = text.length();
     if (!srcSize)
@@ -222,14 +222,14 @@ String fromUtf (ByteSpan span)
 }
 
 // Записывает строку в UTF-8
-Byte* toUtf(Byte *dst, const String &text)
+Byte* toUtf (Byte *dst, const String &text)
 {
     const std::size_t length = text.length();
     const Char *src = text.c_str();
     return toUtf(dst, src, length);
 }
 
-std::string toUtf(const String &text)
+std::string toUtf (const String &text)
 {
     const auto srcSize = text.length();
     if (!srcSize)
@@ -268,6 +268,11 @@ String Utf8Encoding::toUnicode(const Byte *bytes, std::size_t count) const
     irbis::fromUtf(const_cast<Char*>(result.data()), bytes, count);
 
     return result;
+}
+
+std::size_t Utf8Encoding::getSize (const String &text) const
+{
+    return countUtf (text.data(), text.length());
 }
 
 }

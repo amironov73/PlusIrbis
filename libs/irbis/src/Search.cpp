@@ -13,7 +13,6 @@
 #pragma warning(disable: 4068)
 #endif
 
-#pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
 namespace irbis {
@@ -33,7 +32,7 @@ Search Search::all()
 /// \brief Логическое И.
 /// \param text Добавляемое выражение.
 /// \return Построенное выражение.
-Search& Search::and_(const String &text)
+Search& Search::and_ (const String &text)
 {
     this->_buffer = String (L"(")
             + this->_buffer
@@ -217,9 +216,9 @@ Search& Search::or_ (const String &text1, const String &text2)
 {
     this->_buffer = String (L"(")
             + this->_buffer
-            + String (L" * ")
+            + String (L" + ")
             + Search::wrap (text1)
-            + String (L" * ")
+            + String (L" + ")
             + Search::wrap (text2)
             + String (L")");
     return *this;
@@ -236,7 +235,7 @@ Search& Search::or_ (const String &text1, const String &text2, const String &tex
             + this->_buffer
             + String (L" + ")
             + Search::wrap (text1)
-            + String (L" * ")
+            + String (L" + ")
             + Search::wrap (text2)
             + String (L" + ")
             + Search::wrap (text3)

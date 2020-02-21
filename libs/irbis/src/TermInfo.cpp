@@ -14,7 +14,7 @@ namespace irbis {
 /// \brief Разбор ответа сервера.
 /// \param lines Ответ сервера.
 /// \return Вектор терминов.
-std::vector<TermInfo> TermInfo::parse(const StringList &lines)
+std::vector<TermInfo> TermInfo::parse (const StringList &lines)
 {
     std::vector<TermInfo> result;
     result.reserve(lines.size());
@@ -31,10 +31,10 @@ std::vector<TermInfo> TermInfo::parse(const StringList &lines)
     }
 
     return result;
-
 }
 
 /// \brief Текстовое представление термина.
+/// \return Текстовое представление.
 String TermInfo::toString() const
 {
     return std::to_wstring(this->count) + String (L"#")  + this->text;

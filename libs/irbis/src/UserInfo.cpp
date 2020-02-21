@@ -22,6 +22,7 @@ static String formatPair(const String &prefix, const String &value, const String
 }
 
 /// \brief Формирование текстового представления настроек пользователя.
+/// \return Текстовое представление.
 String UserInfo::toString() const
 {
     return this->name + L"\r\n"
@@ -37,7 +38,7 @@ String UserInfo::toString() const
 /// \brief Разбор ответа сервера.
 /// \param lines Строки с ответом сервера.
 /// \return Вектор пользовательских настроек.
-std::vector<UserInfo> UserInfo::parse(const StringList &lines)
+std::vector<UserInfo> UserInfo::parse (const StringList &lines)
 {
     std::vector<UserInfo> result;
 
@@ -54,13 +55,13 @@ std::vector<UserInfo> UserInfo::parse(const StringList &lines)
         }
 
         UserInfo user;
-        user.number = lines[index++];
-        user.name = lines[index++];
-        user.password = lines[index++];
-        user.cataloger = lines[index++];
-        user.reader = lines[index++];
-        user.circulation = lines[index++];
-        user.provision = lines[index++];
+        user.number        = lines[index++];
+        user.name          = lines[index++];
+        user.password      = lines[index++];
+        user.cataloger     = lines[index++];
+        user.reader        = lines[index++];
+        user.circulation   = lines[index++];
+        user.provision     = lines[index++];
         user.administrator = lines[index++];
 
         result.push_back(user);

@@ -12,9 +12,15 @@
 
 namespace irbis {
 
-void GblResult::parse(const StringList& lines)
+/// \brief Разбор ответа сервера.
+/// \param lines Вектор строк.
+void GblResult::parse (const StringList& lines)
 {
-    throw NotImplementedException();
+    for (const auto &line : lines) {
+        if (!line.empty()) {
+            throw NotImplementedException();
+        }
+    }
 }
 
 

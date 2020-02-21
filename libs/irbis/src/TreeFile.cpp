@@ -11,7 +11,7 @@
 
 namespace irbis {
 
-static std::size_t arrangeLevel(std::vector<TreeNode> &list, int level, std::size_t index, std::size_t count) {
+static std::size_t arrangeLevel (std::vector<TreeNode> &list, int level, std::size_t index, std::size_t count) {
     std::size_t next = index + 1;
     int level2 = level + 1;
 
@@ -32,7 +32,7 @@ static std::size_t arrangeLevel(std::vector<TreeNode> &list, int level, std::siz
     return next;
 }
 
-static void arrangeLevel(std::vector<TreeNode> &list, int level) {
+static void arrangeLevel (std::vector<TreeNode> &list, int level) {
     std::size_t count = list.size();
     std::size_t index = 0;
 
@@ -42,7 +42,7 @@ static void arrangeLevel(std::vector<TreeNode> &list, int level) {
     }
 }
 
-static int countIndent(const String &text) {
+static int countIndent (const String &text) {
     int result = 0;
     for (wchar_t c : text) {
         if (c == L'\u0009') {
@@ -55,7 +55,9 @@ static int countIndent(const String &text) {
     return result;
 }
 
-void TreeFile::parse(const StringList &lines) {
+/// \brief Разбор текстового представления дерева.
+/// \param lines Вектор строк.
+void TreeFile::parse (const StringList &lines) {
     roots.clear();
     std::vector<TreeNode> list;
     if (lines.empty()) {
@@ -83,7 +85,9 @@ void TreeFile::parse(const StringList &lines) {
         }
 
         currentLevel = level;
-        // line = line.trimmed(); // TODO: trimStart()
+        if (level) {
+            line = line.substr (level);
+        }
         TreeNode node2;
         node2.value = line;
         node2.level = level;

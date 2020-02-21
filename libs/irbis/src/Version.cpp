@@ -14,18 +14,18 @@ namespace irbis {
 
 /// \brief Разбор ответа сервера.
 /// \param response Ответ сервера.
-void Version::parse(ServerResponse &response)
+void Version::parse (ServerResponse &response)
 {
     const auto lines = response.readRemainingAnsiLines();
     if (lines.size() == 3) {
-        this->version = lines[0];
-        this->connectedClients = fastParse32(lines[1]);
-        this->maxClients = fastParse32(lines[2]);
+        this->version          = lines[0];
+        this->connectedClients = fastParse32 (lines[1]);
+        this->maxClients       = fastParse32 (lines[2]);
     } else {
-        this->organization = lines[0];
-        this->version = lines[1];
-        this->connectedClients = fastParse32(lines[2]);
-        this->maxClients = fastParse32(lines[3]);
+        this->organization     = lines[0];
+        this->version          = lines[1];
+        this->connectedClients = fastParse32 (lines[2]);
+        this->maxClients       = fastParse32 (lines[3]);
     }
 }
 
@@ -33,10 +33,10 @@ void Version::parse(ServerResponse &response)
 /// \return Строковое представление.
 String Version::toString() const
 {
-    return String(L"organization=") + this->organization +
+    return String (L"organization=") + this->organization +
         L", version=" + this->version +
-        L", maxClients=" + std::to_wstring(this->maxClients) +
-        L", connectedClients=" + std::to_wstring(this->connectedClients);
+        L", maxClients=" + std::to_wstring (this->maxClients) +
+        L", connectedClients=" + std::to_wstring (this->connectedClients);
 }
 
 }

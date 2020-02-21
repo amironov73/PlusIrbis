@@ -12,17 +12,24 @@ set(CppFiles
     src/EanTest.cpp
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
+    src/FileSpecificationTest.cpp
     src/FormatTest.cpp
     src/IOTest.cpp
     src/IsbnTest.cpp
+    src/Iso2709Test.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
+    src/PointerGuardTest.cpp
     src/RecordFieldTest.cpp
     src/ResultTest.cpp
+    src/SearchTest.cpp
     src/SpanTest.cpp
     src/SubFieldTest.cpp
+    src/TermInfoTest.cpp
+    src/TermPostingTest.cpp
     src/TextNavigatorTest.cpp
     src/TextTest.cpp
+    src/TreeFileTest.cpp
     src/UpcTest.cpp
     src/UtilsTest.cpp
     src/XrfTest.cpp

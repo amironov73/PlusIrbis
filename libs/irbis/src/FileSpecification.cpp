@@ -83,13 +83,11 @@ FileSpecification FileSpecification::parse(const String &text)
 /// \brief Верификация спецификации файла.
 /// \param throwException Бросать ли исключение при обнаружении ошибки?
 /// \return Результат верификации.
-bool FileSpecification::verify(bool throwException) const
+bool FileSpecification::verify (bool throwException) const
 {
     auto result = !filename.empty();
 
-    if ((path != IrbisPath::System) && (path != IrbisPath::Data)) {
-        result = result && !database.empty();
-    }
+    result = result && ((path != IrbisPath::System) && (path != IrbisPath::Data)) == !database.empty();
 
     if (!result && throwException) {
         throw VerificationException();
@@ -102,36 +100,28 @@ bool FileSpecification::verify(bool throwException) const
 /// \return Строковое представление.
 String FileSpecification::toString() const
 {
-    String result = filename;
+    String result = this->filename;
 
-    if (binaryFile) {
+    if (this->binaryFile) {
         result = L"@" + result;
     } else {
-        if (!content.empty()) {
-            result = L"&" + result;
+        if (!this->content.empty()) {
+            result = result + L"&" + this->content;
         }
     }
 
-    switch (path) {
+    switch (this->path) {
     case 0:
     case 1:
-        result = std::to_wstring(path) + L".." + result;
+        result = std::to_wstring(this->path) + L".." + result;
         break;
 
     default:
-        result = std::to_wstring(path) + L"." + database + L"." + result;
+        result = std::to_wstring(this->path) + L"." + this->database + L"." + result;
         break;
     }
 
-    // TODO implement
-//    if (!content.empty()) {
-  //      QString copy(content);
-    //    IrbisText::fromDosToIrbis(copy);
-      //  result = result + "&" + copy;
-    //}
-
     return result;
 }
-
 
 }

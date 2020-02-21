@@ -35,7 +35,7 @@ namespace irbis {
 /// \brief Конструктор.
 /// \param fileName Имя файла.
 /// \param mode Режим доступа.
-XrfFile64::XrfFile64(const String &fileName, DirectAccessMode mode)
+XrfFile64::XrfFile64 (const String &fileName, DirectAccessMode mode)
 {
     auto *modeString = L"r+b";
     if (mode == DirectAccessMode::ReadOnly) {
@@ -61,9 +61,12 @@ void XrfFile64::close()
     }
 }
 
+/// \brief Расчёт смещения в XRF-файле для указанного MFN.
+/// \param mfn MFN, для которого необходимо смещение.
+/// \return Вычисленное смещение.
 Offset XrfFile64::getOffset(Mfn mfn) noexcept
 {
-    return static_cast<Offset>(XrfRecord64::RecordSize) * static_cast<Offset>(mfn - 1);
+    return static_cast<Offset> (XrfRecord64::RecordSize) * static_cast<Offset> (mfn - 1);
 }
 
 /// \brief Считывание одной XRF-записи.
@@ -71,7 +74,7 @@ Offset XrfFile64::getOffset(Mfn mfn) noexcept
 /// \return Прочитанная запись.
 /// \warning Очень неэффективно! Лучше читать "пачками".
 /// \throw irbis::IrbisException
-XrfRecord64 XrfFile64::readRecord(Mfn mfn)
+XrfRecord64 XrfFile64::readRecord (Mfn mfn)
 {
     assert (mfn > 0);
     std::lock_guard<std::mutex> guard (this->_mutex);
@@ -93,11 +96,11 @@ XrfRecord64 XrfFile64::readRecord(Mfn mfn)
 /// \param record Сохраняемая запись.
 /// \warning Очень неэффективно! Лучше писать "пачками".
 /// \throw irbis::IrbisException
-void XrfFile64::writeRecord(Mfn mfn, XrfRecord64 record)
+void XrfFile64::writeRecord (Mfn mfn, XrfRecord64 record)
 {
     assert (mfn > 0);
-    std::lock_guard<std::mutex> guard(this->_mutex);
-    const auto offset = XrfFile64::getOffset(mfn);
+    std::lock_guard<std::mutex> guard (this->_mutex);
+    const auto offset = XrfFile64::getOffset (mfn);
     if (this->_file->seek(offset) != offset) {
         throw IrbisException();
     }

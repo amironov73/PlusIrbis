@@ -6,7 +6,10 @@
 
 namespace irbis {
 
-std::vector<TermPosting> TermPosting::parse(const StringList &lines)
+/// \brief Разбор ответа сервера.
+/// \param lines Ответ сервера.
+/// \return Вектор постингов.
+std::vector<TermPosting> TermPosting::parse (const StringList &lines)
 {
     std::vector<TermPosting> result;
     result.reserve(lines.size());
@@ -16,10 +19,10 @@ std::vector<TermPosting> TermPosting::parse(const StringList &lines)
             break;
         }
         TermPosting posting;
-        posting.mfn = fastParse32(parts[0]);
-        posting.tag = fastParse32(parts[1]);
-        posting.occurrence = fastParse32(parts[2]);
-        posting.count = fastParse32(parts[3]);
+        posting.mfn        = fastParse32 (parts[0]);
+        posting.tag        = fastParse32 (parts[1]);
+        posting.occurrence = fastParse32 (parts[2]);
+        posting.count      = fastParse32 (parts[3]);
         if (parts.size() > 4) {
             posting.text = parts[4];
         }
@@ -29,16 +32,18 @@ std::vector<TermPosting> TermPosting::parse(const StringList &lines)
     return result;
 }
 
+/// \brief Текстовое представление постинга.
+/// \return Текстовое представление.
 std::wstring TermPosting::toString() const
 {
-    return std::to_wstring(this->mfn)
-        + std::wstring(L"#")
-        + std::to_wstring(this->tag)
-        + std::wstring(L"#")
-        + std::to_wstring(this->occurrence)
+    return std::to_wstring (this->mfn)
         + std::wstring (L"#")
-        + std::to_wstring(this->count)
-        + std::wstring(L"#")
+        + std::to_wstring (this->tag)
+        + std::wstring (L"#")
+        + std::to_wstring (this->occurrence)
+        + std::wstring (L"#")
+        + std::to_wstring (this->count)
+        + std::wstring (L"#")
         + this->text;
 }
 
