@@ -5,7 +5,9 @@
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
+option(WITH_MINGW    "Build with MINGW compiler"    OFF)
 option(WITH_TESTS    "Build with tests"             ON)
+option(WITH_COVERAGE "Build with code coverage"     OFF)
 option(WITH_APPS     "Build with apps"              ON)
 option(WITH_EXAMPLES "Build with examples"          ON)
 option(WITH_DYNAMIC  "Build with dynamic libraries" OFF)
@@ -17,15 +19,22 @@ project(PlusIrbis)
 set(CMAKE_CXX_STANDARD 11)
 
 # compiler-dependent definitions
-if(GCC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
 if(MSVC)
     add_compile_options(/UTF-8)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-endif()
-if(IRBIS_MINGW)
-    add_definitions(-DIRBIS_MINGW)
+else()
+    # g++ or clang++
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    if (WITH_COVERAGE)
+      add_compile_options("--coverage")
+      add_link_options("--coverage")
+    endif()
+    if (IRBIS_MINGW)
+        add_definitions(-DIRBIS_MINGW)
+    endif()
+    if (WITH_MINGW)
+        add_definitions(_DIRBIS_MINGW)
+    endif()
 endif()
 
 # headers of irbis and third-party libraries

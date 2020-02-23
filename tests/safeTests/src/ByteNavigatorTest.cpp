@@ -931,16 +931,16 @@ TEST_CASE("ByteNavigator_writeWideBE_2", "[navigator]")
     irbis::WideSpan span (text);
     CHECK (navigator.writeWideBE (span));
     CHECK (navigator.position() == 24);
-    CHECK (bytes[0] == 0x04);
-    CHECK (bytes[1] == 0x1F);
-    CHECK (bytes[2] == 0x04);
-    CHECK (bytes[3] == 0x40);
-    CHECK (bytes[4] == 0x04);
-    CHECK (bytes[5] == 0x38);
-    CHECK (bytes[6] == 0x04);
-    CHECK (bytes[7] == 0x32);
-    CHECK (bytes[8] == 0x04);
-    CHECK (bytes[9] == 0x35);
+    CHECK (bytes[0]  == 0x04);
+    CHECK (bytes[1]  == 0x1F);
+    CHECK (bytes[2]  == 0x04);
+    CHECK (bytes[3]  == 0x40);
+    CHECK (bytes[4]  == 0x04);
+    CHECK (bytes[5]  == 0x38);
+    CHECK (bytes[6]  == 0x04);
+    CHECK (bytes[7]  == 0x32);
+    CHECK (bytes[8]  == 0x04);
+    CHECK (bytes[9]  == 0x35);
     CHECK (bytes[10] == 0x04);
     CHECK (bytes[11] == 0x42);
     CHECK (bytes[12] == 0x00);
@@ -973,3 +973,37 @@ TEST_CASE("ByteNavigator_fill_2", "[navigator]")
     CHECK (bytes[2] == 0);
     CHECK (bytes[3] == 0);
 }
+
+TEST_CASE("ByteNavigator_find_1", "[navigator]")
+{
+    irbis::ByteNavigator navigator;
+    CHECK (navigator.find (10) == irbis::ByteNavigator::EOT);
+}
+
+TEST_CASE("ByteNavigator_find_2", "[navigator]")
+{
+    irbis::Byte hay[] { 3, 14, 15, 9, 26, 5, 35, 89, 79, 3, 23, 8, 46 };
+    irbis::ByteNavigator navigator { irbis::ByteSpan (hay, sizeof(hay)) };
+    CHECK (navigator.find (9) == 3);
+    CHECK (navigator.find (10) == irbis::ByteNavigator::EOT);
+}
+
+TEST_CASE("ByteNavigator_find_3", "[navigator]")
+{
+    irbis::ByteNavigator navigator;
+    irbis::ByteSpan span;
+    CHECK (navigator.find (span) == irbis::ByteNavigator::EOT);
+}
+
+TEST_CASE("ByteNavigator_find_4", "[navigator]")
+{
+    irbis::Byte hay[] { 3, 14, 15, 9, 26, 5, 35, 89, 79, 3, 23, 8, 46 };
+    irbis::ByteNavigator navigator { irbis::ByteSpan (hay, sizeof(hay)) };
+    irbis::Byte needle[] { 89, 79, 3 };
+    auto span = irbis::ByteSpan (needle, sizeof(needle));
+    CHECK (navigator.find (span) == 7);
+    needle[0] = 100;
+    CHECK (navigator.find (span) == irbis::ByteNavigator::EOT);
+}
+
+

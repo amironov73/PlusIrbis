@@ -208,36 +208,45 @@ TEST_CASE("Span_toVector_1", "[span]")
 TEST_CASE("Span_toString_1", "[span]")
 {
     char chars[] { 'H', 'e', 'l', 'l', 'o' };
-    const irbis::Span<char> span(chars, sizeof(chars));
+    const irbis::Span<char> span (chars, sizeof(chars));
     const std::string text = span.toString();
-    CHECK(text == "Hello");
+    CHECK (text == "Hello");
 }
 
 TEST_CASE("Span_slice_1", "[span]")
 {
     const std::vector<int> vec1 { 1, 2, 3, 4, 5 };
     const irbis::Span<int> span1 (vec1);
-    const irbis::Span<int> span2 = span1.slice(0, 3);
-    CHECK(span2.size() == 3);
-    CHECK(span2[0] == 1);
+    const irbis::Span<int> span2 = span1.slice (0, 3);
+    CHECK (span2.size() == 3);
+    CHECK (span2[0] == 1);
 }
 
 TEST_CASE("Span_slice_2", "[span]")
 {
     const std::vector<int> vec1 { 1, 2, 3, 4, 5 };
     const irbis::Span<int> span1 (vec1);
-    const irbis::Span<int> span2 = span1.slice(2);
-    CHECK(span2.size() == 3);
-    CHECK(span2[0] == 3);
+    const irbis::Span<int> span2 = span1.slice (2);
+    CHECK (span2.size() == 3);
+    CHECK (span2[0] == 3);
 }
 
 TEST_CASE("Span_slice_3", "[span]")
 {
     const std::vector<int> vec1 { 1, 2, 3, 4, 5 };
     const irbis::Span<int> span1 (vec1);
-    const irbis::Span<int> span2 = span1.slice(2, 0);
-    CHECK(span2.size() == 0);  // NOLINT(readability-container-size-empty)
-    CHECK(span2.empty());
+    const irbis::Span<int> span2 = span1.slice (2, 0);
+    CHECK (span2.size() == 0);  // NOLINT(readability-container-size-empty)
+    CHECK (span2.empty());
+}
+
+TEST_CASE("Span_slice_4", "[span]")
+{
+    const std::vector<int> vec1 { 1, 2, 3, 4, 5 };
+    const irbis::Span<int> span1 (vec1);
+    const irbis::Span<int> span2 = span1.slice (2, -2);
+    CHECK (span2.size() == 0);
+    CHECK (span2.empty());
 }
 
 TEST_CASE("Span_startsWith_1", "[span]")
@@ -458,36 +467,314 @@ TEST_CASE("Span_parseInt32_1", "[span]")
 
 TEST_CASE("Span_parseInt32_2", "[span]")
 {
-    CHECK(irbis::WideSpan::fromString(L"").parseInt32() == 0);
-    CHECK(irbis::WideSpan::fromString(L"0").parseInt32() == 0);
-    CHECK(irbis::WideSpan::fromString(L"1").parseInt32() == 1);
-    CHECK(irbis::WideSpan::fromString(L"12").parseInt32() == 12);
-    CHECK(irbis::WideSpan::fromString(L"123").parseInt32() == 123);
-    CHECK(irbis::WideSpan::fromString(L"1234").parseInt32() == 1234);
-    CHECK(irbis::WideSpan::fromString(L"12345").parseInt32() == 12345);
-    CHECK(irbis::WideSpan::fromString(L"123456").parseInt32() == 123456);
+    CHECK (irbis::WideSpan::fromString (L"").parseInt32() == 0);
+    CHECK (irbis::WideSpan::fromString (L"0").parseInt32() == 0);
+    CHECK (irbis::WideSpan::fromString (L"1").parseInt32() == 1);
+    CHECK (irbis::WideSpan::fromString (L"12").parseInt32() == 12);
+    CHECK (irbis::WideSpan::fromString (L"123").parseInt32() == 123);
+    CHECK (irbis::WideSpan::fromString (L"1234").parseInt32() == 1234);
+    CHECK (irbis::WideSpan::fromString (L"12345").parseInt32() == 12345);
+    CHECK (irbis::WideSpan::fromString (L"123456").parseInt32() == 123456);
 }
 
 TEST_CASE("Span_parseInt64_1", "[span]")
 {
-    CHECK(irbis::CharSpan::fromString("").parseInt64() == 0);
-    CHECK(irbis::CharSpan::fromString("0").parseInt64() == 0);
-    CHECK(irbis::CharSpan::fromString("1").parseInt64() == 1);
-    CHECK(irbis::CharSpan::fromString("12").parseInt64() == 12);
-    CHECK(irbis::CharSpan::fromString("123").parseInt64() == 123);
-    CHECK(irbis::CharSpan::fromString("1234").parseInt64() == 1234);
-    CHECK(irbis::CharSpan::fromString("12345").parseInt64() == 12345);
-    CHECK(irbis::CharSpan::fromString("123456").parseInt64() == 123456);
+    CHECK (irbis::CharSpan::fromString ("").parseInt64() == 0);
+    CHECK (irbis::CharSpan::fromString ("0").parseInt64() == 0);
+    CHECK (irbis::CharSpan::fromString ("1").parseInt64() == 1);
+    CHECK (irbis::CharSpan::fromString ("12").parseInt64() == 12);
+    CHECK (irbis::CharSpan::fromString ("123").parseInt64() == 123);
+    CHECK (irbis::CharSpan::fromString ("1234").parseInt64() == 1234);
+    CHECK (irbis::CharSpan::fromString ("12345").parseInt64() == 12345);
+    CHECK (irbis::CharSpan::fromString ("123456").parseInt64() == 123456);
 }
 
 TEST_CASE("Span_parseInt64_2", "[span]")
 {
-    CHECK(irbis::WideSpan::fromString(L"").parseInt64() == 0);
-    CHECK(irbis::WideSpan::fromString(L"0").parseInt64() == 0);
-    CHECK(irbis::WideSpan::fromString(L"1").parseInt64() == 1);
-    CHECK(irbis::WideSpan::fromString(L"12").parseInt64() == 12);
-    CHECK(irbis::WideSpan::fromString(L"123").parseInt64() == 123);
-    CHECK(irbis::WideSpan::fromString(L"1234").parseInt64() == 1234);
-    CHECK(irbis::WideSpan::fromString(L"12345").parseInt64() == 12345);
-    CHECK(irbis::WideSpan::fromString(L"123456").parseInt64() == 123456);
+    CHECK (irbis::WideSpan::fromString (L"").parseInt64() == 0);
+    CHECK (irbis::WideSpan::fromString (L"0").parseInt64() == 0);
+    CHECK (irbis::WideSpan::fromString (L"1").parseInt64() == 1);
+    CHECK (irbis::WideSpan::fromString (L"12").parseInt64() == 12);
+    CHECK (irbis::WideSpan::fromString (L"123").parseInt64() == 123);
+    CHECK (irbis::WideSpan::fromString (L"1234").parseInt64() == 1234);
+    CHECK (irbis::WideSpan::fromString (L"12345").parseInt64() == 12345);
+    CHECK (irbis::WideSpan::fromString (L"123456").parseInt64() == 123456);
+}
+
+TEST_CASE("Span_sameString_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("hello");
+    const auto span2 = irbis::CharSpan::fromString ("HELLO");
+    const auto span3 = irbis::CharSpan::fromString ("HELLA");
+    CHECK (irbis::sameString (span1, span2));
+    CHECK_FALSE (irbis::sameString (span1, span3));
+}
+
+TEST_CASE("Span_sameString_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"hello");
+    const auto span2 = irbis::WideSpan::fromString (L"HELLO");
+    const auto span3 = irbis::WideSpan::fromString (L"HELLA");
+    CHECK (irbis::sameString (span1, span2));
+    CHECK_FALSE (irbis::sameString (span1, span3));
+}
+
+TEST_CASE("Span_equals_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1234");
+    const auto span3 = irbis::CharSpan::fromString ("1235");
+    CHECK (span1 == span2);
+    CHECK_FALSE (span1 == span3);
+}
+
+TEST_CASE("Span_equals_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1234");
+    const auto span3 = irbis::WideSpan::fromString (L"1235");
+    CHECK (span1 == span2);
+    CHECK_FALSE (span1 == span3);
+}
+
+TEST_CASE("Span_equals_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1235";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span == text1);
+    CHECK_FALSE (span == text2);
+}
+
+TEST_CASE("Span_equals_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1235";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span == text1);
+    CHECK_FALSE (span == text2);
+}
+
+TEST_CASE("Span_equals_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 5 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span == v1);
+    CHECK_FALSE (span == v2);
+}
+
+TEST_CASE("Span_notequals_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1235");
+    CHECK (span1 != span2);
+    CHECK_FALSE (span1 != span1);
+}
+
+TEST_CASE("Span_notequals_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1235");
+    CHECK (span1 != span2);
+    CHECK_FALSE (span1 != span1);
+}
+
+TEST_CASE("Span_notequals_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1235";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span != text2);
+    CHECK_FALSE (span != text1);
+}
+
+TEST_CASE("Span_notequals_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1235";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span != text2);
+    CHECK_FALSE (span != text1);
+}
+
+TEST_CASE("Span_notequals_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 5 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span != v2);
+    CHECK_FALSE (span != v1);
+}
+
+TEST_CASE("Span_less_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1235");
+    CHECK (span1 < span2);
+    CHECK_FALSE (span1 < span1);
+}
+
+TEST_CASE("Span_less_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1235");
+    CHECK (span1 < span2);
+    CHECK_FALSE (span1 < span1);
+}
+
+TEST_CASE("Span_less_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1235";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span < text2);
+    CHECK_FALSE (span < text1);
+}
+
+TEST_CASE("Span_less_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1235";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span < text2);
+    CHECK_FALSE (span < text1);
+}
+
+TEST_CASE("Span_less_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 5 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span < v2);
+    CHECK_FALSE (span < v1);
+}
+
+TEST_CASE("Span_lesseq_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1235");
+    CHECK (span1 <= span2);
+    CHECK (span1 <= span1);
+}
+
+TEST_CASE("Span_lesseq_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1235");
+    CHECK (span1 <= span2);
+    CHECK (span1 <= span1);
+}
+
+TEST_CASE("Span_lesseq_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1235";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span <= text2);
+    CHECK (span <= text1);
+}
+
+TEST_CASE("Span_lesseq_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1235";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span <= text2);
+    CHECK (span <= text1);
+}
+
+TEST_CASE("Span_lesseq_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 5 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span <= v2);
+    CHECK (span <= v1);
+}
+
+TEST_CASE("Span_more_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1235");
+    CHECK (span2 > span1);
+    CHECK_FALSE (span1 > span1);
+}
+
+TEST_CASE("Span_more_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1235");
+    CHECK (span2 > span1);
+    CHECK_FALSE (span1 > span1);
+}
+
+TEST_CASE("Span_more_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1233";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span > text2);
+    CHECK_FALSE (span > text1);
+}
+
+TEST_CASE("Span_more_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1233";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span > text2);
+    CHECK_FALSE (span > text1);
+}
+
+TEST_CASE("Span_more_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 3 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span > v2);
+    CHECK_FALSE (span > v1);
+}
+
+TEST_CASE("Span_moreeq_1", "[span]")
+{
+    const auto span1 = irbis::CharSpan::fromString ("1234");
+    const auto span2 = irbis::CharSpan::fromString ("1233");
+    CHECK (span1 >= span2);
+    CHECK (span1 >= span1);
+}
+
+TEST_CASE("Span_moreeq_2", "[span]")
+{
+    const auto span1 = irbis::WideSpan::fromString (L"1234");
+    const auto span2 = irbis::WideSpan::fromString (L"1233");
+    CHECK (span1 >= span2);
+    CHECK (span1 >= span1);
+}
+
+TEST_CASE("Span_moreeq_3", "[span]")
+{
+    const std::string text1 = "1234";
+    const std::string text2 = "1233";
+    const auto span = irbis::CharSpan (text1);
+    CHECK (span >= text2);
+    CHECK (span >= text1);
+}
+
+TEST_CASE("Span_moreeq_4", "[span]")
+{
+    const std::wstring text1 = L"1234";
+    const std::wstring text2 = L"1233";
+    const auto span = irbis::WideSpan (text1);
+    CHECK (span >= text2);
+    CHECK (span >= text1);
+}
+
+TEST_CASE("Span_moreeq_5", "[span]")
+{
+    const std::vector<int> v1 { 1, 2, 3, 4 };
+    const std::vector<int> v2 { 1, 2, 3, 3 };
+    const auto span = irbis::Span<int> (v1);
+    CHECK (span >= v2);
+    CHECK (span >= v1);
 }

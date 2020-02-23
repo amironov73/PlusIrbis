@@ -5,7 +5,6 @@
 #include "irbis_private.h"
 
 #include <cctype>
-#include <cassert>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)

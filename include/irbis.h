@@ -313,7 +313,7 @@ public:
     {
         for (std::size_t i = 0; i < this->length; ++i) {
             if (this->ptr[i] == val) {
-                return static_cast<std::ptrdiff_t >(i);
+                return static_cast<std::ptrdiff_t > (i);
             }
         }
         return -1;
@@ -325,7 +325,7 @@ public:
     /// либо отрицательное значение.
     std::ptrdiff_t lastIndexOf(const T val) const noexcept
     {
-        for (auto i = static_cast<std::ptrdiff_t>(this->length - 1); i >= 0; --i) {
+        for (auto i = static_cast<std::ptrdiff_t> (this->length - 1); i >= 0; --i) {
             if (this->ptr[i] == val) {
                 return i;
             }
@@ -349,7 +349,7 @@ public:
             length_ = 0;
         }
 
-        return Span<T>(this->ptr + start, length_);
+        return Span<T> (this->ptr + start, length_);
     }
 
     /// \brief Сырой указатель на начало спана.
@@ -376,7 +376,7 @@ public:
         std::basic_string<T> result;
         result.reserve(this->length);
         for (std::size_t ofs = 0; ofs < this->length; ofs++) {
-            result.push_back(this->ptr[ofs]);
+            result.push_back (this->ptr[ofs]);
         }
         return result;
     }
@@ -490,7 +490,7 @@ public:
                 ++current;
             }
             if (current != start) {
-                result.emplace_back(start, current - start);
+                result.emplace_back (start, current - start);
             }
             start = ++current;
         }
@@ -518,15 +518,14 @@ public:
                 ++current;
             }
             if (current != start) {
-                result.emplace_back(start, current - start);
+                result.emplace_back (start, current - start);
             }
             start = ++current;
             --nelem;
         }
         if (nelem <= 0 && start < end) {
-            result.emplace_back(start, end - start);
+            result.emplace_back (start, end - start);
         }
-
 
         return result;
     }
@@ -567,109 +566,109 @@ public:
 template <class T>
 inline bool operator == (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) == 0;
+    return left.compare (right) == 0;
 }
 
 template <class T>
 inline bool operator == (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) == 0;
+    return left.compare (Span<T>(right.data(), right.size())) == 0;
 }
 
 template <class T>
 inline bool operator == (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) == 0;
+    return left.compare (Span<T>(right.data(), right.size())) == 0;
 }
 
 template <class T>
 inline bool operator != (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) != 0;
+    return left.compare (right) != 0;
 }
 
 template <class T>
 inline bool operator != (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) != 0;
+    return left.compare (Span<T>(right.data(), right.size())) != 0;
 }
 
 template <class T>
 inline bool operator != (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) != 0;
+    return left.compare (Span<T>(right.data(), right.size())) != 0;
 }
 
 template <class T>
 inline bool operator < (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) < 0;
+    return left.compare (right) < 0;
 }
 
 template <class T>
 inline bool operator < (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) < 0;
+    return left.compare (Span<T>(right.data(), right.size())) < 0;
 }
 
 template <class T>
 inline bool operator < (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) < 0;
+    return left.compare (Span<T>(right.data(), right.size())) < 0;
 }
 
 template <class T>
 inline bool operator <= (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) <= 0;
+    return left.compare (right) <= 0;
 }
 
 template <class T>
 inline bool operator <= (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) <= 0;
+    return left.compare (Span<T>(right.data(), right.size())) <= 0;
 }
 
 template <class T>
 inline bool operator <= (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) <= 0;
+    return left.compare (Span<T>(right.data(), right.size())) <= 0;
 }
 
 template <class T>
 inline bool operator > (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) > 0;
+    return left.compare (right) > 0;
 }
 
 template <class T>
 inline bool operator > (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) > 0;
+    return left.compare (Span<T>(right.data(), right.size())) > 0;
 }
 
 template <class T>
 inline bool operator > (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) > 0;
+    return left.compare (Span<T>(right.data(), right.size())) > 0;
 }
 
 template <class T>
 inline bool operator >= (const Span<T> left, const Span<T> right)
 {
-    return left.compare(right) >= 0;
+    return left.compare (right) >= 0;
 }
 
 template <class T>
 inline bool operator >= (const Span<T> left, const std::basic_string<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) >= 0;
+    return left.compare (Span<T>(right.data(), right.size())) >= 0;
 }
 
 template <class T>
 inline bool operator >= (const Span<T> left, const std::vector<T> &right)
 {
-    return left.compare(Span<T>(right.data(), right.size())) >= 0;
+    return left.compare (Span<T>(right.data(), right.size())) >= 0;
 }
 
 using CharSpan = Span<char>;

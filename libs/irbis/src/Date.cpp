@@ -35,7 +35,7 @@ Date::Date(const String &text_)  // NOLINT(modernize-pass-by-value)
 /// \brief Конструктор из структуры.
 /// \param date_ Компоненты даты в виде структуры.
 Date::Date(const struct tm *date_)
-    : text(convert(date_)), date(*date_)
+    : text (convert (date_)), date (*date_)
 {
 }
 
@@ -45,25 +45,25 @@ Date::Date(const struct tm *date_)
 String Date::convert(const struct tm *date)
 {
     Char buf[10];
-    std::wcsftime(buf, sizeof(buf)/ sizeof(buf[0]), L"%Y%m%d", date);
-    return String(buf);
+    std::wcsftime (buf, sizeof(buf)/ sizeof(buf[0]), L"%Y%m%d", date);
+    return String (buf);
 }
 
 /// \brief Разбор текстового представления даты.
 /// \param text Представление даты в виде YYYYMMDD (8 символов).
 /// \param date Структура для размещения результата.
 /// \return Признак успешного выполнения.
-bool Date::parse(const String &text, struct tm *date)
+bool Date::parse (const String &text, struct tm *date)
 {
     const auto data = text.data();
-    date->tm_sec = 0;
-    date->tm_min = 0;
-    date->tm_hour = 0;
-    date->tm_mday = fastParse32(data + 6, 2);
-    date->tm_mon = fastParse32(data + 4, 2) - 1;
-    date->tm_year = fastParse32(data, 4) - 1900;
-    date->tm_wday = 0;
-    date->tm_yday = 0;
+    date->tm_sec   = 0;
+    date->tm_min   = 0;
+    date->tm_hour  = 0;
+    date->tm_mday  = fastParse32 (data + 6, 2);
+    date->tm_mon   = fastParse32 (data + 4, 2) - 1;
+    date->tm_year  = fastParse32 (data, 4) - 1900;
+    date->tm_wday  = 0;
+    date->tm_yday  = 0;
     date->tm_isdst = 0;
     return true;
 }
@@ -72,9 +72,9 @@ bool Date::parse(const String &text, struct tm *date)
 /// \return Сегодняшняя дата.
 Date Date::today()
 {
-    auto t1 = std::time(nullptr);
-    auto t2 = std::localtime(&t1);
-    return Date(t2);
+    auto t1 = std::time (nullptr);
+    auto t2 = std::localtime (&t1);
+    return Date (t2);
 }
 
 }
