@@ -1640,42 +1640,47 @@ public:
 
 //=========================================================
 
+/// \brief Обёртка над OPT-файлом.
 class PLUSIRBIS_EXPORTS OptFile final
 {
 public:
-    std::vector<OptLine> lines;
+    int tag { 0 };              ///< Метка поля, используемая для хранения рабочего листа.
+    int length { 0 };           ///< Длина ключа (шаблона) в символах.
+    std::vector<OptLine> lines; ///< Строки с ключами и рабочими листами
 
-    void parse(const StringList &text);
+    void parse (const StringList &text);
 };
 
 //=========================================================
 
+/// \brief Строка OPT-файла.
 class PLUSIRBIS_EXPORTS OptLine final
 {
 public:
-    std::wstring key;
-    std::wstring value;
+    String key;   ///< Ключ (шаблон).
+    String value; ///< Имя соответствующего рабочего листа.
 };
 
 //=========================================================
 
+/// \brief Обертка над PAR-файлом.
 class PLUSIRBIS_EXPORTS ParFile final
 {
 public:
-    String xrf;
-    String mst;
-    String cnt;
-    String n01;
-    String n02;
-    String l01;
-    String l02;
-    String ifp;
-    String any;
-    String pft;
-    String ext;
+    String xrf; ///< Путь к файлу XRF.
+    String mst; ///< Путь к файлу MST.
+    String cnt; ///< Путь к файлу CNT.
+    String n01; ///< Путь к файлу N01.
+    String n02; ///< Путь к файлу N02. В ИРБИС64 не используется.
+    String l01; ///< Путь к файлу L01.
+    String l02; ///< Путь к файлу L02. В ИРБИС64 не используется.
+    String ifp; ///< Путь к файлу IFP.
+    String any; ///< Путь к файлу ANY. В ИРБИС64 не используется.
+    String pft; ///< Путь к файлам PFT.
+    String ext; ///< Расположение внешних объектов (поле 951).
 
     void assign (const String &path);
-    void parse(const StringList &lines);
+    void parse (const StringList &lines);
     std::map<int, String> toDictionary() const;
 };
 

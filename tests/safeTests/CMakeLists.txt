@@ -19,6 +19,8 @@ set(CppFiles
     src/Iso2709Test.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
+    src/OptFileTest.cpp
+    src/ParFileTest.cpp
     src/PointerGuardTest.cpp
     src/RecordFieldTest.cpp
     src/ResultTest.cpp

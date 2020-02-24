@@ -13,8 +13,73 @@
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
+/*!
+    \file ParFile.cpp
+
+    \class irbis::ParFile
+
+    Каждой базе данных ИРБИС соответствует один .par-файл.
+    Этот файл содержит набор путей к файлам базы данных ИРБИС.
+    Имя .par-файла соответствует имени базы данных.
+
+    .par-файл представляет собой текстовый файл, состоящий
+    из 11 строк. Каждая строка представляет собой путь,
+    указывающий местонахождение соответствующих файлов базы данных.
+    Примечание: до версии 2011.1 включительно .par-файлы включают
+    в себя 10 строк. 11-я строка добавлена в версии 2012.1.
+
+    В исходном состоянии системы .par-файл содержит относительные
+    пути размещения файлов базы данных – относительно основной
+    директории системы <IRBIS_SERVER_ROOT>.
+
+    Фактически в ИРБИС принят принцип хранения всех файлов
+    базы данных в одной папке, поэтому .par-файлы содержат
+    один и тот же путь, повторяющийся в каждой строке.
+
+    Как правило, PAR-файлы располагаются в подпапке DataI внутри
+    папки IRBIS64, в которую установлен сервер ИРБИС
+    (но их расположение может быть переопределено параметром
+    DataPath в irbis_server.ini).
+
+    Пример файла IBIS.PAR:
+
+    ```
+    1=.\datai\ibis\
+    2=.\datai\ibis\
+    3=.\datai\ibis\
+    4=.\datai\ibis\
+    5=.\datai\ibis\
+    6=.\datai\ibis\
+    7=.\datai\ibis\
+    8=.\datai\ibis\
+    9=.\datai\ibis\
+    10=.\datai\ibis\
+    11=f:\webshare\
+    ```
+
+    ```
+    Параметр | Назначение
+    ---------|-----------
+           1 | Путь к файлу XRF
+           2 | MST
+           3 | CNT
+           4 | N01
+           5 | N02 (только для ИРБИС32)
+           6 | L01
+           7 | L02 (только для ИРБИС32)
+           8 | IFP
+           9 | ANY
+          10 | FDT, FST, FMT, PFT, STW, SRT
+          11 | появился в версии 2012:
+             | расположение внешних объектов (поле 951)
+    ```
+
+ */
+
 namespace irbis {
 
+/// \brief Присваивание пути.
+/// \param path Предполагается, что все файлы базы располагаются по указанному пути.
 void ParFile::assign (const String &path)
 {
     assert(!path.empty());
@@ -32,14 +97,22 @@ void ParFile::assign (const String &path)
     this->ext = path;
 }
 
-void ParFile::parse(const StringList &lines)
+/// \brief Разбор ответа сервера.
+/// \param lines Строки с ответом сервера.
+void ParFile::parse (const StringList &lines)
 {
     std::map<int, String> dict;
 
     for (const auto &line : lines) {
-        const auto parts = maxSplit(line, L'=', 2);
-        const auto key = fastParse32(trim(parts[0]));
-        const auto value = trim(parts[1]);
+        if (line.empty()) {
+            continue;
+        }
+        const auto parts = maxSplit (line, L'=', 2);
+        if (parts.size() != 2) {
+            continue;
+        }
+        const auto key = fastParse32 (trim(parts[0]));
+        const auto value = trim (parts[1]);
         dict[key] = value;
     }
 
@@ -53,11 +126,12 @@ void ParFile::parse(const StringList &lines)
     this->ifp = dict[8];
     this->any = dict[9];
     this->pft = dict[10];
-    if (dict.find(11) != end(dict)) {
+    if (dict.find (11) != end (dict)) {
         this->ext = dict[11];
     }
 }
 
+/// \brief Превращение в словарь.
 std::map<int, String> ParFile::toDictionary() const
 {
     std::map<int, String> result;

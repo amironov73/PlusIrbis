@@ -50,9 +50,9 @@ std::string libraryVersionString()
 /// \param second Второй символ.
 /// \return Возвращает true, если символы равны с точностью до регистра,
 /// иначе false.
-bool sameChar(Char first, Char second) noexcept
+bool sameChar (Char first, Char second) noexcept
 {
-    return ::towupper(first) == ::towupper(second);
+    return ::towupper (first) == ::towupper (second);
 }
 
 /// \brief Сравнение двух строк с точностью до регистра символов.
@@ -60,13 +60,13 @@ bool sameChar(Char first, Char second) noexcept
 /// \param second Вторая строка.
 /// \return Возвращает true, если строки равны с точностью до регистра,
 /// иначе false.
-bool sameString(const String &first, const String &second) noexcept
+bool sameString (const String &first, const String &second) noexcept
 {
     if (first.size() != second.size()) {
         return false;
     }
-    return std::equal(first.begin(), first.end(), second.begin(),
-        [] (Char a, Char b) { return towupper(a) == towupper(b); });
+    return std::equal (first.begin(), first.end(), second.begin(),
+        [] (Char a, Char b) { return towupper (a) == towupper (b); });
 }
 
 /// \brief Преобразование строки к нижнему регистру.
@@ -97,7 +97,7 @@ std::string toLower (std::string &text) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toUpper(String &text) noexcept
+String toUpper (String &text) noexcept
 {
     for (auto &i : text) {
         i = ::toupper(i);
@@ -109,7 +109,7 @@ String toUpper(String &text) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-std::string toUpper(std::string &text) noexcept
+std::string toUpper (std::string &text) noexcept
 {
     for (auto &i : text) {
         i = ::toupper(i);
@@ -121,7 +121,7 @@ std::string toUpper(std::string &text) noexcept
 /// \param text Текст для изучения.
 /// \param fragment Подстрока для поиска.
 /// \return Возвращает true, если подстрока найдена, иначе false.
-bool contains(const String &text, const String &fragment)
+bool contains (const String &text, const String &fragment)
 {
     return text.find(fragment) != std::string::npos;
 }
@@ -130,7 +130,7 @@ bool contains(const String &text, const String &fragment)
 /// \param text Текст для изучения.
 /// \param c Символ для поиска.
 /// \return Возвращает true, если символ найден, иначе false.
-bool contains(const String &text, Char c)
+bool contains (const String &text, Char c)
 {
     return text.find(c) != std::string::npos;
 }
@@ -140,7 +140,7 @@ bool contains(const String &text, Char c)
 /// \param from Заменяемый текст.
 /// \param to Заменяющий текст.
 /// \return Обработанный текст.
-std::string replace(const std::string &text, const std::string &from, const std::string &to)
+std::string replace (const std::string &text, const std::string &from, const std::string &to)
 {
     std::string result = text;
     std::size_t index = 0;
@@ -160,7 +160,7 @@ std::string replace(const std::string &text, const std::string &from, const std:
 /// \param from Заменяемый текст.
 /// \param to Заменяющий текст.
 /// \return Обработанный текст.
-String replace(const String &text, const String &from, const String &to)
+String replace (const String &text, const String &from, const String &to)
 {
     String result = text;
     std::size_t index = 0;
@@ -178,7 +178,7 @@ String replace(const String &text, const String &from, const String &to)
 /// \brief Удаление пробельных символов в начале строки.
 /// \param text Текст для обработки.
 /// \return Обработанный текст.
-String PLUSIRBIS_EXPORTS trimStart(const String &text)
+String PLUSIRBIS_EXPORTS trimStart (const String &text)
 {
     auto length = text.length();
     std::size_t i = 0;
@@ -202,7 +202,7 @@ String PLUSIRBIS_EXPORTS trimStart(const String &text)
 /// \brief Удаление пробельных символов в конце строки.
 /// \param text Текст для обработки.
 /// \return Обработанный текст.
-String PLUSIRBIS_EXPORTS trimEnd(const String &text)
+String PLUSIRBIS_EXPORTS trimEnd (const String &text)
 {
     auto length = text.length();
     auto i = static_cast<std::ptrdiff_t >(length - 1);
@@ -226,10 +226,10 @@ String PLUSIRBIS_EXPORTS trimEnd(const String &text)
 /// \brief Удаление пробельных символов в начале и в конце строки.
 /// \param text Текст для обработки.
 /// \return Обработанный текст.
-String trim(const String &text)
+String trim (const String &text)
 {
-    auto length = static_cast<std::ptrdiff_t>(text.length());
-    std::ptrdiff_t start = 0, end = static_cast<std::ptrdiff_t>(length - 1);
+    auto length = static_cast<std::ptrdiff_t> (text.length());
+    std::ptrdiff_t start = 0, end = static_cast<std::ptrdiff_t> (length - 1);
     for (; start < length; ++start) {
         if (!::iswspace(text[start])) {
             break;
@@ -237,12 +237,12 @@ String trim(const String &text)
     }
 
     for (; end >= 0; --end) {
-        if (!::iswspace(text[end])) {
+        if (!::iswspace (text[end])) {
             break;
         }
     }
 
-    if (end - start <= 0) {
+    if (end - start < 0) {
         return String ();
     }
 
@@ -250,13 +250,13 @@ String trim(const String &text)
         return text;
     }
 
-    return text.substr(start, end - start + 1);
+    return text.substr (start, end - start + 1);
 }
 
 /// \brief Выдаёт текстовое описание ошибки по её коду.
 /// \param errorCode Код ошибки, полученный из Connection::lastError.
 /// \return Текстовое описание проблемы.
-String describeError(int errorCode)
+String describeError (int errorCode)
 {
     if (errorCode >= 0) {
         return L"\u041D\u0435\u0442 \u043E\u0448\u0438\u0431\u043A\u0438";
@@ -316,7 +316,7 @@ String describeError(int errorCode)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const String &text)
+int fastParse32 (const String &text)
 {
     auto result = 0;
     const std::size_t length = text.length();
@@ -328,7 +328,7 @@ int fastParse32(const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const CharSpan text)
+int fastParse32 (const CharSpan text)
 {
     auto result = 0;
     const std::size_t length = text.length;
@@ -340,7 +340,7 @@ int fastParse32(const CharSpan text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const WideSpan text)
+int fastParse32 (const WideSpan text)
 {
     auto result = 0;
     const std::size_t length = text.length;
@@ -352,7 +352,7 @@ int fastParse32(const WideSpan text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32(const String &text)
+unsigned int fastParseUnsigned32 (const String &text)
 {
     auto result = 0u;
     const std::size_t length = text.length();
@@ -364,7 +364,7 @@ unsigned int fastParseUnsigned32(const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const Char *text)
+int fastParse32 (const Char *text)
 {
     auto result = 0;
     while (*text != 0) {
@@ -376,7 +376,7 @@ int fastParse32(const Char *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32(const Char *text)
+unsigned int fastParseUnsigned32 (const Char *text)
 {
     auto result = 0u;
     while (*text != 0) {
@@ -388,7 +388,7 @@ unsigned int fastParseUnsigned32(const Char *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const Char *text, std::size_t length)
+int fastParse32 (const Char *text, std::size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -401,7 +401,7 @@ int fastParse32(const Char *text, std::size_t length)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32(const Char *text, std::size_t length)
+unsigned int fastParseUnsigned32 (const Char *text, std::size_t length)
 {
     auto result = 0u;
     while (length > 0) {
@@ -414,7 +414,7 @@ unsigned int fastParseUnsigned32(const Char *text, std::size_t length)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const std::string &text)
+int fastParse32 (const std::string &text)
 {
     auto result = 0;
     const std::size_t length = text.length();
@@ -426,7 +426,7 @@ int fastParse32(const std::string &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32(const std::string &text)
+unsigned int fastParseUnsigned32 (const std::string &text)
 {
     auto result = 0u;
     const std::size_t length = text.length();
@@ -438,7 +438,7 @@ unsigned int fastParseUnsigned32(const std::string &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32(const char *text)
+int fastParse32 (const char *text)
 {
     auto result = 0;
     while (*text != 0) {
@@ -454,7 +454,7 @@ int fastParse32(const char *text)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-int fastParse32(const char *text, std::size_t length)
+int fastParse32 (const char *text, std::size_t length)
 {
     auto result = 0;
     while (length > 0) {
@@ -471,7 +471,7 @@ int fastParse32(const char *text, std::size_t length)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-unsigned int fastParseUnsigned32(const char *text, std::size_t length)
+unsigned int fastParseUnsigned32 (const char *text, std::size_t length)
 {
     auto result = 0u;
     while (length > 0) {
@@ -487,7 +487,7 @@ unsigned int fastParseUnsigned32(const char *text, std::size_t length)
 /// \param s1
 /// \param s2
 /// \return
-const std::string& iif(const std::string& s1, const std::string &s2)
+const std::string& iif (const std::string& s1, const std::string &s2)
 {
     if (!s1.empty())
     {
@@ -501,7 +501,7 @@ const std::string& iif(const std::string& s1, const std::string &s2)
 /// \param s1
 /// \param s2
 /// \return
-const std::wstring& iif(const std::wstring& s1, const std::wstring &s2)
+const String& iif (const String& s1, const String &s2)
 {
     if (!s1.empty())
     {
@@ -516,7 +516,7 @@ const std::wstring& iif(const std::wstring& s1, const std::wstring &s2)
 /// \param s2
 /// \param s3
 /// \return
-const std::string& iif(const std::string& s1, const std::string &s2, const std::string &s3)
+const std::string& iif (const std::string& s1, const std::string &s2, const std::string &s3)
 {
     if (!s1.empty())
     {
@@ -536,7 +536,7 @@ const std::string& iif(const std::string& s1, const std::string &s2, const std::
 /// \param s2
 /// \param s3
 /// \return
-const std::wstring& iif(const std::wstring& s1, const std::wstring &s2, const std::wstring &s3)
+const std::wstring& iif (const String &s1, const String &s2, const String &s3)
 {
     if (!s1.empty())
     {
@@ -586,18 +586,18 @@ StringList maxSplit (const String &text, Char separator, int count)
     std::size_t position = 0;
     const std::size_t length = text.length();
     while ((count > 1) && (position < length)) {
-        const auto index = text.find(separator, position);
+        const auto index = text.find (separator, position);
         if (index != std::wstring::npos) {
-            result.push_back(text.substr(position, index - position));
+            result.push_back(text.substr (position, index - position));
             position = index + 1;
         } else {
-            result.push_back(text.substr(position));
+            result.push_back (text.substr (position));
             break;
         }
         count--;
     }
     if (position < length) {
-        result.push_back(text.substr(position));
+        result.push_back (text.substr(position));
     }
     return result;
 }
@@ -613,18 +613,18 @@ std::vector<std::string> maxSplit (const std::string &text, char separator, int 
     std::size_t position = 0;
     const std::size_t length = text.length();
     while ((count > 1) && (position < length)) {
-        const auto index = text.find(separator, position);
+        const auto index = text.find (separator, position);
         if (index != std::wstring::npos) {
-            result.push_back(text.substr(position, index - position));
+            result.push_back (text.substr (position, index - position));
             position = index + 1;
         } else {
-            result.push_back(text.substr(position));
+            result.push_back (text.substr (position));
             break;
         }
         count--;
     }
     if (position < length) {
-        result.push_back(text.substr(position));
+        result.push_back (text.substr(position));
     }
     return result;
 }
@@ -633,14 +633,13 @@ std::vector<std::string> maxSplit (const std::string &text, char separator, int 
 /// \param text
 /// \param delimiter
 /// \return
-std::vector<std::string> split(const std::string &text, char delimiter)
+std::vector<std::string> split (const std::string &text, char delimiter)
 {
     std::vector<std::string> result;
     std::string token;
-    std::istringstream stream(text);
-    while (std::getline(stream, token, delimiter))
-    {
-        result.push_back(token);
+    std::istringstream stream (text);
+    while (std::getline (stream, token, delimiter)) {
+        result.push_back (token);
     }
 
     return result;
@@ -650,13 +649,12 @@ std::vector<std::string> split(const std::string &text, char delimiter)
 /// \param text
 /// \param delimiter
 /// \return
-StringList split(const String &text, Char delimiter)
+StringList split (const String &text, Char delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
-    std::wistringstream stream(text);
-    while (std::getline(stream, token, delimiter))
-    {
+    std::wistringstream stream (text);
+    while (std::getline (stream, token, delimiter)) {
         result.push_back(token);
     }
 
@@ -729,7 +727,7 @@ String removeComments (const String &text)
     std::size_t index = 0;
     const std::size_t length = text.length();
     while (index < length) {
-        Char c = text.at(index);
+        Char c = text.at (index);
 
         switch(state) {
         case '\'':
@@ -747,7 +745,7 @@ String removeComments (const String &text)
                     while (index < length) {
                         c = text.at(index);
                         if (c == '\r' || c == '\n') {
-                            result.push_back(c);
+                            result.push_back (c);
                             break;
                         }
 
@@ -778,7 +776,7 @@ String removeComments (const String &text)
 /// \brief Подготовка формата к отсылке на сервер.
 /// \param text
 /// \return
-std::wstring prepareFormat (const std::wstring &text)
+std::wstring prepareFormat (const String &text)
 {
     String text2 = removeComments (text);
     const std::size_t length = text2.length();

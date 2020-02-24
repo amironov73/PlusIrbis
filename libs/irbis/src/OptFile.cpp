@@ -13,13 +13,31 @@
 
 namespace irbis {
 
-void OptFile::parse(const StringList &text) {
+/// \brief Разбор ответа сервера.
+/// \param text Строки с ответом сервера.
+void OptFile::parse (const StringList &text) {
+    auto index = 0;
     for (const auto &line : text) {
-        const auto parts = maxSplit(line, L' ', 2);
-        const auto key = parts[0];
-        const auto value = trim(parts[1]);
-        OptLine optLine { key, value };
-        this->lines.push_back(optLine);
+        if (line.empty()) {
+            break;
+        }
+        if (line[0] == L'*') {
+            break;
+        }
+        ++index;
+        if (index == 1) {
+            this->tag = fastParse32 (line);
+        }
+        else if (index == 2) {
+            this->length = fastParse32 (line);
+        }
+        else {
+            const auto parts = maxSplit (line, L' ', 2);
+            const auto key = parts[0];
+            const auto value = trim (parts[1]);
+            OptLine optLine { key, value };
+            this->lines.push_back (optLine);
+        }
     }
 }
 

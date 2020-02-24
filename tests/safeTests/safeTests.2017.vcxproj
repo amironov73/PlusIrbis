@@ -70,6 +70,8 @@
     <ClCompile Include="src\IsbnTest.cpp" />
     <ClCompile Include="src\Iso2709Test.cpp" />
     <ClCompile Include="src\MarcRecordTest.cpp" />
+    <ClCompile Include="src\OptFileTest.cpp" />
+    <ClCompile Include="src\ParFileTest.cpp" />
     <ClCompile Include="src\PointerGuardTest.cpp" />
     <ClCompile Include="src\RecordFieldTest.cpp" />
     <ClCompile Include="src\ResultTest.cpp" />
