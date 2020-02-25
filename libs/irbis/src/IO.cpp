@@ -17,7 +17,7 @@
 #include <windows.h>
 #include <io.h>
 
-#pragma comment (lib, "ws2_32.lib")
+#pragma comment (lib, "ws2_32.lib") // for ntohl/htonl
 
 #else
 
@@ -73,7 +73,7 @@ bool IO::readInt64 (FILE* file, uint64_t *value)
 
     buffer[0] = ntohl(buffer[0]);
     buffer[1] = ntohl(buffer[1]);
-    *value = (((uint64_t)buffer[1]) << 32) + ((uint64_t)buffer[0]);
+    *value = (((uint64_t)buffer[1]) << 32u) + ((uint64_t)buffer[0]);
 
     return true;
 }
@@ -455,6 +455,7 @@ String IO::combinePath (const String &path1, const String &path2)
     if (path2.empty()) {
         return path1;
     }
+
     auto p1 = path1;
     trimTrailingSlashes(p1);
 
@@ -483,6 +484,7 @@ std::string IO::combinePath (const std::string &path1, const std::string &path2)
     if (path2.empty()) {
         return path1;
     }
+
     auto p1 = path1;
     trimTrailingSlashes(p1);
 
@@ -878,9 +880,9 @@ uint64_t IO::getFileSize (const String &path)
 
 #else
 
-    const auto narrow = irbis::wide2string(path);
+    const auto narrow = irbis::wide2string (path);
     struct stat buf { 0 };
-    if (::stat(narrow.c_str(), &buf) < 0) {
+    if (::stat (narrow.c_str(), &buf) < 0) {
         throw IrbisException();
     }
     return buf.st_size;
@@ -896,7 +898,7 @@ uint64_t IO::getFileSize (const std::string &path)
 #ifdef IRBIS_WINDOWS
 
     WIN32_FILE_ATTRIBUTE_DATA data;
-    if (!::GetFileAttributesExA(path.c_str(), ::GetFileExInfoStandard, &data)) {
+    if (!::GetFileAttributesExA (path.c_str(), ::GetFileExInfoStandard, &data)) {
         throw IrbisException();
     }
     LARGE_INTEGER size;
@@ -907,10 +909,47 @@ uint64_t IO::getFileSize (const std::string &path)
 #else
 
     struct stat buf { 0 };
-    if (::stat(path.c_str(), &buf) < 0) {
+    if (::stat (path.c_str(), &buf) < 0) {
         throw IrbisException();
     }
     return buf.st_size;
+
+#endif
+}
+
+/// \brief Удаление папки (пустой).
+/// \param path Путь к папке.
+/// \return Признак успешности операции.
+bool IO::removeDirectory (const String &path)
+{
+#ifdef IRBIS_WINDOWS
+
+    bool result = RemoveDirectoryW (path.c_str());
+    return result;
+
+#else
+
+    const auto narrow = irbis::wide2string (path);
+    int retcode = rmdir (narrow.c_str());
+    return retcode == 0;
+
+#endif
+}
+
+/// \brief Удаление папки (пустой).
+/// \param path Путь к папке.
+/// \return Признак успешности операции.
+bool IO::removeDirectory (const std::string &path)
+{
+#ifdef IRBIS_WINDOWS
+
+    bool result = RemoveDirectoryA (path.c_str());
+    return result;
+
+#else
+
+    int retcode = rmdir (path.c_str());
+    return retcode == 0;
 
 #endif
 }

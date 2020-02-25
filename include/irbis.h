@@ -822,40 +822,21 @@ public:
 //=========================================================
 
 /// \brief Таблица алфавитных символов.
-///
-/// Таблица алфавитных символов используется системой ИРБИС
-/// при разбиении текста на слова и представляет собой список
-/// кодов символов, которые считаются алфавитными.
-///
 class PLUSIRBIS_EXPORTS AlphabetTable final
 {
 public:
     const static String FileName;
     std::set<Char> characters;
 
-    /// Конструктор.
-    explicit AlphabetTable(const std::vector<Byte> &bytes);
-
-    /// Синглтон.
     static const AlphabetTable& instance();
+    static AlphabetTable readLocalFile (const String &fileName);
 
-    /// Проверка, является ли указанный символ буквой.
-    bool isAlpha(const Char &c) const;
-
-    /// Парсинг потока.
-    static AlphabetTable parse(std::istream &stream);
-
-    /// Чтение локального файла.
-    static AlphabetTable readLocalFile(const String &fileName);
-
-    /// Удаление пробелов в начале и в конце строки.
-    String trimText(const String &text) const;
-
-    /// Разбиение текста на слова.
-    StringList splitWords(const String &text) const;
-
-    /// Верификация таблицы.
-    bool verify(bool throwOnError) const;
+    bool       isAlpha    (const Char &c)            const;
+    void       parse      (const StringList &lines);
+    void       setup      (const Bytes &bytes);
+    StringList splitWords (const String &text)       const;
+    String     trimText   (const String &text)       const;
+    bool       verify     (bool throwOnError)        const;
 };
 
 //=========================================================

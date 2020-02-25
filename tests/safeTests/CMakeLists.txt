@@ -7,6 +7,7 @@
 project(safeTests)
 
 set(CppFiles
+    src/AlphabetTableTest.cpp
     src/ByteNavigatorTest.cpp
     src/DateTest.cpp
     src/EanTest.cpp

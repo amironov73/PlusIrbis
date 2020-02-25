@@ -59,6 +59,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AlphabetTableTest.cpp" />
     <ClCompile Include="src\ByteNavigatorTest.cpp" />
     <ClCompile Include="src\DateTest.cpp" />
     <ClCompile Include="src\EanTest.cpp" />
