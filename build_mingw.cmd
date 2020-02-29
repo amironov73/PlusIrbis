@@ -13,7 +13,7 @@ SET MINGW_MAKE=%MINGW_PATH%/mingw32-make.exe
 SET CMAKE="C:\Program Files\JetBrains\CLion\bin\cmake\win\bin\cmake.exe"
 SET PATH=%MINGW_PATH%;%PATH%
 
-%CMAKE% -B ./build -G "MinGW Makefiles" -D CMAKE_C_COMPILER=%MINGW_C% -D CMAKE_CXX_COMPILER=%MINGW_CPP% -D CMAKE_MAKE_PROGRAM=%MINGW_MAKE% -D CMAKE_BUILD_TYPE=Release -D IRBIS_MINGW=1 .
+%CMAKE% -B ./build -G "MinGW Makefiles" -D CMAKE_C_COMPILER=%MINGW_C% -D CMAKE_CXX_COMPILER=%MINGW_CPP% -D CMAKE_MAKE_PROGRAM=%MINGW_MAKE% -D CMAKE_BUILD_TYPE=Release .
 %CMAKE% --build ./build --config Release -j 2
 %CMAKE% --install ./build --config Release 
 

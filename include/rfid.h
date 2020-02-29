@@ -12,10 +12,10 @@
 
 namespace irbis {
 
-PLUSIRBIS_EXPORTS bool isRfidSupported();
+bool IRBIS_API isRfidSupported();
 
 /// \brief Поддержка Smart Cards
-PLUSIRBIS_EXPORTS class WinSmartCards final
+class IRBIS_API WinSmartCards final
 {
 public:
 

@@ -156,9 +156,9 @@ String RecordField::toString() const
     return result;
 }
 
-PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field)
+std::wostream& IRBIS_API operator << (std::wostream &stream, const RecordField &field)
 {
-    stream << std::to_wstring(field.tag) << std::wstring(L"#") << field.value;
+    stream << std::to_wstring (field.tag) << std::wstring (L"#") << field.value;
     for (const auto &sub : field.subfields) {
         stream << sub;
     }

@@ -5,7 +5,6 @@
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-option(WITH_MINGW    "Build with MINGW compiler"    OFF)
 option(WITH_TESTS    "Build with tests"             ON)
 option(WITH_COVERAGE "Build with code coverage"     OFF)
 option(WITH_APPS     "Build with apps"              ON)
@@ -31,12 +30,6 @@ else()
     endif()
     if (MINGW)
         add_definitions(-DIRBIS_MINGW)
-    endif()
-    if (IRBIS_MINGW)
-        add_definitions(-DIRBIS_MINGW)
-    endif()
-    if (WITH_MINGW)
-        add_definitions(_DIRBIS_MINGW)
     endif()
 endif()
 

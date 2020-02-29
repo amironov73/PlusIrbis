@@ -314,6 +314,8 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <LanguageStandard>stdcpp14</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)include</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -545,7 +547,14 @@
     <ClCompile Include="src/ClientQuery.cpp" />
     <ClCompile Include="src/ClientSocket.cpp" />
     <ClCompile Include="src/Connection.cpp" />
+    <ClCompile Include="src/ConnectionAdmin.cpp" />
+    <ClCompile Include="src/ConnectionBase.cpp" />
+    <ClCompile Include="src/ConnectionContext.cpp" />
     <ClCompile Include="src/ConnectionFactory.cpp" />
+    <ClCompile Include="src/ConnectionFull.cpp" />
+    <ClCompile Include="src/ConnectionLite.cpp" />
+    <ClCompile Include="src/ConnectionPhantom.cpp" />
+    <ClCompile Include="src/ConnectionSearch.cpp" />
     <ClCompile Include="src/DatabaseInfo.cpp" />
     <ClCompile Include="src/Date.cpp" />
     <ClCompile Include="src/DirectAccess.cpp" />
@@ -601,13 +610,6 @@
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
-    <ClCompile Include="src\ConnectionAdmin.cpp" />
-    <ClCompile Include="src\ConnectionBase.cpp" />
-    <ClCompile Include="src\ConnectionContext.cpp" />
-    <ClCompile Include="src\ConnectionFull.cpp" />
-    <ClCompile Include="src\ConnectionLite.cpp" />
-    <ClCompile Include="src\ConnectionPhantom.cpp" />
-    <ClCompile Include="src\ConnectionSearch.cpp" />
   </ItemGroup>
   <!-- END -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

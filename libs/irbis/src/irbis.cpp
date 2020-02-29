@@ -178,7 +178,7 @@ String replace (const String &text, const String &from, const String &to)
 /// \brief Удаление пробельных символов в начале строки.
 /// \param text Текст для обработки.
 /// \return Обработанный текст.
-String PLUSIRBIS_EXPORTS trimStart (const String &text)
+String trimStart (const String &text)
 {
     auto length = text.length();
     std::size_t i = 0;
@@ -202,7 +202,7 @@ String PLUSIRBIS_EXPORTS trimStart (const String &text)
 /// \brief Удаление пробельных символов в конце строки.
 /// \param text Текст для обработки.
 /// \return Обработанный текст.
-String PLUSIRBIS_EXPORTS trimEnd (const String &text)
+String trimEnd (const String &text)
 {
     auto length = text.length();
     auto i = static_cast<std::ptrdiff_t >(length - 1);

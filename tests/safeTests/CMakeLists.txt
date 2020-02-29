@@ -53,8 +53,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
-if(IRBIS_MINGW)
+if(MINGW)
     target_link_libraries(${PROJECT_NAME} libws2_32.a)
-endif(IRBIS_MINGW)
+endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

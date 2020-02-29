@@ -43,16 +43,19 @@
 
     #if defined(_MSC_VER)
         // Microsoft
-        #define IRBIS_EXPORT __declspec(dllexport)
-        #define IRBIS_IMPORT __declspec(dllimport)
+        #define IRBIS_EXPORT __declspec(dllexport) __cdecl
+        #define IRBIS_IMPORT __declspec(dllimport) __cdecl
+        #define IRBIS_HIDDEN
     #elif defined(__GNUC__)
         //  GCC
         #define IRBIS_EXPORT __attribute__((visibility("default")))
         #define IRBIS_IMPORT
+        #define IRBIS_HIDDEN __attribute__((visibility("hidden")))
     #else
         //  do nothing and hope for the best?
         #define IRBIS_EXPORT
         #define IRBIS_IMPORT
+        #define IRBIS_HIDDEN
         #pragma warning Unknown dynamic link import/export semantics.
     #endif
 
@@ -60,20 +63,25 @@
 
     #define IRBIS_EXPORT
     #define IRBIS_IMPORT
+    #define IRBIS_HIDDEN
 
 #endif
 
 //=========================================================
 
-#ifdef PLUSIRBIS_LIBRARY
+#ifndef IRBIS_API
 
-    #define PLUSIRBIS_EXPORTS IRBIS_EXPORT
+    #ifdef PLUSIRBIS_LIBRARY
 
-#else
+        #define IRBIS_API IRBIS_EXPORT
 
-    #define PLUSIRBIS_EXPORTS IRBIS_IMPORT
+    #else
 
-#endif
+        #define IRBIS_API IRBIS_IMPORT
+
+    #endif // PLUSIRBIS_LIBRARY
+
+#endif // IRBIS_API
 
 //=========================================================
 
@@ -675,18 +683,18 @@ using CharSpan = Span<char>;
 using WideSpan = Span<Char>;
 using ByteSpan = Span<Byte>;
 
-PLUSIRBIS_EXPORTS bool sameString (CharSpan first, CharSpan second);
-PLUSIRBIS_EXPORTS bool sameString (WideSpan first, WideSpan second);
-PLUSIRBIS_EXPORTS CharSpan trimStart (CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trimStart (WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan trimEnd (CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trimEnd (WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan trim (CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan trim (WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan toupper (CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan toupper (WideSpan text);
-PLUSIRBIS_EXPORTS CharSpan tolower (CharSpan text);
-PLUSIRBIS_EXPORTS WideSpan tolower (WideSpan text);
+IRBIS_API bool sameString (CharSpan first, CharSpan second);
+IRBIS_API bool sameString (WideSpan first, WideSpan second);
+IRBIS_API CharSpan trimStart (CharSpan text);
+IRBIS_API WideSpan trimStart (WideSpan text);
+IRBIS_API CharSpan trimEnd (CharSpan text);
+IRBIS_API WideSpan trimEnd (WideSpan text);
+IRBIS_API CharSpan trim (CharSpan text);
+IRBIS_API WideSpan trim (WideSpan text);
+IRBIS_API CharSpan toupper (CharSpan text);
+IRBIS_API WideSpan toupper (WideSpan text);
+IRBIS_API CharSpan tolower (CharSpan text);
+IRBIS_API WideSpan tolower (WideSpan text);
 
 //=========================================================
 
@@ -705,7 +713,7 @@ public:
 //=========================================================
 
 /// \brief Базовое исключение для всех нештатных ситуаций.
-class PLUSIRBIS_EXPORTS IrbisException
+class IRBIS_API IrbisException
         : public std::exception
 {
 public:
@@ -714,7 +722,7 @@ public:
 //=========================================================
 
 /// \brief Файл на сервере не найден.
-class PLUSIRBIS_EXPORTS FileNotFoundException
+class IRBIS_API FileNotFoundException
         : public IrbisException
 {
     String _fileName;
@@ -730,7 +738,7 @@ public:
 //=========================================================
 
 /// \brief Штрих-код длиной 13 символов.
-class PLUSIRBIS_EXPORTS Ean13 final
+class IRBIS_API Ean13 final
 {
 public:
     static char computeCheckDigit (CharSpan text);
@@ -742,7 +750,7 @@ public:
 //=========================================================
 
 /// \brief Штрих-код длиной 8 символов.
-class PLUSIRBIS_EXPORTS Ean8 final
+class IRBIS_API Ean8 final
 {
 public:
     static char computeCheckDigit (CharSpan text);
@@ -754,7 +762,7 @@ public:
 //=========================================================
 
 /// \brief INI-файл.
-class PLUSIRBIS_EXPORTS IniFile final
+class IRBIS_API IniFile final
 {
 public:
     std::vector<IniSection> sections; ///< Секции INI-файла.
@@ -780,7 +788,7 @@ public:
 /// \brief Строка INI-файла.
 ///
 /// Состоит из ключа и значения, разделённых символом '='.
-class PLUSIRBIS_EXPORTS IniLine final
+class IRBIS_API IniLine final
 {
 public:
     String key;    ///< Ключ (не должен быть пустым).
@@ -799,7 +807,7 @@ private:
 //=========================================================
 
 /// \brief Секция INI-файла.
-class PLUSIRBIS_EXPORTS IniSection final
+class IRBIS_API IniSection final
 {
 public:
     String name; ///< Имя секции.
@@ -822,7 +830,7 @@ public:
 //=========================================================
 
 /// \brief Таблица алфавитных символов.
-class PLUSIRBIS_EXPORTS AlphabetTable final
+class IRBIS_API AlphabetTable final
 {
 public:
     const static String FileName;
@@ -842,7 +850,7 @@ public:
 //=========================================================
 
 /// \brief Информация о подключенном клиенте.
-class PLUSIRBIS_EXPORTS ClientInfo final
+class IRBIS_API ClientInfo final
 {
 public:
     String number;        ///< Порядковый номер.
@@ -860,7 +868,7 @@ public:
 //=========================================================
 
 /// \brief Базовые функции подключения
-class PLUSIRBIS_EXPORTS ConnectionBase
+class IRBIS_API ConnectionBase
 {
 private:
     bool _connected;
@@ -906,7 +914,7 @@ public:
 };
 
 /// \brief Функции работы с контекстом
-class PLUSIRBIS_EXPORTS ConnectionContext : public virtual ConnectionBase
+class IRBIS_API ConnectionContext : public virtual ConnectionBase
 {
 public:
     std::vector<DatabaseInfo> listDatabases (const IniFile &iniFile, const String &defaultFileName);
@@ -923,7 +931,7 @@ public:
 };
 
 /// \brief Функции работы с поисковым индексом
-class PLUSIRBIS_EXPORTS ConnectionSearch : public virtual ConnectionBase
+class IRBIS_API ConnectionSearch : public virtual ConnectionBase
 {
 public:
     StringList listTerms (const String &prefix);
@@ -936,7 +944,7 @@ public:
 };
 
 /// \brief Администраторские функции
-class PLUSIRBIS_EXPORTS ConnectionAdmin : public virtual ConnectionBase
+class IRBIS_API ConnectionAdmin : public virtual ConnectionBase
 {
 public:
     bool createDatabase (const String &databaseName, const String &description, bool readerAccess);
@@ -954,7 +962,7 @@ public:
 };
 
 /// \brief Функции работы с фантомными записями
-class PLUSIRBIS_EXPORTS ConnectionPhantom : public virtual ConnectionBase
+class IRBIS_API ConnectionPhantom : public virtual ConnectionBase
 {
 public:
     PhantomRecord readPhantomRecord (Mfn mfn);
@@ -962,14 +970,14 @@ public:
 };
 
 /// \brief Облегченные функции работы с записями
-class PLUSIRBIS_EXPORTS ConnectionLite : public virtual ConnectionBase
+class IRBIS_API ConnectionLite : public virtual ConnectionBase
 {
 public:
     LiteRecord readLiteRecord (Mfn mfn);
 };
 
 /// \brief Полноценные функции работы с записями
-class PLUSIRBIS_EXPORTS ConnectionFull : public virtual ConnectionBase
+class IRBIS_API ConnectionFull : public virtual ConnectionBase
 {
 public:
     bool deleteRecord (int mfn);
@@ -984,7 +992,7 @@ public:
 /// \brief Подключение к серверу ИРБИС64.
 ///
 /// Объекты данного типа неперемещаемые.
-class PLUSIRBIS_EXPORTS Connection final :
+class IRBIS_API Connection final :
     public virtual ConnectionContext,
     public virtual ConnectionSearch,
     public virtual ConnectionAdmin,
@@ -1028,7 +1036,7 @@ public:
 //=========================================================
 
 /// \brief Фабрика подключений.
-class PLUSIRBIS_EXPORTS ConnectionFactory
+class IRBIS_API ConnectionFactory
 {
 public:
     ConnectionFactory() = default;
@@ -1044,7 +1052,7 @@ public:
 //=========================================================
 
 /// \brief Информация о базе данных ИРБИС.
-class PLUSIRBIS_EXPORTS DatabaseInfo final
+class IRBIS_API DatabaseInfo final
 {
 public:
     String name;                      ///< Имя базы данных.
@@ -1074,7 +1082,7 @@ enum DirectAccessMode : unsigned int
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS DirectAccess64 final
+class IRBIS_API DirectAccess64 final
 {
 public:
     MstFile64 *mst;
@@ -1094,7 +1102,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS EmbeddedField final
+class IRBIS_API EmbeddedField final
 {
 public:
 
@@ -1106,7 +1114,7 @@ public:
 //=========================================================
 
 /// \brief Простая абстракция кодировки символов.
-class PLUSIRBIS_EXPORTS Encoding // abstract
+class IRBIS_API Encoding // abstract
 {
     static Encoding *_ansi;
     static Encoding *_utf;
@@ -1127,7 +1135,7 @@ public:
     static Encoding* utf();
 };
 
-class PLUSIRBIS_EXPORTS Cp1251Encoding final
+class IRBIS_API Cp1251Encoding final
     : public Encoding
 {
 public:
@@ -1137,7 +1145,7 @@ public:
     virtual std::size_t getSize (const String &text) const override;
 };
 
-class PLUSIRBIS_EXPORTS Utf8Encoding final
+class IRBIS_API Utf8Encoding final
     : public Encoding
 {
 public:
@@ -1150,7 +1158,7 @@ public:
 //=========================================================
 
 /// \brief Сведения об экземпляре документа (поле 910).
-class PLUSIRBIS_EXPORTS Exemplar final
+class IRBIS_API Exemplar final
 {
 public:
     static const int TAG = 910;
@@ -1193,7 +1201,7 @@ public:
 //=========================================================
 
 /// \brief Спецификация имени файла.
-class PLUSIRBIS_EXPORTS FileSpecification final
+class IRBIS_API FileSpecification final
 {
 public:
     bool binaryFile { false }; ///< Признак двоичного файла.
@@ -1219,7 +1227,7 @@ public:
 //=========================================================
 
 /// \brief Одна строка из списка найденных записей.
-class PLUSIRBIS_EXPORTS FoundLine final
+class IRBIS_API FoundLine final
 {
 public:
     Mfn mfn {0};         ///< MFN найденной записи.
@@ -1237,7 +1245,7 @@ public:
 //=========================================================
 
 /// \brief Параметр глобальной корректировки.
-class PLUSIRBIS_EXPORTS GblParameter final
+class IRBIS_API GblParameter final
 {
 public:
     /// Наименование параметра, которое появится в названии столбца, задающего параметр.
@@ -1255,7 +1263,7 @@ public:
 //=========================================================
 
 /// \brief Результат выполнения глобальной корректировки.
-class PLUSIRBIS_EXPORTS GblResult final
+class IRBIS_API GblResult final
 {
 public:
 
@@ -1265,7 +1273,7 @@ public:
 //=========================================================
 
 /// \brief Оператор глобальной корректировки.
-class PLUSIRBIS_EXPORTS GblStatement final
+class IRBIS_API GblStatement final
 {
 public:
     String command;    ///< Команда, например, ADD или DEL.
@@ -1285,7 +1293,7 @@ public:
 //=========================================================
 
 /// \brief Настройки для глобальной корректировки.
-class PLUSIRBIS_EXPORTS GblSettings final
+class IRBIS_API GblSettings final
 {
 public:
     bool actualize { false };             ///< Надо ли актуализировать записи?
@@ -1314,7 +1322,7 @@ public:
 //=========================================================
 
 /// \brief Запись в ILF-файле. Хранит информацию об одном ресурсе.
-class PLUSIRBIS_EXPORTS IlfEntry final
+class IRBIS_API IlfEntry final
 {
 public:
     String date;               ///< Дата создания.
@@ -1331,7 +1339,7 @@ public:
 //=========================================================
 
 /// \brief Обертка над ILF-файлом.
-class PLUSIRBIS_EXPORTS IlfFile final
+class IRBIS_API IlfFile final
 {
 public:
     const static std::string MagicString; ///< Магическая строка в заголовке файла.
@@ -1349,7 +1357,7 @@ public:
 //=========================================================
 
 /// \brief Специфичная для ИРБИС дата.
-class PLUSIRBIS_EXPORTS Date final
+class IRBIS_API Date final
 {
 public:
     String text;          ///< Текстовое представление в формате YYYYMMDD.
@@ -1386,7 +1394,7 @@ enum IrbisPath : unsigned int
 //=========================================================
 
 /// \brief Международный стандартный книжный номер.
-class PLUSIRBIS_EXPORTS Isbn final
+class IRBIS_API Isbn final
 {
 public:
     static bool check978 (WideSpan isbn) noexcept;
@@ -1396,7 +1404,7 @@ public:
 //=========================================================
 
 /// \brief Ввод-вывод ISO 2709
-class PLUSIRBIS_EXPORTS Iso2709 final
+class IRBIS_API Iso2709 final
 {
 public:
     static const int  MarkerLength = 24;
@@ -1411,7 +1419,7 @@ public:
 //=========================================================
 
 /// \brief Библиографическая запись. Состоит из произвольного количества полей.
-class PLUSIRBIS_EXPORTS MarcRecord final
+class IRBIS_API MarcRecord final
 {
 public:
     Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
@@ -1439,12 +1447,12 @@ public:
     MarcRecord& reset() noexcept;
     bool verify (bool throwOnError) const;
 
-    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
+    friend IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS MenuEntry final
+class IRBIS_API MenuEntry final
 {
 public:
     std::wstring code;
@@ -1455,7 +1463,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS MenuFile final
+class IRBIS_API MenuFile final
 {
 public:
     const static String StopMarker;
@@ -1479,7 +1487,7 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class PLUSIRBIS_EXPORTS MstControlRecord64 final
+class IRBIS_API MstControlRecord64 final
 {
 public:
     const static int RecordSize;
@@ -1501,7 +1509,7 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class PLUSIRBIS_EXPORTS MstDictionaryEntry64 final
+class IRBIS_API MstDictionaryEntry64 final
 {
 public:
     const static int EntrySize;
@@ -1517,7 +1525,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS MstFile64 final
+class IRBIS_API MstFile64 final
 {
     FILE *_file;
 
@@ -1538,7 +1546,7 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class PLUSIRBIS_EXPORTS MstRecordLeader64 final
+class IRBIS_API MstRecordLeader64 final
 {
 public:
     const static int LeaderSize;
@@ -1558,7 +1566,7 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class PLUSIRBIS_EXPORTS MstRecord64 final
+class IRBIS_API MstRecord64 final
 {
 public:
     MstRecordLeader64 leader;
@@ -1572,7 +1580,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NetworkException final
+class IRBIS_API NetworkException final
     : public IrbisException
 {
 public:
@@ -1580,7 +1588,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NotImplementedException final
+class IRBIS_API NotImplementedException final
     : public IrbisException
 {
 public:
@@ -1588,7 +1596,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NumberChunk final
+class IRBIS_API NumberChunk final
 {
     bool setUp(const String &str, const String &number);
 
@@ -1614,7 +1622,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS NumberText final
+class IRBIS_API NumberText final
 {
 public:
 };
@@ -1622,7 +1630,7 @@ public:
 //=========================================================
 
 /// \brief Обёртка над OPT-файлом.
-class PLUSIRBIS_EXPORTS OptFile final
+class IRBIS_API OptFile final
 {
 public:
     int tag { 0 };              ///< Метка поля, используемая для хранения рабочего листа.
@@ -1635,7 +1643,7 @@ public:
 //=========================================================
 
 /// \brief Строка OPT-файла.
-class PLUSIRBIS_EXPORTS OptLine final
+class IRBIS_API OptLine final
 {
 public:
     String key;   ///< Ключ (шаблон).
@@ -1645,7 +1653,7 @@ public:
 //=========================================================
 
 /// \brief Обертка над PAR-файлом.
-class PLUSIRBIS_EXPORTS ParFile final
+class IRBIS_API ParFile final
 {
 public:
     String xrf; ///< Путь к файлу XRF.
@@ -1668,7 +1676,7 @@ public:
 //=========================================================
 
 /// \brief Невладеющее подполе.
-class PLUSIRBIS_EXPORTS PhantomSubField final
+class IRBIS_API PhantomSubField final
 {
 public:
 
@@ -1696,7 +1704,7 @@ public:
 //=========================================================
 
 /// \brief Невладеющее поле.
-class PLUSIRBIS_EXPORTS PhantomField final
+class IRBIS_API PhantomField final
 {
 public:
 
@@ -1730,7 +1738,7 @@ public:
 //=========================================================
 
 /// \brief Невладеющая запись.
-class PLUSIRBIS_EXPORTS PhantomRecord final
+class IRBIS_API PhantomRecord final
 {
 public:
     Mfn mfn { 0u };                 ///< MFN (порядковый номер в базе) записи.
@@ -1763,7 +1771,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS PostingParameters final
+class IRBIS_API PostingParameters final
 {
 public:
     StringList listOfTerms;
@@ -1776,7 +1784,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS ProcessInfo final
+class IRBIS_API ProcessInfo final
 {
 public:
     String number;
@@ -1795,7 +1803,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RawRecord final
+class IRBIS_API RawRecord final
 {
 public:
     Mfn mfn { 0 };
@@ -1804,16 +1812,16 @@ public:
     StringList fields;
     String database;
 
-    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record);
+    friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RawRecord &record);
 
-    String encode(const String &delimiter) const;
-    void parseSingle(const StringList &lines);
+    String encode (const String &delimiter = L"\u001F\u001E") const;
+    void parseSingle (const StringList &lines);
     String toString() const;
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RecordField final
+class IRBIS_API RecordField final
 {
 public:
     //const static int NoTag = 0;
@@ -1842,12 +1850,12 @@ public:
     bool verify (bool throwOnError) const;
     String toString() const;
 
-    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RecordField &field);
+    friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS RecordSerializer
+class IRBIS_API RecordSerializer
 {
     std::wiostream &stream;
 
@@ -1875,7 +1883,7 @@ enum RecordStatus : unsigned int
 //=========================================================
 
 /// \brief Построитель запросов.
-class PLUSIRBIS_EXPORTS Search final
+class IRBIS_API Search final
 {
 public:
     static Search all();
@@ -1925,7 +1933,7 @@ Search mhr (const String &value1);
 //=========================================================
 
 /// \brief Параметры для поиска записей.
-class PLUSIRBIS_EXPORTS SearchParameters final
+class IRBIS_API SearchParameters final
 {
 public:
     String searchExpression;        ///< Выражение для поиска по словарю.
@@ -1942,7 +1950,7 @@ public:
 //=========================================================
 
 /// \brief Сценарий поиска.
-class PLUSIRBIS_EXPORTS SearchScenario final
+class IRBIS_API SearchScenario final
 {
 public:
     String name;              ///< Название поискового атрибута(автор, инвентарный номер и т. д.).
@@ -1962,7 +1970,7 @@ public:
 //=========================================================
 
 /// \brief Статистика работы ИРБИС-сервера.
-class PLUSIRBIS_EXPORTS ServerStat final
+class IRBIS_API ServerStat final
 {
 public:
     std::vector<ClientInfo> runningClients; ///< Подключенные в данный момент клиенты.
@@ -1975,7 +1983,7 @@ public:
 //=========================================================
 
 /// \brief Подполе записи. Состоит из кода и значения.
-class PLUSIRBIS_EXPORTS SubField final
+class IRBIS_API SubField final
 {
 public:
     /// \brief Отсутствующий код подполя.
@@ -1999,13 +2007,13 @@ public:
     bool verify(bool throwOnError) const;
     String toString() const;
 
-    friend PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const SubField &subfield);
+    friend IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
 
 //=========================================================
 
 /// \brief Данные для метода printTable.
-class PLUSIRBIS_EXPORTS TableDefinition final
+class IRBIS_API TableDefinition final
 {
 public:
     String database;        ///< Имя базы данных.
@@ -2022,7 +2030,7 @@ public:
 //=========================================================
 
 /// \brief Информация о термине поискового словаря.
-class PLUSIRBIS_EXPORTS TermInfo final
+class IRBIS_API TermInfo final
 {
 public:
     int count { 0 }; ///< Количество ссылок на данный термин.
@@ -2043,7 +2051,7 @@ public:
 //=========================================================
 
 /// \brief Параметры извлечения терминов из поискового словаря.
-class PLUSIRBIS_EXPORTS TermParameters final
+class IRBIS_API TermParameters final
 {
 public:
     String database;              ///< Имя базы данных.
@@ -2056,7 +2064,7 @@ public:
 //=========================================================
 
 /// \brief Постинг термина.
-class PLUSIRBIS_EXPORTS TermPosting final
+class IRBIS_API TermPosting final
 {
 public:
     Mfn mfn { 0 };
@@ -2071,7 +2079,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS TreeFile final
+class IRBIS_API TreeFile final
 {
 public:
     std::vector<TreeNode> roots;
@@ -2082,7 +2090,7 @@ public:
 //=========================================================
 
 /// \brief Узел дерева TRE-файла.
-class PLUSIRBIS_EXPORTS TreeNode final
+class IRBIS_API TreeNode final
 {
 public:
     String value; ///< Значение, хранящееся в узле.
@@ -2103,7 +2111,7 @@ public:
 //=========================================================
 
 /// \brief Информация о зарегистрированном пользователе системы (по данным client_m.mnu).
-class PLUSIRBIS_EXPORTS UserInfo final
+class IRBIS_API UserInfo final
 {
 public:
     String number;        ///< Номер по порядку в списке.
@@ -2130,7 +2138,7 @@ public:
 //=========================================================
 
 /// \brief UTF-версия RecordField.
-class PLUSIRBIS_EXPORTS LiteField final
+class IRBIS_API LiteField final
 {
 public:
     int tag { 0 };
@@ -2163,7 +2171,7 @@ public:
 //=========================================================
 
 /// \brief UTF-версия MarcRecord.
-class PLUSIRBIS_EXPORTS LiteRecord final
+class IRBIS_API LiteRecord final
 {
 public:
     Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
@@ -2197,7 +2205,7 @@ public:
 //=========================================================
 
 /// \brief UTF-версия SubField.
-class PLUSIRBIS_EXPORTS LiteSubField final
+class IRBIS_API LiteSubField final
 {
 public:
     /// \brief Одноисмвольный код подполя.
@@ -2223,7 +2231,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS VerificationException final
+class IRBIS_API VerificationException final
     : public IrbisException
 {
 public:
@@ -2232,7 +2240,7 @@ public:
 //=========================================================
 
 /// \brief Американский штрих-код для товаров.
-class PLUSIRBIS_EXPORTS Upc12 final
+class IRBIS_API Upc12 final
 {
 public:
     static char computeCheckDigit (CharSpan text);
@@ -2244,7 +2252,7 @@ public:
 //=========================================================
 
 /// \brief Информация о версии ИРБИС-сервера.
-class PLUSIRBIS_EXPORTS Version final
+class IRBIS_API Version final
 {
 public:
     String organization;        ///< На какое юридическое лицо приобретен сервер.
@@ -2266,7 +2274,7 @@ public:
 //=========================================================
 
 /// \brief XRF-файл -- файл перекрестных ссылок.
-class PLUSIRBIS_EXPORTS XrfFile64 final
+class IRBIS_API XrfFile64 final
 {
 public:
 
@@ -2296,7 +2304,7 @@ private:
 //=========================================================
 
 /// \brief Запись в XRF-файле. Содержит смещение и флаги для записи в MST-файле.
-class PLUSIRBIS_EXPORTS XrfRecord64 final
+class IRBIS_API XrfRecord64 final
 {
 public:
     const static int RecordSize;
@@ -2313,17 +2321,17 @@ public:
 
 // Utilities
 
-PLUSIRBIS_EXPORTS uint32_t libraryVersion() noexcept;
-PLUSIRBIS_EXPORTS std::string libraryVersionString();
+IRBIS_API uint32_t libraryVersion() noexcept;
+IRBIS_API std::string libraryVersionString();
 
-PLUSIRBIS_EXPORTS std::string wide2string (const String &s);
-PLUSIRBIS_EXPORTS String string2wide (const std::string &s);
-PLUSIRBIS_EXPORTS std::string toUtf (const std::string &s);
-PLUSIRBIS_EXPORTS std::string toAnsi (const std::string &s);
+IRBIS_API std::string wide2string (const String &s);
+IRBIS_API String string2wide (const std::string &s);
+IRBIS_API std::string toUtf (const std::string &s);
+IRBIS_API std::string toAnsi (const std::string &s);
 
-PLUSIRBIS_EXPORTS bool isWindows();
+IRBIS_API bool isWindows();
 
-PLUSIRBIS_EXPORTS String describeError(int errorCode);
+IRBIS_API String describeError(int errorCode);
 
 }
 

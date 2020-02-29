@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include <iostream>
@@ -75,7 +75,7 @@ static LRESULT CALLBACK MyWindowProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
             HDC hdc = BeginPaint (hwnd, &ps);
 
             FillRect (hdc, &ps.rcPaint, (HBRUSH) (COLOR_WINDOW + 1));
-            DrawText (hdc, mainText.data(), static_cast<int>(mainText.size()), &ps.rcPaint,
+            DrawTextA (hdc, mainText.data(), static_cast<int>(mainText.size()), &ps.rcPaint,
                       DT_NOPREFIX|DT_CENTER|DT_VCENTER);
 
             EndPaint (hwnd, &ps);
@@ -88,13 +88,13 @@ static LRESULT CALLBACK MyWindowProc (HWND hwnd, UINT uMsg, WPARAM wParam, LPARA
 
 static void registerClass (HINSTANCE hInstance)
 {
-    WNDCLASS wc {};
+    WNDCLASSA wc {};
     wc.lpfnWndProc   = MyWindowProc;
     wc.hInstance     = hInstance;
     wc.lpszClassName = CLASS_NAME;
-    wc.hIcon         = LoadIcon (hInstance, "info");
+    wc.hIcon         = LoadIconA (hInstance, "info");
 
-    RegisterClass (&wc);
+    RegisterClassA (&wc);
 }
 
 static void createWindow (HINSTANCE hInstance)
@@ -102,7 +102,7 @@ static void createWindow (HINSTANCE hInstance)
     DWORD style = WS_CAPTION|WS_SYSMENU;
     DWORD styleEx = WS_EX_APPWINDOW;
 
-    mainWindow = CreateWindowEx
+    mainWindow = CreateWindowExA
             (
                     styleEx,      // Optional window styles.
                     CLASS_NAME,   // Window class
@@ -136,20 +136,20 @@ static void messageLoop()
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, PSTR pCmdLine, int nCmdShow)
 {
     if (!irbis::isRfidSupported()) {
-        MessageBox (nullptr, "RFID is not supported on this platform",
+        MessageBoxA (nullptr, "RFID is not supported on this platform",
                     "ERROR", MB_OK|MB_ICONSTOP);
         return 1;
     }
 
     if (!mgr.open()) {
-        MessageBox (nullptr, "Can't open RFID manager",
+        MessageBoxA (nullptr, "Can't open RFID manager",
                     "ERROR", MB_OK|MB_ICONSTOP);
         return 1;
     }
 
     const auto readers = mgr.listReaders();
     if (readers.empty()) {
-        MessageBox (nullptr, "No readers in the system",
+        MessageBoxA (nullptr, "No readers in the system",
                     "ERROR", MB_OK|MB_ICONSTOP);
         return 1;
     }

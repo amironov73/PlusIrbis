@@ -21,7 +21,7 @@
 
 namespace irbis {
 
-PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRecord &record)
+std::wostream& IRBIS_API operator << (std::wostream &stream, const RawRecord &record)
 {
     stream << std::to_wstring(record.mfn) << String(L"#")
         << std::to_wstring(record.status) << std::endl;
@@ -35,20 +35,19 @@ PLUSIRBIS_EXPORTS std::wostream& operator << (std::wostream &stream, const RawRe
     return stream;
 }
 
-String RawRecord::encode(const String &delimiter = Text::IrbisDelimiter) const
+String RawRecord::encode (const String &delimiter) const
 {
     String result;
-    result.append(std::to_wstring(mfn));
-    result.append(L"#");
-    result.append(std::to_wstring(status));
-    result.append(delimiter);
-    result.append(L"0#");
-    result.append(std::to_wstring(version));
-    result.append(delimiter);
+    result.append (std::to_wstring(mfn));
+    result.append (L"#");
+    result.append (std::to_wstring(status));
+    result.append (delimiter);
+    result.append (L"0#");
+    result.append (std::to_wstring(version));
+    result.append (delimiter);
 
     for (const auto &field : fields) {
-        result.append(field).append(delimiter);
-
+        result.append (field).append (delimiter);
     }
 
     return result;

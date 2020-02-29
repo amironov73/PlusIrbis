@@ -21,7 +21,7 @@ namespace irbis
 
 /// \brief Простая освобождалка памяти.
 template <typename T>
-class PLUSIRBIS_EXPORTS PointerGuard final
+class IRBIS_API PointerGuard final
 {
 public:
     PointerGuard (T *ptr, bool needFree = true) : _pointer(ptr), _needFree(needFree) {}; // NOLINT(google-explicit-constructor,hicpp-explicit-conversions)
@@ -48,7 +48,7 @@ private:
 //=========================================================
 
 /// \brief Простая обертка над файлом.
-class PLUSIRBIS_EXPORTS File final
+class IRBIS_API File final
 {
 public:
 
@@ -80,7 +80,7 @@ private:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS ChunkedBuffer final
+class IRBIS_API ChunkedBuffer final
 {
 private:
     MemoryChunk *_first, *_current, *_last;
@@ -116,7 +116,7 @@ public:
 ///
 /// Наследники обязательно должны переопределить методы send и receive.
 /// Объекты данного класса неперемещаемые.
-class PLUSIRBIS_EXPORTS ClientSocket // abstract
+class IRBIS_API ClientSocket // abstract
 {
 public:
     String host { L"localhost" }; ///< Адрес сервера в виде строки.
@@ -153,7 +153,7 @@ public:
 /// \brief Клиентский запрос.
 ///
 /// Объекты данного класса неперемещаемые.
-class PLUSIRBIS_EXPORTS ClientQuery final
+class IRBIS_API ClientQuery final
 {
     std::vector<Byte> _content;
 
@@ -183,7 +183,7 @@ public:
 //=========================================================
 
 /// \brief Утилиты для ввода-вывода.
-class PLUSIRBIS_EXPORTS IO final
+class IRBIS_API IO final
 {
 public:
 
@@ -232,7 +232,7 @@ public:
 //=========================================================
 
 /// \brief Специфичная для ИРБИС работа с текстом.
-class PLUSIRBIS_EXPORTS Text final
+class IRBIS_API Text final
 {
 public:
     const static char CrLf[];
@@ -260,7 +260,7 @@ public:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS MemoryChunk final
+class IRBIS_API MemoryChunk final
 {
 public:
     char *data;
@@ -277,7 +277,7 @@ public:
 //=========================================================
 
 /// \brief Ответ сервера на клиентский запрос.
-class PLUSIRBIS_EXPORTS ServerResponse final
+class IRBIS_API ServerResponse final
 {
 public:
     String command;       ///< Код команды (дублирует клиентский запрос).
@@ -321,7 +321,7 @@ private:
 
 //=========================================================
 
-class PLUSIRBIS_EXPORTS Tcp4Socket final
+class IRBIS_API Tcp4Socket final
     : public ClientSocket
 {
     void *_impl;
@@ -343,7 +343,7 @@ public:
 //=========================================================
 
 /// \brief Навигация по диапазону байт.
-class PLUSIRBIS_EXPORTS ByteNavigator final
+class IRBIS_API ByteNavigator final
 {
 public:
     const static int EOT;
@@ -418,7 +418,7 @@ private:
 //=========================================================
 
 /// \brief Навигация по тексту.
-class PLUSIRBIS_EXPORTS TextNavigator final
+class IRBIS_API TextNavigator final
 {
 public:
     const static Char EOT;
@@ -481,83 +481,83 @@ private:
 
 // Utilities
 
-PLUSIRBIS_EXPORTS bool sameChar   (Char first, Char second) noexcept;
-PLUSIRBIS_EXPORTS bool sameString (const String &first, const String &second) noexcept;
+IRBIS_API bool sameChar   (Char first, Char second) noexcept;
+IRBIS_API bool sameString (const String &first, const String &second) noexcept;
 
-PLUSIRBIS_EXPORTS String toLower      (String &text)      noexcept;
-PLUSIRBIS_EXPORTS std::string toLower (std::string &text) noexcept;
-PLUSIRBIS_EXPORTS String toUpper      (String &text)      noexcept;
-PLUSIRBIS_EXPORTS std::string toUpper (std::string &text) noexcept;
+IRBIS_API String toLower      (String &text)      noexcept;
+IRBIS_API std::string toLower (std::string &text) noexcept;
+IRBIS_API String toUpper      (String &text)      noexcept;
+IRBIS_API std::string toUpper (std::string &text) noexcept;
 
-PLUSIRBIS_EXPORTS bool contains (const String &text, const String &fragment);
-PLUSIRBIS_EXPORTS bool contains (const String &text, Char c);
+IRBIS_API bool contains (const String &text, const String &fragment);
+IRBIS_API bool contains (const String &text, Char c);
 
-PLUSIRBIS_EXPORTS std::string replace (const std::string &text, const std::string &from, const std::string &to);
-PLUSIRBIS_EXPORTS String replace      (const String &text, const String &from, const String &to);
+IRBIS_API std::string replace (const std::string &text, const std::string &from, const std::string &to);
+IRBIS_API String replace      (const String &text, const String &from, const String &to);
 
-PLUSIRBIS_EXPORTS String trimStart (const String &text);
-PLUSIRBIS_EXPORTS String trimEnd   (const String &text);
-PLUSIRBIS_EXPORTS String trim      (const String &text);
+IRBIS_API String trimStart (const String &text);
+IRBIS_API String trimEnd   (const String &text);
+IRBIS_API String trim      (const String &text);
 
-PLUSIRBIS_EXPORTS int fastParse32 (const String &text);
-PLUSIRBIS_EXPORTS int fastParse32 (CharSpan text);
-PLUSIRBIS_EXPORTS int fastParse32 (WideSpan text);
-PLUSIRBIS_EXPORTS int fastParse32 (const Char *text);
-PLUSIRBIS_EXPORTS int fastParse32 (const Char *text, std::size_t length);
-PLUSIRBIS_EXPORTS int fastParse32 (const std::string &text);
-PLUSIRBIS_EXPORTS int fastParse32 (const char *text);
-PLUSIRBIS_EXPORTS int fastParse32 (const char *text, std::size_t length);
+IRBIS_API int fastParse32 (const String &text);
+IRBIS_API int fastParse32 (CharSpan text);
+IRBIS_API int fastParse32 (WideSpan text);
+IRBIS_API int fastParse32 (const Char *text);
+IRBIS_API int fastParse32 (const Char *text, std::size_t length);
+IRBIS_API int fastParse32 (const std::string &text);
+IRBIS_API int fastParse32 (const char *text);
+IRBIS_API int fastParse32 (const char *text, std::size_t length);
 
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const String &text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const Char *text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const Char *text, std::size_t length);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const std::string &text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const char *text);
-PLUSIRBIS_EXPORTS unsigned int fastParseUnsigned32 (const char *text, std::size_t length);
+IRBIS_API unsigned int fastParseUnsigned32 (const String &text);
+IRBIS_API unsigned int fastParseUnsigned32 (const Char *text);
+IRBIS_API unsigned int fastParseUnsigned32 (const Char *text, std::size_t length);
+IRBIS_API unsigned int fastParseUnsigned32 (const std::string &text);
+IRBIS_API unsigned int fastParseUnsigned32 (const char *text);
+IRBIS_API unsigned int fastParseUnsigned32 (const char *text, std::size_t length);
 
-PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2);
-PLUSIRBIS_EXPORTS const String& iif(const String &s1, const String &s2);
-PLUSIRBIS_EXPORTS const std::string& iif(const std::string &s1, const std::string &s2, const std::string &s3);
-PLUSIRBIS_EXPORTS const String& iif(const String& s1, const String &s2, const String &s3);
+IRBIS_API const std::string& iif(const std::string &s1, const std::string &s2);
+IRBIS_API const String& iif(const String &s1, const String &s2);
+IRBIS_API const std::string& iif(const std::string &s1, const std::string &s2, const std::string &s3);
+IRBIS_API const String& iif(const String& s1, const String &s2, const String &s3);
 
-PLUSIRBIS_EXPORTS std::string safeAt (const std::vector<std::string> &list, std::size_t index);
-PLUSIRBIS_EXPORTS String safeAt (const StringList &list, std::size_t index);
+IRBIS_API std::string safeAt (const std::vector<std::string> &list, std::size_t index);
+IRBIS_API String safeAt (const StringList &list, std::size_t index);
 
-PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, char delimiter);
-PLUSIRBIS_EXPORTS StringList split(const String &text, Char delimiter);
-PLUSIRBIS_EXPORTS std::vector<std::string> split(const std::string &text, const std::string &delimiter);
-PLUSIRBIS_EXPORTS StringList split(const String &text, const String &delimiter);
-PLUSIRBIS_EXPORTS std::vector<std::string> maxSplit(const std::string &text, char separator, int count);
-PLUSIRBIS_EXPORTS StringList maxSplit(const String &text, Char separator, int count);
+IRBIS_API std::vector<std::string> split(const std::string &text, char delimiter);
+IRBIS_API StringList split(const String &text, Char delimiter);
+IRBIS_API std::vector<std::string> split(const std::string &text, const std::string &delimiter);
+IRBIS_API StringList split(const String &text, const String &delimiter);
+IRBIS_API std::vector<std::string> maxSplit(const std::string &text, char separator, int count);
+IRBIS_API StringList maxSplit(const String &text, Char separator, int count);
 
-PLUSIRBIS_EXPORTS String cp866_to_unicode(const std::string &text);
-PLUSIRBIS_EXPORTS String cp1251_to_unicode(const std::string &text);
-PLUSIRBIS_EXPORTS String koi8r_to_unicode(const std::string &text);
+IRBIS_API String cp866_to_unicode(const std::string &text);
+IRBIS_API String cp1251_to_unicode(const std::string &text);
+IRBIS_API String koi8r_to_unicode(const std::string &text);
 
-PLUSIRBIS_EXPORTS std::string unicode_to_cp866(const String &text);
-PLUSIRBIS_EXPORTS std::string unicode_to_cp1251(const String &text);
-PLUSIRBIS_EXPORTS void unicode_to_cp1251(Byte *dst, const Char *src, std::size_t size);
-PLUSIRBIS_EXPORTS std::string unicode_to_koi8r(const String &text);
+IRBIS_API std::string unicode_to_cp866(const String &text);
+IRBIS_API std::string unicode_to_cp1251(const String &text);
+IRBIS_API void unicode_to_cp1251(Byte *dst, const Char *src, std::size_t size);
+IRBIS_API std::string unicode_to_koi8r(const String &text);
 
-PLUSIRBIS_EXPORTS std::string narrow(const String &wide, const std::locale &loc);
-PLUSIRBIS_EXPORTS String widen(const std::string &str, const std::locale &loc);
-PLUSIRBIS_EXPORTS String new_cp1251_to_unicode(const std::string &text);
-PLUSIRBIS_EXPORTS std::string new_unicode_to_cp1251(const String &text);
-PLUSIRBIS_EXPORTS std::string new_toUtf(const String &text);
-PLUSIRBIS_EXPORTS String new_fromUtf(const std::string &text);
+IRBIS_API std::string narrow(const String &wide, const std::locale &loc);
+IRBIS_API String widen(const std::string &str, const std::locale &loc);
+IRBIS_API String new_cp1251_to_unicode(const std::string &text);
+IRBIS_API std::string new_unicode_to_cp1251(const String &text);
+IRBIS_API std::string new_toUtf(const String &text);
+IRBIS_API String new_fromUtf(const std::string &text);
 
-PLUSIRBIS_EXPORTS Byte* toUtf (Byte *dst, const Char *src, std::size_t length);
-PLUSIRBIS_EXPORTS Char* fromUtf (Char *dst, const Byte *src, std::size_t length);
-PLUSIRBIS_EXPORTS std::size_t countUtf (const Char *src, std::size_t length);
-PLUSIRBIS_EXPORTS std::size_t countUtf (const Byte *src, std::size_t length);
-PLUSIRBIS_EXPORTS const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result);
-PLUSIRBIS_EXPORTS Byte* toUtf (Byte *dst, const String &text);
-PLUSIRBIS_EXPORTS String fromUtf (const std::string &text);
-PLUSIRBIS_EXPORTS std::string toUtf (const String &text);
-PLUSIRBIS_EXPORTS String fromUtf (ByteSpan span);
+IRBIS_API Byte* toUtf (Byte *dst, const Char *src, std::size_t length);
+IRBIS_API Char* fromUtf (Char *dst, const Byte *src, std::size_t length);
+IRBIS_API std::size_t countUtf (const Char *src, std::size_t length);
+IRBIS_API std::size_t countUtf (const Byte *src, std::size_t length);
+IRBIS_API const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result);
+IRBIS_API Byte* toUtf (Byte *dst, const String &text);
+IRBIS_API String fromUtf (const std::string &text);
+IRBIS_API std::string toUtf (const String &text);
+IRBIS_API String fromUtf (ByteSpan span);
 
-PLUSIRBIS_EXPORTS String removeComments (const String &text);
-PLUSIRBIS_EXPORTS String prepareFormat (const String &text);
+IRBIS_API String removeComments (const String &text);
+IRBIS_API String prepareFormat (const String &text);
 
 template<typename T>
 bool isDigit(T c)  { return (c >= '0') && (c <= '9'); }

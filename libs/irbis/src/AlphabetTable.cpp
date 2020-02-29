@@ -46,8 +46,11 @@
 
 namespace irbis {
 
+/// \brief Стандартный файл с алфавитной таблицей.
 const String AlphabetTable::FileName = L"ISISACW.TAB";
 
+/// \brief Настройка таблицы на указанный набор байтов.
+/// \param bytes Байты, считающиеся входящими в слова.
 void AlphabetTable::setup (const Bytes &bytes)
 {
     const auto encoding = Encoding::ansi();
@@ -100,7 +103,7 @@ const AlphabetTable& AlphabetTable::instance()
 /// \return `true`, если является.
 bool AlphabetTable::isAlpha (const Char &c) const
 {
-    return this->characters.find (c) != std::end(this->characters);
+    return this->characters.find (c) != std::end (this->characters);
 }
 
 /// \brief Разбор ответа сервера или прочитанного файла.
@@ -144,17 +147,17 @@ String AlphabetTable::trimText (const String &text) const
         return text;
     }
 
-    if (isAlpha(text.at(0)) && isAlpha(text.at(text.size()-1))) {
+    if (isAlpha(text.at (0)) && isAlpha (text.at (text.size() - 1))) {
         return text;
     }
 
     String result = text;
-    while (result.length() && !isAlpha(result.at(0))) {
-        // result.remove(0, 1);
+    while (result.length() && !isAlpha (result.at (0))) {
+        result = result.substr (1);
     }
 
-    while (result.length() && !isAlpha(result.at(result.size() - 1))) {
-        // result.remove(result.size() - 1, 1);
+    while (result.length() && !isAlpha (result.at (result.size() - 1))) {
+        result = result.substr (0, result.size() - 1);
     }
 
     return result;
