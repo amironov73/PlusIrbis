@@ -67,7 +67,7 @@ bool SubField::verify(bool throwOnError) const
     return result;
 }
 
-std::wostream& IRBIS_API operator << (std::wostream &stream, const SubField &subfield)
+IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &subfield)
 {
     return stream << std::wstring (L"^") << std::wstring (subfield.code, 1)
         << subfield.value;

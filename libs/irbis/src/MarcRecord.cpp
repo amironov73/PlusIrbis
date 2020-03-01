@@ -198,7 +198,7 @@ bool MarcRecord::verify (bool throwOnError) const
     return result;
 }
 
-std::wostream& IRBIS_API operator << (std::wostream &stream, const MarcRecord &record)
+IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &record)
 {
     stream << std::to_wstring (record.mfn) << String (L"#")
         << std::to_wstring (record.status) << std::endl;

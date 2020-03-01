@@ -43,8 +43,8 @@
 
     #if defined(_MSC_VER)
         // Microsoft
-        #define IRBIS_EXPORT __declspec(dllexport) __cdecl
-        #define IRBIS_IMPORT __declspec(dllimport) __cdecl
+        #define IRBIS_EXPORT __declspec(dllexport)
+        #define IRBIS_IMPORT __declspec(dllimport)
         #define IRBIS_HIDDEN
     #elif defined(__GNUC__)
         //  GCC
@@ -683,18 +683,18 @@ using CharSpan = Span<char>;
 using WideSpan = Span<Char>;
 using ByteSpan = Span<Byte>;
 
-IRBIS_API bool sameString (CharSpan first, CharSpan second);
-IRBIS_API bool sameString (WideSpan first, WideSpan second);
-IRBIS_API CharSpan trimStart (CharSpan text);
-IRBIS_API WideSpan trimStart (WideSpan text);
-IRBIS_API CharSpan trimEnd (CharSpan text);
-IRBIS_API WideSpan trimEnd (WideSpan text);
-IRBIS_API CharSpan trim (CharSpan text);
-IRBIS_API WideSpan trim (WideSpan text);
-IRBIS_API CharSpan toupper (CharSpan text);
-IRBIS_API WideSpan toupper (WideSpan text);
-IRBIS_API CharSpan tolower (CharSpan text);
-IRBIS_API WideSpan tolower (WideSpan text);
+bool     IRBIS_API sameString (CharSpan first, CharSpan second);
+bool     IRBIS_API sameString (WideSpan first, WideSpan second);
+CharSpan IRBIS_API trimStart (CharSpan text);
+WideSpan IRBIS_API trimStart (WideSpan text);
+CharSpan IRBIS_API trimEnd (CharSpan text);
+WideSpan IRBIS_API trimEnd (WideSpan text);
+CharSpan IRBIS_API trim (CharSpan text);
+WideSpan IRBIS_API trim (WideSpan text);
+CharSpan IRBIS_API toupper (CharSpan text);
+WideSpan IRBIS_API toupper (WideSpan text);
+CharSpan IRBIS_API tolower (CharSpan text);
+WideSpan IRBIS_API tolower (WideSpan text);
 
 //=========================================================
 

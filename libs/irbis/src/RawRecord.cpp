@@ -21,7 +21,7 @@
 
 namespace irbis {
 
-std::wostream& IRBIS_API operator << (std::wostream &stream, const RawRecord &record)
+IRBIS_API std::wostream& operator << (std::wostream &stream, const RawRecord &record)
 {
     stream << std::to_wstring(record.mfn) << String(L"#")
         << std::to_wstring(record.status) << std::endl;

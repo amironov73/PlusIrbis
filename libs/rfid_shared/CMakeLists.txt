@@ -3,25 +3,31 @@
 # Alexey Mironov, 2018-2020
 ###########################################################
 
-# network client library
-project(irbis)
+# shared library for rfid reader interaction
+project(rfid_shared)
 
-include(../common/irbis.cmake)
+include(../common/rfid.cmake)
 
 add_library(${PROJECT_NAME}
-    STATIC
-    ${HeaderFiles}
+    SHARED
     ${CppFiles}
+    src/main.cpp
 )
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
     -DPLUSIRBIS_LIBRARY
+    -DIRBIS_DYNAMIC_LIBRARY
 )
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/../irbis/include
+)
+
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+    irbis
 )
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})
