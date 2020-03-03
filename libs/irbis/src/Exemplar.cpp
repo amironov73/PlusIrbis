@@ -130,34 +130,34 @@ void Exemplar::applyTo (RecordField &field_) const
 /// \param field_ Поле для разбора.
 void Exemplar::parse (const RecordField &field_)
 {
-    this->status        = field_.getFirstSubfieldValue (L'a');
-    this->number        = field_.getFirstSubfieldValue (L'b');
-    this->date          = field_.getFirstSubfieldValue (L'c');
-    this->place         = field_.getFirstSubfieldValue (L'd');
-    this->collection    = field_.getFirstSubfieldValue (L'q');
-    this->shelf         = field_.getFirstSubfieldValue (L'r');
-    this->price         = field_.getFirstSubfieldValue (L'e');
-    this->barcode       = field_.getFirstSubfieldValue (L'h');
-    this->amount        = field_.getFirstSubfieldValue (L'1');
-    this->purpose       = field_.getFirstSubfieldValue (L't');
-    this->coefficient   = field_.getFirstSubfieldValue (L'=');
-    this->offBalance    = field_.getFirstSubfieldValue (L'4');
-    this->ksuNumber1    = field_.getFirstSubfieldValue (L'u');
-    this->actNumber1    = field_.getFirstSubfieldValue (L'y');
-    this->channel       = field_.getFirstSubfieldValue (L'f');
-    this->onHand        = field_.getFirstSubfieldValue (L'2');
-    this->actNumber2    = field_.getFirstSubfieldValue (L'v');
-    this->writeOff      = field_.getFirstSubfieldValue (L'x');
-    this->completion    = field_.getFirstSubfieldValue (L'k');
-    this->actNumber3    = field_.getFirstSubfieldValue (L'w');
-    this->moving        = field_.getFirstSubfieldValue (L'z');
-    this->newPlace      = field_.getFirstSubfieldValue (L'm');
-    this->checkedDate   = field_.getFirstSubfieldValue (L's');
-    this->checkedAmount = field_.getFirstSubfieldValue (L'0');
-    this->realPlace     = field_.getFirstSubfieldValue (L'!');
-    this->bindingIndex  = field_.getFirstSubfieldValue (L'p');
-    this->bindingNumber = field_.getFirstSubfieldValue (L'i');
     this->field         = &(const_cast<RecordField&>(field_));
+    this->status        = this->fm (L'a');
+    this->number        = this->fm (L'b');
+    this->date          = this->fm (L'c');
+    this->place         = this->fm (L'd');
+    this->collection    = this->fm (L'q');
+    this->shelf         = this->fm (L'r');
+    this->price         = this->fm (L'e');
+    this->barcode       = this->fm (L'h');
+    this->amount        = this->fm (L'1');
+    this->purpose       = this->fm (L't');
+    this->coefficient   = this->fm (L'=');
+    this->offBalance    = this->fm (L'4');
+    this->ksuNumber1    = this->fm (L'u');
+    this->actNumber1    = this->fm (L'y');
+    this->channel       = this->fm (L'f');
+    this->onHand        = this->fm (L'2');
+    this->actNumber2    = this->fm (L'v');
+    this->writeOff      = this->fm (L'x');
+    this->completion    = this->fm (L'k');
+    this->actNumber3    = this->fm (L'w');
+    this->moving        = this->fm (L'z');
+    this->newPlace      = this->fm (L'm');
+    this->checkedDate   = this->fm (L's');
+    this->checkedAmount = this->fm (L'0');
+    this->realPlace     = this->fm (L'!');
+    this->bindingIndex  = this->fm (L'p');
+    this->bindingNumber = this->fm (L'i');
 }
 
 /// \brief Разбор записи на экземпляры.
@@ -173,6 +173,14 @@ std::vector<Exemplar> Exemplar::parse (const MarcRecord &record)
         item.parse(*field);
     }
     return result;
+}
+
+/// \brief Получение значения подполя с указанным кодом.
+/// \param code Искомый код.
+/// \return Значение подполя либо пустая строка.
+inline String Exemplar::fm (Char code) const noexcept
+{
+    return this->field->getFirstSubfieldValue (code);
 }
 
 }

@@ -23,6 +23,7 @@ set(CppFiles
     src/OptFileTest.cpp
     src/ParFileTest.cpp
     src/PointerGuardTest.cpp
+    src/ReaderTest.cpp
     src/RecordFieldTest.cpp
     src/ResultTest.cpp
     src/SearchTest.cpp
@@ -35,6 +36,7 @@ set(CppFiles
     src/TreeFileTest.cpp
     src/UpcTest.cpp
     src/UtilsTest.cpp
+    src/VisitTest.cpp
     src/XrfTest.cpp
 )
 

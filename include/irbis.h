@@ -25,7 +25,7 @@
 
 #if !defined(IRBIS_WINDOWS) && !defined (IRBIS_UNIX)
 
-    #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(_WINDOWS)
+    #if defined(__WIN32__) || defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(_WINDOWS)
 
         #define IRBIS_WINDOWS
 
@@ -82,6 +82,70 @@
     #endif // PLUSIRBIS_LIBRARY
 
 #endif // IRBIS_API
+
+// для функций: int __fastcall func (int arg).
+#ifndef IRBIS_CALL
+
+    #if defined(_MSC_VER)
+        // Microsoft
+        #define IRBIS_CALL __fastcall
+    #elif defined(__GNUC__)
+        //  GCC
+        #define IRBIS_CALL
+    #else
+        //  do nothing and hope for the best?
+        #define IRBIS_CALL
+    #endif
+
+#endif // IRBIS_CALL
+
+// для функций: __declspec(naked) int func (int arg).
+#ifndef IRBIS_NAKED
+
+    #if defined(_MSC_VER)
+        // Microsoft
+        #define IRBIS_NAKED __declspec(naked)
+    #elif defined(__GNUC__)
+        //  GCC
+        #define IRBIS_NAKED
+    #else
+        //  do nothing and hope for the best?
+        #define IRBIS_NAKED
+    #endif
+
+#endif // IRBIS_NAKED
+
+// для функций: void __declspec(nothrow) func (int arg).
+#ifndef IRBIS_NOTHROW
+
+    #if defined(_MSC_VER)
+        // Microsoft
+        #define IRBIS_NOTHROW __declspec(nothrow)
+    #elif defined(__GNUC__)
+        //  GCC
+        #define IRBIS_NOTHROW
+    #else
+        //  do nothing and hope for the best?
+        #define IRBIS_NOTHROW
+    #endif
+
+#endif // IRBIS_NOTHROW
+
+// для аргументов функций: int func (char* __restrict ptr1, int* __restrict ptr2).
+#ifndef IRBIS_RESTRICT
+
+    #if defined(_MSC_VER)
+        // Microsoft
+        #define IRBIS_RESTRICT __restrict
+    #elif defined(__GNUC__)
+        //  GCC
+        #define IRBIS_RESTRICT __restrict__
+    #else
+        //  do nothing and hope for the best?
+        #define IRBIS_RESTRICT
+    #endif
+
+#endif // IRBIS_RESTRICT
 
 //=========================================================
 
@@ -683,18 +747,18 @@ using CharSpan = Span<char>;
 using WideSpan = Span<Char>;
 using ByteSpan = Span<Byte>;
 
-bool     IRBIS_API sameString (CharSpan first, CharSpan second);
-bool     IRBIS_API sameString (WideSpan first, WideSpan second);
-CharSpan IRBIS_API trimStart (CharSpan text);
-WideSpan IRBIS_API trimStart (WideSpan text);
-CharSpan IRBIS_API trimEnd (CharSpan text);
-WideSpan IRBIS_API trimEnd (WideSpan text);
-CharSpan IRBIS_API trim (CharSpan text);
-WideSpan IRBIS_API trim (WideSpan text);
-CharSpan IRBIS_API toupper (CharSpan text);
-WideSpan IRBIS_API toupper (WideSpan text);
-CharSpan IRBIS_API tolower (CharSpan text);
-WideSpan IRBIS_API tolower (WideSpan text);
+IRBIS_API bool     IRBIS_CALL sameString (CharSpan first, CharSpan second);
+IRBIS_API bool     IRBIS_CALL sameString (WideSpan first, WideSpan second);
+IRBIS_API CharSpan IRBIS_CALL trimStart  (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL trimStart  (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL trimEnd    (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL trimEnd    (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL trim       (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL trim       (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL toupper    (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL toupper    (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL tolower    (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL tolower    (WideSpan text);
 
 //=========================================================
 
@@ -1196,6 +1260,134 @@ public:
     void applyTo (RecordField &field_) const;
     void parse (const RecordField &field_);
     static std::vector<Exemplar> parse (const MarcRecord &record);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
+/// \brief Сведения о посещении/книговыдаче (поле 40).
+class IRBIS_API Visit final
+{
+public:
+    static const int TAG = 40;
+
+    String database;
+    String index;
+    String inventory;
+    String barcode;
+    String sigla;
+    String given;
+    String department;
+    String expected;
+    String returned;
+    String prolong;
+    String lost;
+    String description;
+    String responsible;
+    String timeIn;
+    String timeOut;
+    String count;
+
+    RecordField *field { nullptr };
+
+    void applyTo    (RecordField &field_)       const;
+    bool isVisit    ()                          const noexcept;
+    bool isReturned ()                          const noexcept;
+    void parse      (const RecordField &field_);
+
+    static std::vector<Visit> parse (const MarcRecord &record);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
+/// \brief Адрес читателя, поле 13 в базе RDR.
+class IRBIS_API Address final
+{
+public:
+    static const int TAG = 13;
+
+    String postcode;
+    String country;
+    String city;
+    String street;
+    String building;
+    String entrance;
+    String apartment;
+    String additional;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field_) const;
+    void parse (const RecordField &field_);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
+/// \brief Информация о регистрации/перерегистрации читателя.
+class IRBIS_API Registration final
+{
+public:
+    String date;
+    String chair;
+    String number;
+    String reason;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field_) const;
+    void parse (const RecordField &field_);
+    static std::vector<Registration> parse (const MarcRecord &record, int tag);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
+/// \brief Сведения о читателе (запись в базе RDR).
+class IRBIS_API Reader final
+{
+public:
+    String       familyName;
+    String       firstName;
+    String       patronymic;
+    String       birth;
+    String       ticket;
+    String       gender;
+    String       category;
+    Address      address;
+    String       workplace;
+    String       education;
+    String       email;
+    String       phone;
+    Registration registration;
+    String       enabled;
+    String       disabled;
+    String       right;
+    String       remarks;
+    String       photo;
+    String       password;
+    std::vector<Visit> visits;
+    std::vector<Registration> enrollment;
+    std::vector<Registration> registrations;
+
+    Mfn mfn { 0 };
+    MarcRecord *record { nullptr };
+
+    void   applyTo  (MarcRecord &record_)        const;
+    String fullName ()                           const;
+    void   parse    (const MarcRecord &record_);
+
+private:
+    String fm (int tag, Char code=0) const noexcept;
 };
 
 //=========================================================
@@ -1230,13 +1422,13 @@ public:
 class IRBIS_API FoundLine final
 {
 public:
-    Mfn mfn {0};         ///< MFN найденной записи.
+    Mfn mfn { 0 };       ///< MFN найденной записи.
     String description;  ///< Опциональный текст, например, результат расформатирования записи.
 
     FoundLine() = default;
-    FoundLine(Mfn mfn_, const String &description_) : mfn(mfn_), description(description_) {}
-    FoundLine(const FoundLine &other) = default;
-    FoundLine(FoundLine &&other) = default;
+    FoundLine (Mfn mfn_, const String &description_) : mfn(mfn_), description(description_) {}
+    FoundLine (const FoundLine &other) = default;
+    FoundLine (FoundLine &&other) = default;
     FoundLine& operator = (const FoundLine &other) = default;
     FoundLine& operator = (FoundLine &&other) = default;
     ~FoundLine() = default;
@@ -1283,8 +1475,8 @@ public:
     String format2;    ///< Второй формат, например, заменяющее выражение.
 
     GblStatement() = default;
-    GblStatement(const GblStatement &other) = default;
-    GblStatement(GblStatement &&other) = default;
+    GblStatement (const GblStatement &other) = default;
+    GblStatement (GblStatement &&other) = default;
     GblStatement& operator = (const GblStatement &other) = default;
     GblStatement& operator = (GblStatement &&other) = default;
     ~GblStatement() = default;
@@ -1345,10 +1537,10 @@ public:
     const static std::string MagicString; ///< Магическая строка в заголовке файла.
 
     std::vector<IlfEntry> entries; ///< Вектор записей.
-    uint32_t unknown1 { 0 };       ///< Неизвестно.
-    uint32_t slotCount { 0 };      ///< Количество слотов для хранения записей.
-    uint32_t entryCount { 0 };     ///< Количество записей.
-    uint32_t writeCount { 0 };     ///< Количество модификаций записей.
+    uint32_t unknown1    { 0 };    ///< Неизвестно.
+    uint32_t slotCount   { 0 };    ///< Количество слотов для хранения записей.
+    uint32_t entryCount  { 0 };    ///< Количество записей.
+    uint32_t writeCount  { 0 };    ///< Количество модификаций записей.
     uint32_t deleteCount { 0 };    ///< Количество удаленных записей.
 
     void readLocalFile (const String &fileName);
@@ -1429,8 +1621,8 @@ public:
     std::list<RecordField> fields; ///< Список полей.
 
     MarcRecord() = default;                                     ///< Конструктор по умолчанию.
-    MarcRecord(const MarcRecord &other) = default;              ///< Конструктор копирования.
-    MarcRecord(MarcRecord &&other) = default;                   ///< Конструктор перемещения.
+    MarcRecord (const MarcRecord &other) = default;              ///< Конструктор копирования.
+    MarcRecord (MarcRecord &&other) = default;                   ///< Конструктор перемещения.
     MarcRecord& operator = (const MarcRecord &other) = default; ///< Оператор копирования.
     MarcRecord& operator = (MarcRecord &&other) = default;      ///< Оператор перемещения.
     ~MarcRecord() = default;                                    ///< Деструктор.
@@ -1444,6 +1636,8 @@ public:
     StringList fma (int tag, Char code = 0) const;
     RecordField* getField (int tag, int occurrence = 0) const noexcept;
     std::vector<RecordField*> getFields (int tag) const;
+    MarcRecord& removeField (int tag);
+    MarcRecord& setField (int tag, const String &value);
     MarcRecord& reset() noexcept;
     bool verify (bool throwOnError) const;
 
@@ -1452,17 +1646,19 @@ public:
 
 //=========================================================
 
+/// \brief Пара строк в MNU-файле.
 class IRBIS_API MenuEntry final
 {
 public:
-    std::wstring code;
-    std::wstring comment;
+    String code;
+    String comment;
 
-    std::wstring toString() const;
+    String toString() const;
 };
 
 //=========================================================
 
+/// \brief Обертка над MNU-файлом.
 class IRBIS_API MenuFile final
 {
 public:
@@ -1771,6 +1967,7 @@ public:
 
 //=========================================================
 
+/// \brief Параметры выборки постингов.
 class IRBIS_API PostingParameters final
 {
 public:
@@ -1784,6 +1981,7 @@ public:
 
 //=========================================================
 
+/// \brief Информация о процессе на ИРБИС-сервере.
 class IRBIS_API ProcessInfo final
 {
 public:
@@ -1842,6 +2040,7 @@ public:
     RecordField& clear();
     RecordField clone() const;
     void decode (const String &line);
+    void decodeBody (const String &line);
     bool empty() const noexcept;
     SubField* getFirstSubfield( Char code) const noexcept;
     String getFirstSubfieldValue (Char code) const noexcept;
@@ -1915,20 +2114,20 @@ private:
     String _buffer;
 };
 
-Search keyword (const String &value1);
-Search author (const String &value1);
-Search title (const String &value1);
-Search publisher (const String &value1);
-Search place (const String &value1);
-Search subject (const String &value1);
-Search language (const String &value1);
-Search year (const String &value1);
-Search magazine (const String &value1);
+Search keyword      (const String &value1);
+Search author       (const String &value1);
+Search title        (const String &value1);
+Search publisher    (const String &value1);
+Search place        (const String &value1);
+Search subject      (const String &value1);
+Search language     (const String &value1);
+Search year         (const String &value1);
+Search magazine     (const String &value1);
 Search documentKind (const String &value1);
-Search udc (const String &value1);
-Search bbk (const String &value1);
-Search rzn (const String &value1);
-Search mhr (const String &value1);
+Search udc          (const String &value1);
+Search bbk          (const String &value1);
+Search rzn          (const String &value1);
+Search mhr          (const String &value1);
 
 //=========================================================
 
@@ -1994,18 +2193,18 @@ public:
     String value; ///< Значение подполя (может быть пустой строкой).
 
     SubField() = default;
-    SubField(Char code, const String &value = L"") : code(code), value(value) {}
-    SubField(const SubField &other) = default;
-    SubField(SubField &&other) = default;
+    SubField (Char code, const String &value = L"") : code(code), value(value) {}
+    SubField (const SubField &other) = default;
+    SubField (SubField &&other) = default;
     SubField& operator = (const SubField &other) = default;
     SubField& operator = (SubField &&other) = default;
     ~SubField() = default;
 
-    SubField clone() const;
-    void decode(const String &line);
-    bool empty() const noexcept;
-    bool verify(bool throwOnError) const;
-    String toString() const;
+    SubField clone    ()                    const;
+    void     decode   (const String &line);
+    bool     empty    ()                    const noexcept;
+    String   toString ()                    const;
+    bool     verify   (bool throwOnError)   const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 };
@@ -2079,6 +2278,7 @@ public:
 
 //=========================================================
 
+/// \brief Обертка над TRE-файлом.
 class IRBIS_API TreeFile final
 {
 public:
@@ -2098,9 +2298,9 @@ public:
     int level { 0 }; ///< Уровень вложенности узла (отслеживается автоматически).
 
     TreeNode() = default;
-    TreeNode(const String &value_) : value(value_) {}
-    TreeNode(const TreeNode &other) = default;
-    TreeNode(TreeNode &&other) = default;
+    TreeNode (const String &value_) : value(value_) {}
+    TreeNode (const TreeNode &other) = default;
+    TreeNode (TreeNode &&other) = default;
     TreeNode& operator = (const TreeNode &other) = default;
     TreeNode& operator = (TreeNode &&other) = default;
     ~TreeNode() = default;
@@ -2312,8 +2512,8 @@ public:
     Offset offset { 0 }; ///< Смещение записи в MST-файле.
     Mfn    status { 0 }; ///< Статус записи (удалена, заблокирована и т.д.).
 
-    bool deleted() const noexcept;
-    bool locked() const noexcept;
+    bool   deleted()  const noexcept;
+    bool   locked()   const noexcept;
     String toString() const;
 };
 
@@ -2321,17 +2521,17 @@ public:
 
 // Utilities
 
-IRBIS_API uint32_t libraryVersion() noexcept;
-IRBIS_API std::string libraryVersionString();
+IRBIS_API uint32_t    IRBIS_CALL libraryVersion() noexcept;
+IRBIS_API std::string IRBIS_CALL libraryVersionString();
 
-IRBIS_API std::string wide2string (const String &s);
-IRBIS_API String string2wide (const std::string &s);
-IRBIS_API std::string toUtf (const std::string &s);
-IRBIS_API std::string toAnsi (const std::string &s);
+IRBIS_API std::string IRBIS_CALL wide2string (const String &s);
+IRBIS_API String      IRBIS_CALL string2wide (const std::string &s);
+IRBIS_API std::string IRBIS_CALL toUtf       (const std::string &s);
+IRBIS_API std::string IRBIS_CALL toAnsi      (const std::string &s);
 
-IRBIS_API bool isWindows();
+IRBIS_API bool        IRBIS_CALL isWindows();
 
-IRBIS_API String describeError(int errorCode);
+IRBIS_API String      IRBIS_CALL describeError (int errorCode);
 
 }
 

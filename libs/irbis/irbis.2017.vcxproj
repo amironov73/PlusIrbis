@@ -541,6 +541,7 @@
     <ClInclude Include="include/irbis_private.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src/Address.cpp" />
     <ClCompile Include="src/AlphabetTable.cpp" />
     <ClCompile Include="src/ByteNavigator.cpp" />
     <ClCompile Include="src/ChunkedBuffer.cpp" />
@@ -592,8 +593,10 @@
     <ClCompile Include="src/Phantom.cpp" />
     <ClCompile Include="src/ProcessInfo.cpp" />
     <ClCompile Include="src/RawRecord.cpp" />
+    <ClCompile Include="src/Reader.cpp" />
     <ClCompile Include="src/RecordField.cpp" />
     <ClCompile Include="src/RecordSerializer.cpp" />
+    <ClCompile Include="src/Registration.cpp" />
     <ClCompile Include="src/Search.cpp" />
     <ClCompile Include="src/ServerResponse.cpp" />
     <ClCompile Include="src/ServerStat.cpp" />
@@ -608,6 +611,7 @@
     <ClCompile Include="src/Upc.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
     <ClCompile Include="src/Version.cpp" />
+    <ClCompile Include="src/Visit.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
   </ItemGroup>

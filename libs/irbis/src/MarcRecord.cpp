@@ -174,6 +174,25 @@ std::vector<RecordField*> MarcRecord::getFields (int tag) const
     return result;
 }
 
+MarcRecord& MarcRecord::removeField (int tag)
+{
+    // TODO implement
+    return *this;
+}
+
+MarcRecord& MarcRecord::setField (int tag, const String &value)
+{
+    if (value.empty()) {
+        return this->removeField (tag);
+    }
+    auto field = this->getField (tag);
+    if (!field) {
+        field = &this->add (tag, value);
+    }
+    field->value = value;
+    return *this;
+}
+
 MarcRecord& MarcRecord::reset() noexcept
 {
     this->mfn = 0;

@@ -27,7 +27,7 @@ namespace irbis {
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-bool sameString(CharSpan first, CharSpan second)
+IRBIS_API bool IRBIS_CALL sameString (CharSpan first, CharSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
@@ -44,7 +44,7 @@ bool sameString(CharSpan first, CharSpan second)
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-bool sameString(WideSpan first, WideSpan second)
+IRBIS_API bool IRBIS_CALL sameString (WideSpan first, WideSpan second)
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {

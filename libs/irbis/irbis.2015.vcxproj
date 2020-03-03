@@ -71,13 +71,21 @@
     <ClInclude Include="include/irbis_private.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src/Address.cpp" />
     <ClCompile Include="src/AlphabetTable.cpp" />
     <ClCompile Include="src/ByteNavigator.cpp" />
     <ClCompile Include="src/ChunkedBuffer.cpp" />
     <ClCompile Include="src/ClientQuery.cpp" />
     <ClCompile Include="src/ClientSocket.cpp" />
     <ClCompile Include="src/Connection.cpp" />
+    <ClCompile Include="src/ConnectionAdmin.cpp" />
+    <ClCompile Include="src/ConnectionBase.cpp" />
+    <ClCompile Include="src/ConnectionContext.cpp" />
     <ClCompile Include="src/ConnectionFactory.cpp" />
+    <ClCompile Include="src/ConnectionFull.cpp" />
+    <ClCompile Include="src/ConnectionLite.cpp" />
+    <ClCompile Include="src/ConnectionPhantom.cpp" />
+    <ClCompile Include="src/ConnectionSearch.cpp" />
     <ClCompile Include="src/DatabaseInfo.cpp" />
     <ClCompile Include="src/Date.cpp" />
     <ClCompile Include="src/DirectAccess.cpp" />
@@ -91,10 +99,7 @@
     <ClCompile Include="src/Exemplar.cpp" />
     <ClCompile Include="src/File.cpp" />
     <ClCompile Include="src/FileSpecification.cpp" />
-    <ClCompile Include="src/FoundLine.cpp" />
-    <ClCompile Include="src/GblParameter.cpp" />
     <ClCompile Include="src/GblResult.cpp" />
-    <ClCompile Include="src/GblStatement.cpp" />
     <ClCompile Include="src/IlfFile.cpp" />
     <ClCompile Include="src/IniFile.cpp" />
     <ClCompile Include="src/IO.cpp" />
@@ -112,15 +117,16 @@
     <ClCompile Include="src/MstFile64.cpp" />
     <ClCompile Include="src/MstRecord64.cpp" />
     <ClCompile Include="src/MstRecordLeader64.cpp" />
-    <ClCompile Include="src/NewEncoding.cpp" />
     <ClCompile Include="src/NumberChunk.cpp" />
     <ClCompile Include="src/OptFile.cpp" />
     <ClCompile Include="src/ParFile.cpp" />
     <ClCompile Include="src/Phantom.cpp" />
     <ClCompile Include="src/ProcessInfo.cpp" />
     <ClCompile Include="src/RawRecord.cpp" />
+    <ClCompile Include="src/Reader.cpp" />
     <ClCompile Include="src/RecordField.cpp" />
     <ClCompile Include="src/RecordSerializer.cpp" />
+    <ClCompile Include="src/Registration.cpp" />
     <ClCompile Include="src/Search.cpp" />
     <ClCompile Include="src/ServerResponse.cpp" />
     <ClCompile Include="src/ServerStat.cpp" />
@@ -135,15 +141,9 @@
     <ClCompile Include="src/Upc.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
     <ClCompile Include="src/Version.cpp" />
+    <ClCompile Include="src/Visit.cpp" />
     <ClCompile Include="src/XrfFile64.cpp" />
     <ClCompile Include="src/XrfRecord64.cpp" />
-    <ClCompile Include="src\ConnectionAdmin.cpp" />
-    <ClCompile Include="src\ConnectionBase.cpp" />
-    <ClCompile Include="src\ConnectionContext.cpp" />
-    <ClCompile Include="src\ConnectionFull.cpp" />
-    <ClCompile Include="src\ConnectionLite.cpp" />
-    <ClCompile Include="src\ConnectionPhantom.cpp" />
-    <ClCompile Include="src\ConnectionSearch.cpp" />
   </ItemGroup>
   <!-- END -->
   <PropertyGroup Label="Globals">

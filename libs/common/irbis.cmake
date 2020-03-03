@@ -3,6 +3,7 @@ set(HeaderFiles
 )
 
 set(CppFiles
+    ../irbis/src/Address.cpp
     ../irbis/src/AlphabetTable.cpp
     ../irbis/src/ByteNavigator.cpp
     ../irbis/src/ChunkedBuffer.cpp
@@ -53,8 +54,10 @@ set(CppFiles
     ../irbis/src/Phantom.cpp
     ../irbis/src/ProcessInfo.cpp
     ../irbis/src/RawRecord.cpp
+    ../irbis/src/Reader.cpp
     ../irbis/src/RecordField.cpp
     ../irbis/src/RecordSerializer.cpp
+    ../irbis/src/Registration.cpp
     ../irbis/src/Search.cpp
     ../irbis/src/ServerResponse.cpp
     ../irbis/src/ServerStat.cpp
@@ -70,6 +73,7 @@ set(CppFiles
     ../irbis/src/Upc.cpp
     ../irbis/src/UserInfo.cpp
     ../irbis/src/Version.cpp
+    ../irbis/src/Visit.cpp
     ../irbis/src/XrfFile64.cpp
     ../irbis/src/XrfRecord64.cpp
 )

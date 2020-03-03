@@ -49,14 +49,8 @@ RecordField RecordField::clone() const
     return result;
 }
 
-void RecordField::decode (const String &line)
+void RecordField::decodeBody (const String &body)
 {
-    const auto parts = maxSplit (line, L'#', 2);
-    this->tag = fastParse32 (parts[0]);
-    if (parts.size() == 1 || parts[1].empty()) {
-        return;
-    }
-    const auto body = parts[1];
     StringList all;
     if (body[0] == L'^') {
         all = split (body, L'^');
@@ -72,6 +66,17 @@ void RecordField::decode (const String &line)
             this->subfields.push_back (subField);
         }
     }
+}
+
+void RecordField::decode (const String &line)
+{
+    const auto parts = maxSplit (line, L'#', 2);
+    this->tag = fastParse32 (parts[0]);
+    if (parts.size() == 1 || parts[1].empty()) {
+        return;
+    }
+    const auto body = parts[1];
+    this->decodeBody (body);
 }
 
 bool RecordField::empty() const noexcept
