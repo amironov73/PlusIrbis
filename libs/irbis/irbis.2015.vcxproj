@@ -73,6 +73,7 @@
   <ItemGroup>
     <ClCompile Include="src/Address.cpp" />
     <ClCompile Include="src/AlphabetTable.cpp" />
+    <ClCompile Include="src/BookInfo.cpp" />
     <ClCompile Include="src/ByteNavigator.cpp" />
     <ClCompile Include="src/ChunkedBuffer.cpp" />
     <ClCompile Include="src/ClientQuery.cpp" />

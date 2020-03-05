@@ -197,7 +197,7 @@ GblResult Connection::globalCorrection(const GblSettings &settings)
     }
 
     // TODO implement
-    const auto db = iif (settings.database, this->database);  // NOLINT(performance-unnecessary-copy-initialization)
+    const auto db = choose (settings.database, this->database);  // NOLINT(performance-unnecessary-copy-initialization)
     ClientQuery query (*this, "5");
     query.addAnsi(db).newLine();
 
@@ -337,7 +337,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
     query.add (lockFlag).newLine();
     query.add (actualize).newLine();
     for (const auto record : records) {
-        const auto db = iif (record->database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
+        const auto db = choose (record->database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
         query.addAnsi (db).addAnsi (Text::IrbisDelimiter)
             .addUtf (record->encode(Text::IrbisDelimiter)).newLine();
     }
@@ -358,7 +358,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
 
             auto record = records[i];
             record->fields.clear();
-            record->database = iif (record->database, this->database);
+            record->database = choose (record->database, this->database);
             const auto recordLines = Text::fromFullDelimiter(line);
             record->decode(recordLines);
         }
@@ -379,7 +379,7 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
         return 0;
     }
 
-    const auto db = iif(record.database, this->database);
+    const auto db = choose (record.database, this->database);
     ClientQuery query(*this, "D");
     query.addAnsi(db).newLine();
     query.add(lockFlag).newLine();

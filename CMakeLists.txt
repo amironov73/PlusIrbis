@@ -5,10 +5,11 @@
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-option(WITH_TESTS    "Build with tests"             ON)
-option(WITH_COVERAGE "Build with code coverage"     OFF)
-option(WITH_APPS     "Build with apps"              ON)
-option(WITH_EXAMPLES "Build with examples"          ON)
+option(WITH_SHARED_LIBRARIES "Build with shared libraries" OFF)
+option(WITH_TESTS            "Build with tests"             ON)
+option(WITH_COVERAGE         "Build with code coverage"     OFF)
+option(WITH_APPS             "Build with apps"              ON)
+option(WITH_EXAMPLES         "Build with examples"          ON)
 
 # top level project
 project(PlusIrbis)

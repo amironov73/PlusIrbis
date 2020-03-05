@@ -5,6 +5,7 @@ set(HeaderFiles
 set(CppFiles
     ../irbis/src/Address.cpp
     ../irbis/src/AlphabetTable.cpp
+    ../irbis/src/BookInfo.cpp
     ../irbis/src/ByteNavigator.cpp
     ../irbis/src/ChunkedBuffer.cpp
     ../irbis/src/ClientQuery.cpp

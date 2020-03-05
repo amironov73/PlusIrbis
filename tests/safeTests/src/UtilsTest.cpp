@@ -53,73 +53,73 @@ TEST_CASE("toUpper_2", "[utils]")
     CHECK (irbis::toUpper (text) == "HELLO");
 }
 
-TEST_CASE("iif_1", "[utils]")
+TEST_CASE("choose_1", "[utils]")
 {
     const std::string s1 = "Hello", s2 = "World";
-    const auto s3 = irbis::iif (s1, s2);
+    const auto s3 = irbis::choose (s1, s2);
     CHECK (s1 == s3);
 }
 
-TEST_CASE("iif_2", "[utils]")
+TEST_CASE("choose_2", "[utils]")
 {
     const std::string s1, s2 = "World";
-    const auto s3 = irbis::iif (s1, s2);
+    const auto s3 = irbis::choose (s1, s2);
     CHECK (s2 == s3);
 }
 
-TEST_CASE("iif_3", "[utils]")
+TEST_CASE("choose_3", "[utils]")
 {
     const std::string s1 = "Hello", s2 = "World", s3 = "Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s1 == s4);
 }
 
-TEST_CASE("iif_4", "[utils]")
+TEST_CASE("choose_4", "[utils]")
 {
     const std::string s1, s2 = "World", s3 = "Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s2 == s4);
 }
 
-TEST_CASE("iif_5", "[utils]")
+TEST_CASE("choose_5", "[utils]")
 {
     const std::string s1, s2, s3 = "Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s3 == s4);
 }
 
-TEST_CASE("iif_6", "[utils]")
+TEST_CASE("choose_6", "[utils]")
 {
     const irbis::String s1 = L"Hello", s2 = L"World";
-    const auto s3 = irbis::iif (s1, s2);
+    const auto s3 = irbis::choose (s1, s2);
     CHECK (s1 == s3);
 }
 
-TEST_CASE("iif_7", "[utils]")
+TEST_CASE("choose_7", "[utils]")
 {
     const irbis::String s1, s2 = L"World";
-    const auto s3 = irbis::iif (s1, s2);
+    const auto s3 = irbis::choose (s1, s2);
     CHECK (s2 == s3);
 }
 
-TEST_CASE("iif_8", "[utils]")
+TEST_CASE("choose_8", "[utils]")
 {
     const irbis::String s1 = L"Hello", s2 = L"World", s3 = L"Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s1 == s4);
 }
 
-TEST_CASE("iif_9", "[utils]")
+TEST_CASE("choose_9", "[utils]")
 {
     const irbis::String s1, s2 = L"World", s3 = L"Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s2 == s4);
 }
 
-TEST_CASE("iif_10", "[utils]")
+TEST_CASE("choose_10", "[utils]")
 {
     const irbis::String s1, s2, s3 = L"Again";
-    const auto s4 = irbis::iif (s1, s2, s3);
+    const auto s4 = irbis::choose (s1, s2, s3);
     CHECK (s3 == s4);
 }
 

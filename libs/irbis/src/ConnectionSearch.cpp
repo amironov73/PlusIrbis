@@ -63,17 +63,17 @@ std::vector<TermPosting> ConnectionSearch::readPostings (const PostingParameters
         return result;
     }
 
-    const auto db = iif(parameters.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
+    const auto db = choose (parameters.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
     ClientQuery query (*this, "I");
-    query.addAnsi(db).newLine();
-    query.add(parameters.numberOfPostings).newLine();
-    query.add(parameters.firstPosting).newLine();
-    query.addFormat(parameters.format);
+    query.addAnsi (db).newLine();
+    query.add (parameters.numberOfPostings).newLine();
+    query.add (parameters.firstPosting).newLine();
+    query.addFormat (parameters.format);
     if (!parameters.listOfTerms.empty()) {
-        query.addUtf(parameters.term).newLine();
+        query.addUtf (parameters.term).newLine();
     } else {
         for (const auto &term : parameters.listOfTerms) {
-            query.addUtf(term).newLine();
+            query.addUtf (term).newLine();
         }
     }
 
@@ -106,22 +106,22 @@ std::vector<TermInfo> ConnectionSearch::readTerms(const TermParameters &paramete
     }
 
     const std::string command = parameters.reverseOrder ? "P" : "H";
-    const auto db = iif(parameters.database, this->database);
+    const auto db = choose (parameters.database, this->database);
     ClientQuery query (*this, command);
-    query.addAnsi(db).newLine();
-    query.addUtf(parameters.startTerm).newLine();
-    query.add(parameters.numberOfTerms).newLine();
-    query.addFormat(parameters.format);
+    query.addAnsi (db).newLine();
+    query.addUtf (parameters.startTerm).newLine();
+    query.add (parameters.numberOfTerms).newLine();
+    query.addFormat (parameters.format);
     ServerResponse response (*this, query);
     if (!response.success()) {
         return result;
     }
-    if (!response.checkReturnCode(3, -202, -203, -204)) {
+    if (!response.checkReturnCode (3, -202, -203, -204)) {
         return result;
     }
 
     const auto lines = response.readRemainingUtfLines();
-    result = TermInfo::parse(lines);
+    result = TermInfo::parse (lines);
 
     return result;
 }
@@ -156,16 +156,16 @@ MfnList ConnectionSearch::search (const SearchParameters &parameters)
         return result;
     }
 
-    const auto &databaseName = iif(parameters.database, this->database);
+    const auto &databaseName = choose (parameters.database, this->database);
     ClientQuery query (*this, "K");
-    query.addAnsi(databaseName).newLine()
-            .addUtf(parameters.searchExpression).newLine()
-            .add(parameters.numberOfRecords).newLine()
-            .add(parameters.firstRecord).newLine()
-            .addAnsi(parameters.formatSpecification).newLine()
-            .add(parameters.minMfn).newLine()
-            .add(parameters.maxMfn).newLine()
-            .addAnsi(parameters.sequentialSpecification);
+    query.addAnsi (databaseName).newLine()
+            .addUtf (parameters.searchExpression).newLine()
+            .add (parameters.numberOfRecords).newLine()
+            .add (parameters.firstRecord).newLine()
+            .addAnsi (parameters.formatSpecification).newLine()
+            .add (parameters.minMfn).newLine()
+            .add (parameters.maxMfn).newLine()
+            .addAnsi (parameters.sequentialSpecification);
 
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {

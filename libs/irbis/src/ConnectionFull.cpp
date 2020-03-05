@@ -121,7 +121,7 @@ int ConnectionFull::writeRecord (MarcRecord &record, bool lockFlag, bool actuali
         return 0;
     }
 
-    const auto db = iif (record.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
+    const auto db = choose (record.database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
     ClientQuery query (*this, "D");
     query.addAnsi (db).newLine();
     query.add (lockFlag).newLine();

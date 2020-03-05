@@ -8,6 +8,7 @@ project(safeTests)
 
 set(CppFiles
     src/AlphabetTableTest.cpp
+    src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
     src/DateTest.cpp
     src/EanTest.cpp
@@ -15,12 +16,14 @@ set(CppFiles
     src/ExemplarTest.cpp
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
+    src/FrugalTest.cpp
     src/IOTest.cpp
     src/IsbnTest.cpp
     src/Iso2709Test.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
     src/OptFileTest.cpp
+    src/OptionalTest.cpp
     src/ParFileTest.cpp
     src/PointerGuardTest.cpp
     src/ReaderTest.cpp

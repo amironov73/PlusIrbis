@@ -312,10 +312,20 @@ bool TextNavigator::isWhitespace() const noexcept
     return std::iswspace(c);
 }
 
+/// \brief Извлечение целого числа без знака.
+WideSpan TextNavigator::extractInteger() noexcept
+{
+    // Сначала пропускаем нечисловые символы
+    while (!this->eot() && !this->isDigit()) {
+        this->readChar();
+    }
+    return this->readInteger();
+}
+
 /// \brief Чтение целого числа без знака.
 WideSpan TextNavigator::readInteger() noexcept
 {
-    WideSpan result {this->_text, 0 };
+    WideSpan result { this->_text, 0 };
 
     while (this->isDigit()) {
         ++result.length;

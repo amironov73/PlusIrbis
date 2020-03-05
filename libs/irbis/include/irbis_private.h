@@ -19,6 +19,121 @@ namespace irbis
 
 //=========================================================
 
+/// \brief Простой контейнер для случаев,
+/// когда предполагается, что элементов будет мало - один или два.
+template <class T>
+class Frugal
+{
+public:
+
+    Frugal() = default;
+    ~Frugal() {
+        if (this->_array) {
+            delete[] this->_array;
+        }
+    }
+
+    class iterator : public std::iterator<std::input_iterator_tag, T>
+    {
+    public:
+        iterator(Frugal<T> &container, std::size_t pos)
+                : _container (container), _position (pos) {}
+
+        bool operator == (const iterator &other) { return this->_position == other._position; }
+        bool operator != (const iterator &other) { return this->_position != other._position; }
+        iterator& operator ++() { ++this->_position; return *this; }
+        T& operator *() { return this->_container[this->_position]; }
+        T& operator ->() { return this->_container[this->_position]; }
+
+    private:
+        Frugal<T> &_container;
+        std::size_t _position;
+    };
+
+    T& operator [] (std::size_t offset)
+    {
+        switch (offset) {
+            case 0: return this->_first;
+            case 1: return this->_second;
+            default: return this->_array[offset - 2];
+        }
+    }
+
+    iterator begin() { return iterator (*this, 0); }
+    iterator end() { return iterator (*this, this->_size); }
+    T& front() { return (*this)[0]; }
+    T& back() { return (*this)[this->_size - 1]; }
+    std::size_t capacity() const noexcept { return this->_capacity + 2; }
+    void clear() noexcept { this->_size = 0; }
+    bool empty() const noexcept { return this->_size == 0; }
+    std::size_t size() const noexcept  { return this->_size; }
+    std::vector<T> toVector()
+    {
+        std::vector<T> result;
+        result.reserve (this->size());
+        result.insert (std::end(result), std::begin(*this), std::end(*this));
+        return result;
+    }
+    void push_back (const T &value)
+    {
+        switch (this->_size) {
+            case 0: this->_first = value; break;
+            case 1: this->_second = value; break;
+            default:
+                if (this->_size - 2 == this->_capacity) {
+                    this->_enlarge();
+                }
+                this->_array[this->_size - 2] = value;
+                break;
+        }
+        ++this->_size;
+    }
+    template <class... Args>
+    T& emplace_back (Args&&... args)
+    {
+        T * place;
+        switch (this->_size) {
+            case 0: place = &this->_first; break;
+            case 1: place = &this->_second; break;
+            default:
+                if (this->_size - 2 == this->_capacity) {
+                    this->_enlarge();
+                }
+                place = this->_array + this->_size - 2;
+                break;
+        }
+        T *value = new (place) T(args...);
+        ++this->_size;
+        return *value;
+    }
+
+private:
+    std::size_t _size { 0 };
+    std::size_t _capacity { 0 };
+    T *_array { nullptr };
+    T _first {};
+    T _second {};
+
+    void _enlarge() {
+        std::size_t  oldSize = this->_capacity;
+        std::size_t newSize = oldSize * 2;
+        if (newSize <= 4) {
+            newSize = 4;
+        }
+
+        T *newArray = new T[newSize];
+        if (this->_array) {
+            std::copy (this->_array, this->_array + oldSize, newArray);
+            delete[] this->_array;
+        }
+
+        this->_array = newArray;
+        this->_capacity = newSize;
+    }
+};
+
+//=========================================================
+
 /// \brief Простая освобождалка памяти.
 template <typename T>
 class IRBIS_API PointerGuard final
@@ -460,6 +575,7 @@ public:
     bool isDigit() const noexcept;
     bool isLetter() const noexcept;
     bool isWhitespace() const noexcept;
+    WideSpan extractInteger() noexcept;
     WideSpan readInteger() noexcept;
     WideSpan readString (std::size_t length) noexcept;
     WideSpan readTo (Char stopChar) noexcept;
@@ -481,8 +597,46 @@ private:
 
 // Utilities
 
+/// \brief Выбор первой непустой строки из произвольного количества.
+template<class T> T choose (T first) { return first; }
+
+/// \brief Выбор первой непустой строки из произвольного количества.
+template<class T1, class... T2>
+T1 choose (const T1& first, const T2&... others)
+{
+    if (!first.empty()) {
+        return first;
+    }
+    return choose (others...);
+}
+
+/// \brief Является ли данный элемент одним из перечисленных?
+template<class T> bool oneOf (T left, T right) { return left == right; }
+
+/// \brief Является ли данный элемент одним из перечисленных?
+template<class T1, class... T2>
+bool oneOf (const T1& first, const T1& second, const T2& ... others)
+{
+    if (oneOf (first, second)) {
+        return true;
+    }
+    return oneOf (first, others...);
+}
+
+/// \brief Безопасное извлечение элемента из контейнера.
+template<typename T1, typename T2>
+typename T1::value_type safeAt (const T1& container, T2 index)
+{
+    if (index >= container.size()) {
+        return typename T1::value_type();
+    }
+    return container[index];
+}
+
 IRBIS_API bool sameChar   (Char first, Char second) noexcept;
 IRBIS_API bool sameString (const String &first, const String &second) noexcept;
+IRBIS_API Char firstChar  (const String &text)      noexcept;
+IRBIS_API char firstChar  (const std::string &text) noexcept;
 
 IRBIS_API String toLower      (String &text)      noexcept;
 IRBIS_API std::string toLower (std::string &text) noexcept;
@@ -514,14 +668,6 @@ IRBIS_API unsigned int fastParseUnsigned32 (const Char *text, std::size_t length
 IRBIS_API unsigned int fastParseUnsigned32 (const std::string &text);
 IRBIS_API unsigned int fastParseUnsigned32 (const char *text);
 IRBIS_API unsigned int fastParseUnsigned32 (const char *text, std::size_t length);
-
-IRBIS_API const std::string& iif(const std::string &s1, const std::string &s2);
-IRBIS_API const String& iif(const String &s1, const String &s2);
-IRBIS_API const std::string& iif(const std::string &s1, const std::string &s2, const std::string &s3);
-IRBIS_API const String& iif(const String& s1, const String &s2, const String &s3);
-
-IRBIS_API std::string safeAt (const std::vector<std::string> &list, std::size_t index);
-IRBIS_API String safeAt (const StringList &list, std::size_t index);
 
 IRBIS_API std::vector<std::string> split(const std::string &text, char delimiter);
 IRBIS_API StringList split(const String &text, Char delimiter);

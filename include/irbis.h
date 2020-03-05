@@ -303,6 +303,32 @@ public:
 
 //=========================================================
 
+/// \brief Опциональное значение.
+/// \tparam T Тип элемента.
+template<class T>
+class Optional
+{
+public:
+    T value; ///< Хранимое значение (если есть)
+    bool hasValue { false }; ///< Содержит ли значение?
+
+    Optional() = default;
+    explicit Optional (T value_) : value (value_), hasValue (true) {}
+    Optional (const Optional<T> &other)
+        : value (other.value), hasValue (other.hasValue) {}
+    Optional& operator = (const Optional<T> &other)
+        { if (this != &other) { this->value = other.value; this->hasValue = other.value; } return *this; }
+    Optional& operator = (const T &newValue)
+        { this->value = newValue; this->hasValue = true; return *this; }
+
+    explicit operator bool() const noexcept { return this->hasValue; }
+    T operator *() const noexcept { return value; }
+    void reset() noexcept { this->hasValue = false; }
+    T valueOr (const T& alternative) { return this->hasValue ? this->value : alternative; }
+};
+
+//=========================================================
+
 /// \brief Непрерывный кусок памяти.
 /// \tparam T Тип элемента.
 template<class T>
@@ -1392,6 +1418,43 @@ private:
 
 //=========================================================
 
+/// \brief Самая общая информация о книге.
+class IRBIS_API BookInfo final
+{
+public:
+
+    String description;
+    String firstAuthor;
+    String character;
+    String title;
+    String type;
+    String kind;
+    String worksheet;
+
+    MarcRecord *record;
+
+    explicit BookInfo (MarcRecord *record_);
+
+    int amount();
+    StringList authors();
+    bool electronic();
+    std::vector<Exemplar> exemplars();
+    bool foreign();
+    StringList languages();
+    String link();
+    int pages();
+    float price();
+    StringList publishers();
+    int usage();
+    String volume();
+    int year();
+
+private:
+    String fm (int tag, Char code=0) const;
+};
+
+//=========================================================
+
 /// \brief Спецификация имени файла.
 class IRBIS_API FileSpecification final
 {
@@ -1627,7 +1690,7 @@ public:
     MarcRecord& operator = (MarcRecord &&other) = default;      ///< Оператор перемещения.
     ~MarcRecord() = default;                                    ///< Деструктор.
 
-    RecordField& add (int tag, const String &value);
+    RecordField& add (int tag, const String &value = L"");
     MarcRecord clone() const;
     void decode (const StringList &lines);
     bool deleted() const noexcept;

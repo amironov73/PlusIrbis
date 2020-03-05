@@ -69,6 +69,23 @@ bool sameString (const String &first, const String &second) noexcept
         [] (Char a, Char b) { return towupper (a) == towupper (b); });
 }
 
+/// \brief Первый символ строки.
+/// \param text Текст.
+/// \return Первый символ либо 0.
+Char firstChar (const String &text) noexcept
+{
+    return text.empty() ? L'\0' : text[0];
+}
+
+/// \brief Первый символ строки.
+/// \param text Текст.
+/// \return Первый символ либо 0.
+char firstChar (const std::string &text) noexcept
+{
+    return text.empty() ? '\0' : text[0];
+}
+
+
 /// \brief Преобразование строки к нижнему регистру.
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
@@ -551,29 +568,29 @@ const std::wstring& iif (const String &s1, const String &s2, const String &s3)
     return s3;
 }
 
-///
-/// \param list
-/// \param index
-/// \return
-String safeAt (const StringList &list, std::size_t index)
-{
-    if (index >= list.size()) {
-        return std::wstring();
-    }
-    return list.at(index);
-}
-
-///
-/// \param list
-/// \param index
-/// \return
-std::string safeAt (const std::vector<std::string> &list, std::size_t index)
-{
-    if (index >= list.size()) {
-        return std::string();
-    }
-    return list.at(index);
-}
+/////
+///// \param list
+///// \param index
+///// \return
+//String safeAt (const StringList &list, std::size_t index)
+//{
+//    if (index >= list.size()) {
+//        return std::wstring();
+//    }
+//    return list.at(index);
+//}
+//
+/////
+///// \param list
+///// \param index
+///// \return
+//std::string safeAt (const std::vector<std::string> &list, std::size_t index)
+//{
+//    if (index >= list.size()) {
+//        return std::string();
+//    }
+//    return list.at(index);
+//}
 
 ///
 /// \param text
