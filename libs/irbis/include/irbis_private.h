@@ -297,6 +297,29 @@ public:
 
 //=========================================================
 
+/// \brief Блок памяти из пула.
+struct IRBIS_API MemoryBlock final
+{
+    void *pointer    { nullptr }; ///< Указатель на кусок памяти.
+    std::size_t size { 0 };       ///< Размер блока.
+};
+
+/// \brief Пул памяти.
+class IRBIS_API MemoryPool final
+{
+public:
+    static MemoryPool& instance();
+    MemoryBlock rent (std::size_t size);
+    void release (MemoryBlock block);
+    void reset ();
+
+private:
+    std::list<MemoryBlock> _used;
+    std::list<MemoryBlock> _free;
+};
+
+//=========================================================
+
 /// \brief Утилиты для ввода-вывода.
 class IRBIS_API IO final
 {

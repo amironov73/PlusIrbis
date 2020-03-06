@@ -8,32 +8,35 @@
 
     \class irbis::Address
 
-    \var postcode
-        Почтовый индекс, подполе a.
+    \var irbis::Address::TAG
+        \brief Метка поля для адреса.
 
-    \var country
-        Страна/республика, подполе b.
+    \var irbis::Address::postcode
+        \brief Почтовый индекс, подполе a.
 
-    \var city
-        Город, подполе c.
+    \var irbis::Address::country
+        \brief Страна/республика, подполе b.
 
-    \var street
-        Улица, подполе d.
+    \var irbis::Address::city
+        \brief Город, подполе c.
 
-    \var building
-        Номер дома, подполе e.
+    \var irbis::Address::street
+        \brief Улица, подполе d.
 
-    \var entrance
-        Номер подъезда, подполе g.
+    \var irbis::Address::building
+        \brief Номер дома, подполе e.
 
-    \var apartment
-        Номер квартиры, подполе h.
+    \var irbis::Address::entrance
+        \brief Номер подъезда, подполе g.
 
-    \var additional
-        Дополнительные данные, подполе f.
+    \var irbis::Address::apartment
+        \brief Номер квартиры, подполе h.
 
-    \var field
-        Поле, из которого извлечены данные об адресе.
+    \var irbis::Address::additional
+        \brief Дополнительные данные, подполе f.
+
+    \var irbis::Address::field
+        \brief Поле, из которого извлечены данные об адресе.
 
  */
 

@@ -11,12 +11,36 @@
 
     \class irbis::BookInfo
 
+    \var irbis::BookInfo::description
+        \brief Библиографическое описание.
+
+    \var irbis::BookInfo::firstAuthor
+        \brief Первый автор.
+
+    \var irbis::BookInfo::character
+        \brief Характер документа.
+
+    \var irbis::BookInfo::title
+        \brief Заглавие.
+
+    \var irbis::BookInfo::type
+        \brief Тип документа.
+
+    \var irbis::BookInfo::kind
+        \brief Вид документа.
+
+    \var irbis::BookInfo::worksheet
+        \brief Рабочий лист.
+
+    \var irbis::BookInfo::record
+        \brief Запись, из которой были извлечены сведения.
+
  */
 
 namespace irbis {
 
 /// \brief Конструктор.
-/// \param record_ Запись.
+/// \param record_ Запись, из которой необходимо извлечь сведения о документе.
 BookInfo::BookInfo (MarcRecord *record_)
 {
     assert (record_ != nullptr);
@@ -30,7 +54,7 @@ BookInfo::BookInfo (MarcRecord *record_)
 }
 
 /// \brief Количество экземпляров.
-/// \return
+/// \return Общее число экземпляров, либо 0, если извлечь сведения не удалось.
 int BookInfo::amount()
 {
     int result = 0;
@@ -49,7 +73,7 @@ int BookInfo::amount()
 }
 
 /// \brief Авторы.
-/// \return
+/// \return Вектор авторов.
 StringList BookInfo::authors()
 {
     StringList result;
@@ -65,7 +89,7 @@ StringList BookInfo::authors()
 }
 
 /// \brief Электронный ресурс?
-/// \return
+/// \return true, если электронный.
 bool BookInfo::electronic()
 {
     // Электронными считаются:
@@ -116,14 +140,14 @@ bool BookInfo::foreign()
 }
 
 /// \brief Языки документа.
-/// \return
+/// \return Вектор языков.
 StringList BookInfo::languages()
 {
     return this->record->fma (101);
 }
 
 /// \brief Первая ссиылка на электронный ресурс.
-/// \return
+/// \return Адрес.
 String BookInfo::link()
 {
     const auto all951 = this->record->getFields (951);
@@ -140,7 +164,7 @@ String BookInfo::link()
 }
 
 /// \brief Количество страниц.
-/// \return
+/// \return Число страниц, либо 0, если не удалось извлечь сведения.
 int BookInfo::pages()
 {
     const auto volume = this->volume();
@@ -151,7 +175,7 @@ int BookInfo::pages()
 }
 
 /// \brief Цена, общая для всех экземпляров.
-/// \return
+/// \return Цена, либо 0, если не удалсь извлечь сведения.
 float BookInfo::price()
 {
     const auto text = this->fm (10, 'd');
@@ -159,7 +183,7 @@ float BookInfo::price()
 }
 
 /// \brief Издательства.
-/// \return
+/// \return Вектор издательств.
 StringList BookInfo::publishers()
 {
     StringList result = this->record->fma (210, 'c');
@@ -169,7 +193,7 @@ StringList BookInfo::publishers()
 }
 
 /// \brief Счетчик выдач.
-/// \return
+/// \return Число выдач, либо 0, если не удалсь извлечь сведения.
 int BookInfo::usage()
 {
     const auto text = this->fm (999);
@@ -177,13 +201,14 @@ int BookInfo::usage()
 }
 
 /// \brief Объем издания (цифры).
+/// \return Объем, либо 0, если не удалось извлечь сведения.
 String BookInfo::volume()
 {
     return this->fm (215, 'a');
 }
 
 /// \brief Год издания.
-/// \return
+/// \return Год издания, либо 0, если не удалось извлечь сведения.
 int BookInfo::year()
 {
     auto text = this->fm (210, 'd');

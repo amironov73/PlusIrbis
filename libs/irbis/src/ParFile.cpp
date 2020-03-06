@@ -82,7 +82,7 @@ namespace irbis {
 /// \param path Предполагается, что все файлы базы располагаются по указанному пути.
 void ParFile::assign (const String &path)
 {
-    assert(!path.empty());
+    assert (!path.empty());
 
     this->mst = path;
     this->xrf = path;
@@ -148,6 +148,18 @@ std::map<int, String> ParFile::toDictionary() const
     result[10] = this->pft;
     result[11] = this->ext;
 
+    return result;
+}
+
+/// \brief Чтение из локального файла.
+/// \param path
+/// \return
+ParFile ParFile::readLocalFile (const String &path)
+{
+    assert (!path.empty());
+    const auto lines = Text::readAnsiLines (path);
+    ParFile result;
+    result.parse (lines);
     return result;
 }
 

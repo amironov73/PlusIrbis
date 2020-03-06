@@ -10,7 +10,7 @@
 #pragma warning(disable: 4068)
 #endif
 
-TEST_CASE("ParFile_assign_1", "[par]")
+TEST_CASE ("ParFile_assign_1", "[par]")
 {
     irbis::ParFile par;
     par.assign (L"IBIS");
@@ -21,7 +21,7 @@ TEST_CASE("ParFile_assign_1", "[par]")
 
 TEST_CASE("ParFile_parse_1", "[par]")
 {
-    auto path = irbis::IO::combinePath (whereTestData(), L"ibis.par");
+    auto path = irbis::IO::combinePath (whereDatai(), L"ibis.par");
     irbis::IO::convertSlashes (path);
     REQUIRE (irbis::IO::fileExist (path));
     const auto lines = irbis::Text::readAnsiLines (path);

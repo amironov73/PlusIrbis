@@ -63,6 +63,7 @@
     <ClCompile Include="src/BookInfoTest.cpp" />
     <ClCompile Include="src/ByteNavigatorTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
+    <ClCompile Include="src/DirectAccessTest.cpp" />
     <ClCompile Include="src/EanTest.cpp" />
     <ClCompile Include="src/EncodingTest.cpp" />
     <ClCompile Include="src/ExemplarTest.cpp" />
@@ -73,10 +74,12 @@
     <ClCompile Include="src/IsbnTest.cpp" />
     <ClCompile Include="src/Iso2709Test.cpp" />
     <ClCompile Include="src/MarcRecordTest.cpp" />
+    <ClCompile Include="src/MemoryPoolTest.cpp" />
     <ClCompile Include="src/OptFileTest.cpp" />
     <ClCompile Include="src/OptionalTest.cpp" />
     <ClCompile Include="src/ParFileTest.cpp" />
     <ClCompile Include="src/PointerGuardTest.cpp" />
+    <ClCompile Include="src/RangeTest.cpp" />
     <ClCompile Include="src/ReaderTest.cpp" />
     <ClCompile Include="src/RecordFieldTest.cpp" />
     <ClCompile Include="src/ResultTest.cpp" />

@@ -28,12 +28,22 @@ irbis::String whereTestData()
     }
 }
 
+/// \brief Где у нас лежит ИРБИС64.
+/// \return Путь к папке `Irbis64` (включая её саму).
+irbis::String whereIrbis64()
+{
+    auto result = whereTestData();
+    result = irbis::IO::combinePath(result, L"Irbis64");
+    irbis::IO::convertSlashes(result);
+    return result;
+}
+
 /// \brief Где у нас лежит `Datai` для ИРБИС64.
 /// \return Путь к папке `Datai` (включая её саму).
 irbis::String whereDatai()
 {
-    auto result = whereTestData();
-    result = irbis::IO::combinePath(result, L"Irbis64/Datai");
+    auto result = whereIrbis64();
+    result = irbis::IO::combinePath(result, L"Datai");
     irbis::IO::convertSlashes(result);
     return result;
 }

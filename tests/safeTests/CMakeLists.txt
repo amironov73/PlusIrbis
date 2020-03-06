@@ -11,6 +11,7 @@ set(CppFiles
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
     src/DateTest.cpp
+    src/DirectAccessTest.cpp
     src/EanTest.cpp
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
@@ -22,10 +23,12 @@ set(CppFiles
     src/Iso2709Test.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
+    src/MemoryPoolTest.cpp
     src/OptFileTest.cpp
     src/OptionalTest.cpp
     src/ParFileTest.cpp
     src/PointerGuardTest.cpp
+    src/RangeTest.cpp
     src/ReaderTest.cpp
     src/RecordFieldTest.cpp
     src/ResultTest.cpp

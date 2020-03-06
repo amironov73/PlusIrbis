@@ -10,6 +10,7 @@ irbis::String whereTestData();
 irbis::String whereDatai();
 irbis::String whereDeposit();
 irbis::String whereIbis();
+irbis::String whereIrbis64();
 irbis::String whereTemp();
 
 #endif

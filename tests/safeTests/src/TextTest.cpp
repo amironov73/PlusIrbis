@@ -204,7 +204,7 @@ TEST_CASE("Text_fromShortDelimiter_1", "[text]")
 
 TEST_CASE("Text_readAllAnsi_1", "[text]")
 {
-    auto path = whereTestData();
+    auto path = whereDatai();
     REQUIRE (!path.empty());
     path = irbis::IO::combinePath (path, L"ibis.par");
     irbis::IO::convertSlashes (path);
@@ -226,7 +226,7 @@ TEST_CASE("Text_readAllUtf_1", "[text]")
 
 TEST_CASE("Text_readAnsiLines_1", "[text]")
 {
-    auto path = whereTestData();
+    auto path = whereDatai();
     REQUIRE (!path.empty());
     path = irbis::IO::combinePath (path, L"ibis.par");
     irbis::IO::convertSlashes (path);

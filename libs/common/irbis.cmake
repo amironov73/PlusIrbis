@@ -42,6 +42,7 @@ set(CppFiles
     ../irbis/src/Lite.cpp
     ../irbis/src/MarcRecord.cpp
     ../irbis/src/MemoryChunk.cpp
+    ../irbis/src/MemoryPool.cpp
     ../irbis/src/MenuEntry.cpp
     ../irbis/src/MenuFile.cpp
     ../irbis/src/MstControlRecord64.cpp

@@ -802,6 +802,58 @@ public:
 
 //=========================================================
 
+/// \brief Диапазон, задаваемый двумя итераторами.
+/// \tparam T Тип итератора.
+template<class T>
+class Range
+{
+public:
+
+    Range (T begin_, T end_) : _begin (begin_), _current (begin_), _end (end_) {}
+
+    /// \brief Начало диапазона (включительно).
+    T begin() const noexcept { return this->_begin; }
+
+    /// \brief Текущая позиция итератора (может указывать на конец).
+    T current() const noexcept { return this->_current; }
+
+    /// \brief Пустой диапазон?
+    /// \return true, если пустой.
+    bool empty() const noexcept { return !(this->_begin != this->_end); }
+
+    /// \brief Конец диапазона (не включается).
+    T end() const noexcept { return this->_end; }
+
+    /// \brief Переход к следующему элементу.
+    /// \return true, если был выполнен шаг вперед.
+    bool moveNext()
+    {
+        if (this->_current != this->_end) {
+            ++this->_current;
+            return this->_current != this->_end;
+        }
+        return false;
+    }
+
+    void reset() noexcept { this->_current = this->_begin; }
+
+    /// \brief Значение в текущей позиции.
+    auto value() { return *(this->current()); }
+
+private:
+    T _begin;   // Начало диапазона (включается).
+    T _current; // Текущая позиция.
+    T _end;     // Конец диапазона (не включается).
+};
+
+template<class T>
+Range<typename T::iterator> makeRange (T& value)
+{
+    return Range<typename T::iterator> (std::begin (value), std::end (value));
+}
+
+//=========================================================
+
 /// \brief Базовое исключение для всех нештатных ситуаций.
 class IRBIS_API IrbisException
         : public std::exception
@@ -1155,8 +1207,8 @@ public:
     bool databaseLocked { false };    ///< Признак блокировки базы данных в целом.
     bool readOnly { false };          ///< База данных доступна только для чтения.
 
-    void parse(ServerResponse &response);
-    static std::vector<DatabaseInfo> parse(const MenuFile &menu);
+    void parse (ServerResponse &response);
+    static std::vector<DatabaseInfo> parse (const MenuFile &menu);
     String toString() const;
 };
 
@@ -1179,15 +1231,15 @@ public:
     XrfFile64 *xrf;
     String database;
 
-    DirectAccess64(const String &path);
-    DirectAccess64(const DirectAccess64 &) = delete;
-    DirectAccess64(const DirectAccess64 &&) = delete;
+    DirectAccess64 (const String &parPath, const String &systemPath);
+    DirectAccess64 (const DirectAccess64 &) = delete;
+    DirectAccess64 (const DirectAccess64 &&) = delete;
     DirectAccess64& operator = (const DirectAccess64 &) = delete;
     DirectAccess64& operator = (const DirectAccess64 &&) = delete;
     ~DirectAccess64();
 
-    MstRecord64 readRawRecord(unsigned int mfn);
-    MarcRecord readRecord(unsigned int mfn);
+    MstRecord64 readRawRecord (unsigned int mfn);
+    MarcRecord readRecord     (unsigned int mfn);
 };
 
 //=========================================================
@@ -1929,6 +1981,7 @@ public:
 
     void assign (const String &path);
     void parse (const StringList &lines);
+    static ParFile readLocalFile (const String &path);
     std::map<int, String> toDictionary() const;
 };
 
