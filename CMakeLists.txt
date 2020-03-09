@@ -6,20 +6,21 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
 option(WITH_SHARED_LIBRARIES "Build with shared libraries" OFF)
-option(WITH_TESTS            "Build with tests"             ON)
-option(WITH_COVERAGE         "Build with code coverage"     OFF)
-option(WITH_APPS             "Build with apps"              ON)
-option(WITH_EXAMPLES         "Build with examples"          ON)
+option(WITH_TESTS            "Build with tests"            ON)
+option(WITH_COVERAGE         "Build with code coverage"    OFF)
+option(WITH_APPS             "Build with apps"             ON)
+option(WITH_EXAMPLES         "Build with examples"         ON)
 
 # top level project
 project(PlusIrbis)
 
 # force C++11
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # compiler-dependent definitions
 if(MSVC)
-    add_compile_options(/UTF-8)
+    add_compile_options(/UTF-8 /permissive-)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
     # g++ or clang++

@@ -8,56 +8,56 @@
 
     \class irbis::Visit
 
-    \var database
-        Имя БД каталога, подполе g.
+    \var irbis::Visit::database
+        \brief Имя БД каталога, подполе g.
 
-    \var index
-        Шифр документа, подполе a.
+    \var irbis::Visit::index
+        \brief Шифр документа, подполе a.
 
-    \var inventory
-        Инвентарный номер экземпляра, подполе b.
+    \var irbis::Visit::inventory
+        \brief Инвентарный номер экземпляра, подполе b.
 
-    \var barcode
-        Штрих-код экземпляра, подполе h.
+    \var irbis::Visit::barcode
+        \brief Штрих-код экземпляра, подполе h.
 
-    \var sigla
-        Место хранения экземпляра, подполе k.
+    \var irbis::Visit::sigla
+        \brief Место хранения экземпляра, подполе k.
 
-    \var given
-        Дата выдачи, подполе d.
+    \var irbis::Visit::given
+        \brief Дата выдачи, подполе d.
 
-    \var department
-        Место выдачи, подполе v.
+    \var irbis::Visit::department
+        \brief Место выдачи, подполе v.
 
-    \var expected
-        Дата предполагаемого возврата, подполе e.
+    \var irbis::Visit::expected
+        \brief Дата предполагаемого возврата, подполе e.
 
-    \var returned
-        Дата фактического возврата, подполе f.
+    \var irbis::Visit::returned
+        \brief Дата фактического возврата, подполе f.
 
-    \var prolong
-        Дата продления, подполе l.
+    \var irbis::Visit::prolong
+        \brief Дата продления, подполе l.
 
-    \var lost
-        Признак утерянной книги, подполе u.
+    \var irbis::Visit::lost
+        \brief Признак утерянной книги, подполе u.
 
-    \var description
-        Краткое библиографическое описание, подполе c.
+    \var irbis::Visit::description
+        \brief Краткое библиографическое описание, подполе c.
 
-    \var responsible
-        Ответственное лицо, подполе i.
+    \var irbis::Visit::responsible
+        \brief Ответственное лицо, подполе i.
 
-    \var timeIn
-        Время начала визита в библиотеку, подполе 1.
+    \var irbis::Visit::timeIn
+        \brief Время начала визита в библиотеку, подполе 1.
 
-    \var timeOut
-        Время окончания визита в библиотеку, подполе 2.
+    \var irbis::Visit::timeOut
+        \brief Время окончания визита в библиотеку, подполе 2.
 
-    \var count
-        Счетчик продлений, подполе 4.
+    \var irbis::Visit::count
+        \brief Счетчик продлений, подполе 4.
 
-    \var field
-        Поле, из которого извлечены данные о посещении.
+    \var irbis::Visit::field
+        \brief Поле, из которого извлечены данные о посещении.
 
  */
 

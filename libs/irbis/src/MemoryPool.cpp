@@ -28,11 +28,9 @@ MemoryBlock MemoryPool::rent (std::size_t size)
 {
     assert (size > 0);
     // TODO implement
-    MemoryBlock result
-    {
-        ::malloc (size),
-        size
-    };
+    MemoryBlock result;
+    result.pointer = ::malloc (size);
+    result.size = size;
     this->_used.push_front (result);
     return result;
 }

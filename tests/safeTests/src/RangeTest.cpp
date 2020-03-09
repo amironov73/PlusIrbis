@@ -19,11 +19,11 @@ TEST_CASE("makeRange_2", "[range]")
     std::vector<int> v { 1, 2, 3 };
     auto range = irbis::makeRange (v);
     CHECK_FALSE (range.empty());
-    CHECK (range.value() == 1);
+    CHECK (*range.current() == 1);
     CHECK (range.moveNext());
-    CHECK (range.value() == 2);
+    CHECK (*range.current() == 2);
     CHECK (range.moveNext());
-    CHECK (range.value() == 3);
+    CHECK (*range.current() == 3);
     CHECK_FALSE (range.moveNext());
     CHECK_FALSE (range.moveNext());
 }

@@ -837,8 +837,8 @@ public:
 
     void reset() noexcept { this->_current = this->_begin; }
 
-    /// \brief Значение в текущей позиции.
-    auto value() { return *(this->current()); }
+    // /// \brief Значение в текущей позиции.
+    // typename T::iter_value_t value() { return *(this->current()); }
 
 private:
     T _begin;   // Начало диапазона (включается).
@@ -1303,7 +1303,7 @@ public:
 class IRBIS_API Exemplar final
 {
 public:
-    static const int TAG = 910;
+    static const int TAG = 910; ///< Метка поля для экземпляра.
 
     String status;
     String number;
@@ -1349,7 +1349,7 @@ private:
 class IRBIS_API Visit final
 {
 public:
-    static const int TAG = 40;
+    static const int TAG = 40; ///< Метка поля для посещения/книговыдачи.
 
     String database;
     String index;
@@ -1466,6 +1466,34 @@ public:
 
 private:
     String fm (int tag, Char code=0) const noexcept;
+};
+
+//=========================================================
+
+/// \brief Информация об авторе.
+class IRBIS_API Author final
+{
+public:
+
+    String familyName;
+    String initials;
+    String fullName;
+    String canBeInverted;
+    String postfix;
+    String appendix;
+    String number;
+    String dates;
+    String variant;
+    String workplace;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field_) const;
+    void parse (const RecordField &field_);
+    static std::vector<Author> parse (const MarcRecord &record, int tag);
+
+private:
+    String fm (Char code) const noexcept;
 };
 
 //=========================================================

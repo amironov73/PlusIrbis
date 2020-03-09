@@ -8,86 +8,89 @@
 
     \class irbis::Exemplar
 
-    \var status
-        Статус экземпляра. Подполе `a`.
+    \var irbis::Exemplar::status
+        \brief Статус экземпляра. Подполе `a`.
 
-    \var number
-        Инвентарный номер. Подполе `b`.
+    \var irbis::Exemplar::number
+        \brief Инвентарный номер. Подполе `b`.
 
-    \var date
-        Дата поступления. Подполе `c`.
+    \var irbis::Exemplar::date
+        \brief Дата поступления. Подполе `c`.
 
-    \var place
-        Место хранения. Подполе `d`.
+    \var irbis::Exemplar::place
+        \brief Место хранения. Подполе `d`.
 
-    \var collection
-        Наименование коллекции. Подполе `q`.
+    \var irbis::Exemplar::collection
+        \brief Наименование коллекции. Подполе `q`.
 
-    \var shelf
-        Расстановочный шифр (полочный индекс). Подполе `r`.
+    \var irbis::Exemplar::shelf
+        \brief Расстановочный шифр (полочный индекс). Подполе `r`.
 
-    \var price
-        Цена экземпляра. Подполе `e`.
+    \var irbis::Exemplar::price
+        \brief Цена экземпляра. Подполе `e`.
 
-    \var barcode
-        Штрих-код или радиометка. Подполе `h`.
+    \var irbis::Exemplar::barcode
+        \brief Штрих-код или радиометка. Подполе `h`.
 
-    \var amount
-        Количество экземпляров. Подполе `1`.
+    \var irbis::Exemplar::amount
+        \brief Количество экземпляров. Подполе `1`.
 
-    \var purpose
-        Специальное назначение фонда. Подполе `t`.
+    \var irbis::Exemplar::purpose
+        \brief Специальное назначение фонда. Подполе `t`.
 
-    \var coefficient
-        Коэффициент многоразового использования. Подполе `=`.
+    \var irbis::Exemplar::coefficient
+        \brief Коэффициент многоразового использования. Подполе `=`.
 
-    \var offBalance
-        Экземпляры не на баланс. Подполе `4`.
+    \var irbis::Exemplar::offBalance
+        \brief Экземпляры не на баланс. Подполе `4`.
 
-    \var ksuNumber1
-        Номер записи КСУ (поступление). Подполе `u`.
+    \var irbis::Exemplar::ksuNumber1
+        \brief Номер записи КСУ (поступление). Подполе `u`.
 
-    \var actNumber1
-        Номер акта поступления. Подполе `y`.
+    \var irbis::Exemplar::actNumber1
+        \brief Номер акта поступления. Подполе `y`.
 
-    \var channel
-        Канал поступления. Подполе `f`.
+    \var irbis::Exemplar::channel
+        \brief Канал поступления. Подполе `f`.
 
-    \var onHand
-        Число выданных экземпляров. Подполе `2`.
+    \var irbis::Exemplar::onHand
+        \brief Число выданных экземпляров. Подполе `2`.
 
-    \var actNumber2
-        Номер акта списания. Подполе `v`.
+    \var irbis::Exemplar::actNumber2
+        \brief Номер акта списания. Подполе `v`.
 
-    \var writeOff
-        Количество списываемых экземпляров. Подполе `x`.
+    \var irbis::Exemplar::writeOff
+        \brief Количество списываемых экземпляров. Подполе `x`.
 
-    \var completion
-        Количество экземпляров для докомплектования. Подполе `k`.
+    \var irbis::Exemplar::completion
+        \brief Количество экземпляров для докомплектования. Подполе `k`.
 
-    \var actNumber3
-        Номер акта передачи в другое подразделение. Подполе `w`.
+    \var irbis::Exemplar::actNumber3
+        \brief Номер акта передачи в другое подразделение. Подполе `w`.
 
-    \var moving
-        Количество передаваемых экземпляров. Подполе `z`.
+    \var irbis::Exemplar::moving
+        \brief Количество передаваемых экземпляров. Подполе `z`.
 
-    \var newPlace
-        Новое место хранения. Подполе `m`.
+    \var irbis::Exemplar::newPlace
+        \brief Новое место хранения. Подполе `m`.
 
-    \var checkedDate
-        Дата проверки фонда. Подполе `s`.
+    \var irbis::Exemplar::checkedDate
+        \brief Дата проверки фонда. Подполе `s`.
 
-    \var checkedAmount
-        Число проверенных экземпляров. Подполе `0`.
+    \var irbis::Exemplar::checkedAmount
+        \brief Число проверенных экземпляров. Подполе `0`.
 
-    \var realPlace
-        Реальное место нахождения книги. Подполе `!`.
+    \var irbis::Exemplar::realPlace
+        \brief Реальное место нахождения книги. Подполе `!`.
 
-    \var bindingIndex
-        Шифр подшивки. Подполе `p`.
+    \var irbis::Exemplar::bindingIndex
+        \brief Шифр подшивки. Подполе `p`.
 
-    \var bindingNumber
-        Инвентарный номер подшивки. Подполе `i`.
+    \var irbis::Exemplar::bindingNumber
+        \brief Инвентарный номер подшивки. Подполе `i`.
+
+    \var irbis::Exemplar::field
+        \brief Поле, из которого извлечена информация.
 
  */
 
@@ -170,7 +173,7 @@ std::vector<Exemplar> Exemplar::parse (const MarcRecord &record)
     for (const auto field : fields) {
         result.emplace_back();
         auto &item = result.back();
-        item.parse(*field);
+        item.parse (*field);
     }
     return result;
 }

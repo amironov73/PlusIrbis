@@ -8,20 +8,20 @@
 
     \class irbis::Registration
 
-    \var date
-        Дата. Подполе *.
+    \var irbis::Registration::date
+        \brief Дата. Подполе *.
 
-    \var chair
-        Место (кафедра обслуживания). Подпое c.
+    \var irbis::Registration::chair
+        \brief Место (кафедра обслуживания). Подпое c.
 
-    \var number
-        Номер приказа. Подполе a.
+    \var irbis::Registration::number
+        \brief Номер приказа. Подполе a.
 
-    \var reason
-        Причина. Подполе b.
+    \var irbis::Registration::reason
+        \brief Причина. Подполе b.
 
-    \var field
-        Поле, из которого была извлечена информация о регистрации.
+    \var irbis::Registration::field
+        \brief Поле, из которого была извлечена информация о регистрации.
 
  */
 

@@ -8,74 +8,74 @@
 
     \class irbis::Reader
 
-    \var familyName
-        Фамилия. Поле 10.
+    \var irbis::Reader::familyName
+        \brief Фамилия. Поле 10.
 
-    \var firstName
-        Имя. Поле 11.
+    \var irbis::Reader::firstName
+        \brief Имя. Поле 11.
 
-    \var patronymic
-        Отчество. Поле 12.
+    \var irbis::Reader::patronymic
+        \brief Отчество. Поле 12.
 
-    \var birth
-        Дата рождения. Поле 21.
+    \var irbis::Reader::birth
+        \brief Дата рождения. Поле 21.
 
-    \var ticket
-        Номер читательского билета. Поле 30.
+    \var irbis::Reader::ticket
+        \brief Номер читательского билета. Поле 30.
 
-    \var gender
-        Пол. Поле 23.
+    \var irbis::Reader::gender
+        \brief Пол. Поле 23.
 
-    \var category
-        Категория. Поле 50.
+    \var irbis::Reader::category
+        \brief Категория. Поле 50.
 
-    \var address
-        Домашний адрес. Поле 13.
+    \var irbis::Reader::address
+        \brief Домашний адрес. Поле 13.
 
-    \var workplace
-        Место работы. Поле 15.
+    \var irbis::Reader::workplace
+        \brief Место работы. Поле 15.
 
-    \var education
-        Образование. Поле 20.
+    \var irbis::Reader::education
+        \brief Образование. Поле 20.
 
-    \var email
-        Электронная почта. Поле 32.
+    \var irbis::Reader::email
+        \brief Электронная почта. Поле 32.
 
-    \var phone
-        Домашний телефон. Поле 17.
+    \var irbis::Reader::phone
+        \brief Домашний телефон. Поле 17.
 
-    \var registration
-        Дата записи в библиотеку. Поле 51.
+    \var irbis::Reader::registration
+        \brief Дата записи в библиотеку. Поле 51.
 
-    \var enrollment
-        Запись/перерегистрация в библиотеке. Поле 51.
+    \var irbis::Reader::enrollment
+        \brief Запись/перерегистрация в библиотеке. Поле 51.
 
-    \var registrations
-        Дата перерегистрации. Поле 52.
+    \var irbis::Reader::registrations
+        \brief Дата перерегистрации. Поле 52.
 
-    \var enabled
-        Разрешенные места получения литературы. Поле 56.
+    \var irbis::Reader::enabled
+        \brief Разрешенные места получения литературы. Поле 56.
 
-    \var disabled
-        Запрещенные места получения литературы. Поле 57.
+    \var irbis::Reader::disabled
+        \brief Запрещенные места получения литературы. Поле 57.
 
-    \var right
-        Право пользования библиотекой. Поле 29.
+    \var irbis::Reader::right
+        \brief Право пользования библиотекой. Поле 29.
 
-    \var remarks
-        Примечания. Поле 33.
+    \var irbis::Reader::remarks
+        \brief Примечания. Поле 33.
 
-    \var photo
-        Фотография. Поле 950.
+    \var irbis::Reader::photo
+        \brief Фотография. Поле 950.
 
-    \var visits
-        Посещения.
+    \var irbis::Reader::visits
+        \brief Посещения.
 
-    \var password
-        Пароль.
+    \var irbis::Reader::password
+        \brief Пароль.
 
-    \var record
-        Запись, из которой извлечены данные о читателе.
+    \var irbis::Reader::record
+        \brief Запись, из которой извлечены данные о читателе.
 
  */
 

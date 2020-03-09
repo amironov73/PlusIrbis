@@ -291,6 +291,7 @@
   <ItemGroup>
     <ClCompile Include="src/Address.cpp" />
     <ClCompile Include="src/AlphabetTable.cpp" />
+    <ClCompile Include="src/Author.cpp" />
     <ClCompile Include="src/BookInfo.cpp" />
     <ClCompile Include="src/ByteNavigator.cpp" />
     <ClCompile Include="src/ChunkedBuffer.cpp" />
@@ -329,6 +330,7 @@
     <ClCompile Include="src/Lite.cpp" />
     <ClCompile Include="src/MarcRecord.cpp" />
     <ClCompile Include="src/MemoryChunk.cpp" />
+    <ClCompile Include="src/MemoryPool.cpp" />
     <ClCompile Include="src/MenuEntry.cpp" />
     <ClCompile Include="src/MenuFile.cpp" />
     <ClCompile Include="src/MstControlRecord64.cpp" />
