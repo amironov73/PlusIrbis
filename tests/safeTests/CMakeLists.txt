@@ -11,6 +11,7 @@ set(CppFiles
     src/AuthorTest.cpp
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
+    src/CodeTest.cpp
     src/DateTest.cpp
     src/DirectAccessTest.cpp
     src/EanTest.cpp
@@ -40,6 +41,7 @@ set(CppFiles
     src/TermPostingTest.cpp
     src/TextNavigatorTest.cpp
     src/TextTest.cpp
+    src/TitleTest.cpp
     src/TreeFileTest.cpp
     src/UpcTest.cpp
     src/UtilsTest.cpp

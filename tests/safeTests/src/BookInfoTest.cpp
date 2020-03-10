@@ -226,16 +226,16 @@ TEST_CASE("BookInfo_price_2", "[bookinfo]")
 TEST_CASE("BookInfo_publishers_1", "[bookinfo]")
 {
     irbis::MarcRecord record;
-    record.add (210).add ('c', L"Наука");
-    record.add (210).add ('c', L"Высшая школа");
-    record.add (461).add ('g', L"Энергоатомиздат");
+    record.add (210).add ('c', L"\u041D\u0430\u0443\u043A\u0430");
+    record.add (210).add ('c', L"\u0412\u044B\u0441\u0448\u0430\u044F \u0448\u043A\u043E\u043B\u0430");
+    record.add (461).add ('g', L"\u042D\u043D\u0435\u0440\u0433\u043E\u0430\u0442\u043E\u043C\u0438\u0437\u0434\u0430\u0442");
 
     irbis::BookInfo book (&record);
     const auto publishers = book.publishers();
     REQUIRE (publishers.size() == 3);
-    CHECK (publishers[0] == L"Наука");
-    CHECK (publishers[1] == L"Высшая школа");
-    CHECK (publishers[2] == L"Энергоатомиздат");
+    CHECK (publishers[0] == L"\u041D\u0430\u0443\u043A\u0430");
+    CHECK (publishers[1] == L"\u0412\u044B\u0441\u0448\u0430\u044F \u0448\u043A\u043E\u043B\u0430");
+    CHECK (publishers[2] == L"\u042D\u043D\u0435\u0440\u0433\u043E\u0430\u0442\u043E\u043C\u0438\u0437\u0434\u0430\u0442");
 }
 
 TEST_CASE("BookInfo_usage_1", "[bookinfo]")

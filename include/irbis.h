@@ -1299,6 +1299,36 @@ public:
 
 //=========================================================
 
+/// \brief Коды (поле 900).
+class IRBIS_API Codes final
+{
+public:
+    static const int TAG = 900; ///< Метка поля для кодов.
+
+    String type;
+    String kind;
+    String character1;
+    String character2;
+    String character3;
+    String character4;
+    String character5;
+    String character6;
+    String purpose1;
+    String purpose2;
+    String purpose3;
+    String restrictions;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field_) const;
+    void parse (const RecordField &field_);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
 /// \brief Сведения об экземпляре документа (поле 910).
 class IRBIS_API Exemplar final
 {
@@ -1498,6 +1528,32 @@ private:
 
 //=========================================================
 
+/// \brief Информация о заглавии, поле 200.
+class IRBIS_API Title final
+{
+public:
+    static const int TAG = 200; ///< Метка поля заглавия.
+
+    String number;
+    String title;
+    String specific;
+    String general;
+    String subtitle;
+    String first;
+    String other;
+
+    RecordField *field { nullptr };
+
+    void applyTo (RecordField &field_) const;
+    String fullTitle() const;
+    void parse (const RecordField &field_);
+
+private:
+    String fm (Char code) const noexcept;
+};
+
+//=========================================================
+
 /// \brief Самая общая информация о книге.
 class IRBIS_API BookInfo final
 {
@@ -1511,23 +1567,23 @@ public:
     String kind;
     String worksheet;
 
-    MarcRecord *record;
+    MarcRecord *record { nullptr };
 
     explicit BookInfo (MarcRecord *record_);
 
-    int amount();
-    StringList authors();
-    bool electronic();
+    int                   amount();
+    StringList            authors();
+    bool                  electronic();
     std::vector<Exemplar> exemplars();
-    bool foreign();
-    StringList languages();
-    String link();
-    int pages();
-    float price();
-    StringList publishers();
-    int usage();
-    String volume();
-    int year();
+    bool                  foreign();
+    StringList            languages();
+    String                link();
+    int                   pages();
+    float                 price();
+    StringList            publishers();
+    int                   usage();
+    String                volume();
+    int                   year();
 
 private:
     String fm (int tag, Char code=0) const;
@@ -1811,16 +1867,16 @@ public:
     String fileName;
     std::list<MenuEntry> entries;
 
-    MenuFile& add(const String &code, const String &comment);
-    MenuEntry* getEntry(const String &code) const noexcept;
-    MenuEntry* getEntrySensitive(const String &code) const noexcept;
-    String* getValue(const String &code) const noexcept;
-    String* getValueSensitive(const String &code) const noexcept;
-    const String& getValue(const String &code, const String &defaultValue) const noexcept;
-    const String& getValueSensitive(const String &code, const String &defaultValue) const noexcept;
-    void parse(std::istream &stream);
-    void parse(const StringList &lines);
-    void parseLocalFile(const std::wstring &filename /* const QTextCodec *encoding */);
+    MenuFile& add (const String &code, const String &comment);
+    MenuEntry* getEntry (const String &code) const noexcept;
+    MenuEntry* getEntrySensitive (const String &code) const noexcept;
+    String* getValue (const String &code) const noexcept;
+    String* getValueSensitive (const String &code) const noexcept;
+    const String& getValue (const String &code, const String &defaultValue) const noexcept;
+    const String& getValueSensitive (const String &code, const String &defaultValue) const noexcept;
+    void parse (std::istream &stream);
+    void parse (const StringList &lines);
+    void parseLocalFile (const std::wstring &filename /* const QTextCodec *encoding */);
 };
 
 //=========================================================
@@ -1832,14 +1888,14 @@ public:
     const static int RecordSize;
     const static long LockFlagPosition;
 
-    uint32_t ctlMfn { 0 };
-    uint32_t nextMfn { 0 };
-    int64_t nextPosition { 0 };
-    uint32_t mftType { 0 };
-    uint32_t recCnt { 0 };
-    uint32_t reserv1 { 0 };
-    uint32_t reserv2 { 0 };
-    uint32_t blocked { 0 };
+    uint32_t ctlMfn       { 0 };
+    uint32_t nextMfn      { 0 };
+    int64_t  nextPosition { 0 };
+    uint32_t mftType      { 0 };
+    uint32_t recCnt       { 0 };
+    uint32_t reserv1      { 0 };
+    uint32_t reserv2      { 0 };
+    uint32_t blocked      { 0 };
 
     void read(FILE *file);
 };
@@ -1856,7 +1912,7 @@ public:
     int tag { 0 };
     int position { 0 };
     int length { 0 };
-    std::wstring text;
+    String text;
 
     void read(FILE *file);
 };
@@ -1872,9 +1928,9 @@ public:
     MstControlRecord64 control;
     String fileName;
 
-    MstFile64(const String &fileName, DirectAccessMode mode);
-    MstFile64(const MstFile64 &) = delete;
-    MstFile64(const MstFile64 &&) = delete;
+    MstFile64 (const String &fileName, DirectAccessMode mode);
+    MstFile64 (const MstFile64 &) = delete;
+    MstFile64 (const MstFile64 &&) = delete;
     MstFile64& operator = (const MstFile64 &) = delete;
     MstFile64& operator = (const MstFile64 &&) = delete;
     ~MstFile64();
@@ -2140,7 +2196,7 @@ public:
     String processId;
     String state;
 
-    static std::vector<ProcessInfo> parse(ServerResponse &response);
+    static std::vector<ProcessInfo> parse (ServerResponse &response);
 };
 
 //=========================================================

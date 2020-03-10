@@ -23,13 +23,13 @@ TEST_CASE("Author_construction_1", "[author]")
 TEST_CASE("Author_applyTo_1", "[author]")
 {
     irbis::Author author;
-    author.familyName = L"Пушкин";
-    author.initials   = L"А. С.";
-    author.fullName   = L"Александр Сергеевич";
-    author.appendix   = L"русский поэт";
+    author.familyName = L"\u041F\u0443\u0448\u043A\u0438\u043D";
+    author.initials   = L"\u0410. \u0421.";
+    author.fullName   = L"\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447";
+    author.appendix   = L"\u0440\u0443\u0441\u0441\u043A\u0438\u0439 \u043F\u043E\u044D\u0442";
     author.dates      = L"1799-1837";
-    author.variant    = L"Белкин, Иван Петрович";
-    author.workplace  = L"камер-юнкер";
+    author.variant    = L"\u0411\u0435\u043B\u043A\u0438\u043D, \u0418\u0432\u0430\u043D \u041F\u0435\u0442\u0440\u043E\u0432\u0438\u0447";
+    author.workplace  = L"\u043A\u0430\u043C\u0435\u0440-\u044E\u043D\u043A\u0435\u0440";
 
     irbis::RecordField field (700);
     author.applyTo (field);
@@ -49,13 +49,13 @@ TEST_CASE("Author_parse_1", "[author]")
 {
     irbis::RecordField field(700);
     field
-        .add ('a', L"Пушкин")
-        .add ('b', L"А. С.")
-        .add ('g', L"Александр Сергеевич")
-        .add ('c', L"русский поэт")
+        .add ('a', L"\u041F\u0443\u0448\u043A\u0438\u043D")
+        .add ('b', L"\u0410. \u0421.")
+        .add ('g', L"\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447")
+        .add ('c', L"\u0440\u0443\u0441\u0441\u043A\u0438\u0439 \u043F\u043E\u044D\u0442")
         .add ('f', L"1799-1837")
-        .add ('r', L"Белкин, Иван Петрович")
-        .add ('p', L"камер-юнкер");
+        .add ('r', L"\u0411\u0435\u043B\u043A\u0438\u043D, \u0418\u0432\u0430\u043D \u041F\u0435\u0442\u0440\u043E\u0432\u0438\u0447")
+        .add ('p', L"\u043A\u0430\u043C\u0435\u0440-\u044E\u043D\u043A\u0435\u0440");
 
     irbis::Author author;
     author.parse (field);
@@ -76,13 +76,13 @@ TEST_CASE("Author_parse_2", "[author]")
 {
     irbis::MarcRecord record;
     record.add (700)
-            .add ('a', L"Пушкин")
-            .add ('b', L"А. С.")
-            .add ('g', L"Александр Сергеевич")
-            .add ('c', L"русский поэт")
+            .add ('a', L"\u041F\u0443\u0448\u043A\u0438\u043D")
+            .add ('b', L"\u0410. \u0421.")
+            .add ('g', L"\u0410\u043B\u0435\u043A\u0441\u0430\u043D\u0434\u0440 \u0421\u0435\u0440\u0433\u0435\u0435\u0432\u0438\u0447")
+            .add ('c', L"\u0440\u0443\u0441\u0441\u043A\u0438\u0439 \u043F\u043E\u044D\u0442")
             .add ('f', L"1799-1837")
-            .add ('r', L"Белкин, Иван Петрович")
-            .add ('p', L"камер-юнкер");
+            .add ('r', L"\u0411\u0435\u043B\u043A\u0438\u043D, \u0418\u0432\u0430\u043D \u041F\u0435\u0442\u0440\u043E\u0432\u0438\u0447")
+            .add ('p', L"\u043A\u0430\u043C\u0435\u0440-\u044E\u043D\u043A\u0435\u0440");
 
     std::vector<irbis::Author> authors = irbis::Author::parse (record, 700);
     CHECK (authors[0].familyName    == record.fm (700, 'a'));

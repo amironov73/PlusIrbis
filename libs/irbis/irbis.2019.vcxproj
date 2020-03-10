@@ -297,6 +297,7 @@
     <ClCompile Include="src/ChunkedBuffer.cpp" />
     <ClCompile Include="src/ClientQuery.cpp" />
     <ClCompile Include="src/ClientSocket.cpp" />
+    <ClCompile Include="src/Codes.cpp" />
     <ClCompile Include="src/Connection.cpp" />
     <ClCompile Include="src/ConnectionAdmin.cpp" />
     <ClCompile Include="src/ConnectionBase.cpp" />

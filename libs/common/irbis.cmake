@@ -11,6 +11,7 @@ set(CppFiles
     ../irbis/src/ChunkedBuffer.cpp
     ../irbis/src/ClientQuery.cpp
     ../irbis/src/ClientSocket.cpp
+    ../irbis/src/Codes.cpp
     ../irbis/src/Connection.cpp
     ../irbis/src/ConnectionAdmin.cpp
     ../irbis/src/ConnectionBase.cpp
@@ -71,6 +72,7 @@ set(CppFiles
     ../irbis/src/TermPosting.cpp
     ../irbis/src/Text.cpp
     ../irbis/src/TextNavigator.cpp
+    ../irbis/src/Title.cpp
     ../irbis/src/TreeFile.cpp
     ../irbis/src/TreeNode.cpp
     ../irbis/src/Upc.cpp

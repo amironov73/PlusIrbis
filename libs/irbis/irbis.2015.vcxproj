@@ -79,6 +79,7 @@
     <ClCompile Include="src/ChunkedBuffer.cpp" />
     <ClCompile Include="src/ClientQuery.cpp" />
     <ClCompile Include="src/ClientSocket.cpp" />
+    <ClCompile Include="src/Codes.cpp" />
     <ClCompile Include="src/Connection.cpp" />
     <ClCompile Include="src/ConnectionAdmin.cpp" />
     <ClCompile Include="src/ConnectionBase.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="src/TextNavigator.cpp" />
     <ClCompile Include="src/TreeFile.cpp" />
     <ClCompile Include="src/TreeNode.cpp" />
+    <ClCompile Include="src/Title.cpp" />
     <ClCompile Include="src/Upc.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
     <ClCompile Include="src/Version.cpp" />

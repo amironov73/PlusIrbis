@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="DebugDll|Win32">
@@ -63,6 +63,7 @@
     <ClCompile Include="src/AuthorTest.cpp" />
     <ClCompile Include="src/BookInfoTest.cpp" />
     <ClCompile Include="src/ByteNavigatorTest.cpp" />
+    <ClCompile Include="src/CodesTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
     <ClCompile Include="src/DirectAccessTest.cpp" />
     <ClCompile Include="src/EanTest.cpp" />
@@ -92,6 +93,7 @@
     <ClCompile Include="src/TermPostingTest.cpp" />
     <ClCompile Include="src/TextTest.cpp" />
     <ClCompile Include="src/TextNavigatorTest.cpp" />
+    <ClCompile Include="src/TitleTest.cpp" />
     <ClCompile Include="src/TreeFileTest.cpp" />
     <ClCompile Include="src/UpcTest.cpp" />
     <ClCompile Include="src/UtilsTest.cpp" />
