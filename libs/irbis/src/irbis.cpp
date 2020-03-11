@@ -31,14 +31,14 @@ namespace irbis {
 
 /// \brief Версия библиотеки-клиента (числом).
 /// \return (major << 16) + minor.
-uint32_t libraryVersion() noexcept
+uint32_t IRBIS_CALL libraryVersion() noexcept
 {
     return (IRBIS_VERSION_MAJOR << 16) + IRBIS_VERSION_MINOR;
 }
 
 /// \brief Версия библиотеки-клиента (строкой).
 /// \return "major.minor beta".
-std::string libraryVersionString()
+std::string IRBIS_CALL libraryVersionString()
 {
     return std::to_string(IRBIS_VERSION_MAJOR)
         + "." + std::to_string(IRBIS_VERSION_MINOR)
@@ -273,7 +273,7 @@ String trim (const String &text)
 /// \brief Выдаёт текстовое описание ошибки по её коду.
 /// \param errorCode Код ошибки, полученный из Connection::lastError.
 /// \return Текстовое описание проблемы.
-String describeError (int errorCode)
+String IRBIS_CALL describeError (int errorCode)
 {
     if (errorCode >= 0) {
         return L"\u041D\u0435\u0442 \u043E\u0448\u0438\u0431\u043A\u0438";
@@ -824,7 +824,7 @@ std::wstring prepareFormat (const String &text)
     return result;
 }
 
-bool isWindows()
+bool IRBIS_CALL isWindows()
 {
 #ifdef IRBIS_WINDOWS
     return true;

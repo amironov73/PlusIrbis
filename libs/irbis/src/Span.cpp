@@ -62,7 +62,7 @@ IRBIS_API bool IRBIS_CALL sameString (WideSpan first, WideSpan second)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan trimStart (CharSpan text)
+CharSpan IRBIS_CALL trimStart (CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -79,7 +79,7 @@ CharSpan trimStart (CharSpan text)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan trimStart (WideSpan text)
+WideSpan IRBIS_CALL trimStart (WideSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -96,7 +96,7 @@ WideSpan trimStart (WideSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan trimEnd (CharSpan text)
+CharSpan IRBIS_CALL trimEnd (CharSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -113,7 +113,7 @@ CharSpan trimEnd (CharSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan trimEnd(WideSpan text)
+WideSpan IRBIS_CALL trimEnd (WideSpan text)
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -130,9 +130,9 @@ WideSpan trimEnd(WideSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan trim(CharSpan text)
+CharSpan IRBIS_CALL trim (CharSpan text)
 {
-    return trimStart(trimEnd(text));
+    return trimStart (trimEnd(text));
 }
 
 /// \brief Удаление пробельных элементов из начала и конца спана.
@@ -140,7 +140,7 @@ CharSpan trim(CharSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan trim(WideSpan text)
+WideSpan IRBIS_CALL trim (WideSpan text)
 {
     return trimStart(trimEnd(text));
 }
@@ -148,7 +148,7 @@ WideSpan trim(WideSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan toupper(CharSpan text)
+CharSpan IRBIS_CALL toupper (CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -161,7 +161,7 @@ CharSpan toupper(CharSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan toupper(WideSpan text)
+WideSpan IRBIS_CALL toupper (WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -174,7 +174,7 @@ WideSpan toupper(WideSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan tolower(CharSpan text)
+CharSpan IRBIS_CALL tolower (CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -187,7 +187,7 @@ CharSpan tolower(CharSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan tolower(WideSpan text)
+WideSpan IRBIS_CALL tolower (WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {

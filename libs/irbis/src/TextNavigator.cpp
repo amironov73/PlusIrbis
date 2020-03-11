@@ -376,7 +376,7 @@ WideSpan TextNavigator::readTo(Char stopChar) noexcept
     return result;
 }
 
-WideSpan TextNavigator::readUntil(Char stopChar) noexcept
+WideSpan TextNavigator::readUntil (Char stopChar) noexcept
 {
     WideSpan result {this->ccurrent(), 0 };
 
@@ -394,7 +394,7 @@ WideSpan TextNavigator::readUntil(Char stopChar) noexcept
         this->readChar();
     }
 
-    result = this->substr(start, this->_position - start);
+    result = this->substr (start, this->_position - start);
     return result;
 }
 

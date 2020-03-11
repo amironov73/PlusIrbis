@@ -63,7 +63,6 @@
     <ClCompile Include="src/AuthorTest.cpp" />
     <ClCompile Include="src/BookInfoTest.cpp" />
     <ClCompile Include="src/ByteNavigatorTest.cpp" />
-    <ClCompile Include="src/CodesTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
     <ClCompile Include="src/DirectAccessTest.cpp" />
     <ClCompile Include="src/EanTest.cpp" />
@@ -99,6 +98,7 @@
     <ClCompile Include="src/UtilsTest.cpp" />
     <ClCompile Include="src/VisitTest.cpp" />
     <ClCompile Include="src/XrfTest.cpp" />
+    <ClCompile Include="src\CodeTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\libs\irbis\irbis.2017.vcxproj">

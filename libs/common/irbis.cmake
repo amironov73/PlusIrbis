@@ -1,4 +1,5 @@
 set(HeaderFiles
+    ../../include/irbis_pft.h
     ../irbis/include/irbis_private.h
 )
 
@@ -55,6 +56,7 @@ set(CppFiles
     ../irbis/src/NumberChunk.cpp
     ../irbis/src/OptFile.cpp
     ../irbis/src/ParFile.cpp
+    ../irbis/src/Pft.cpp
     ../irbis/src/Phantom.cpp
     ../irbis/src/ProcessInfo.cpp
     ../irbis/src/RawRecord.cpp

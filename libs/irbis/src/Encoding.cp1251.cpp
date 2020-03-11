@@ -145,7 +145,7 @@ std::size_t Cp1251Encoding::getSize (const String &text) const
 /// \brief Преобразование строки из UTF16 в однобайтную русскую кодировку.
 /// \param s Текст для преобразования.
 /// \return Полученный результат.
-std::string wide2string (const String &s)
+std::string IRBIS_CALL wide2string (const String &s)
 {
     return unicode_to_cp1251(s);
 }
@@ -153,7 +153,7 @@ std::string wide2string (const String &s)
 /// \brief Преобразование строки из однобайтной русской кодировки в UTF16.
 /// \param s Текст для преобразования.
 /// \return Полученный результат.
-String string2wide (const std::string &s)
+String IRBIS_CALL string2wide (const std::string &s)
 {
     return cp1251_to_unicode(s);
 }
@@ -163,7 +163,7 @@ String string2wide (const std::string &s)
 /// \brief Преобразование строки из однобайтовой русской кодировки в UTF8.
 /// \param s Текст для преобразования.
 /// \return Полученный результат.
-std::string toUtf (const std::string &s)
+std::string IRBIS_CALL toUtf (const std::string &s)
 {
     // TODO реализовать оптимально
     const auto temp = cp1251_to_unicode (s);
@@ -174,7 +174,7 @@ std::string toUtf (const std::string &s)
 /// \brief Преобразование строки из UTF8 в однобайтовую русскую кодировку.
 /// \param s Текст для преобразования.
 /// \return Полученный результат.
-std::string toAnsi (const std::string &s)
+std::string IRBIS_CALL toAnsi (const std::string &s)
 {
     // TODO реализовать оптимально
     const auto temp = fromUtf (s);

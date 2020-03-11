@@ -342,6 +342,7 @@
     <ClCompile Include="src/NumberChunk.cpp" />
     <ClCompile Include="src/OptFile.cpp" />
     <ClCompile Include="src/ParFile.cpp" />
+    <ClCompile Include="src/Pft.cpp" />
     <ClCompile Include="src/Phantom.cpp" />
     <ClCompile Include="src/ProcessInfo.cpp" />
     <ClCompile Include="src/RawRecord.cpp" />
