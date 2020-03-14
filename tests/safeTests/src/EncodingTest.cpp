@@ -87,11 +87,11 @@ TEST_CASE("Encoding_fromUtf_2", "[encoding]")
     std::size_t size = sizeof(src);
     irbis::String result;
     const irbis::Byte *end = irbis::fromUtf(src, size, 0x10, result);
-    CHECK(irbis::String(L"Hello!") == result);
+    CHECK(irbis::String (L"Hello!") == result);
     end++;
     size--;
     end++;
     size--;
     irbis::fromUtf(end, size, 0x10, result);
-    CHECK(irbis::String(L"\u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430") == result);
+    CHECK(irbis::String (L"\u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430") == result);
 }

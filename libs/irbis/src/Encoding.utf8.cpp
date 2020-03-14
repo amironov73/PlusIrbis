@@ -16,9 +16,12 @@ namespace irbis {
 
 // Quick and dirty UTF-8 conversion
 
-// Преобразует UCS-16 в UTF-8
-// Возвращает указатель на место после последнего преобразованного символа
-Byte* toUtf (Byte *dst, const Char *src, std::size_t length)
+/// \brief Преобразует UCS-16 в UTF-8.
+/// \param dst Указатель на буфер для результата.
+/// \param src Указатель на буфер с источником.
+/// \param length Количество символов для преобразования.
+/// \return Возвращает указатель на место после последнего преобразованного символа
+Byte* IRBIS_CALL toUtf (Byte *dst, const Char *src, std::size_t length) noexcept
 {
     while (length > 0) {
         const unsigned int c = *src++;
@@ -49,8 +52,11 @@ Byte* toUtf (Byte *dst, const Char *src, std::size_t length)
     return dst;
 }
 
-// Подсчитывает число байт, необходимых для размещения в UTF-8.
-std::size_t countUtf (const Char *src, std::size_t length)
+/// \brief Подсчитывает число байт, необходимых для размещения в UTF-8.
+/// \param src Указатель на текст в UCS-16.
+/// \param length Длина текста в символах.
+/// \return Длина заданного текста в UTF-8 в байтах.
+std::size_t IRBIS_CALL countUtf (const Char *src, std::size_t length) noexcept
 {
     std::size_t result = 0;
 
@@ -84,9 +90,12 @@ std::size_t countUtf (const Char *src, std::size_t length)
     return result;
 }
 
-// Преобразует UTF-8 в UCS-16
-// Возвращает указатель на место после последнего преобразованного символа
-Char* fromUtf (Char *dst, const Byte *src, std::size_t length)
+/// \brief Преобразует UTF-8 в UCS-16.
+/// \param dst Указатель на буфер для результата.
+/// \param src Указатель на буфер с источником.
+/// \param length Длина исходного текста в байтах.
+/// \return Возвращает указатель на место после последнего преобразованного символа.
+Char* IRBIS_CALL fromUtf (Char *dst, const Byte *src, std::size_t length) noexcept
 {
     const Byte *stop = src + length;
 
@@ -127,8 +136,11 @@ Char* fromUtf (Char *dst, const Byte *src, std::size_t length)
     return dst;
 }
 
-// Подсчитывает число Char, необходимых для размещения в UCS-16.
-std::size_t countUtf (const Byte *src, std::size_t length)
+/// \brief Подсчитывает число Char, необходимых для размещения в UCS-16.
+/// \param src Указатель на текст в кодировке UTF-8.
+/// \param length Длина изучаемого текста в байтах.
+/// \return Длина того же текста в символах.
+std::size_t IRBIS_CALL countUtf (const Byte *src, std::size_t length) noexcept
 {
     std::size_t result = 0;
 
@@ -163,73 +175,84 @@ std::size_t countUtf (const Byte *src, std::size_t length)
     return result;
 }
 
-// Считывает строку UTF-8 вплоть до разделителя.
-const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result)
+/// \brief Считывает строку UTF-8 вплоть до разделителя.
+/// \param src Буфер для считывания.
+/// \param size Размер буфера.
+/// \param stop Стоп-байт.
+/// \param result Строка для помещения результата.
+/// \return Указатель на буфер сразу за последним прочитанным байтом.
+const Byte* IRBIS_CALL fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result)
 {
     const Byte *end = src;
-    while (size && (*end != stop))
-    {
+    while (size && (*end != stop)) {
         end++;
         size--;
     }
     const std::size_t length = end - src;
-    if (length == 0)
-    {
+    if (length == 0) {
         result.clear();
         return end;
     }
-    auto dst = new Char[length + 1];
-    memset(dst, 0, sizeof(Char)*(length + 1));
-    if (!fromUtf(dst, src, length))
-    {
-        result.clear();
-        return end;
-    }
-    result = dst;
-    delete[] dst;
+
+    const std::size_t resultSize = countUtf (src, length);
+    result.reserve (resultSize + 1);
+    result.resize (resultSize);
+    Char* dst = const_cast<Char*> (result.data());
+    memset (dst, 0, sizeof(Char)*(resultSize));
+    fromUtf (dst, src, length) - dst;
     return end;
 }
 
-String fromUtf (const std::string &text)
+/// \brief Преобразует строку в кодировке UTF-8 в строку в кодировке UCS-16.
+/// \param text Исходная строка.
+/// \return Получившаяся строка
+String IRBIS_CALL fromUtf (const std::string &text)
 {
     const auto srcSize = text.length();
-    if (!srcSize)
-    {
-        return std::wstring();
+    if (!srcSize) {
+        return String();
     }
 
-    const auto *src = reinterpret_cast<const Byte*>(text.c_str());
-    const auto dstSize = countUtf(src, srcSize);
-    auto *dst = new Char[dstSize + 1];
-    memset(dst, 0, sizeof(Char)*(dstSize+1));
-    if (!fromUtf(dst, src, srcSize))
-    {
-        return std::wstring();
+    const auto *src = reinterpret_cast<const Byte*> (text.c_str());
+    const auto dstSize = countUtf (src, srcSize);
+    String result;
+    result.reserve (dstSize + 1);
+    result.resize (dstSize);
+    auto *dst = const_cast<Char*> (result.data());
+    memset (dst, 0, sizeof(Char)*(dstSize + 1));
+    if (!fromUtf (dst, src, srcSize)) {
+        result.clear();
     }
-    String result(dst);
-    delete[] dst;
     return result;
 }
 
 /// \brief Преобразует диапазон байт в Unicode-строку.
-String fromUtf (ByteSpan span)
+/// \param span Диапазон байт в кодировке UTF-8.
+/// \return Получивашаяся строка.
+String IRBIS_CALL fromUtf (ByteSpan span)
 {
-    const auto size = countUtf(span.ptr, span.length);
+    const auto size = countUtf (span.ptr, span.length);
     String result;
-    result.resize(size);
-    fromUtf(const_cast<Char*>(result.data()), span.ptr, span.length);
+    result.resize (size);
+    fromUtf (const_cast<Char*> (result.data()), span.ptr, span.length);
     return result;
 }
 
-// Записывает строку в UTF-8
-Byte* toUtf (Byte *dst, const String &text)
+/// \brief Записывает строку UCS-16 в буфер в кодировке UTF-8.
+/// \param dst Указатель на буфер в кодировке UTF-8.
+/// \param text Текст, который нужно записать.
+/// \return Указатель сразу за последним записанным байтом.
+Byte* IRBIS_CALL toUtf (Byte *dst, const String &text)
 {
     const std::size_t length = text.length();
     const Char *src = text.c_str();
-    return toUtf(dst, src, length);
+    return toUtf (dst, src, length);
 }
 
-std::string toUtf (const String &text)
+/// \brief Преобразование строки из UCS-16 в UTF-8.
+/// \param text Текст для преобразования.
+/// \return Преобразованный текст.
+std::string IRBIS_CALL toUtf (const String &text)
 {
     const auto srcSize = text.length();
     if (!srcSize)
@@ -252,20 +275,20 @@ std::string toUtf (const String &text)
 
 //=========================================================
 
-Bytes Utf8Encoding::fromUnicode(const String &text) const
+Bytes Utf8Encoding::fromUnicode (const String &text) const
 {
-    const auto size = countUtf(text.data(), text.size());
+    const auto size = countUtf (text.data(), text.size());
     Bytes result;
-    result.reserve(size);
-    irbis::toUtf(result.data(), text);
+    result.reserve (size);
+    irbis::toUtf (result.data(), text);
     return result;
 }
 
-String Utf8Encoding::toUnicode(const Byte *bytes, std::size_t count) const
+String Utf8Encoding::toUnicode (const Byte *bytes, std::size_t count) const
 {
     String result;
-    result.reserve(count);
-    irbis::fromUtf(const_cast<Char*>(result.data()), bytes, count);
+    result.reserve (count);
+    irbis::fromUtf (const_cast<Char*> (result.data()), bytes, count);
 
     return result;
 }

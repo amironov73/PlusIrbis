@@ -10,9 +10,8 @@
 
 /*!
 
-    \file
+    \file irbis.cpp
     \brief Утилиты, используемые в PlusIrbis.
-
 
     \mainpage Универсальный клиент для системы ИРБИС64.
 
@@ -33,7 +32,7 @@ namespace irbis {
 /// \return (major << 16) + minor.
 uint32_t IRBIS_CALL libraryVersion() noexcept
 {
-    return (IRBIS_VERSION_MAJOR << 16) + IRBIS_VERSION_MINOR;
+    return (IRBIS_VERSION_MAJOR << 16u) + IRBIS_VERSION_MINOR;
 }
 
 /// \brief Версия библиотеки-клиента (строкой).
@@ -50,7 +49,7 @@ std::string IRBIS_CALL libraryVersionString()
 /// \param second Второй символ.
 /// \return Возвращает true, если символы равны с точностью до регистра,
 /// иначе false.
-bool sameChar (Char first, Char second) noexcept
+bool IRBIS_CALL sameChar (Char first, Char second) noexcept
 {
     return ::towupper (first) == ::towupper (second);
 }
@@ -60,7 +59,7 @@ bool sameChar (Char first, Char second) noexcept
 /// \param second Вторая строка.
 /// \return Возвращает true, если строки равны с точностью до регистра,
 /// иначе false.
-bool sameString (const String &first, const String &second) noexcept
+bool IRBIS_CALL sameString (const String &first, const String &second) noexcept
 {
     if (first.size() != second.size()) {
         return false;
@@ -72,7 +71,7 @@ bool sameString (const String &first, const String &second) noexcept
 /// \brief Первый символ строки.
 /// \param text Текст.
 /// \return Первый символ либо 0.
-Char firstChar (const String &text) noexcept
+Char IRBIS_CALL firstChar (const String &text) noexcept
 {
     return text.empty() ? L'\0' : text[0];
 }
@@ -80,17 +79,16 @@ Char firstChar (const String &text) noexcept
 /// \brief Первый символ строки.
 /// \param text Текст.
 /// \return Первый символ либо 0.
-char firstChar (const std::string &text) noexcept
+char IRBIS_CALL firstChar (const std::string &text) noexcept
 {
     return text.empty() ? '\0' : text[0];
 }
-
 
 /// \brief Преобразование строки к нижнему регистру.
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toLower (String &text) noexcept
+String IRBIS_CALL toLower (String &text) noexcept
 {
     for (auto &i : text) {
         i = ::tolower(i);
@@ -102,7 +100,7 @@ String toLower (String &text) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-std::string toLower (std::string &text) noexcept
+std::string IRBIS_CALL toLower (std::string &text) noexcept
 {
     for (auto &i : text) {
         i = ::tolower(i);
@@ -114,7 +112,7 @@ std::string toLower (std::string &text) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-String toUpper (String &text) noexcept
+String IRBIS_CALL toUpper (String &text) noexcept
 {
     for (auto &i : text) {
         i = ::toupper(i);
@@ -126,7 +124,7 @@ String toUpper (String &text) noexcept
 /// \param text Текст, подлежащий трансформации.
 /// \return Возвращает преобразованную строку.
 /// \warning Трансформация осуществляется "по месту"!
-std::string toUpper (std::string &text) noexcept
+std::string IRBIS_CALL toUpper (std::string &text) noexcept
 {
     for (auto &i : text) {
         i = ::toupper(i);
@@ -333,7 +331,9 @@ String IRBIS_CALL describeError (int errorCode)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const String &text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const String &text) noexcept
 {
     auto result = 0;
     const std::size_t length = text.length();
@@ -345,7 +345,9 @@ int fastParse32 (const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const CharSpan text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const CharSpan text) noexcept
 {
     auto result = 0;
     const std::size_t length = text.length;
@@ -357,7 +359,9 @@ int fastParse32 (const CharSpan text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const WideSpan text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const WideSpan text) noexcept
 {
     auto result = 0;
     const std::size_t length = text.length;
@@ -369,7 +373,9 @@ int fastParse32 (const WideSpan text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32 (const String &text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+unsigned int IRBIS_CALL fastParseUnsigned32 (const String &text) noexcept
 {
     auto result = 0u;
     const std::size_t length = text.length();
@@ -381,7 +387,9 @@ unsigned int fastParseUnsigned32 (const String &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const Char *text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const Char *text) noexcept
 {
     auto result = 0;
     while (*text != 0) {
@@ -393,7 +401,9 @@ int fastParse32 (const Char *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32 (const Char *text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+unsigned int IRBIS_CALL fastParseUnsigned32 (const Char *text) noexcept
 {
     auto result = 0u;
     while (*text != 0) {
@@ -405,7 +415,9 @@ unsigned int fastParseUnsigned32 (const Char *text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const Char *text, std::size_t length)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const Char *text, std::size_t length) noexcept
 {
     auto result = 0;
     while (length > 0) {
@@ -418,7 +430,9 @@ int fastParse32 (const Char *text, std::size_t length)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32 (const Char *text, std::size_t length)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+unsigned int IRBIS_CALL fastParseUnsigned32 (const Char *text, std::size_t length) noexcept
 {
     auto result = 0u;
     while (length > 0) {
@@ -431,7 +445,9 @@ unsigned int fastParseUnsigned32 (const Char *text, std::size_t length)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const std::string &text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const std::string &text) noexcept
 {
     auto result = 0;
     const std::size_t length = text.length();
@@ -443,7 +459,9 @@ int fastParse32 (const std::string &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-unsigned int fastParseUnsigned32 (const std::string &text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+unsigned int IRBIS_CALL fastParseUnsigned32 (const std::string &text) noexcept
 {
     auto result = 0u;
     const std::size_t length = text.length();
@@ -455,7 +473,9 @@ unsigned int fastParseUnsigned32 (const std::string &text)
 }
 
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
-int fastParse32 (const char *text)
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int IRBIS_CALL fastParse32 (const char *text) noexcept
 {
     auto result = 0;
     while (*text != 0) {
@@ -471,7 +491,7 @@ int fastParse32 (const char *text)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-int fastParse32 (const char *text, std::size_t length)
+int IRBIS_CALL fastParse32 (const char *text, std::size_t length) noexcept
 {
     auto result = 0;
     while (length > 0) {
@@ -488,7 +508,7 @@ int fastParse32 (const char *text, std::size_t length)
 /// \param length Длина текста в байтах.
 /// \return Результат разбора.
 /// \warning Мусор на входе -- мусор на выходе!
-unsigned int fastParseUnsigned32 (const char *text, std::size_t length)
+unsigned int IRBIS_CALL fastParseUnsigned32 (const char *text, std::size_t length) noexcept
 {
     auto result = 0u;
     while (length > 0) {
@@ -500,104 +520,12 @@ unsigned int fastParseUnsigned32 (const char *text, std::size_t length)
     return result;
 }
 
-///
-/// \param s1
-/// \param s2
-/// \return
-const std::string& iif (const std::string& s1, const std::string &s2)
-{
-    if (!s1.empty())
-    {
-        return s1;
-    }
-
-    return s2;
-}
-
-///
-/// \param s1
-/// \param s2
-/// \return
-const String& iif (const String& s1, const String &s2)
-{
-    if (!s1.empty())
-    {
-        return s1;
-    }
-
-    return s2;
-}
-
-///
-/// \param s1
-/// \param s2
-/// \param s3
-/// \return
-const std::string& iif (const std::string& s1, const std::string &s2, const std::string &s3)
-{
-    if (!s1.empty())
-    {
-        return s1;
-    }
-
-    if (!s2.empty())
-    {
-        return s2;
-    }
-
-    return s3;
-}
-
-///
-/// \param s1
-/// \param s2
-/// \param s3
-/// \return
-const std::wstring& iif (const String &s1, const String &s2, const String &s3)
-{
-    if (!s1.empty())
-    {
-        return s1;
-    }
-
-    if (!s2.empty())
-    {
-        return s2;
-    }
-
-    return s3;
-}
-
-/////
-///// \param list
-///// \param index
-///// \return
-//String safeAt (const StringList &list, std::size_t index)
-//{
-//    if (index >= list.size()) {
-//        return std::wstring();
-//    }
-//    return list.at(index);
-//}
-//
-/////
-///// \param list
-///// \param index
-///// \return
-//std::string safeAt (const std::vector<std::string> &list, std::size_t index)
-//{
-//    if (index >= list.size()) {
-//        return std::string();
-//    }
-//    return list.at(index);
-//}
-
-///
-/// \param text
-/// \param separator
-/// \param count
-/// \return
-StringList maxSplit (const String &text, Char separator, int count)
+/// \brief Разбор строки по указанному разделителю.
+/// \param text Текст для разбора.
+/// \param separator Разделитель.
+/// \param count Не больше указанного количества подстрок.
+/// \return Вектор подстрок.
+StringList IRBIS_CALL maxSplit (const String &text, Char separator, int count)
 {
     StringList result;
     std::size_t position = 0;
@@ -619,12 +547,12 @@ StringList maxSplit (const String &text, Char separator, int count)
     return result;
 }
 
-///
-/// \param text
-/// \param separator
-/// \param count
-/// \return
-std::vector<std::string> maxSplit (const std::string &text, char separator, int count)
+/// \brief Разбор строки по указанному разделителю.
+/// \param text Текст для разбора.
+/// \param separator Разделитель.
+/// \param count Не больше указанного количества подстрок.
+/// \return Вектор подстрок.
+std::vector<std::string> IRBIS_CALL maxSplit (const std::string &text, char separator, int count)
 {
     std::vector<std::string> result;
     std::size_t position = 0;
@@ -646,11 +574,11 @@ std::vector<std::string> maxSplit (const std::string &text, char separator, int 
     return result;
 }
 
-///
-/// \param text
-/// \param delimiter
-/// \return
-std::vector<std::string> split (const std::string &text, char delimiter)
+/// \brief Разбор строки по указанному разделителю.
+/// \param text Текст для разбора.
+/// \param delimiter Разделитель.
+/// \return Вектор подстрок.
+std::vector<std::string> IRBIS_CALL split (const std::string &text, char delimiter)
 {
     std::vector<std::string> result;
     std::string token;
@@ -662,11 +590,11 @@ std::vector<std::string> split (const std::string &text, char delimiter)
     return result;
 }
 
-///
-/// \param text
-/// \param delimiter
-/// \return
-StringList split (const String &text, Char delimiter)
+/// \brief Разбор строки по указанному разделителю.
+/// \param text Текст для разбора.
+/// \param delimiter Разделитель.
+/// \return Вектор подстрок.
+StringList IRBIS_CALL split (const String &text, Char delimiter)
 {
     std::vector<std::wstring> result;
     std::wstring token;
@@ -682,7 +610,7 @@ StringList split (const String &text, Char delimiter)
 /// \param text Текст, подлежащий разбиению.
 /// \param delimiter Разделитель.
 /// \return Вектор строк. Включает, кроме прочего, пустые строки.
-std::vector<std::string> split (const std::string &text, const std::string &delimiter)
+std::vector<std::string> IRBIS_CALL split (const std::string &text, const std::string &delimiter)
 {
     std::vector<std::string> result;
     std::string token;
@@ -705,7 +633,7 @@ std::vector<std::string> split (const std::string &text, const std::string &deli
 /// \param text Текст, подлежащий разбиению.
 /// \param delimiter Разделитель.
 /// \return Вектор строк. Включает, кроме прочего, пустые строки.
-StringList split (const String &text, const String &delimiter)
+StringList IRBIS_CALL split (const String &text, const String &delimiter)
 {
     StringList result;
     String token;
@@ -727,9 +655,10 @@ StringList split (const String &text, const String &delimiter)
 //=========================================================
 
 /// \brief Удаление из формата комментариев.
-/// \param text
-/// \return
-String removeComments (const String &text)
+/// Комментарии заменяются пустой строкой.
+/// \param text Текст для обработки.
+/// \return Обработанный текст.
+String IRBIS_CALL removeComments (const String &text)
 {
     if (text.empty()) {
         return text;
@@ -744,7 +673,7 @@ String removeComments (const String &text)
     std::size_t index = 0;
     const std::size_t length = text.length();
     while (index < length) {
-        Char c = text.at (index);
+        Char c = text [index];
 
         switch(state) {
         case '\'':
@@ -758,9 +687,9 @@ String removeComments (const String &text)
 
         default:
             if (c == '/') {
-                if ((index + 1u) < length && text.at(index + 1u) == '*') {
+                if ((index + 1u) < length && text [index + 1u] == '*') {
                     while (index < length) {
-                        c = text.at(index);
+                        c = text [index];
                         if (c == '\r' || c == '\n') {
                             result.push_back (c);
                             break;
@@ -770,15 +699,15 @@ String removeComments (const String &text)
                     }
                 }
                 else {
-                    result.push_back(c);
+                    result.push_back (c);
                 }
             }
             else if (c == '\'' || c == '"' || c == '|') {
                 state = c;
-                result.push_back(c);
+                result.push_back (c);
             }
             else {
-                result.push_back(c);
+                result.push_back (c);
             }
 
             break;
@@ -791,9 +720,11 @@ String removeComments (const String &text)
 }
 
 /// \brief Подготовка формата к отсылке на сервер.
-/// \param text
-/// \return
-std::wstring prepareFormat (const String &text)
+/// Удаляются служебные символы, на которые сервер реагирует очень нервно.
+/// Также удаляются комментарии.
+/// \param text Текст формата.
+/// \return Обработанный текст.
+String IRBIS_CALL prepareFormat (const String &text)
 {
     String text2 = removeComments (text);
     const std::size_t length = text2.length();
@@ -814,16 +745,19 @@ std::wstring prepareFormat (const String &text)
     }
 
     String result;
+    result.reserve (text2.length());
     for (std::size_t i = 0; i < length; i++) {
-        const Char c = text.at(i);
+        const Char c = text [i];
         if (c >= ' ') {
-            result.push_back(c);
+            result.push_back (c);
         }
     }
 
     return result;
 }
 
+/// \brief Программа выполняется на Windows или на Unix-подобной системе?
+/// \return true если Windows.
 bool IRBIS_CALL isWindows()
 {
 #ifdef IRBIS_WINDOWS

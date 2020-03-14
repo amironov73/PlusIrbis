@@ -19,6 +19,7 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 //=========================================================
@@ -270,7 +271,8 @@ public:
     T result; ///< Результирующее значение (имеет смысл при успешном завершении).
     String errorMessage; ///< Сообщение об ошибке.
 
-    /// \brief Преобразование к логическому значению. true означает успех.
+    /// \brief Преобразование к логическому значению.
+    /// \return true означает успех.
     operator bool() const // NOLINT(hicpp-explicit-conversions)
     {
         return this->success;
@@ -283,7 +285,7 @@ public:
     }
 
     /// \brief Формирование результата успешного выполнения.
-    static Result Success (T value)
+    static Result Success (T &&value)
     {
         Result result;
         result.success = true;
@@ -292,6 +294,8 @@ public:
     }
 
     /// \brief Формирование признака ошибки.
+    /// \param message Сообщение об ошибке.
+    /// \return Результат.
     static Result Failure (const String &message)
     {
         Result result;
@@ -299,7 +303,15 @@ public:
         result.errorMessage = message;
         return result;
     }
+
+    T resultOr (T (*func) ()) { return this->success ? this->result : func(); }
 };
+
+template<class T, class... Args>
+Result<T> makeResult (Args&&... args)
+{
+    return Result<T>::Success ({std::forward<Args> (args)...});
+}
 
 //=========================================================
 
@@ -325,6 +337,7 @@ public:
     T operator *() const noexcept { return value; }
     void reset() noexcept { this->hasValue = false; }
     T valueOr (const T& alternative) { return this->hasValue ? this->value : alternative; }
+    T valueOr (T (*func) ()) { return this->hasValue ? this->value : func(); }
 };
 
 //=========================================================

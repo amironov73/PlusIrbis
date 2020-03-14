@@ -177,6 +177,19 @@ Char TextNavigator::peekChar() const noexcept
     return this->at(this->_position);
 }
 
+/// \brief Подсматриваем текущий символ (пропускаем перевод строки).
+Char TextNavigator::peekCharNoCrLf() const noexcept
+{
+    std::ptrdiff_t distance = 0;
+    while (true) {
+        auto result = this->at (this->_position + distance);
+        if (result != '\r' && result != '\n') {
+            return result;
+        }
+        ++distance;
+    }
+}
+
 /// \brief Считываем текущий символ. Двигаемся вперёд по тексту.
 Char TextNavigator::readChar() noexcept
 {
@@ -194,6 +207,18 @@ Char TextNavigator::readChar() noexcept
 
     return result;
 }
+
+/// \brief Считываем текущий символ (пропуская перевод строки). Двигаемся вперёд по тексту.
+Char TextNavigator::readCharNoCrLf() noexcept
+{
+    while (true) {
+        const auto result = this->readChar();
+        if (result != '\r' && result != '\n') {
+            return result;
+        }
+    }
+}
+
 
 /// \brief Подглядывание строки вплоть до указанной длины.
 WideSpan TextNavigator::peekString(std::size_t length) const noexcept

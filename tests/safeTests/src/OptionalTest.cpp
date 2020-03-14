@@ -54,3 +54,10 @@ TEST_CASE("Optional_valueOr_2", "[optional]")
     irbis::Optional<int> opt;
     CHECK (opt.valueOr(1) == 1);
 }
+
+TEST_CASE("Optional_valueOr_3", "[optional]")
+{
+    irbis::Optional<int> opt;
+    int v = opt.valueOr([]() { return 3; });
+    CHECK (v == 3);
+}

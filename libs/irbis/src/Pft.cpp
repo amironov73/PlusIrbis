@@ -55,27 +55,17 @@ std::size_t PftLexer::line() const noexcept
 }
 
 /// \brief Подглядывание на один символ вперед.
-/// \return Считанный символ либо 0.
+/// \return Считанный символ либо EOT.
 Char PftLexer::peekChar() const noexcept
 {
-    std::ptrdiff_t distance = 1;
-    auto c = this->navigator->lookAhead (distance);
-    while (c == '\r' || c == '\n') {
-        ++distance;
-        c = this->navigator->lookAhead (distance);
-    }
-    return c;
+    return this->navigator->peekCharNoCrLf();
 }
 
 /// \brief Чтение одного символа.
-/// \return Считанный символ либо 0.
+/// \return Считанный символ либо EOT.
 Char PftLexer::readChar() noexcept
 {
-    auto c = this->navigator->readChar();
-    while (c == '\r' || c == '\n') {
-        c = this->navigator->readChar();
-    }
-    return c;
+    return this->navigator->readCharNoCrLf();
 }
 
 /// \brief Чтение вплоть до указанного символа.
@@ -105,14 +95,14 @@ String PftLexer::readTo (Char stopChar)
 PftTokenList PftLexer::tokenize (const String &text)
 {
     PftTokenList result;
-    this->navigator = std::make_unique<TextNavigator> (text);
+    this->navigator = makeUnique<TextNavigator> (text);
     while (!this->eot()) {
         this->navigator->skipWhitespace();
         if (this->eot()) {
             break;
         }
         auto c = this->readChar();
-        Char c2;
+        Char c2 = 0;
         String value;
         auto kind = TokenKind::None;
         switch (c) {
@@ -413,6 +403,305 @@ String PftLexer::readInteger()
 
     return result;
 }
+
+//=========================================================
+
+/// \brief Разбор текста.
+/// \param text Текст для разбора.
+/// \return Признак успешности.
+bool FieldSpecification::parse (const String &text)
+{
+    TextNavigator navigator (text);
+    auto c = navigator.readCharNoCrLf();
+    switch (c) {
+        case 'd':
+        case 'D':
+            this->command = 'd';
+            break;
+
+        case 'g':
+        case 'G':
+            this->command = 'g';
+            break;
+
+        case 'n':
+        case 'N':
+            this->command = 'n';
+            break;
+
+        case 'v':
+        case 'V':
+            this->command = 'v';
+            break;
+
+        default:
+            return false;
+    }
+
+    c = navigator.readCharNoCrLf();
+    if (!isDigit (c)) {
+        return false;
+    }
+    String s;
+    s.push_back (c);
+    while (true) {
+        c = navigator.peekCharNoCrLf();
+        if (!isDigit (c)) {
+            break;
+        }
+        navigator.readCharNoCrLf();
+        s.push_back (c);
+    }
+    this->tag = fastParse32 (s);
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+    if (c == '@') {
+        s.clear();
+        navigator.readCharNoCrLf();
+    }
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '[') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+    }
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '^') {
+        navigator.readCharNoCrLf();
+        if (navigator.eot()) {
+            return false;
+        }
+    }
+
+    if (this->command != 'v' && this->command != 'g') {
+        return true;
+    }
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '*') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+        s.clear();
+        while (true) {
+            c = navigator.peekCharNoCrLf();
+            if (!isDigit (c)) {
+                break;
+            }
+            s.push_back (c);
+            navigator.readCharNoCrLf();
+        }
+        if (s.empty()) {
+            return false;
+        }
+        this->offset = fastParse32 (s);
+    }
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '.') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+        s.clear();
+        while (true) {
+            c = navigator.peekCharNoCrLf();
+            if (!isDigit (c)) {
+                break;
+            }
+            s.push_back (c);
+            navigator.readCharNoCrLf();
+        }
+        if (s.empty()) {
+            return false;
+        }
+        this->length = fastParse32 (s);
+    }
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '(') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+        s.clear();
+    }
+
+    return true;
+}
+
+/// \brief Разбор краткого варианта спецификации.
+bool FieldSpecification::parseShort (const String &text)
+{
+    TextNavigator navigator (text);
+    auto c = navigator.readCharNoCrLf();
+    switch (c) {
+        case 'g':
+        case 'G':
+            this->command = 'g';
+            break;
+
+        case 'v':
+        case 'V':
+            this->command = 'v';
+            break;
+
+        default:
+            return false;
+    }
+
+    c = navigator.readCharNoCrLf();
+    if (!isDigit (c)) {
+        return false;
+    }
+    String s;
+    s.push_back (c);
+    while (true) {
+        c = navigator.peekCharNoCrLf();
+        if (!isDigit (c)) {
+            break;
+        }
+        navigator.readCharNoCrLf();
+        s.push_back (c);
+    }
+    this->tag = fastParse32 (s);
+
+    navigator.skipWhitespace();
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '^') {
+        navigator.readCharNoCrLf();
+        if (navigator.eot()) {
+            return false;
+        }
+        this->subfield = navigator.readCharNoCrLf();
+    }
+
+    return true;
+}
+
+/// \brief Разбор спецификации поля в стиле Unifor.
+bool FieldSpecification::parseUnifor (const String &text)
+{
+    TextNavigator navigator (text);
+    auto c = navigator.readCharNoCrLf();
+    switch (c) {
+        case 'v':
+        case 'V':
+            this->command = 'v';
+            break;
+
+        default:
+            return false;
+    }
+
+    c = navigator.readCharNoCrLf();
+    if (!isDigit (c)) {
+        return false;
+    }
+    String s;
+    s.push_back (c);
+    while (true) {
+        c = navigator.peekCharNoCrLf();
+        if (!isDigit (c)) {
+            break;
+        }
+        navigator.readCharNoCrLf();
+        s.push_back (c);
+    }
+    this->tag = fastParse32 (s);
+
+    if (c == '^') {
+        navigator.readCharNoCrLf();
+        if (navigator.eot()) {
+            return false;
+        }
+        this->subfield = navigator.readCharNoCrLf();
+    }
+
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '*') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+        s.clear();
+
+        while (true) {
+            c = navigator.peekCharNoCrLf();
+            if (!isDigit (c)) {
+                break;
+            }
+            navigator.readCharNoCrLf();
+            s.push_back (c);
+        }
+        if (s.empty()) {
+            return false;
+        }
+        this->offset = fastParse32 (s);
+    }
+
+    c = navigator.peekCharNoCrLf();
+
+    if (c == '.') {
+        navigator.readCharNoCrLf();
+        navigator.skipWhitespace();
+        s.clear();
+
+        while (true) {
+            c = navigator.peekCharNoCrLf();
+            if (!isDigit (c)) {
+                break;
+            }
+            navigator.readCharNoCrLf();
+            s.push_back (c);
+        }
+        if (s.empty()) {
+            return false;
+        }
+        this->length = fastParse32 (s);
+    }
+
+    return true;
+}
+
+/// \brief Преобразование в строку.
+/// \return Строковое представление.
+String FieldSpecification::toString() const
+{
+    String result;
+    result.push_back (this->command);
+    result.append (std::to_wstring (this->tag));
+    if (!this->embedded.empty()) {
+        result.push_back ('@');
+        result.append (this->embedded);
+    }
+    if (this->subfield != 0) {
+        result.push_back ('^');
+        result.push_back (this->subfield);
+    }
+    if (this->offset != 0) {
+        result.push_back ('*');
+        result.append (std::to_wstring (this->offset));
+    }
+    if (this->length != 0) {
+        result.push_back ('.');
+        result.append (std::to_wstring (this->length));
+    }
+    if (paragraphIndent != 0) {
+        result.push_back ('(');
+        result.append (std::to_wstring (this->paragraphIndent));
+        result.push_back (')');
+    }
+    return result;
+}
+
 
 //=========================================================
 

@@ -1,6 +1,8 @@
 #ifndef PLUSIRBIS_IRBIS_PFT_H
 #define PLUSIRBIS_IRBIS_PFT_H
 
+#include <memory>
+
 namespace irbis {
 
 //=========================================================
@@ -159,9 +161,9 @@ enum class IndexKind
 class IRBIS_API IndexSpecification final
 {
 public:
-    IndexKind kind;      ///< Вид индекса.
-    int literal;         ///< Значение литерала.
-    String expression;   ///< Выражение.
+    IndexKind kind { IndexKind::None };  ///< Вид индекса.
+    int literal { 0 };                   ///< Значение литерала.
+    String expression;                   ///< Выражение.
     std::unique_ptr<PftNumeric> program; ///< Компилированное выражение.
 };
 
@@ -171,7 +173,7 @@ public:
 class IRBIS_API FieldSpecification final
 {
 public:
-    char command;              ///< Код команды (обязательно в нижнем регистре)
+    char command { 0 };        ///< Код команды (обязательно в нижнем регистре)
     String embedded;           ///< Метка встроенного поля.
     int firstLine { 0 };       ///< Красная строка.
     int paragraphIndent;       ///< Общий абзацный отступ.
@@ -179,8 +181,13 @@ public:
     int length { 0 };          ///< Длина.
     IndexSpecification repeat; ///< Спецификация повторения.
     int tag { 0 };             ///< Метка поля
-    String subfield;           ///< Спецификация подполя.
+    Char subfield { 0 };       ///< Спецификация подполя.
     String raw;                ///< Сырая строка.
+
+    bool   parse       (const String &text);
+    bool   parseShort  (const String &text);
+    bool   parseUnifor (const String &text);
+    String toString() const;
 };
 
 //=========================================================

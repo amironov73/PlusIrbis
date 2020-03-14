@@ -589,7 +589,9 @@ public:
     Char lookBehind (std::ptrdiff_t distance = 1) const noexcept;
     TextNavigator& move (std::ptrdiff_t distance) noexcept;
     Char peekChar() const noexcept;
+    Char peekCharNoCrLf() const noexcept;
     Char readChar() noexcept;
+    Char readCharNoCrLf() noexcept;
     WideSpan peekString (std::size_t length) const noexcept;
     WideSpan peekTo (Char stopChar) const noexcept;
     WideSpan peekUntil (Char stopChar) const noexcept;
@@ -656,84 +658,89 @@ typename T1::value_type safeAt (const T1& container, T2 index)
     return container[index];
 }
 
-IRBIS_API bool sameChar   (Char first, Char second) noexcept;
-IRBIS_API bool sameString (const String &first, const String &second) noexcept;
-IRBIS_API Char firstChar  (const String &text)      noexcept;
-IRBIS_API char firstChar  (const std::string &text) noexcept;
+IRBIS_API bool IRBIS_CALL sameChar   (Char first, Char second) noexcept;
+IRBIS_API bool IRBIS_CALL sameString (const String &first, const String &second) noexcept;
+IRBIS_API Char IRBIS_CALL firstChar  (const String &text)      noexcept;
+IRBIS_API char IRBIS_CALL firstChar  (const std::string &text) noexcept;
 
-IRBIS_API String toLower      (String &text)      noexcept;
-IRBIS_API std::string toLower (std::string &text) noexcept;
-IRBIS_API String toUpper      (String &text)      noexcept;
-IRBIS_API std::string toUpper (std::string &text) noexcept;
+IRBIS_API String      IRBIS_CALL toLower (String &text)      noexcept;
+IRBIS_API std::string IRBIS_CALL toLower (std::string &text) noexcept;
+IRBIS_API String      IRBIS_CALL toUpper (String &text)      noexcept;
+IRBIS_API std::string IRBIS_CALL toUpper (std::string &text) noexcept;
 
 IRBIS_API bool contains (const String &text, const String &fragment);
 IRBIS_API bool contains (const String &text, Char c);
 
 IRBIS_API std::string replace (const std::string &text, const std::string &from, const std::string &to);
-IRBIS_API String replace      (const String &text, const String &from, const String &to);
+IRBIS_API String      replace (const String &text, const String &from, const String &to);
 
 IRBIS_API String trimStart (const String &text);
 IRBIS_API String trimEnd   (const String &text);
 IRBIS_API String trim      (const String &text);
 
-IRBIS_API int fastParse32 (const String &text);
-IRBIS_API int fastParse32 (CharSpan text);
-IRBIS_API int fastParse32 (WideSpan text);
-IRBIS_API int fastParse32 (const Char *text);
-IRBIS_API int fastParse32 (const Char *text, std::size_t length);
-IRBIS_API int fastParse32 (const std::string &text);
-IRBIS_API int fastParse32 (const char *text);
-IRBIS_API int fastParse32 (const char *text, std::size_t length);
+IRBIS_API int IRBIS_CALL fastParse32 (const String &text)                   noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (CharSpan text)                        noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (WideSpan text)                        noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (const Char *text)                     noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (const Char *text, std::size_t length) noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (const std::string &text)              noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (const char *text)                     noexcept;
+IRBIS_API int IRBIS_CALL fastParse32 (const char *text, std::size_t length) noexcept;
 
-IRBIS_API unsigned int fastParseUnsigned32 (const String &text);
-IRBIS_API unsigned int fastParseUnsigned32 (const Char *text);
-IRBIS_API unsigned int fastParseUnsigned32 (const Char *text, std::size_t length);
-IRBIS_API unsigned int fastParseUnsigned32 (const std::string &text);
-IRBIS_API unsigned int fastParseUnsigned32 (const char *text);
-IRBIS_API unsigned int fastParseUnsigned32 (const char *text, std::size_t length);
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const String &text)                   noexcept;
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const Char *text)                     noexcept;
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const Char *text, std::size_t length) noexcept;
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const std::string &text)              noexcept;
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const char *text)                     noexcept;
+IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const char *text, std::size_t length) noexcept;
 
-IRBIS_API std::vector<std::string> split(const std::string &text, char delimiter);
-IRBIS_API StringList split(const String &text, Char delimiter);
-IRBIS_API std::vector<std::string> split(const std::string &text, const std::string &delimiter);
-IRBIS_API StringList split(const String &text, const String &delimiter);
-IRBIS_API std::vector<std::string> maxSplit(const std::string &text, char separator, int count);
-IRBIS_API StringList maxSplit(const String &text, Char separator, int count);
+IRBIS_API std::vector<std::string> IRBIS_CALL split    (const std::string &text, char delimiter);
+IRBIS_API StringList               IRBIS_CALL split    (const String &text, Char delimiter);
+IRBIS_API std::vector<std::string> IRBIS_CALL split    (const std::string &text, const std::string &delimiter);
+IRBIS_API StringList               IRBIS_CALL split    (const String &text, const String &delimiter);
+IRBIS_API std::vector<std::string> IRBIS_CALL maxSplit (const std::string &text, char separator, int count);
+IRBIS_API StringList               IRBIS_CALL maxSplit (const String &text, Char separator, int count);
 
-IRBIS_API String cp866_to_unicode(const std::string &text);
-IRBIS_API String cp1251_to_unicode(const std::string &text);
-IRBIS_API String koi8r_to_unicode(const std::string &text);
+IRBIS_API String cp866_to_unicode  (const std::string &text);
+IRBIS_API String cp1251_to_unicode (const std::string &text);
+IRBIS_API String koi8r_to_unicode  (const std::string &text);
 
-IRBIS_API std::string unicode_to_cp866(const String &text);
-IRBIS_API std::string unicode_to_cp1251(const String &text);
-IRBIS_API void unicode_to_cp1251(Byte *dst, const Char *src, std::size_t size);
-IRBIS_API std::string unicode_to_koi8r(const String &text);
+IRBIS_API std::string unicode_to_cp866  (const String &text);
+IRBIS_API std::string unicode_to_cp1251 (const String &text);
+IRBIS_API void        unicode_to_cp1251 (Byte *dst, const Char *src, std::size_t size);
+IRBIS_API std::string unicode_to_koi8r  (const String &text);
 
-IRBIS_API std::string narrow(const String &wide, const std::locale &loc);
-IRBIS_API String widen(const std::string &str, const std::locale &loc);
-IRBIS_API String new_cp1251_to_unicode(const std::string &text);
-IRBIS_API std::string new_unicode_to_cp1251(const String &text);
-IRBIS_API std::string new_toUtf(const String &text);
-IRBIS_API String new_fromUtf(const std::string &text);
+IRBIS_API std::string narrow                (const String &wide, const std::locale &loc);
+IRBIS_API String      widen                 (const std::string &str, const std::locale &loc);
+IRBIS_API String      new_cp1251_to_unicode (const std::string &text);
+IRBIS_API std::string new_unicode_to_cp1251 (const String &text);
+IRBIS_API std::string new_toUtf             (const String &text);
+IRBIS_API String      new_fromUtf           (const std::string &text);
 
-IRBIS_API Byte* toUtf (Byte *dst, const Char *src, std::size_t length);
-IRBIS_API Char* fromUtf (Char *dst, const Byte *src, std::size_t length);
-IRBIS_API std::size_t countUtf (const Char *src, std::size_t length);
-IRBIS_API std::size_t countUtf (const Byte *src, std::size_t length);
-IRBIS_API const Byte* fromUtf (const Byte *src, std::size_t &size, Byte stop, String &result);
-IRBIS_API Byte* toUtf (Byte *dst, const String &text);
-IRBIS_API String fromUtf (const std::string &text);
-IRBIS_API std::string toUtf (const String &text);
-IRBIS_API String fromUtf (ByteSpan span);
+IRBIS_API Byte*       IRBIS_CALL toUtf    (Byte *dst, const Char *src, std::size_t length) noexcept;
+IRBIS_API Char*       IRBIS_CALL fromUtf  (Char *dst, const Byte *src, std::size_t length) noexcept;
+IRBIS_API std::size_t IRBIS_CALL countUtf (const Char *src, std::size_t length)            noexcept;
+IRBIS_API std::size_t IRBIS_CALL countUtf (const Byte *src, std::size_t length)            noexcept;
+IRBIS_API const Byte* IRBIS_CALL fromUtf  (const Byte *src, std::size_t &size, Byte stop, String &result);
+IRBIS_API Byte*       IRBIS_CALL toUtf    (Byte *dst, const String &text);
+IRBIS_API String      IRBIS_CALL fromUtf  (const std::string &text);
+IRBIS_API std::string IRBIS_CALL toUtf    (const String &text);
+IRBIS_API String      IRBIS_CALL fromUtf  (ByteSpan span);
 
-IRBIS_API String removeComments (const String &text);
-IRBIS_API String prepareFormat (const String &text);
+IRBIS_API String IRBIS_CALL removeComments (const String &text);
+IRBIS_API String IRBIS_CALL prepareFormat  (const String &text);
 
 template<typename T>
 bool isDigit(T c)  { return (c >= '0') && (c <= '9'); }
 
-}
-
 //=========================================================
+// borrow from C++14
+
+template<typename T, typename ... Args>
+std::unique_ptr<T> makeUnique (Args&& ... args)
+{ return std::unique_ptr<T> (new T (std::forward<Args>(args)...)); }
+
+}
 
 //=========================================================
 
