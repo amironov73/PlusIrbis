@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
-#include <cassert>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -55,9 +54,11 @@ static int coefficients[] { 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 };
 /// \brief Вычисление контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-char Ean13::computeCheckDigit (CharSpan text)
+char Ean13::computeCheckDigit (CharSpan text) noexcept
 {
-    assert (text.size() >= 12);
+    if (text.size() < 12) {
+        return 0;
+    }
     auto sum = 0;
     for (auto i = 0; i < 12; i++) {
         sum = sum + (text[i] - '0') * coefficients[i];
@@ -69,9 +70,11 @@ char Ean13::computeCheckDigit (CharSpan text)
 /// \brief Вычисление контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-Char Ean13::computeCheckDigit (WideSpan text)
+Char Ean13::computeCheckDigit (WideSpan text) noexcept
 {
-    assert (text.size() >= 12);
+    if (text.size() < 12) {
+        return 0;
+    }
     auto sum = 0;
     for (auto i = 0; i < 12; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i];
@@ -83,9 +86,11 @@ Char Ean13::computeCheckDigit (WideSpan text)
 /// \brief Проверка контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-bool Ean13::checkControlDigit (CharSpan text)
+bool Ean13::checkControlDigit (CharSpan text) noexcept
 {
-    assert (text.size() >= 13);
+    if (text.size() < 13) {
+        return false;
+    }
     auto sum = 0;
     for (auto i = 0; i < 13; i++) {
         sum = sum + (text[i] - '0') * coefficients[i];
@@ -97,9 +102,11 @@ bool Ean13::checkControlDigit (CharSpan text)
 /// \brief Проверка контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-bool Ean13::checkControlDigit (WideSpan text)
+bool Ean13::checkControlDigit (WideSpan text) noexcept
 {
-    assert (text.size() >= 13);
+    if (text.size() < 13) {
+        return false;
+    }
     auto sum = 0;
     for (auto i = 0; i < 13; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i];
@@ -111,9 +118,11 @@ bool Ean13::checkControlDigit (WideSpan text)
 /// \brief Вычисление контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-char Ean8::computeCheckDigit (CharSpan text)
+char Ean8::computeCheckDigit (CharSpan text) noexcept
 {
-    assert (text.size() >= 7);
+    if (text.size() < 7) {
+        return 0;
+    }
     auto sum = 0;
     for (auto i = 0; i < 7; i++) {
         sum = sum + (text[i] - '0') * coefficients[i + 1];
@@ -125,9 +134,11 @@ char Ean8::computeCheckDigit (CharSpan text)
 /// \brief Вычисление контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-Char Ean8::computeCheckDigit (WideSpan text)
+Char Ean8::computeCheckDigit (WideSpan text) noexcept
 {
-    assert (text.size() >= 7);
+    if (text.size() < 7) {
+        return 0;
+    }
     auto sum = 0;
     for (auto i = 0; i < 7; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i + 1];
@@ -139,9 +150,11 @@ Char Ean8::computeCheckDigit (WideSpan text)
 /// \brief Проверка контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-bool Ean8::checkControlDigit (CharSpan text)
+bool Ean8::checkControlDigit (CharSpan text) noexcept
 {
-    assert (text.size() >= 8);
+    if (text.size() < 8) {
+        return false;
+    }
     auto sum = 0;
     for (auto i = 0; i < 8; i++) {
         sum = sum + (text[i] - '0') * coefficients[i + 1];
@@ -153,9 +166,11 @@ bool Ean8::checkControlDigit (CharSpan text)
 /// \brief Проверка контрольной цифры.
 /// \param text Цифры EAN без посторонних знаков.
 /// \return Вычисленная контрольная цифра.
-bool Ean8::checkControlDigit (WideSpan text)
+bool Ean8::checkControlDigit (WideSpan text) noexcept
 {
-    assert (text.size() >= 8);
+    if (text.size() < 8) {
+        return false;
+    }
     auto sum = 0;
     for (auto i = 0; i < 8; i++) {
         sum = sum + (text[i] - L'0') * coefficients[i + 1];

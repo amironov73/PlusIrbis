@@ -27,12 +27,28 @@
 
 namespace irbis {
 
+/// \brief Добавление подполя.
+/// \param subFieldCode Код подполя.
+/// \param subFieldValue Значение подполя.
+/// \return this.
 RecordField& RecordField::add (Char subFieldCode, const String &subFieldValue)
 {
-    this->subfields.emplace_back(subFieldCode, subFieldValue);
+    this->subfields.emplace_back (subFieldCode, subFieldValue);
     return *this;
 }
 
+/// \brief Добавление подполя.
+/// \param subFieldCode Код подполя.
+/// \param subFieldValue Значение подполя.
+/// \return this.
+RecordField& RecordField::add (Char subFieldCode,  String &&subFieldValue)
+{
+    this->subfields.emplace_back (subFieldCode, std::move (subFieldValue));
+    return *this;
+}
+
+/// \brief Очистка (удаление всех подполей).
+/// \return this.
 RecordField& RecordField::clear()
 {
     value.clear();
@@ -40,6 +56,8 @@ RecordField& RecordField::clear()
     return *this;
 }
 
+/// \brief Создание глубокой копии поля.
+/// \return Глубокая копия.
 RecordField RecordField::clone() const
 {
     RecordField result (this->tag, this->value);
@@ -49,6 +67,8 @@ RecordField RecordField::clone() const
     return result;
 }
 
+/// \brief Декодирование текстового представления тела поля.
+/// \param body Текст для декодирования.
 void RecordField::decodeBody (const String &body)
 {
     StringList all;
@@ -68,6 +88,8 @@ void RecordField::decodeBody (const String &body)
     }
 }
 
+/// \brief Декодирование текстового представления поля,
+/// \param line Текст для декодирования.
 void RecordField::decode (const String &line)
 {
     const auto parts = maxSplit (line, L'#', 2);
@@ -79,11 +101,16 @@ void RecordField::decode (const String &line)
     this->decodeBody (body);
 }
 
+/// \brief Пустое поле (нет значения и подполей)?
+/// \return true если пустое.
 bool RecordField::empty() const noexcept
 {
     return !this->tag || (this->value.empty() && this->subfields.empty());
 }
 
+/// \brief Получение указателя на первое подполе с указанным кодом.
+/// \param code Искомый код подполя.
+/// \return Указатель на подполе либо `nullptr`.
 SubField* RecordField::getFirstSubfield (Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
@@ -94,6 +121,9 @@ SubField* RecordField::getFirstSubfield (Char code) const noexcept
     return nullptr;
 }
 
+/// \brief Получение значения первого подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \return Значение первого подполя либо пустая строка.
 String RecordField::getFirstSubfieldValue (Char code) const noexcept
 {
     for (const auto &one : this->subfields) {
@@ -101,9 +131,12 @@ String RecordField::getFirstSubfieldValue (Char code) const noexcept
             return one.value;
         }
     }
-    return String();
+    return {};
 }
 
+/// \brief Удаление подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \return this.
 RecordField& RecordField::removeSubfield (Char code)
 {
     std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
@@ -113,6 +146,10 @@ RecordField& RecordField::removeSubfield (Char code)
     return *this;
 }
 
+/// \brief Установка значения подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \param newValue Новое значение поля.
+/// \return this.
 RecordField& RecordField::setSubfield (Char code, const String &newValue)
 {
     if (newValue.empty()) {
@@ -129,6 +166,29 @@ RecordField& RecordField::setSubfield (Char code, const String &newValue)
     return *this;
 }
 
+/// \brief Установка значения подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \param newValue Новое значение поля.
+/// \return this.
+RecordField& RecordField::setSubfield (Char code, String &&newValue)
+{
+    if (newValue.empty()) {
+        this->removeSubfield (code);
+        return *this;
+    }
+    auto *subField = this->getFirstSubfield (code);
+    if (!subField) {
+        this->add (code, std::move (newValue));
+    }
+    else {
+        subField->value = std::move (newValue);
+    }
+    return *this;
+}
+
+/// \brief Верификация поля.
+/// \param throwOnError Бросать исключение при ошибке.
+/// \return true если поле верифицировано.
 bool RecordField::verify (bool throwOnError) const
 {
     bool result = tag > 0;
@@ -151,6 +211,8 @@ bool RecordField::verify (bool throwOnError) const
     return result;
 }
 
+/// \brief Получение строкового представления поля.
+/// \return Строковое представление поля.
 String RecordField::toString() const
 {
     String result = std::to_wstring(tag)

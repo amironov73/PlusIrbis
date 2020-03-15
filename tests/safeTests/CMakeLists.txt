@@ -11,7 +11,7 @@ set(CppFiles
     src/AuthorTest.cpp
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
-    src/CodeTest.cpp
+    src/CodesTest.cpp
     src/DateTest.cpp
     src/DirectAccessTest.cpp
     src/EanTest.cpp
@@ -20,6 +20,7 @@ set(CppFiles
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
     src/FrugalTest.cpp
+    src/IniTest.cpp
     src/IOTest.cpp
     src/IsbnTest.cpp
     src/Iso2709Test.cpp

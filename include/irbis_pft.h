@@ -1,7 +1,10 @@
 #ifndef PLUSIRBIS_IRBIS_PFT_H
 #define PLUSIRBIS_IRBIS_PFT_H
 
+#include "irbis.h"
+
 #include <memory>
+#include <utility>
 
 namespace irbis {
 

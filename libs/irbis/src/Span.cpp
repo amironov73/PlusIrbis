@@ -148,7 +148,7 @@ WideSpan IRBIS_CALL trim (WideSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan IRBIS_CALL toupper (CharSpan text)
+CharSpan IRBIS_CALL toUpper (CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -161,7 +161,7 @@ CharSpan IRBIS_CALL toupper (CharSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan IRBIS_CALL toupper (WideSpan text)
+WideSpan IRBIS_CALL toUpper (WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -174,7 +174,7 @@ WideSpan IRBIS_CALL toupper (WideSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan IRBIS_CALL tolower (CharSpan text)
+CharSpan IRBIS_CALL toLower (CharSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -187,7 +187,7 @@ CharSpan IRBIS_CALL tolower (CharSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan IRBIS_CALL tolower (WideSpan text)
+WideSpan IRBIS_CALL toLower (WideSpan text)
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {

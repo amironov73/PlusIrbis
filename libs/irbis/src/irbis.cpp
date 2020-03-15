@@ -758,7 +758,7 @@ String IRBIS_CALL prepareFormat (const String &text)
 
 /// \brief Программа выполняется на Windows или на Unix-подобной системе?
 /// \return true если Windows.
-bool IRBIS_CALL isWindows()
+bool IRBIS_CALL isWindows() noexcept
 {
 #ifdef IRBIS_WINDOWS
     return true;

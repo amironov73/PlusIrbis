@@ -4,6 +4,8 @@
 #ifndef IRBIS_PRIVATE_H
 #define IRBIS_PRIVATE_H
 
+#include "irbis.h"
+
 //=========================================================
 
 #if defined(_MSC_VER)
@@ -283,16 +285,16 @@ public:
     ClientQuery& operator = (ClientQuery &&) = delete;
     ~ClientQuery() = default;
 
-    ClientQuery& add (int value);
-    ClientQuery& add (const FileSpecification &specification);
-    ClientQuery& add (const MarcRecord &record, const std::wstring &delimiter);
-    ClientQuery& addAnsi (const std::string &text);
-    ClientQuery& addAnsi (const String &text);
-    bool addFormat (const String &format);
-    ClientQuery& addUtf (const String &text);
-    void dump (std::ostream &stream) const;
-    Bytes encode() const;
-    ClientQuery& newLine();
+    ClientQuery& add       (int value);
+    ClientQuery& add       (const FileSpecification &specification);
+    ClientQuery& add       (const MarcRecord &record, const std::wstring &delimiter);
+    ClientQuery& addAnsi   (const std::string &text);
+    ClientQuery& addAnsi   (const String &text);
+    bool         addFormat (const String &format);
+    ClientQuery& addUtf    (const String &text);
+    void         dump      (std::ostream &stream) const;
+    Bytes        encode    () const;
+    ClientQuery& newLine   ();
 };
 
 //=========================================================

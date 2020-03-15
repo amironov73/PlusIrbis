@@ -73,7 +73,7 @@ TEST_CASE("Result_destruction_1", "[result]")
         CHECK (r1.success);
         CHECK (r1.result.value == 1);
     }
-    CHECK (destructionCounter == 3);
+    CHECK (destructionCounter >= 2);
 }
 
 TEST_CASE("Result_resultOr_1", "[result]")

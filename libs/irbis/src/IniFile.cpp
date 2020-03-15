@@ -36,7 +36,17 @@ void IniLine::notModified() noexcept
 /// \param newKey Новый ключ строки.
 ///
 /// Устанавливает состояние "строка модифицирована".
-void IniLine::setKey(const String &newKey) noexcept
+void IniLine::setKey (const String &newKey)
+{
+    this->key = newKey;
+    this->_modified = true;
+}
+
+/// \brief Смена ключа строки.
+/// \param newKey Новый ключ строки.
+///
+/// Устанавливает состояние "строка модифицирована".
+void IniLine::setKey (String &&newKey) noexcept
 {
     this->key = newKey;
     this->_modified = true;
@@ -46,7 +56,17 @@ void IniLine::setKey(const String &newKey) noexcept
 /// \param newValue Новое значение строки.
 ///
 /// Устанавливает состояние "строка модифицирована".
-void IniLine::setValue(const String &newValue) noexcept
+void IniLine::setValue (const String &newValue)
+{
+    this->value = newValue;
+    this->_modified = true;
+}
+
+/// \brief Смена значения строки.
+/// \param newValue Новое значение строки.
+///
+/// Устанавливает состояние "строка модифицирована".
+void IniLine::setValue (String &&newValue) noexcept
 {
     this->value = newValue;
     this->_modified = true;
@@ -58,6 +78,8 @@ String IniLine::toString() const
 {
     return this->key + L"=" + this->value;
 }
+
+//=========================================================
 
 /// \brief Очищает секцию (удаляет все строки).
 /// \return `this`.

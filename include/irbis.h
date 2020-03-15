@@ -16,6 +16,7 @@
 #include <ios>
 #include <list>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -246,17 +247,17 @@ class XrfRecord64;
 
 //=========================================================
 
-using Byte = std::uint8_t;
-using Bytes = std::vector<Byte>;
-using Char = wchar_t;
-using Chars = std::vector<Char>;
-using String = std::wstring;
-using Flag = std::uint32_t;
-using Mfn = std::uint32_t;
-using MfnList = std::vector<Mfn>;
-using Offset = std::uint64_t;
-using StringList = std::vector<String>;
-using SubFieldList = std::vector<SubField>;
+using Byte            = std::uint8_t;
+using Bytes           = std::vector<Byte>;
+using Char            = wchar_t;
+using Chars           = std::vector<Char>;
+using String          = std::wstring;
+using Flag            = std::uint32_t;
+using Mfn             = std::uint32_t;
+using MfnList         = std::vector<Mfn>;
+using Offset          = std::uint64_t;
+using StringList      = std::vector<String>;
+using SubFieldList    = std::vector<SubField>;
 using RecordFieldList = std::vector<RecordField>;
 
 //=========================================================
@@ -794,10 +795,10 @@ IRBIS_API CharSpan IRBIS_CALL trimEnd    (CharSpan text);
 IRBIS_API WideSpan IRBIS_CALL trimEnd    (WideSpan text);
 IRBIS_API CharSpan IRBIS_CALL trim       (CharSpan text);
 IRBIS_API WideSpan IRBIS_CALL trim       (WideSpan text);
-IRBIS_API CharSpan IRBIS_CALL toupper    (CharSpan text);
-IRBIS_API WideSpan IRBIS_CALL toupper    (WideSpan text);
-IRBIS_API CharSpan IRBIS_CALL tolower    (CharSpan text);
-IRBIS_API WideSpan IRBIS_CALL tolower    (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL toUpper    (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL toUpper    (WideSpan text);
+IRBIS_API CharSpan IRBIS_CALL toLower    (CharSpan text);
+IRBIS_API WideSpan IRBIS_CALL toLower    (WideSpan text);
 
 //=========================================================
 
@@ -896,10 +897,10 @@ public:
 class IRBIS_API Ean13 final
 {
 public:
-    static char computeCheckDigit (CharSpan text);
-    static Char computeCheckDigit (WideSpan text);
-    static bool checkControlDigit (CharSpan text);
-    static bool checkControlDigit (WideSpan text);
+    static char computeCheckDigit (CharSpan text) noexcept;
+    static Char computeCheckDigit (WideSpan text) noexcept;
+    static bool checkControlDigit (CharSpan text) noexcept;
+    static bool checkControlDigit (WideSpan text) noexcept;
 };
 
 //=========================================================
@@ -908,10 +909,10 @@ public:
 class IRBIS_API Ean8 final
 {
 public:
-    static char computeCheckDigit (CharSpan text);
-    static Char computeCheckDigit (WideSpan text);
-    static bool checkControlDigit (CharSpan text);
-    static bool checkControlDigit (WideSpan text);
+    static char computeCheckDigit (CharSpan text) noexcept;
+    static Char computeCheckDigit (WideSpan text) noexcept;
+    static bool checkControlDigit (CharSpan text) noexcept;
+    static bool checkControlDigit (WideSpan text) noexcept;
 };
 
 //=========================================================
@@ -949,11 +950,17 @@ public:
     String key;    ///< Ключ (не должен быть пустым).
     String value;  ///< Значение (может быть пустым).
 
-    bool modified() const noexcept;
-    void notModified() noexcept;
-    void setKey(const String &newKey) noexcept;
-    void setValue(const String &newValue) noexcept;
-    String toString() const;
+    IniLine() = default;
+    IniLine (const String &key_, const String &value_) : key (key_), value (value_) {}
+    IniLine (String &&key_, String &&value_) : key (std::move (key_)), value (std::move (value_)) {}
+
+    bool   modified    ()                       const noexcept;
+    void   notModified ()                       noexcept;
+    void   setKey      (const String &newKey);
+    void   setKey      (String &&newKey)        noexcept;
+    void   setValue    (const String &newValue);
+    void   setValue    (String &&newValue)      noexcept;
+    String toString    ()                       const;
 
 private:
     bool _modified { false };
@@ -2242,7 +2249,8 @@ public:
     std::list<SubField> subfields;
 
     RecordField() = default;
-    RecordField (int tag, const String &value = L"") : tag(tag), value(value) {}
+    RecordField (int tag_, const String &value_ = L"") : tag (tag_), value (value_) {}
+    RecordField (int tag_, String &&value_) : tag (tag_), value (std::move (value_)) {}
     RecordField (const RecordField &other) = default;
     RecordField (RecordField &&other) = default;
     RecordField& operator = (const RecordField &other) = default;
@@ -2250,6 +2258,7 @@ public:
     ~RecordField() = default;
 
     RecordField& add (Char code, const String &value = L"");
+    RecordField& add (Char code, String &&value);
     RecordField& clear();
     RecordField clone() const;
     void decode (const String &line);
@@ -2259,6 +2268,7 @@ public:
     String getFirstSubfieldValue (Char code) const noexcept;
     RecordField& removeSubfield (Char code);
     RecordField& setSubfield (Char code, const String &newValue);
+    RecordField& setSubfield (Char code, String &&newValue);
     bool verify (bool throwOnError) const;
     String toString() const;
 
@@ -2406,7 +2416,8 @@ public:
     String value; ///< Значение подполя (может быть пустой строкой).
 
     SubField() = default;
-    SubField (Char code, const String &value = L"") : code(code), value(value) {}
+    SubField (Char code_, const String &value_ = L"") : code (code_), value (value_) {}
+    SubField (Char code_, String &&value_) : code (code_), value (std::move (value_)) {}
     SubField (const SubField &other) = default;
     SubField (SubField &&other) = default;
     SubField& operator = (const SubField &other) = default;
@@ -2742,7 +2753,7 @@ IRBIS_API String      IRBIS_CALL string2wide (const std::string &s);
 IRBIS_API std::string IRBIS_CALL toUtf       (const std::string &s);
 IRBIS_API std::string IRBIS_CALL toAnsi      (const std::string &s);
 
-IRBIS_API bool        IRBIS_CALL isWindows();
+IRBIS_API bool        IRBIS_CALL isWindows() noexcept;
 
 IRBIS_API String      IRBIS_CALL describeError (int errorCode);
 
