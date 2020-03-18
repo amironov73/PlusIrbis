@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_direct.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -12,7 +13,7 @@
 
 namespace irbis {
 
-void MstRecordLeader64::read(FILE *file)
+void MstRecordLeader64::read (FILE *file)
 {
     fread(this, sizeof(MstRecordLeader64), 1, file);
     throw NotImplementedException();

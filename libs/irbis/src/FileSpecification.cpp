@@ -34,7 +34,7 @@ namespace irbis {
 /// \brief Конструктор для спецификации системных файлов (вне баз данных).
 /// \param path_ Код пути.
 /// \param filename_ Имя файла (не пустое).
-FileSpecification::FileSpecification(int path_, const String &filename_)  // NOLINT(modernize-pass-by-value)
+FileSpecification::FileSpecification(IrbisPath path_, const String &filename_)  // NOLINT(modernize-pass-by-value)
     : path(path_), filename(filename_)
 {
 }
@@ -43,7 +43,7 @@ FileSpecification::FileSpecification(int path_, const String &filename_)  // NOL
 /// \param path_ Код пути.
 /// \param database_ Имя базы данных (не пустое).
 /// \param filename_ Имя файла (не пустое).
-FileSpecification::FileSpecification(int path_, const String &database_, const String &filename_)  // NOLINT(modernize-pass-by-value)
+FileSpecification::FileSpecification(IrbisPath path_, const String &database_, const String &filename_)  // NOLINT(modernize-pass-by-value)
     : path(path_), database(database_), filename(filename_)
 {
 }
@@ -54,7 +54,7 @@ FileSpecification::FileSpecification(int path_, const String &database_, const S
 FileSpecification FileSpecification::parse(const String &text)
 {
     TextNavigator navigator(text);
-    const auto path = fastParse32(navigator.readTo('.'));
+    const auto path = static_cast<IrbisPath> (fastParse32(navigator.readTo('.')));
     const auto database = navigator.readTo('.').toString();
     auto fileName = navigator.remainingText().toString();
     const auto binaryFile = fileName[0] == L'@';
@@ -111,13 +111,15 @@ String FileSpecification::toString() const
     }
 
     switch (this->path) {
-    case 0:
-    case 1:
-        result = std::to_wstring(this->path) + L".." + result;
+    case IrbisPath::System:
+    case IrbisPath::Data:
+        result = std::to_wstring (static_cast<int> (this->path))
+                + L".." + result;
         break;
 
     default:
-        result = std::to_wstring(this->path) + L"." + this->database + L"." + result;
+        result = std::to_wstring (static_cast<int> (this->path))
+                + L"." + this->database + L"." + result;
         break;
     }
 

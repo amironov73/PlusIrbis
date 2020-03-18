@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_direct.h"
 
 /*!
     \class irbis::XrfRecord64
@@ -33,14 +34,14 @@ const int XrfRecord64::RecordSize = sizeof(Offset) + sizeof (Mfn);
 /// \return `true` если запись удалена.
 bool XrfRecord64::deleted() const noexcept
 {
-    return (this->status & RecordStatus::Deleted) != 0;
+    return (this->status & RecordStatus::Deleted) != RecordStatus::None;
 }
 
 /// \brief Запись заблокирована?
 /// \return `true` если запись заблокирована.
 bool XrfRecord64::locked() const noexcept
 {
-    return (this->status & RecordStatus::Locked) != 0;
+    return (this->status & RecordStatus::Locked) != RecordStatus::None;
 }
 
 /// \brief Преобразование в текстовый вид.
@@ -48,7 +49,7 @@ bool XrfRecord64::locked() const noexcept
 String XrfRecord64::toString() const
 {
     return String (L", offset=") + std::to_wstring (this->offset)
-        + String (L", status:=") + std::to_wstring (this->status);
+        + String (L", status:=") + std::to_wstring (static_cast<uint32_t> (this->status));
 }
 
 }

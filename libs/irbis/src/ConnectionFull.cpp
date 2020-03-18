@@ -24,7 +24,7 @@ bool ConnectionFull::deleteRecord(int mfn) {
 
     auto record = readRecord(mfn);
     if (!record.deleted()) {
-        record.status |= RecordStatus::LogicallyDeleted;
+        record.status = record.status | RecordStatus::LogicallyDeleted;
         this->writeRecord(record, false, true, true);
     }
 

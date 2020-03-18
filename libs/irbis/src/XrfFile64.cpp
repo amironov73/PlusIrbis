@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_direct.h"
 #include "irbis_private.h"
 
 #include <cassert>
@@ -85,7 +86,7 @@ XrfRecord64 XrfFile64::readRecord (Mfn mfn)
     XrfRecord64 result;
     const auto stream = this->_file->getStream();
     if (!IO::readInt64 (stream, &result.offset)
-        || !IO::readInt32 (stream, &result.status)) {
+        || !IO::readInt32 (stream, reinterpret_cast<uint32_t*> (&result.status))) {
         throw IrbisException();
     }
     return result;
@@ -106,7 +107,7 @@ void XrfFile64::writeRecord (Mfn mfn, XrfRecord64 record)
     }
     const auto stream = this->_file->getStream();
     if (!IO::writeInt64(stream, record.offset)
-        || !IO::writeInt32(stream, record.status)) {
+        || !IO::writeInt32(stream, static_cast<uint32_t> (record.status))) {
         throw IrbisException();
     }
 }

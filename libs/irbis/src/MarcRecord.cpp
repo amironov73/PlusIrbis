@@ -75,7 +75,7 @@ void MarcRecord::decode (const StringList &lines)
     // mfn and status of the record
     const auto firstLine = split(lines[0], L'#');
     this->mfn = fastParseUnsigned32(firstLine[0]);
-    this->status = fastParseUnsigned32(safeAt(firstLine, 1));
+    this->status = static_cast<RecordStatus> (fastParseUnsigned32 (safeAt(firstLine, 1)));
 
     // version of the record
     const auto secondLine = split(lines[1], L'#');
@@ -94,13 +94,13 @@ void MarcRecord::decode (const StringList &lines)
 
 bool MarcRecord::deleted() const noexcept
 {
-    return (this->status & RecordStatus::Deleted) != 0u;
+    return (this->status & RecordStatus::Deleted) != RecordStatus::None;
 }
 
 String MarcRecord::encode (const String &delimiter) const
 {
-    String result = std::to_wstring(this->mfn) + L"#"
-            + std::to_wstring(this->status) + delimiter
+    String result = std::to_wstring (this->mfn) + L"#"
+            + std::to_wstring (static_cast<int> (this->status)) + delimiter
             + L"0#" + std::to_wstring(this->version) + delimiter;
     for (const auto &field : this->fields) {
         result.append(field.toString());
@@ -196,7 +196,7 @@ MarcRecord& MarcRecord::setField (int tag, const String &value)
 MarcRecord& MarcRecord::reset() noexcept
 {
     this->mfn = 0;
-    this->status = 0;
+    this->status = RecordStatus::None;
     this->version = 0;
     this->database.clear();
     return *this;
@@ -220,7 +220,7 @@ bool MarcRecord::verify (bool throwOnError) const
 IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &record)
 {
     stream << std::to_wstring (record.mfn) << String (L"#")
-        << std::to_wstring (record.status) << std::endl;
+        << std::to_wstring (static_cast<int> (record.status)) << std::endl;
     stream << String (L"0#") << record.version << std::endl;
     for (const RecordField &field : record.fields) {
         stream << field << std::endl;

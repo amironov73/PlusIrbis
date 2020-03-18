@@ -93,7 +93,7 @@ IniSection& IniSection::clear()
 /// \brief Содержит ли данная секция строку с указанным ключом?
 /// \param key Искомый ключ.
 /// \return `true` если содержит.
-bool IniSection::containsKey(const String &key) const noexcept
+bool IniSection::containsKey (const String &key) const noexcept
 {
     return std::any_of(begin(this->lines), end(this->lines),
             [&key] (const IniLine &x) { return sameString(x.key, key); });
@@ -103,10 +103,10 @@ bool IniSection::containsKey(const String &key) const noexcept
 /// \param key Искомый ключ.
 /// \return Индекс строки, либо отрицательное значение,
 /// если строка не найдена.
-std::ptrdiff_t IniSection::getIndex(const String &key) const noexcept
+std::ptrdiff_t IniSection::getIndex (const String &key) const noexcept
 {
     for (std::size_t i=0; i < this->lines.size(); i++) {
-        if (sameString(this->lines[i].key, key)) {
+        if (sameString (this->lines[i].key, key)) {
             return i;
         }
     }
@@ -117,10 +117,10 @@ std::ptrdiff_t IniSection::getIndex(const String &key) const noexcept
 /// \brief Поиск строки с указанным ключом.
 /// \param key Искомый ключ.
 /// \return Указатель на найденную строку, либо `nullptr`.
-IniLine* IniSection::getLine(const String &key) const noexcept
+IniLine* IniSection::getLine (const String &key) const noexcept
 {
     for (const auto &line : this->lines) {
-        if (sameString(line.key, key)) {
+        if (sameString (line.key, key)) {
             return const_cast<IniLine*>(&line);
         }
     }
@@ -132,7 +132,7 @@ IniLine* IniSection::getLine(const String &key) const noexcept
 /// \param key Искомый ключ.
 /// \param defaultValue Значение, возвращаемое, если строка не найдена.
 /// \return Найденное значение либо значение по умолчанию.
-const String& IniSection::getValue(const String &key, const String &defaultValue) const noexcept
+const String& IniSection::getValue (const String &key, const String &defaultValue) const noexcept
 {
     const auto line = this->getLine(key);
     return line ? line->value : defaultValue;
@@ -142,25 +142,33 @@ const String& IniSection::getValue(const String &key, const String &defaultValue
 /// \return `true`, если модифицированные строки есть.
 bool IniSection::modified() const noexcept
 {
-    return std::any_of(begin(this->lines), end(this->lines),
-            [] (const IniLine &x) { return x.modified(); });
+    return std::any_of
+        (
+             begin (this->lines),
+             end (this->lines),
+              [] (const IniLine &x) { return x.modified(); }
+        );
 }
 
 /// \brief Пометка всех строк в данной секции как немодифицированных.
 void IniSection::notModified()
 {
-    std::for_each(begin(this->lines), end(this->lines),
-            [] (IniLine &x) { x.notModified(); });
+    std::for_each
+        (
+            begin (this->lines),
+            end (this->lines),
+            [] (IniLine &x) { x.notModified(); }
+        );
 }
 
 /// \brief Удаление строки с указанным ключом.
 /// \param key Искомый ключ.
 /// \return `this`.
-IniSection& IniSection::removeValue(const String &key)
+IniSection& IniSection::removeValue (const String &key)
 {
-    auto index = this->getIndex(key);
+    auto index = this->getIndex (key);
     if (index >= 0) {
-        this->lines.erase(begin(this->lines) + index);
+        this->lines.erase (begin(this->lines) + index);
     }
 
     return *this;
@@ -170,16 +178,16 @@ IniSection& IniSection::removeValue(const String &key)
 /// \param key Искомый ключ.
 /// \param value Новое значение строки.
 /// \return `this`.
-IniSection& IniSection::setValue(const String &key, const String &value)
+IniSection& IniSection::setValue (const String &key, const String &value)
 {
-    IniLine *line = this->getLine(key);
+    IniLine *line = this->getLine (key);
     if (line) {
-        line->setValue(value);
+        line->setValue (value);
     } else {
         IniLine item;
-        item.key = key;
-        item.value = value;
-        this->lines.push_back(item);
+        item.setKey (key);
+        item.setValue (value);
+        this->lines.push_back (item);
     }
 
     return *this;
@@ -195,8 +203,8 @@ String IniSection::toString() const
     }
 
     for(const auto &line : lines) {
-        result.append(line.toString());
-        result.append(L"\n");
+        result.append (line.toString());
+        result.append (L"\n");
     }
 
     return result;
@@ -207,8 +215,10 @@ String IniSection::toString() const
 /// \return Значение найденной строки либо пустая строка.
 const String& IniSection::operator[] (const String &index) const noexcept
 {
-    return this->getValue(index, L"");
+    return this->getValue (index, L"");
 }
+
+//=========================================================
 
 /// \brief Удаление всех секций из файла.
 /// \return `this`.
@@ -237,15 +247,15 @@ bool IniFile::containsSection (const String &name) const noexcept
 ///
 /// Если секция с указанным именем уже существует, возвращается именно она,
 /// создания новой секции не происходит.
-IniSection& IniFile::createSection(const String &name)
+IniSection& IniFile::createSection (const String &name)
 {
-    auto section = this->getSection(name);
+    auto section = this->getSection (name);
     if (section) {
         return *section;
     }
 
     IniSection result { name };
-    this->sections.push_back(result);
+    this->sections.push_back (std::move (result));
     return this->sections.back();
 }
 
@@ -253,24 +263,32 @@ IniSection& IniFile::createSection(const String &name)
 /// \return `true`, если есть модифицированные секции.
 bool IniFile::modified() const noexcept
 {
-    return std::any_of(begin(this->sections), end(this->sections),
-            [] (const IniSection &x) { return x.modified(); } );
+    return std::any_of
+        (
+            begin (this->sections),
+            end (this->sections),
+            [] (const IniSection &x) { return x.modified(); }
+        );
 }
 
 /// \brief Установка состояния "не модифицировано" для всех секций.
 void IniFile::notModified()
 {
-    std::for_each(begin(this->sections), end(this->sections),
-            [] (IniSection &x) { x.notModified(); });
+    std::for_each
+        (
+            begin (this->sections),
+            end (this->sections),
+            [] (IniSection &x) { x.notModified(); }
+        );
 }
 
 /// \brief Получение индекса секции с указанным именем.
 /// \param name Искомое имя секции.
 /// \return Индекс секции либо отрицательное число, если секция не найдена.
-std::ptrdiff_t IniFile::getIndex(const String &name) const noexcept
+std::ptrdiff_t IniFile::getIndex (const String &name) const noexcept
 {
     for (std::size_t i = 0; i < this->sections.size(); i++) {
-        if (sameString(this->sections[i].name, name)) {
+        if (sameString (this->sections[i].name, name)) {
             return i;
         }
     }
@@ -280,11 +298,11 @@ std::ptrdiff_t IniFile::getIndex(const String &name) const noexcept
 /// \brief Получение указателя на секцию с указанным именем.
 /// \param name Искомое имя секции.
 /// \return Указатель на найденную секцию, либо `nullptr`, если секция не найдена.
-IniSection* IniFile::getSection(const String &name) const noexcept
+IniSection* IniFile::getSection (const String &name) const noexcept
 {
     for (const auto &section : this->sections) {
-        if (sameString(section.name, name)) {
-            return const_cast<IniSection*>(&section);
+        if (sameString (section.name, name)) {
+            return const_cast<IniSection*> (&section);
         }
     }
 
@@ -296,15 +314,15 @@ IniSection* IniFile::getSection(const String &name) const noexcept
 /// \param keyName Ключ строки.
 /// \param defaultValue Значение, возвращаемое, если строка не найдена.
 /// \return Значение найденной строки либо значение по умолчанию.
-const String& IniFile::getValue(const String &sectionName, const String &keyName, const String &defaultValue) const noexcept
+const String& IniFile::getValue (const String &sectionName, const String &keyName, const String &defaultValue) const noexcept
 {
-    const auto section = this->getSection(sectionName);
-    return section ? section->getValue(keyName, defaultValue) : defaultValue;
+    const auto section = this->getSection (sectionName);
+    return section ? section->getValue (keyName, defaultValue) : defaultValue;
 }
 
 /// \brief Разбор текстового представления INI-файла.
 /// \param lines Строки INI-файла.
-void IniFile::parse(const StringList &lines)
+void IniFile::parse (const StringList &lines)
 {
     IniSection *section = nullptr;
 
@@ -318,13 +336,13 @@ void IniFile::parse(const StringList &lines)
             auto name = trimmed.substr(1, trimmed.size()-2);
             section = &this->createSection(name);
         } else if (section) {
-            const auto parts = maxSplit(trimmed, L'=', 2);
-            auto key = trim(parts[0]);
-            auto value = trim(safeAt(parts, 1));
+            const auto parts = maxSplit (trimmed, L'=', 2);
+            auto key = trim (parts[0]);
+            auto value = trim (safeAt(parts, 1));
             IniLine item;
-            item.key = key;
-            item.value = value;
-            section->lines.push_back(item);
+            item.setKey (std::move (key));
+            item.setValue (std::move (value));
+            section->lines.push_back (item);
         }
     }
 }
@@ -332,11 +350,11 @@ void IniFile::parse(const StringList &lines)
 /// \brief Удаление секции с указанным именем.
 /// \param sectionName Имя секции.
 /// \return `this`.
-IniFile& IniFile::removeSection(const String &sectionName)
+IniFile& IniFile::removeSection (const String &sectionName)
 {
-    const auto index = this->getIndex(sectionName);
+    const auto index = this->getIndex (sectionName);
     if (index >= 0) {
-        sections.erase(begin(this->sections) + index);
+        sections.erase (begin (this->sections) + index);
     }
     return *this;
 }
@@ -345,11 +363,11 @@ IniFile& IniFile::removeSection(const String &sectionName)
 /// \param sectionName Имя секции.
 /// \param keyName Ключ.
 /// \return `this`.
-IniFile& IniFile::removeValue(const String &sectionName, const String &keyName)
+IniFile& IniFile::removeValue (const String &sectionName, const String &keyName)
 {
-    const auto section = this->getSection(sectionName);
+    const auto section = this->getSection (sectionName);
     if (section) {
-        section->removeValue(keyName);
+        section->removeValue (keyName);
     }
     return *this;
 }
@@ -359,11 +377,28 @@ IniFile& IniFile::removeValue(const String &sectionName, const String &keyName)
 /// \param keyName Ключ.
 /// \param value Значение.
 /// \return `this`.
-IniFile& IniFile::setValue(const String &sectionName, const String &keyName, const String &value)
+IniFile& IniFile::setValue (const String &sectionName, const String &keyName, const String &value)
 {
-    auto section = this->createSection(sectionName);
-    section.setValue(keyName, value);
+    auto section = this->createSection (sectionName);
+    section.setValue (keyName, value);
     return *this;
+}
+
+/// \brief Конверсия в текстовое представление.
+/// \return Текст.
+String IniFile::toString() const
+{
+    String result;
+    for (const auto &section : this->sections) {
+        if (!result.empty()) {
+            result += L"\n";
+        }
+        if (!section.lines.empty()) {
+            result += section.toString();
+        }
+    }
+
+    return result;
 }
 
 //void IniFile::write(const String &filename, QTextCodec *encoding) const;

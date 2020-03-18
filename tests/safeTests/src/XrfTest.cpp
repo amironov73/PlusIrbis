@@ -3,6 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
+#include "irbis_direct.h"
 #include "irbis_private.h"
 #include "safeTests.h"
 
@@ -16,7 +17,7 @@ TEST_CASE("XrfFile64_readRecord_1", "[xrf]")
     irbis::XrfFile64 xrf (path, irbis::ReadOnly);
     const auto record = xrf.readRecord (1);
     CHECK (record.offset == 22951100ull);
-    CHECK (record.status == 0x00);
+    CHECK (record.status == irbis::RecordStatus::None);
 }
 
 TEST_CASE("XrfFile64_create_1", "[xrf]")

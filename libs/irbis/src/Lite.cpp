@@ -58,7 +58,7 @@ void LiteRecord::decode (const std::vector<std::string> &lines)
     // mfn and status of the record
     const auto firstLine = split(lines[0], '#');
     this->mfn = fastParseUnsigned32(firstLine[0]);
-    this->status = fastParseUnsigned32(safeAt(firstLine, 1));
+    this->status = static_cast<RecordStatus> (fastParseUnsigned32(safeAt(firstLine, 1)));
 
     // version of the record
     const auto secondLine = split(lines[1], L'#');
@@ -77,13 +77,13 @@ void LiteRecord::decode (const std::vector<std::string> &lines)
 
 bool LiteRecord::deleted() const noexcept
 {
-    return (this->status & RecordStatus::Deleted) != 0u;
+    return (this->status & RecordStatus::Deleted) != RecordStatus::None;
 }
 
 std::string LiteRecord::encode (const std::string &delimiter) const
 {
-    std::string result = std::to_string(this->mfn) + "#"
-                    + std::to_string(this->status) + delimiter
+    std::string result = std::to_string (this->mfn) + "#"
+                    + std::to_string (static_cast<int> (this->status)) + delimiter
                     + "0#" + std::to_string(this->version) + delimiter;
     for (const auto &field : this->fields) {
         result.append(field.toString());
@@ -161,7 +161,7 @@ std::vector<LiteField*> LiteRecord::getFields (int tag) const
 LiteRecord& LiteRecord::reset() noexcept
 {
     this->mfn = 0;
-    this->status = 0;
+    this->status = RecordStatus::None;
     this->version = 0;
     this->database.clear();
     return *this;

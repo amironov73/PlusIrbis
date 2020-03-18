@@ -173,13 +173,11 @@ class Connection;
 class ConnectionFactory;
 class DatabaseInfo;
 class Date;
-class DirectAccess64;
 class Ean13;
 class Ean8;
 class EmbeddedField;
 class Encoding;
 class Exemplar;
-class File;
 class FileSpecification;
 class Format;
 class FoundLine;
@@ -199,14 +197,8 @@ class LiteRecord;
 class LiteSubField;
 class MarcRecord;
 class MarcRecordList;
-class MemoryChunk;
 class MenuEntry;
 class MenuFile;
-class MstControlRecord64;
-class MstdDictionaryEntry64;
-class MstFile64;
-class MstRecord64;
-class MstRecordLeader64;
 class NetworkException;
 class NotImplementedException;
 class NumberChunk;
@@ -242,8 +234,6 @@ class Upc12;
 class UserInfo;
 class VerificationException;
 class Version;
-class XrfFile64;
-class XrfRecord64;
 
 //=========================================================
 
@@ -923,18 +913,19 @@ class IRBIS_API IniFile final
 public:
     std::vector<IniSection> sections; ///< Секции INI-файла.
 
-    IniFile& clear();
-    bool containsSection (const String &name) const noexcept;
-    IniSection& createSection(const String &name);
-    bool modified() const noexcept;
-    void notModified();
-    std::ptrdiff_t getIndex(const String &name) const noexcept;
-    IniSection* getSection(const String &name) const noexcept;
-    const String& getValue(const String &sectionName, const String &keyName, const String &defaultValue) const noexcept;
-    void parse(const StringList &lines);
-    IniFile& removeSection(const String &sectionName);
-    IniFile& removeValue(const String &sectionName, const String &keyName);
-    IniFile& setValue(const String &sectionName, const String &keyName, const String &value);
+    IniFile&       clear           ();
+    bool           containsSection (const String &name) const noexcept;
+    IniSection&    createSection   (const String &name);
+    bool           modified        () const noexcept;
+    void           notModified     ();
+    std::ptrdiff_t getIndex        (const String &name) const noexcept;
+    IniSection*    getSection      (const String &name) const noexcept;
+    const String&  getValue        (const String &sectionName, const String &keyName, const String &defaultValue = L"") const noexcept;
+    void           parse           (const StringList &lines);
+    IniFile&       removeSection   (const String &sectionName);
+    IniFile&       removeValue     (const String &sectionName, const String &keyName);
+    IniFile&       setValue        (const String &sectionName, const String &keyName, const String &value);
+    String         toString        () const;
     //void write(const std::wstring &filename, QTextCodec *encoding) const;
     //void writeModifiedOnly(QTextStream &stream) const;
 };
@@ -972,19 +963,19 @@ private:
 class IRBIS_API IniSection final
 {
 public:
-    String name; ///< Имя секции.
+    String name;                ///< Имя секции.
     std::vector<IniLine> lines; ///< Строки, входящие в секцию. \see IniLine
 
-    IniSection& clear();
-    bool containsKey(const String &key) const noexcept;
-    std::ptrdiff_t getIndex(const String &key) const noexcept;
-    IniLine* getLine(const String &key) const noexcept;
-    const String& getValue(const String &key, const String &defaultValue) const noexcept;
-    bool modified() const noexcept;
-    void notModified();
-    IniSection& removeValue(const String &key);
-    IniSection& setValue(const String &key, const String &value);
-    String toString() const;
+    IniSection&    clear       ();
+    bool           containsKey (const String &key) const noexcept;
+    std::ptrdiff_t getIndex    (const String &key) const noexcept;
+    IniLine*       getLine     (const String &key) const noexcept;
+    const String&  getValue    (const String &key, const String &defaultValue) const noexcept;
+    bool           modified    ()                  const noexcept;
+    void           notModified ();
+    IniSection&    removeValue (const String &key);
+    IniSection&    setValue    (const String &key, const String &value);
+    String         toString    ()                  const;
 
     const String& operator[] (const String &index) const noexcept;
 };
@@ -1240,26 +1231,6 @@ enum DirectAccessMode : unsigned int
     Exclusive = 0u, ///< Эксклюзивный (чтение-запись).
     Shared    = 1u, ///< Разделяемый (чтение-запись).
     ReadOnly  = 2u  ///< Только чтение.
-};
-
-//=========================================================
-
-class IRBIS_API DirectAccess64 final
-{
-public:
-    MstFile64 *mst;
-    XrfFile64 *xrf;
-    String database;
-
-    DirectAccess64 (const String &parPath, const String &systemPath);
-    DirectAccess64 (const DirectAccess64 &) = delete;
-    DirectAccess64 (const DirectAccess64 &&) = delete;
-    DirectAccess64& operator = (const DirectAccess64 &) = delete;
-    DirectAccess64& operator = (const DirectAccess64 &&) = delete;
-    ~DirectAccess64();
-
-    MstRecord64 readRawRecord (unsigned int mfn);
-    MarcRecord readRecord     (unsigned int mfn);
 };
 
 //=========================================================
@@ -1611,19 +1582,33 @@ private:
 
 //=========================================================
 
+/// \brief Код пути к ресурсу.
+enum class IrbisPath : unsigned int
+{
+    System = 0u,
+    Data = 1u,
+    MasterFile = 2u,
+    InvertedFile = 3u,
+    ParameterFile = 10u,
+    FullText = 11u,
+    InternalResource = 12u
+};
+
+//=========================================================
+
 /// \brief Спецификация имени файла.
 class IRBIS_API FileSpecification final
 {
 public:
-    bool binaryFile { false }; ///< Признак двоичного файла.
-    int path { 0 };            ///< Код пути.
-    String database;           ///< Имя базы данных (если необходимо).
-    String filename;           ///< Имя файла (обязательно).
-    String content;            ///< Содержимое файла (если необходимо).
+    bool binaryFile { false };            ///< Признак двоичного файла.
+    IrbisPath path { IrbisPath::System }; ///< Код пути.
+    String database;                      ///< Имя базы данных (если необходимо).
+    String filename;                      ///< Имя файла (обязательно).
+    String content;                       ///< Содержимое файла (если необходимо).
 
     FileSpecification() = default;                                            ///< Конструктор по умолчанию.
-    FileSpecification (int path, const String &filename);
-    FileSpecification (int path, const String &database, const String &filename);
+    FileSpecification (IrbisPath path, const String &filename);
+    FileSpecification (IrbisPath path, const String &database, const String &filename);
     FileSpecification (const FileSpecification &other) = default;             ///< Конструктор копирования.
     FileSpecification (FileSpecification &&other) = default;                  ///< Конструктор перемещения.
     FileSpecification& operator = (const FileSpecification &other) = default; ///< Оператор копирования.
@@ -1791,19 +1776,6 @@ public:
 
 //=========================================================
 
-enum IrbisPath : unsigned int
-{
-    System = 0u,
-    Data = 1u,
-    MasterFile = 2u,
-    InvertedFile = 3u,
-    ParameterFile = 10u,
-    FullText = 11u,
-    InternalResource = 12u
-};
-
-//=========================================================
-
 /// \brief Международный стандартный книжный номер.
 class IRBIS_API Isbn final
 {
@@ -1814,18 +1786,21 @@ public:
 
 //=========================================================
 
-/// \brief Ввод-вывод ISO 2709
-class IRBIS_API Iso2709 final
+/// \brief Статус записи.
+enum class RecordStatus : unsigned int
 {
-public:
-    static const int  MarkerLength = 24;
-    static const char RecordDelimiter = 0x1D;
-    static const char FieldDelimiter = 0x1E;
-    static const char SubFieldDelimiter = 0x1F;
-
-    static MarcRecord* readRecord (File *device, const Encoding *encoding);
-    static void writeRecord (File *device, const MarcRecord &record, const Encoding *encoding);
+    None = 0,                                       ///< Исходное состояние.
+    LogicallyDeleted = 1,                           ///< Запись логически удалена.
+    PhysicallyDeleted = 2,                          ///< Запись физически удалена.
+    Deleted = LogicallyDeleted | PhysicallyDeleted, ///< Запись удалена.
+    Absent = 4,                                     ///< Запись отсутствует.
+    NonActualized = 8,                              ///< Не актуализирована.
+    Last = 32,                                      ///< Последняя версия записи.
+    Locked = 64                                     ///< Запись заблокирована.
 };
+
+RecordStatus operator | (RecordStatus left, RecordStatus right);
+RecordStatus operator & (RecordStatus left, RecordStatus right);
 
 //=========================================================
 
@@ -1833,11 +1808,11 @@ public:
 class IRBIS_API MarcRecord final
 {
 public:
-    Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
-    Flag status { 0u };            ///< Статус записи. Представляет собой набор флагов.
-    unsigned int version { 0u };   ///< Номер версии записи.
-    String database;               ///< Имя базы данных.
-    std::list<RecordField> fields; ///< Список полей.
+    Mfn mfn { 0u };                             ///< MFN (порядковый номер в базе) записи.
+    RecordStatus status { RecordStatus::None }; ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };                ///< Номер версии записи.
+    String database;                            ///< Имя базы данных.
+    std::list<RecordField> fields;              ///< Список полей.
 
     MarcRecord() = default;                                     ///< Конструктор по умолчанию.
     MarcRecord (const MarcRecord &other) = default;              ///< Конструктор копирования.
@@ -1935,61 +1910,6 @@ public:
     String text;
 
     void read(FILE *file);
-};
-#pragma pack(pop)
-
-//=========================================================
-
-class IRBIS_API MstFile64 final
-{
-    FILE *_file;
-
-public:
-    MstControlRecord64 control;
-    String fileName;
-
-    MstFile64 (const String &fileName, DirectAccessMode mode);
-    MstFile64 (const MstFile64 &) = delete;
-    MstFile64 (const MstFile64 &&) = delete;
-    MstFile64& operator = (const MstFile64 &) = delete;
-    MstFile64& operator = (const MstFile64 &&) = delete;
-    ~MstFile64();
-
-    MstRecord64 readRecord(long position);
-};
-
-//=========================================================
-
-#pragma pack(push, 1)
-class IRBIS_API MstRecordLeader64 final
-{
-public:
-    const static int LeaderSize;
-
-    uint32_t mfn { 0 };
-    uint32_t length { 0 };
-    uint64_t previous { 0 };
-    uint32_t base { 0 };
-    uint32_t nvf { 0 };
-    uint32_t status { 0 };
-    uint32_t version { 0 };
-
-    void read(FILE *file);
-};
-#pragma pack(pop)
-
-//=========================================================
-
-#pragma pack(push, 1)
-class IRBIS_API MstRecord64 final
-{
-public:
-    MstRecordLeader64 leader;
-    uint64_t offset { 0 };
-    std::vector<MstDictionaryEntry64> dictionary;
-
-    bool deleted() const;
-    MarcRecord toMarcRecord() const;
 };
 #pragma pack(pop)
 
@@ -2157,11 +2077,11 @@ public:
 class IRBIS_API PhantomRecord final
 {
 public:
-    Mfn mfn { 0u };                 ///< MFN (порядковый номер в базе) записи.
-    Flag status { 0u };             ///< Статус записи. Представляет собой набор флагов.
-    unsigned int version { 0u };    ///< Номер версии записи.
-    std::list<PhantomField> fields; ///< Список полей.
-    std::string database;           ///< База данных.
+    Mfn mfn { 0u };                             ///< MFN (порядковый номер в базе) записи.
+    RecordStatus status { RecordStatus::None }; ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };                ///< Номер версии записи.
+    std::list<PhantomField> fields;             ///< Список полей.
+    std::string database;                       ///< База данных.
 
     PhantomRecord() = default;                                        ///< Конструктор по умолчанию.
     PhantomRecord (const PhantomRecord &other) = default;             ///< Конструктор копирования.
@@ -2221,6 +2141,7 @@ public:
 
 //=========================================================
 
+/// \brief Запись с нераскодированными полями.
 class IRBIS_API RawRecord final
 {
 public:
@@ -2239,6 +2160,7 @@ public:
 
 //=========================================================
 
+/// \brief Поле записи.
 class IRBIS_API RecordField final
 {
 public:
@@ -2285,21 +2207,7 @@ public:
     explicit RecordSerializer(std::wiostream &stream);
 
     MarcRecord deserialize();
-    void serialize(const MarcRecord &record);
-};
-
-//=========================================================
-
-/// \brief Статус записи.
-enum RecordStatus : unsigned int
-{
-    LogicallyDeleted = 1u,                          ///< Запись логически удалена.
-    PhysicallyDeleted = 2u,                         ///< Запись физически удалена.
-    Deleted = LogicallyDeleted | PhysicallyDeleted, ///< Запись удалена.
-    Absent = 4u,                                    ///< Запись отсутствует.
-    NonActualized = 8u,                             ///< Не актуализирована.
-    Last = 32u,                                     ///< Последняя версия записи.
-    Locked = 64u                                    ///< Запись заблокирована.
+    void serialize (const MarcRecord &record);
 };
 
 //=========================================================
@@ -2439,15 +2347,15 @@ public:
 class IRBIS_API TableDefinition final
 {
 public:
-    String database;        ///< Имя базы данных.
-    String table;           ///< Имя таблицы.
-    StringList headers;     ///< Заголовки таблицы.
-    String mode;            ///< Режим таблицы.
-    String searchQuery;     ///< Поисковый запрос.
-    int minMfn { 0 };       ///< Минимальный MFN.
-    int maxMfn { 0 };       ///< Максимальный MFN.
-    String sequentialQuery; ///< Запрос для последовательного поиска.
-    MfnList mfnList;        ///< Список MFN, по которым строится таблица.
+    String     database;        ///< Имя базы данных.
+    String     table;           ///< Имя таблицы.
+    StringList headers;         ///< Заголовки таблицы.
+    String     mode;            ///< Режим таблицы.
+    String     searchQuery;     ///< Поисковый запрос.
+    int        minMfn { 0 };    ///< Минимальный MFN.
+    int        maxMfn { 0 };    ///< Максимальный MFN.
+    String     sequentialQuery; ///< Запрос для последовательного поиска.
+    MfnList    mfnList;         ///< Список MFN, по которым строится таблица.
 };
 
 //=========================================================
@@ -2598,11 +2506,11 @@ public:
 class IRBIS_API LiteRecord final
 {
 public:
-    Mfn mfn { 0u };                ///< MFN (порядковый номер в базе) записи.
-    Flag status { 0u };            ///< Статус записи. Представляет собой набор флагов.
-    unsigned int version { 0u };   ///< Номер версии записи.
-    std::list<LiteField> fields;   ///< Список полей.
-    std::string database;          ///< База данных.
+    Mfn mfn { 0u };                             ///< MFN (порядковый номер в базе) записи.
+    RecordStatus status { RecordStatus::None }; ///< Статус записи. Представляет собой набор флагов.
+    unsigned int version { 0u };                ///< Номер версии записи.
+    std::list<LiteField> fields;                ///< Список полей.
+    std::string database;                       ///< База данных.
 
     LiteRecord() = default;                                     ///< Конструктор по умолчанию.
     LiteRecord (const LiteRecord &other) = default;             ///< Конструктор копирования.
@@ -2692,52 +2600,6 @@ public:
     ~Version() = default;
 
     void parse(ServerResponse &response);
-    String toString() const;
-};
-
-//=========================================================
-
-/// \brief XRF-файл -- файл перекрестных ссылок.
-class IRBIS_API XrfFile64 final
-{
-public:
-
-    XrfFile64 (const String &fileName, DirectAccessMode mode);
-    XrfFile64 (const XrfFile64 &) = delete;
-    XrfFile64 (const XrfFile64 &&) = delete;
-    XrfFile64& operator = (const XrfFile64 &) = delete;
-    XrfFile64& operator = (const XrfFile64 &&) = delete;
-    ~XrfFile64();
-
-    void close();
-    XrfRecord64 readRecord (Mfn mfn);
-    void writeRecord (Mfn mfn, XrfRecord64 record);
-
-    static XrfFile64 create (const String &fileName);
-
-private:
-
-    String _fileName;
-    File *_file;
-    DirectAccessMode _mode;
-    std::mutex _mutex;
-
-    static Offset getOffset(Mfn mfn) noexcept;
-};
-
-//=========================================================
-
-/// \brief Запись в XRF-файле. Содержит смещение и флаги для записи в MST-файле.
-class IRBIS_API XrfRecord64 final
-{
-public:
-    const static int RecordSize;
-
-    Offset offset { 0 }; ///< Смещение записи в MST-файле.
-    Mfn    status { 0 }; ///< Статус записи (удалена, заблокирована и т.д.).
-
-    bool   deleted()  const noexcept;
-    bool   locked()   const noexcept;
     String toString() const;
 };
 

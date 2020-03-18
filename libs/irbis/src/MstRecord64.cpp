@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_direct.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -14,13 +15,13 @@ namespace irbis {
 
 bool MstRecord64::deleted() const
 {
-    return (this->leader.status & RecordStatus::Deleted) != 0;
+    return (this->leader.status & RecordStatus::Deleted) != RecordStatus::None;
 }
 
 MarcRecord MstRecord64::toMarcRecord() const
 {
     MarcRecord result;
-    result.status = 0; // TODO obtain the status
+    result.status = RecordStatus::None; // TODO obtain the status
     result.version = 0; // TODO obtain the version
     //result.fields.reserve(dictionary.size());
     for (const auto &entry : dictionary) {

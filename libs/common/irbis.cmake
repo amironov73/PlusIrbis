@@ -1,5 +1,6 @@
 set(HeaderFiles
     ../../include/irbis_pft.h
+    ../../include/irbis_direct.h
     ../irbis/include/irbis_private.h
 )
 
@@ -63,6 +64,7 @@ set(CppFiles
     ../irbis/src/Reader.cpp
     ../irbis/src/RecordField.cpp
     ../irbis/src/RecordSerializer.cpp
+    ../irbis/src/RecordStatus.cpp
     ../irbis/src/Registration.cpp
     ../irbis/src/Search.cpp
     ../irbis/src/ServerResponse.cpp

@@ -3,6 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
+#include "irbis_direct.h"
 #include "irbis_private.h"
 #include "safeTests.h"
 
