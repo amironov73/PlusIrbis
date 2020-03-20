@@ -44,6 +44,7 @@ set(CppFiles
     ../irbis/src/Isbn.cpp
     ../irbis/src/Iso2709.cpp
     ../irbis/src/Lite.cpp
+    ../irbis/src/Log.cpp
     ../irbis/src/MarcRecord.cpp
     ../irbis/src/MemoryChunk.cpp
     ../irbis/src/MemoryPool.cpp

@@ -329,6 +329,7 @@
     <ClCompile Include="src/Text.cpp" />
     <ClCompile Include="src/Iso2709.cpp" />
     <ClCompile Include="src/Lite.cpp" />
+    <ClCompile Include="src/Log.cpp" />
     <ClCompile Include="src/MarcRecord.cpp" />
     <ClCompile Include="src/MemoryChunk.cpp" />
     <ClCompile Include="src/MemoryPool.cpp" />

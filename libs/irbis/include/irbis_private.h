@@ -469,19 +469,20 @@ private:
 class IRBIS_API Tcp4Socket final
     : public ClientSocket
 {
-    void *_impl;
+    struct TcpInternals;
+    std::unique_ptr<TcpInternals> _impl;
 
 public:
-    explicit Tcp4Socket(const std::wstring& host=L"localhost", short port=6666);
-    Tcp4Socket(const Tcp4Socket &) = delete;
-    Tcp4Socket(Tcp4Socket &&) = delete;
+    explicit Tcp4Socket (const String &host=L"localhost", short port=6666);
+    Tcp4Socket (const Tcp4Socket &) = delete;
+    Tcp4Socket (Tcp4Socket &&) = delete;
     Tcp4Socket& operator = (const Tcp4Socket &) = delete;
     Tcp4Socket& operator = (Tcp4Socket &&) = delete;
     ~Tcp4Socket() override;
 
-    void open() override;
-    void close() override;
-    void send(const Byte *buffer, std::size_t size) override;
+    void open () override;
+    void close () override;
+    void send (const Byte *buffer, std::size_t size) override;
     std::size_t receive(Byte *buffer, std::size_t size) override;
 };
 
@@ -624,6 +625,34 @@ private:
     std::size_t _column, _length, _line, _position;
     const Char *_text;
 };
+
+//=========================================================
+
+// Logging
+
+/// \brief Поддержка логирования.
+class IRBIS_API Log
+{
+public:
+    static void write (const String &text);
+    static void write (const std::string &text);
+    static void write (const char *text);
+};
+
+#ifdef IRBIS_DEBUG
+
+    #define LOG_TRACE(__message) irbis::Log::write(__message);
+    #define LOG_ERROR(__message) irbis::Log::write(__message);
+
+#else
+
+    #define LOG_TRACE(__message)
+    #define LOG_ERROR(__message)
+
+#endif // IRBIS_DEBUG
+
+#define LOG_ENTER LOG_TRACE(__func__)
+#define LOG_LEAVE LOG_TRACE(__func__)
 
 //=========================================================
 

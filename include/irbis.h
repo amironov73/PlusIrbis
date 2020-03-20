@@ -85,6 +85,14 @@
 
 #endif // IRBIS_API
 
+#if !defined(IRBIS_DEBUG)
+
+    #ifdef _DEBUG
+        #define IRBIS_DEBUG
+    #endif // _DEBUG
+
+#endif // IRBIS_DEBUG
+
 // для функций: int __fastcall func (int arg).
 #ifndef IRBIS_CALL
 
@@ -1020,6 +1028,24 @@ public:
 
 //=========================================================
 
+/// \brief Этапы выполнения запроса к серверу.
+enum class IRBIS_API RequestStage
+{
+    None,           ///< В состоянии простоя.
+    BuildPackage,   ///< Формирование пакета запроса.
+    NameResolution, ///< Разрешение имени сервера.
+    Connecting,     ///< Установка подключения к серверу.
+    Sending,        ///< Передача пакета запроса на сервер.
+    Waiting,        ///< Ожидание ответа от сервера.
+    Receiving,      ///< Получение ответного пакета от сервера.
+    Shutdown,       ///< Отключение от сервера.
+    ParseHeader,    ///< Разбор заголовка ответа.
+    ParseBody,      ///< Разбор тела ответа (если есть).
+    Error           ///< Ошибка.
+};
+
+//=========================================================
+
 /// \brief Базовые функции подключения
 class IRBIS_API ConnectionBase
 {
@@ -1036,19 +1062,20 @@ protected:
 
 public:
 
-    String host;          ///< Адрес сервера в виде строки.
-    short port;           ///< Номер порта сервера.
-    String username;      ///< Логин пользователя.
-    String password;      ///< Пароль пользователя.
-    String database;      ///< Имя текущей базы данных.
-    String workstation;   ///< Тип клиента.
-    int clientId;         ///< Уникальный идентификатор клиента.
-    int queryId;          ///< Порядковый номер команды, отсылаемой на сервер.
-    int lastError;        ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
-    String serverVersion; ///< Версия сервера (получается при подключении).
-    IniFile iniFile;      ///< Содержимое серверного INI-файла для данного клиента.
-    int interval { 0 };   ///< Интервал автоматического подтверждения.
-    ClientSocket *socket; ///< Клиентский сокет.
+    String       host;                    ///< Адрес сервера в виде строки.
+    short        port;                    ///< Номер порта сервера.
+    String       username;                ///< Логин пользователя.
+    String       password;                ///< Пароль пользователя.
+    String       database;                ///< Имя текущей базы данных.
+    String       workstation;             ///< Тип клиента.
+    int          clientId;                ///< Уникальный идентификатор клиента.
+    int          queryId;                 ///< Порядковый номер команды, отсылаемой на сервер.
+    int          lastError;               ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
+    String       serverVersion;           ///< Версия сервера (получается при подключении).
+    IniFile      iniFile;                 ///< Содержимое серверного INI-файла для данного клиента.
+    int          interval;                ///< Интервал автоматического подтверждения, секунды.
+    RequestStage stage;                   ///< Этап выполнения запроса
+    std::unique_ptr<ClientSocket> socket; ///< Клиентский сокет.
 
     ConnectionBase();
     ~ConnectionBase();
@@ -1721,15 +1748,15 @@ public:
 class IRBIS_API IlfEntry final
 {
 public:
-    String date;               ///< Дата создания.
-    String name;               ///< Имя ресурса.
-    String description;        ///< Описание в произвольной форме.
-    String data;               ///< Собственно данные.
-    uint32_t position { 0 };   ///< Смещение данных от начала файла, байты.
-    uint32_t number { 0 };     ///< Порядковый номер ресурса.
-    uint32_t dataLength { 0 }; ///< Длина данных в байтах.
-    short flags { 0 };         ///< Флаги.
-    bool deleted { false };    ///< Признак удаленной записи.
+    String   date;               ///< Дата создания.
+    String   name;               ///< Имя ресурса.
+    String   description;        ///< Описание в произвольной форме.
+    String   data;               ///< Собственно данные.
+    uint32_t position   { 0 };   ///< Смещение данных от начала файла, байты.
+    uint32_t number     { 0 };   ///< Порядковый номер ресурса.
+    uint32_t dataLength { 0 };   ///< Длина данных в байтах.
+    short    flags      { 0 };   ///< Флаги.
+    bool     deleted { false };  ///< Признак удаленной записи.
 };
 
 //=========================================================
@@ -1787,7 +1814,7 @@ public:
 //=========================================================
 
 /// \brief Статус записи.
-enum class RecordStatus : unsigned int
+enum class IRBIS_API RecordStatus : unsigned int
 {
     None = 0,                                       ///< Исходное состояние.
     LogicallyDeleted = 1,                           ///< Запись логически удалена.
@@ -1799,8 +1826,8 @@ enum class RecordStatus : unsigned int
     Locked = 64                                     ///< Запись заблокирована.
 };
 
-RecordStatus operator | (RecordStatus left, RecordStatus right);
-RecordStatus operator & (RecordStatus left, RecordStatus right);
+IRBIS_API RecordStatus operator | (RecordStatus left, RecordStatus right);
+IRBIS_API RecordStatus operator & (RecordStatus left, RecordStatus right);
 
 //=========================================================
 

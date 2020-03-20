@@ -16,17 +16,21 @@ namespace irbis {
 
 /// \brief Единственный конструктор для данного класса.
 ConnectionBase::ConnectionBase()
-        : _connected(false),
-          host(L"127.0.0.1"),
-          port(6666),
-          username(L""),
-          password(L""),
-          database(L"IBIS"),
-          workstation(L"C"),
-          clientId(0),
-          queryId(0),
-          lastError(0) {
-    this->socket = new Tcp4Socket();
+        : _connected    { false },
+          host          { L"127.0.0.1" },
+          port          { 6666 },
+          username      { },
+          password      { },
+          database      { L"IBIS" },
+          workstation   {L"C" },
+          clientId      { 0 },
+          queryId       { 0 },
+          lastError     { 0 },
+          serverVersion { },
+          interval      { 600 },
+          stage         { RequestStage::None },
+          socket        { new Tcp4Socket }
+{
 }
 
 /// \brief Деструктор для данного класса.
@@ -34,7 +38,7 @@ ConnectionBase::ConnectionBase()
 /// Если необходимо, выполняет отключение от сервера.
 ConnectionBase::~ConnectionBase() {
     this->disconnect();
-    delete this->socket;
+    // this->socket.release();
 }
 
 bool ConnectionBase::_checkConnection()
@@ -55,7 +59,10 @@ bool ConnectionBase::_checkConnection()
 /// При этом возвращается true.
 bool ConnectionBase::connect()
 {
+    LOG_ENTER
+
     if (this->connected()) {
+        LOG_LEAVE
         return true;
     }
 
@@ -74,6 +81,8 @@ bool ConnectionBase::connect()
     try {
         ServerResponse response(*this, query);
         if (!response.success()) {
+            LOG_ERROR(L"Network error")
+            LOG_LEAVE
             return false;
         }
 
@@ -84,6 +93,7 @@ bool ConnectionBase::connect()
         }
 
         if (response.returnCode < 0) {
+            LOG_LEAVE
             return false;
         }
 
@@ -95,9 +105,12 @@ bool ConnectionBase::connect()
     }
     catch (...) {
         this->lastError = -100002;
+        LOG_ERROR(describeError(this->lastError))
+        LOG_LEAVE
         return false;
     }
 
+    LOG_LEAVE
     return true;
 }
 

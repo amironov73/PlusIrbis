@@ -20,6 +20,7 @@ set(CppFiles
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
     src/FrugalTest.cpp
+    src/IlfTest.cpp
     src/IniTest.cpp
     src/IOTest.cpp
     src/IsbnTest.cpp

@@ -72,6 +72,8 @@
     <ClCompile Include="src/FileSpecificationTest.cpp" />
     <ClCompile Include="src/FormatTest.cpp" />
     <ClCompile Include="src/FrugalTest.cpp" />
+    <ClCompile Include="src/IlfTest.cpp" />
+    <ClCompile Include="src/IniTest.cpp" />
     <ClCompile Include="src/IOTest.cpp" />
     <ClCompile Include="src/IsbnTest.cpp" />
     <ClCompile Include="src/Iso2709Test.cpp" />

@@ -4,6 +4,12 @@
 #include "irbis.h"
 #include "irbis_private.h"
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4068)
+#endif
+
+#pragma ide diagnostic ignored "OCUnusedMacroInspection"
+
 #if defined(IRBIS_WINDOWS) || defined(IRBIS_MINGW)
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -30,7 +36,7 @@
 
 namespace irbis {
 
-struct TcpInternals
+struct Tcp4Socket::TcpInternals
 {
 #ifdef IRBIS_WINDOWS
 
@@ -44,17 +50,15 @@ struct TcpInternals
 #endif
 };
 
-Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
-    : _impl(new TcpInternals)
+Tcp4Socket::Tcp4Socket (const String &host_, short port_)
+    : _impl {new TcpInternals}
 {
-    host = host_;
-    port = port_;
+    this->host = host_;
+    this->port = port_;
 
 #ifdef IRBIS_WINDOWS
 
-    auto internals = static_cast<TcpInternals*>(this->_impl);
-
-    if (WSAStartup(0x0202, &internals->wsaData)) {
+    if (WSAStartup (0x0202, &this->_impl->wsaData)) {
         throw NetworkException();
     }
 
@@ -63,26 +67,21 @@ Tcp4Socket::Tcp4Socket(const std::wstring& host_, short port_)
 
 Tcp4Socket::~Tcp4Socket()
 {
-    const auto internals = static_cast<TcpInternals*>(this->_impl);
-
 #ifdef IRBIS_WINDOWS
 
     WSACleanup();
 
 #endif
-
-    delete (internals);
 }
 
 void Tcp4Socket::open()
 {
-    const auto internals = static_cast<TcpInternals*>(this->_impl);
-    internals->socket = socket(AF_INET, SOCK_STREAM, 0);
+    this->_impl->socket = socket (AF_INET, SOCK_STREAM, 0);
     //if (internals->socket < 0) {
     //    throw NetworkException();
     //}
 
-    sockaddr_in destinationAddress;
+    sockaddr_in destinationAddress {};
     destinationAddress.sin_family = AF_INET;
     destinationAddress.sin_port = htons(this->port);
     auto ansi = unicode_to_cp1251(this->host);
@@ -102,31 +101,28 @@ void Tcp4Socket::open()
         }
     }
 
-    if (connect(internals->socket, (sockaddr*)&destinationAddress, sizeof(destinationAddress))) {
+    if (connect(this->_impl->socket, (sockaddr*)&destinationAddress, sizeof(destinationAddress))) {
         throw NetworkException();
     }
 }
 
 void Tcp4Socket::close()
 {
-    auto *internals = static_cast<TcpInternals*>(this->_impl);
-    closesocket(internals->socket);
+    closesocket(this->_impl->socket);
 }
 
-void Tcp4Socket::send(const Byte *buffer, std::size_t size)
+void Tcp4Socket::send (const Byte *buffer, std::size_t size)
 {
-    auto *internals = static_cast<TcpInternals*>(this->_impl);
-    const auto ptr = reinterpret_cast<const char*>(buffer);
-    const auto size2 = static_cast<int>(size);
-    ::send(internals->socket, ptr, size2, 0);
+    const auto ptr = reinterpret_cast <const char*> (buffer);
+    const auto size2 = static_cast <int> (size);
+    ::send (this->_impl->socket, ptr, size2, 0);
 }
 
-std::size_t Tcp4Socket::receive(Byte *buffer, std::size_t size)
+std::size_t Tcp4Socket::receive (Byte *buffer, std::size_t size)
 {
-    auto *internals = static_cast<TcpInternals*>(this->_impl);
-    const auto ptr = reinterpret_cast<char*>(buffer);
-    const auto size2 = static_cast<int>(size);
-    const std::size_t result = ::recv(internals->socket, ptr, size2, 0);
+    const auto ptr = reinterpret_cast <char*> (buffer);
+    const auto size2 = static_cast <int> (size);
+    const std::size_t result = ::recv (this->_impl->socket, ptr, size2, 0);
     return result;
 }
 
