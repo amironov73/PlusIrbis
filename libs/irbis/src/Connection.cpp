@@ -17,9 +17,9 @@ namespace irbis {
 /// \brief Актуализация всех неактуализированных записей в указанной базе данных (если таковые имеются).
 /// \param databaseName Имя базы данных.
 /// \return Признак успешного выполнения операции.
-bool Connection::actualizeDatabase(const String &databaseName)
+bool Connection::actualizeDatabase (const String &databaseName)
 {
-    return this->actualizeRecord(databaseName, 0);
+    return this->actualizeRecord (databaseName, 0);
 }
 
 /// \brief Актуализация на сервере записи по её MFN в базе данных с заданным именем.
@@ -28,17 +28,17 @@ bool Connection::actualizeDatabase(const String &databaseName)
 /// \return Признак успешности выполения операции.
 ///
 /// Если запись уже актуализирована, это не считается ошибкой.
-bool Connection::actualizeRecord(const String &databaseName, int mfn)
+bool Connection::actualizeRecord (const String &databaseName, int mfn)
 {
     if (!this->_checkConnection()) {
         return false;
     }
 
-    ClientQuery query(*this, "F");
-    query.addAnsi(databaseName).newLine()
+    ClientQuery query (*this, "F");
+    query.addAnsi (databaseName).newLine()
             .add(mfn);
 
-    return this->execute(query);
+    return this->execute (query);
 }
 
 // /// \brief Асинхронный вариант connect.
@@ -102,7 +102,7 @@ std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
     // const auto prepared = prepareFormat (format);
     ClientQuery query (*this, "G");
     query.addAnsi (this->database).newLine()
-            .addAnsi("!").addAnsi (format).newLine()
+            .addAnsi ("!").addAnsi (format).newLine()
             .add (1).newLine()
             .add (mfn);
 
@@ -119,18 +119,18 @@ std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
 /// \param format Спецификация формата.
 /// \param record Запись, подлежащая расформатированию.
 /// \return Результат расформатирования.
-String Connection::formatRecord(const String &format, const MarcRecord &record)
+String Connection::formatRecord (const String &format, const MarcRecord &record)
 {
     if (!this->_checkConnection()) {
         return L"";
     }
 
-    const auto prepared = prepareFormat(format);
-    ClientQuery query(*this, "G");
-    query.addAnsi(this->database).newLine()
-            .addAnsi(prepared).newLine()
-            .add(-2).newLine()
-            .add(record, Text::UnixDelimiter);
+    const auto prepared = prepareFormat (format);
+    ClientQuery query (*this, "G");
+    query.addAnsi (this->database).newLine()
+            .addAnsi (prepared).newLine()
+            .add (-2).newLine()
+            .add (record, Text::UnixDelimiter);
 
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
@@ -144,7 +144,7 @@ String Connection::formatRecord(const String &format, const MarcRecord &record)
 /// \brief Получение информации о базе данных с указанным именем.
 /// \param databaseName Имя базы данных.
 /// \return Информация о базе данных.
-DatabaseInfo Connection::getDatabaseInfo(const String &databaseName)
+DatabaseInfo Connection::getDatabaseInfo (const String &databaseName)
 {
     DatabaseInfo result;
 
@@ -188,7 +188,7 @@ std::vector<UserInfo> Connection::getUserList()
 /// \brief Выполнение глобальной корректировки на сервере.
 /// \param settings Настройки глобальной корректировки.
 /// \return Результат выполнения глобальной корректировки.
-GblResult Connection::globalCorrection(const GblSettings &settings)
+GblResult Connection::globalCorrection (const GblSettings &settings)
 {
     GblResult result;
 
@@ -228,16 +228,16 @@ String Connection::printTable (const TableDefinition &definition)
         return L"";
     }
 
-    ClientQuery query(*this, "L");
-    query.addAnsi(definition.database).newLine()
-            .addAnsi(definition.table).newLine()
-            .addAnsi("").newLine() // instead of headers
-            .addAnsi(definition.mode).newLine()
-            .addUtf(definition.searchQuery).newLine()
-            .add(definition.minMfn).newLine()
-            .add(definition.maxMfn).newLine()
-            .addUtf(definition.sequentialQuery).newLine()
-            .addAnsi(""); // instead of MFN list
+    ClientQuery query (*this, "L");
+    query.addAnsi (definition.database).newLine()
+            .addAnsi (definition.table).newLine()
+            .addAnsi ("").newLine() // instead of headers
+            .addAnsi (definition.mode).newLine()
+            .addUtf (definition.searchQuery).newLine()
+            .add (definition.minMfn).newLine()
+            .add (definition.maxMfn).newLine()
+            .addUtf (definition.sequentialQuery).newLine()
+            .addAnsi (""); // instead of MFN list
 
     ServerResponse response(*this, query);
     if (!response.success()) {
@@ -260,7 +260,7 @@ RawRecord Connection::readRawRecord (Mfn mfn)
             .add(mfn);
 
     ServerResponse response(*this, query);
-    if (response.checkReturnCode(4, -201, -600, -602, -603)) {
+    if (response.checkReturnCode (4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
         result.parseSingle(lines);
         result.database = database;
@@ -269,7 +269,7 @@ RawRecord Connection::readRawRecord (Mfn mfn)
     return result;
 }
 
-std::vector<SearchScenario> Connection::readSearchScenario(const FileSpecification &specification)
+std::vector<SearchScenario> Connection::readSearchScenario (const FileSpecification &specification)
 {
     std::vector<SearchScenario> result;
 
@@ -280,7 +280,7 @@ std::vector<SearchScenario> Connection::readSearchScenario(const FileSpecificati
     return result;
 }
 
-String Connection::requireTextFile(const FileSpecification &specification)
+String Connection::requireTextFile (const FileSpecification &specification)
 {
     const auto result = readTextFile(specification);
     if (result.empty()) {
@@ -339,7 +339,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
     for (const auto record : records) {
         const auto db = choose (record->database, this->database); // NOLINT(performance-unnecessary-copy-initialization)
         query.addAnsi (db).addAnsi (Text::IrbisDelimiter)
-            .addUtf (record->encode(Text::IrbisDelimiter)).newLine();
+            .addUtf (record->encode (Text::IrbisDelimiter)).newLine();
     }
     ServerResponse response (*this, query);
     if (!response.success()) {
@@ -359,7 +359,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
             auto record = records[i];
             record->fields.clear();
             record->database = choose (record->database, this->database);
-            const auto recordLines = Text::fromFullDelimiter(line);
+            const auto recordLines = Text::fromFullDelimiter (line);
             record->decode(recordLines);
         }
     }
@@ -380,12 +380,12 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
     }
 
     const auto db = choose (record.database, this->database);
-    ClientQuery query(*this, "D");
-    query.addAnsi(db).newLine();
-    query.add(lockFlag).newLine();
-    query.add(actualize).newLine();
-    query.addUtf(record.encode(Text::IrbisDelimiter)).newLine();
-    ServerResponse response(*this, query);
+    ClientQuery query (*this, "D");
+    query.addAnsi (db).newLine();
+    query.add (lockFlag).newLine();
+    query.add (actualize).newLine();
+    query.addUtf (record.encode(Text::IrbisDelimiter)).newLine();
+    ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
         return 0;
     }
@@ -395,10 +395,10 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
         const auto temp1 = response.readRemainingUtfLines();
         if (temp1.size() > 1) {
             StringList lines;
-            lines.push_back(temp1[0]);
-            const auto temp2 = split(temp1[1], 0x1E);
-            lines.insert(lines.end(), temp2.begin(), temp2.end());
-            record.parseSingle(lines);
+            lines.push_back (temp1[0]);
+            const auto temp2 = split (temp1[1], 0x1E);
+            lines.insert (lines.end(), temp2.begin(), temp2.end());
+            record.parseSingle (lines);
             record.database = this->database;
         }
     }
@@ -408,9 +408,9 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
 
 void Connection::writeTextFile (const FileSpecification &specification)
 {
-    ClientQuery query(*this, "L");
-    query.add(specification);
-    execute(query);
+    ClientQuery query (*this, "L");
+    query.add (specification);
+    execute (query);
 }
 
 }

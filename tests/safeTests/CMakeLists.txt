@@ -12,14 +12,18 @@ set(CppFiles
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
     src/CodesTest.cpp
+    src/ConnectionTest.cpp
     src/DateTest.cpp
     src/DirectAccessTest.cpp
     src/EanTest.cpp
+    src/EmbeddedFieldTest.cpp
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
+    src/FoundLineTest.cpp
     src/FrugalTest.cpp
+    src/GblTest.cpp
     src/IlfTest.cpp
     src/IniTest.cpp
     src/IOTest.cpp
@@ -46,7 +50,9 @@ set(CppFiles
     src/TitleTest.cpp
     src/TreeFileTest.cpp
     src/UpcTest.cpp
+    src/UserInfoTest.cpp
     src/UtilsTest.cpp
+    src/VersionTest.cpp
     src/VisitTest.cpp
     src/XrfTest.cpp
 )

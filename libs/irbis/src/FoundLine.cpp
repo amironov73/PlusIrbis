@@ -2,12 +2,22 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_private.h"
+
+/// \class irbis::FoundLine
+/// \details Содержит MFN найденной записи и опциональный текст,
+/// например, результат расформатирования,
+/// разделённые символом '#'.
 
 namespace irbis {
 
-/// \class FoundLine
-/// Содержит MFN найденной записи и опциональный текст,
-/// например, результат расформатирования,
-/// разделённые символом '#'.
+/// \brief Разбор строки.
+void FoundLine::parse (const String &line)
+{
+    const auto parts = maxSplit (line, L'#', 2);
+    this->mfn = fastParse32 (parts[0]);
+    this->description = safeAt (parts, 1);
+}
+
 
 }

@@ -64,14 +64,18 @@
     <ClCompile Include="src/BookInfoTest.cpp" />
     <ClCompile Include="src/ByteNavigatorTest.cpp" />
     <ClCompile Include="src/CodesTest.cpp" />
+    <ClCompile Include="src/ConnectionTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
     <ClCompile Include="src/DirectAccessTest.cpp" />
     <ClCompile Include="src/EanTest.cpp" />
+    <ClCompile Include="src/EmbeddedFieldTest.cpp" />
     <ClCompile Include="src/EncodingTest.cpp" />
     <ClCompile Include="src/ExemplarTest.cpp" />
     <ClCompile Include="src/FileSpecificationTest.cpp" />
     <ClCompile Include="src/FormatTest.cpp" />
+    <ClCompile Include="src/FoundLineTest.cpp" />
     <ClCompile Include="src/FrugalTest.cpp" />
+    <ClCompile Include="src/GblTest.cpp" />
     <ClCompile Include="src/IlfTest.cpp" />
     <ClCompile Include="src/IniTest.cpp" />
     <ClCompile Include="src/IOTest.cpp" />
@@ -98,7 +102,9 @@
     <ClCompile Include="src/TitleTest.cpp" />
     <ClCompile Include="src/TreeFileTest.cpp" />
     <ClCompile Include="src/UpcTest.cpp" />
+    <ClCompile Include="src/UserInfoTest.cpp" />
     <ClCompile Include="src/UtilsTest.cpp" />
+    <ClCompile Include="src/VersionTest.cpp" />
     <ClCompile Include="src/VisitTest.cpp" />
     <ClCompile Include="src/XrfTest.cpp" />
   </ItemGroup>

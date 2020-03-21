@@ -6,10 +6,10 @@
 namespace irbis {
 
 /// \brief Получение нового подключения к серверу ИРБИС64.
+/// \return Созданное подключение.
 Connection* ConnectionFactory::GetConnection()
 {
     return new Connection();
 }
-
 
 }

@@ -537,6 +537,7 @@ StringList IRBIS_CALL maxSplit (const String &text, Char separator, int count)
             position = index + 1;
         } else {
             result.push_back (text.substr (position));
+            position = length + 1;
             break;
         }
         count--;

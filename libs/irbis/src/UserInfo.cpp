@@ -13,7 +13,8 @@
 
 namespace irbis {
 
-static String formatPair(const String &prefix, const String &value, const String &defaultValue) {
+static String formatPair (const String &prefix, const String &value, const String &defaultValue)
+{
     if (sameString(value, defaultValue)) {
         return L"";
     }
@@ -25,14 +26,14 @@ static String formatPair(const String &prefix, const String &value, const String
 /// \return Текстовое представление.
 String UserInfo::toString() const
 {
-    return this->name + L"\r\n"
+    return this->name    + L"\r\n"
         + this->password + L"\r\n"
-        + formatPair(L"C", this->cataloger,     L"irbisc.ini")
-        + formatPair(L"R", this->reader,        L"irbisr.ini")
-        + formatPair(L"B", this->circulation,   L"irbisb.ini")
-        + formatPair(L"M", this->acquisitions,  L"irbism.ini")
-        + formatPair(L"K", this->provision,     L"irbisk.ini")
-        + formatPair(L"A", this->administrator, L"irbisa.ini");
+        + formatPair (L"C", this->cataloger,     L"irbisc.ini")
+        + formatPair (L"R", this->reader,        L"irbisr.ini")
+        + formatPair (L"B", this->circulation,   L"irbisb.ini")
+        + formatPair (L"M", this->acquisitions,  L"irbism.ini")
+        + formatPair (L"K", this->provision,     L"irbisk.ini")
+        + formatPair (L"A", this->administrator, L"irbisa.ini");
 }
 
 /// \brief Разбор ответа сервера.
@@ -42,8 +43,12 @@ std::vector<UserInfo> UserInfo::parse (const StringList &lines)
 {
     std::vector<UserInfo> result;
 
-    const auto userCount = fastParse32(lines[0]);
-    const auto linesPerUser = fastParse32(lines[1]);
+    if (lines.empty()) {
+        return result;
+    }
+
+    const auto userCount = fastParse32 (safeAt (lines, 0));
+    const auto linesPerUser = fastParse32 (safeAt (lines, 1));
     if (userCount == 0 || linesPerUser == 0) {
         return result;
     }

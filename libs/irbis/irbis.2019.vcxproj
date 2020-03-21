@@ -320,7 +320,8 @@
     <ClCompile Include="src/Exemplar.cpp" />
     <ClCompile Include="src/File.cpp" />
     <ClCompile Include="src/FileSpecification.cpp" />
-    <ClCompile Include="src/GblResult.cpp" />
+    <ClCompile Include="src/FoundLine.cpp" />
+    <ClCompile Include="src/Gbl.cpp" />
     <ClCompile Include="src/IlfFile.cpp" />
     <ClCompile Include="src/IniFile.cpp" />
     <ClCompile Include="src/IO.cpp" />

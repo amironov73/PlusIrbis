@@ -1077,50 +1077,52 @@ public:
     RequestStage stage;                   ///< Этап выполнения запроса
     std::unique_ptr<ClientSocket> socket; ///< Клиентский сокет.
 
-    ConnectionBase();
-    ~ConnectionBase();
+    ConnectionBase  ();
+    ~ConnectionBase ();
 
-    bool connect();
-    bool connected() const noexcept { return this->_connected; }
-    void disconnect();
-    bool execute (ClientQuery &query);
-    Mfn getMaxMfn (const String &databaseName);
-    bool noOp();
-    void parseConnectionString (const std::string &connectionString);
-    void parseConnectionString (const String &connectionString);
-    String popDatabase();
-    String pushDatabase (const String &newDatabase);
-    String toConnectionString() const;
+    /// \brief Подключено ли к серверу?
+    bool   connected() const noexcept { return this->_connected; }
+
+    bool   connect               ();
+    void   disconnect            ();
+    bool   execute               (ClientQuery &query);
+    Mfn    getMaxMfn             (const String &databaseName);
+    bool   noOp                  ();
+    void   parseConnectionString (const std::string &connectionString);
+    void   parseConnectionString (const String &connectionString);
+    String popDatabase           ();
+    String pushDatabase          (const String &newDatabase);
+    String toConnectionString    () const;
 };
 
 /// \brief Функции работы с контекстом
 class IRBIS_API ConnectionContext : public virtual ConnectionBase
 {
 public:
-    std::vector<DatabaseInfo> listDatabases (const IniFile &iniFile, const String &defaultFileName);
-    std::vector<DatabaseInfo> listDatabases (const FileSpecification &specification);
-    StringList listFiles (const FileSpecification &specification);
-    StringList listFiles (const std::vector<FileSpecification> &specifications);
-    Bytes readBinaryFile (const FileSpecification &specification);
-    IniFile readIniFile (const FileSpecification &specification);
-    MenuFile readMenuFile (const FileSpecification &specification);
-    String readTextFile (const FileSpecification &specification);
-    std::string readAnsiFile (const FileSpecification &specification);
-    StringList readTextFiles (std::vector<FileSpecification> &specifications);
-    StringList readTextLines (const FileSpecification &specification);
+    std::vector<DatabaseInfo> listDatabases  (const IniFile &iniFile, const String &defaultFileName);
+    std::vector<DatabaseInfo> listDatabases  (const FileSpecification &specification);
+    StringList                listFiles      (const FileSpecification &specification);
+    StringList                listFiles      (const std::vector<FileSpecification> &specifications);
+    Bytes                     readBinaryFile (const FileSpecification &specification);
+    IniFile                   readIniFile    (const FileSpecification &specification);
+    MenuFile                  readMenuFile   (const FileSpecification &specification);
+    String                    readTextFile   (const FileSpecification &specification);
+    std::string               readAnsiFile   (const FileSpecification &specification);
+    StringList                readTextFiles  (std::vector<FileSpecification> &specifications);
+    StringList                readTextLines  (const FileSpecification &specification);
 };
 
 /// \brief Функции работы с поисковым индексом
 class IRBIS_API ConnectionSearch : public virtual ConnectionBase
 {
 public:
-    StringList listTerms (const String &prefix);
-    std::vector<TermPosting> readPostings(const PostingParameters &parameters);
-    std::vector<TermInfo> readTerms (const String &startTerm, int numberOfTerms);
-    std::vector<TermInfo> readTerms (const TermParameters &parameters);
-    MfnList search (const Search &search);
-    MfnList search (const String &expression);
-    MfnList search (const SearchParameters &parameters);
+    StringList               listTerms    (const String &prefix);
+    std::vector<TermPosting> readPostings (const PostingParameters &parameters);
+    std::vector<TermInfo>    readTerms    (const String &startTerm, int numberOfTerms);
+    std::vector<TermInfo>    readTerms    (const TermParameters &parameters);
+    MfnList                  search       (const Search &search);
+    MfnList                  search       (const String &expression);
+    MfnList                  search       (const SearchParameters &parameters);
 };
 
 /// \brief Администраторские функции
@@ -1182,12 +1184,12 @@ class IRBIS_API Connection final :
 {
 public:
 
-    Connection() = default;
-    Connection(const Connection&) = delete;
-    Connection(Connection&&) = delete;
-    Connection& operator=(const Connection&) = delete;
-    Connection& operator=(Connection&&) = delete;
-    ~Connection() = default;
+    Connection  ()                             = default; ///< Конструктор по умолчанию.
+    Connection  (const Connection&)            = delete;  ///< Конструктор копирования.
+    Connection  (Connection&&)                 = delete;  ///< Конструктор перемещения.
+    ~Connection ()                             = default; ///< Деструктор.
+    Connection& operator = (const Connection&) = delete;  ///< Оператор копирования.
+    Connection& operator = (Connection&&)      = delete;  ///< Оператор перемещения.
 
     bool actualizeDatabase (const String &databaseName);
     bool actualizeRecord (const String &databaseName, int mfn);
@@ -1219,12 +1221,12 @@ public:
 class IRBIS_API ConnectionFactory
 {
 public:
-    ConnectionFactory() = default;
-    ConnectionFactory(const ConnectionFactory &) = delete;
-    ConnectionFactory(ConnectionFactory&&) = delete;
-    ConnectionFactory& operator=(const ConnectionFactory&) = delete;
-    ConnectionFactory& operator=(ConnectionFactory&&) = delete;
-    virtual ~ConnectionFactory() = default;
+    ConnectionFactory             ()                          = default; ///< Конструктор по умолчанию.
+    ConnectionFactory             (const ConnectionFactory &) = delete;  ///< Копирующий конструктор.
+    ConnectionFactory             (ConnectionFactory&&)       = delete;  ///< Перемещающий конструктор.
+    virtual ~ConnectionFactory    ()                          = default; ///< Деструктор.
+    ConnectionFactory& operator = (const ConnectionFactory&)  = delete;  ///< Оператор копирования.
+    ConnectionFactory& operator = (ConnectionFactory&&)       = delete;  ///< Оператор перемещения.
 
     virtual Connection* GetConnection();
 };
@@ -1253,7 +1255,7 @@ public:
 //=========================================================
 
 /// \brief Режим прямого доступа к базе данных.
-enum DirectAccessMode : unsigned int
+enum DirectAccessMode : uint32_t
 {
     Exclusive = 0u, ///< Эксклюзивный (чтение-запись).
     Shared    = 1u, ///< Разделяемый (чтение-запись).
@@ -1262,13 +1264,13 @@ enum DirectAccessMode : unsigned int
 
 //=========================================================
 
+/// \brief Встроенное поле.
 class IRBIS_API EmbeddedField final
 {
 public:
+    const static Char DefaultCode;
 
-    const static char DefaultCode;
-
-    static RecordFieldList getEmbeddedFields(const RecordField &field, char sign = DefaultCode);
+    static RecordFieldList getEmbeddedFields (const RecordField &field, Char sign = DefaultCode);
 };
 
 //=========================================================
@@ -1300,9 +1302,9 @@ class IRBIS_API Cp1251Encoding final
 {
 public:
 
-    virtual Bytes fromUnicode (const String &text) const override;
-    virtual String toUnicode (const Byte *bytes, std::size_t count) const override;
-    virtual std::size_t getSize (const String &text) const override;
+    Bytes       fromUnicode (const String &text)                   const override;
+    String      toUnicode   (const Byte *bytes, std::size_t count) const override;
+    std::size_t getSize     (const String &text)                   const override;
 };
 
 class IRBIS_API Utf8Encoding final
@@ -1310,9 +1312,9 @@ class IRBIS_API Utf8Encoding final
 {
 public:
 
-    virtual Bytes fromUnicode(const String &text) const override;
-    virtual String toUnicode(const Byte *bytes, std::size_t count) const override;
-    virtual std::size_t getSize (const String &text) const override;
+    Bytes       fromUnicode (const String &text)                   const override;
+    String      toUnicode   (const Byte *bytes, std::size_t count) const override;
+    std::size_t getSize     (const String &text)                   const override;
 };
 
 //=========================================================
@@ -1338,8 +1340,8 @@ public:
 
     RecordField *field { nullptr };
 
-    void applyTo (RecordField &field_) const;
-    void parse (const RecordField &field_);
+    void applyTo (RecordField &field_)       const;
+    void parse   (const RecordField &field_);
 
 private:
     String fm (Char code) const noexcept;
@@ -1656,13 +1658,15 @@ public:
     Mfn mfn { 0 };       ///< MFN найденной записи.
     String description;  ///< Опциональный текст, например, результат расформатирования записи.
 
-    FoundLine() = default;
-    FoundLine (Mfn mfn_, const String &description_) : mfn(mfn_), description(description_) {}
-    FoundLine (const FoundLine &other) = default;
-    FoundLine (FoundLine &&other) = default;
-    FoundLine& operator = (const FoundLine &other) = default;
-    FoundLine& operator = (FoundLine &&other) = default;
-    ~FoundLine() = default;
+    FoundLine  ()                 = default; ///< Конструктор по умолчанию.
+    FoundLine  (const FoundLine&) = default; ///< Конструктор копирования.
+    FoundLine  (FoundLine&&)      = default; ///< Конструктор перемещения.
+    ~FoundLine ()                 = default; ///< Деструктор.
+    FoundLine  (Mfn mfn_, const String &description_) : mfn(mfn_), description(description_) {} ///< Конструктор
+    FoundLine& operator = (const FoundLine&) = default; ///< Оператор копирования
+    FoundLine& operator = (FoundLine&&)      = default; ///< Оператор перемещения
+
+    void parse (const String &line);
 };
 
 //=========================================================
@@ -1671,15 +1675,7 @@ public:
 class IRBIS_API GblParameter final
 {
 public:
-    /// Наименование параметра, которое появится в названии столбца, задающего параметр.
     String title;
-
-    /// Значение параметра или пусто, если пользователю
-    /// предлагается задать его значение перед выполнением
-    /// корректировки. В этой строке можно задать имя файла
-    /// меню (с расширением MNU) или имя рабочего листа подполей
-    /// (с расширением Wss), которые будут поданы для выбора
-    /// значения параметра.
     String value;
 };
 
@@ -1705,12 +1701,12 @@ public:
     String format1;    ///< Первый формат, например, выражение для замены.
     String format2;    ///< Второй формат, например, заменяющее выражение.
 
-    GblStatement() = default;
-    GblStatement (const GblStatement &other) = default;
-    GblStatement (GblStatement &&other) = default;
-    GblStatement& operator = (const GblStatement &other) = default;
-    GblStatement& operator = (GblStatement &&other) = default;
-    ~GblStatement() = default;
+    GblStatement             ()                     = default; ///< Конструктор по умолчанию.
+    GblStatement             (const GblStatement &) = default; ///< Конструктор копирования.
+    GblStatement             (GblStatement &&)      = default; ///< Конструктор перемешения.
+    ~GblStatement            ()                     = default; ///< Деструктор.
+    GblStatement& operator = (const GblStatement &) = default; ///< Оператор копирования.
+    GblStatement& operator = (GblStatement &&)      = default; ///< Оператор перемещения.
 };
 
 //=========================================================
@@ -1719,27 +1715,27 @@ public:
 class IRBIS_API GblSettings final
 {
 public:
-    bool actualize { false };             ///< Надо ли актуализировать записи?
-    bool autoin { false };                ///< Надо ли запускать `autoin.gbl`?
-    String database;                      ///< Имя базы данных.
-    String fileName;                      ///< Имя файла глобальной корректировки.
-    Mfn firstRecord { 0 };                ///< Mfn первой записи.
-    bool formalControl { false };         ///< Применять формальный контроль?
-    Mfn maxMfn { 0 };                     ///< Максимальный MFN.
-    MfnList mfnList;                      ///< Список MFN для обработки.
-    Mfn minMfn { 0 };                     ///< Минимальный MFN. 0 означает "все записи в базе".
-    Mfn numberOfRecords { 0 };            ///< Количество записей, подлежащих обработке.
-    String searchExpression;              ///< Выражение для прямого поиска по словарю.
-    String sequentialSearch;              ///< Выражение для последовательного поиска.
-    std::vector<GblStatement> statements; ///< Вектор операторов.
-    std::vector<GblParameter> parameters; ///< Вектор параметров.
+    bool                      actualize        { false }; ///< Надо ли актуализировать записи?
+    bool                      autoin           { false }; ///< Надо ли запускать `autoin.gbl`?
+    String                    database;                   ///< Имя базы данных.
+    String                    fileName;                   ///< Имя файла глобальной корректировки.
+    Mfn                       firstRecord      { 0 };     ///< Mfn первой записи.
+    bool                      formalControl    { false }; ///< Применять формальный контроль?
+    Mfn                       maxMfn           { 0 };     ///< Максимальный MFN.
+    MfnList                   mfnList;                    ///< Список MFN для обработки.
+    Mfn                       minMfn           { 0 };     ///< Минимальный MFN. 0 означает "все записи в базе".
+    Mfn                       numberOfRecords  { 0 };     ///< Количество записей, подлежащих обработке.
+    String                    searchExpression;           ///< Выражение для прямого поиска по словарю.
+    String                    sequentialSearch;           ///< Выражение для последовательного поиска.
+    std::vector<GblStatement> statements;                 ///< Вектор операторов.
+    std::vector<GblParameter> parameters;                 ///< Вектор параметров.
 
-    GblSettings() = default;
-    GblSettings(const GblSettings &other) = default;
-    GblSettings(GblSettings &&other) = default;
-    GblSettings& operator = (const GblSettings &other) = default;
-    GblSettings& operator = (GblSettings &&other) = default;
-    ~GblSettings() = default;
+    GblSettings             ()                    = default; ///< Конструктор по умолчанию.
+    GblSettings             (const GblSettings &) = default; ///< Конструктор копирования.
+    GblSettings             (GblSettings &&)      = default; ///< Конструктор перемещения.
+    ~GblSettings            ()                    = default; ///< Деструктор.
+    GblSettings& operator = (const GblSettings &) = default; ///< Оператор копирования.
+    GblSettings& operator = (GblSettings &&)      = default; ///< Оператор перемещения.
 };
 
 //=========================================================
@@ -2456,15 +2452,17 @@ public:
     std::vector<TreeNode> children; ///< Дочерние узлы.
     int level { 0 }; ///< Уровень вложенности узла (отслеживается автоматически).
 
-    TreeNode() = default;
-    TreeNode (const String &value_) : value(value_) {}
-    TreeNode (const TreeNode &other) = default;
-    TreeNode (TreeNode &&other) = default;
-    TreeNode& operator = (const TreeNode &other) = default;
-    TreeNode& operator = (TreeNode &&other) = default;
-    ~TreeNode() = default;
+    explicit TreeNode    (const String &value_) : value (value_) {} ///< Конструктор.
+    explicit TreeNode    (String &&value_) : value (std::move (value_)) {} ///< Конструктор.
+    TreeNode             ()                  = default; ///< Конструктор по умолчанию.
+    TreeNode             (const TreeNode &)  = default; ///< Конструктор копирования.
+    TreeNode             (TreeNode &&)       = default; ///< Конструктор перемещения.
+    ~TreeNode            ()                  = default; ///< Деструктор.
+    TreeNode& operator = (const TreeNode &)  = default; ///< Оператор копирования.
+    TreeNode& operator = (TreeNode &&)       = default; ///< Оператор перемещения.
 
-    TreeNode& add(const String &name);
+    TreeNode& add (const String &name);
+    TreeNode& add (String &&name);
 };
 
 //=========================================================
@@ -2483,12 +2481,12 @@ public:
     String provision;     ///< Доступность АРМ Книгообеспеченность.
     String administrator; ///< Доступность АРМ Администратор.
 
-    UserInfo() = default;
-    UserInfo(const UserInfo &other) = default;
-    UserInfo(UserInfo &&other) = default;
-    UserInfo& operator = (const UserInfo &other) = default;
-    UserInfo& operator = (UserInfo &&other) = default;
-    ~UserInfo() = default;
+    UserInfo             ()                 = default; ///< Конструктор по умолчанию.
+    UserInfo             (const UserInfo &) = default; ///< Конструктор копирования.
+    UserInfo             (UserInfo &&)      = default; ///< Конструктор перемещения.
+    ~UserInfo            ()                 = default; ///< Деструктор.
+    UserInfo& operator = (const UserInfo &) = default; ///< Оператор копирования.
+    UserInfo& operator = (UserInfo &&)      = default; ///< Оператор перемещения.
 
     String toString() const;
     static std::vector<UserInfo> parse(const StringList &lines);
@@ -2614,19 +2612,19 @@ public:
 class IRBIS_API Version final
 {
 public:
-    String organization;        ///< На какое юридическое лицо приобретен сервер.
-    String version;             ///< Собственно версия сервера. Например, 64.2008.1.
-    int maxClients { 0 };       ///< Максимальное количество одновременных подключений.
-    int connectedClients { 0 }; ///< Текущее количество подключений.
+    String organization;           ///< На какое юридическое лицо приобретен сервер.
+    String version;                ///< Собственно версия сервера. Например, 64.2008.1.
+    int    maxClients       { 0 }; ///< Максимальное количество одновременных подключений.
+    int    connectedClients { 0 }; ///< Текущее количество подключений.
 
-    Version() = default;
-    Version(const Version &other) = default;
-    Version(Version &&other) = default;
-    Version& operator = (const Version &other) = default;
-    Version& operator = (Version &&other) = default;
-    ~Version() = default;
+    Version             ()                = default; ///< Конструктор по умолчанию.
+    Version             (const Version &) = default; ///< Конструктор копирования.
+    Version             (Version &&)      = default; ///< Конструктор перемещения.
+    ~Version            ()                = default; ///< Деструктор.
+    Version& operator = (const Version &) = default; ///< Оператор копирования.
+    Version& operator = (Version &&)      = default; ///< Оператор перемещения.
 
-    void parse(ServerResponse &response);
+    void parse (ServerResponse &response);
     String toString() const;
 };
 

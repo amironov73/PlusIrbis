@@ -13,25 +13,27 @@
 
 namespace irbis {
 
-const char EmbeddedField::DefaultCode = '1';
+const Char EmbeddedField::DefaultCode = '1';
 
-RecordFieldList EmbeddedField::getEmbeddedFields(const RecordField &field, char sign) {
+/// \brief Получение встроенных полей.
+/// \return Вектор встроенных полей.
+RecordFieldList EmbeddedField::getEmbeddedFields (const RecordField &field, Char sign) {
     RecordFieldList result;
     for (const auto &subField : field.subfields) {
         if (subField.code == sign) {
-            auto value = subField.value;
-            auto tagValue = value.substr(0, 3);
-            auto tag = fastParse32(tagValue);
+            auto &value = subField.value;
+            auto tagValue = value.substr (0, 3);
+            auto tag = fastParse32 (tagValue);
             RecordField found;
             found.tag = tag;
             if (tagValue[0] == '0' && tagValue[1] == '0' && value.length() > 3) {
-                found.value = value.substr(3);
+                found.value = value.substr (3);
             }
-            result.push_back(found);
+            result.push_back (found);
         } else {
             if (!result.empty()) {
                 auto &last = result.back();
-                last.add(subField.code, subField.value);
+                last.add (subField.code, subField.value);
             }
         }
     }

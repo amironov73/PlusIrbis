@@ -33,13 +33,15 @@ class Frugal
 {
 public:
 
-    Frugal() = default;
-    ~Frugal() {
+    Frugal() = default; ///< Конструктор по умолчанию.
+    ~Frugal() ///< Деструктор
+    {
         if (this->_array) {
             delete[] this->_array;
         }
     }
 
+    /// \brief Итератор.
     class iterator : public std::iterator<std::input_iterator_tag, T>
     {
     public:
@@ -57,6 +59,7 @@ public:
         std::size_t _position;
     };
 
+    /// \brief Оператор индексирования.
     T& operator [] (std::size_t offset)
     {
         switch (offset) {
@@ -66,14 +69,31 @@ public:
         }
     }
 
+    /// \brief Указатель на первый элемент.
     iterator begin() { return iterator (*this, 0); }
+
+    /// \brief Указатель за последним элементом.
     iterator end() { return iterator (*this, this->_size); }
+
+    /// \brief Ссылка на первый элемент.
     T& front() { return (*this)[0]; }
+
+    /// \brief Ссылка на последний элемент.
     T& back() { return (*this)[this->_size - 1]; }
+
+    /// \brief Емкость контейнера.
     std::size_t capacity() const noexcept { return this->_capacity + 2; }
+
+    /// \brief Очистка контейнера.
     void clear() noexcept { this->_size = 0; }
+
+    /// \brief Проверка, не пустой ли контейнер.
     bool empty() const noexcept { return this->_size == 0; }
+
+    /// \brief Текущий размер контейнера.
     std::size_t size() const noexcept  { return this->_size; }
+
+    /// \brief Преобразование в стандартный вектор.
     std::vector<T> toVector()
     {
         std::vector<T> result;
@@ -81,6 +101,8 @@ public:
         result.insert (std::end(result), std::begin(*this), std::end(*this));
         return result;
     }
+
+    /// \brief Помещение элемента в конец.
     void push_back (const T &value)
     {
         switch (this->_size) {
@@ -95,6 +117,24 @@ public:
         }
         ++this->_size;
     }
+
+    /// \brief Помещение элемента в конец.
+    void push_back (T &&value)
+    {
+        switch (this->_size) {
+            case 0: this->_first = std::move (value); break;
+            case 1: this->_second = std::move (value); break;
+            default:
+                if (this->_size - 2 == this->_capacity) {
+                    this->_enlarge();
+                }
+                this->_array[this->_size - 2] = std::move (value);
+                break;
+        }
+        ++this->_size;
+    }
+
+    /// \brief Помещение элемента в конец
     template <class... Args>
     T& emplace_back (Args&&... args)
     {
@@ -109,7 +149,7 @@ public:
                 place = this->_array + this->_size - 2;
                 break;
         }
-        T *value = new (place) T(args...);
+        T *value = new (place) T(std::forward<Args> (args)...);
         ++this->_size;
         return *value;
     }

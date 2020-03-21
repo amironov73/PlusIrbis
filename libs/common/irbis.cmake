@@ -36,7 +36,8 @@ set(CppFiles
     ../irbis/src/Exemplar.cpp
     ../irbis/src/File.cpp
     ../irbis/src/FileSpecification.cpp
-    ../irbis/src/GblResult.cpp
+    ../irbis/src/FoundLine.cpp
+    ../irbis/src/Gbl.cpp
     ../irbis/src/IlfFile.cpp
     ../irbis/src/IniFile.cpp
     ../irbis/src/IO.cpp

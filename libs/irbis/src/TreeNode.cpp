@@ -14,10 +14,18 @@ namespace irbis {
 /// \brief Добавление дочернего узла с указанным значением.
 /// \param name Имя (значение) узла.
 /// \return Добавленный узел.
-TreeNode& TreeNode::add(const String &name)
+TreeNode& TreeNode::add (const String &name)
 {
-    this->children.emplace_back(name);
+    this->children.emplace_back (name);
+    return this->children.back();
+}
 
+/// \brief Добавление дочернего узла с указанным значением.
+/// \param name Имя (значение) узла.
+/// \return Добавленный узел.
+TreeNode& TreeNode::add (String &&name)
+{
+    this->children.emplace_back (std::move (name));
     return this->children.back();
 }
 

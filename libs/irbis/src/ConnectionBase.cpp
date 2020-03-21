@@ -33,7 +33,7 @@ ConnectionBase::ConnectionBase()
 {
 }
 
-/// \brief Деструктор для данного класса.
+/// \brief Деструктор.
 ///
 /// Если необходимо, выполняет отключение от сервера.
 ConnectionBase::~ConnectionBase() {
@@ -41,6 +41,11 @@ ConnectionBase::~ConnectionBase() {
     // this->socket.release();
 }
 
+/// \brief Проверка, подключены ли мы к серверу.
+/// \return `false` если не подключены.
+///
+/// Большинство операций нет смысла начинать,
+/// если не установлено подключение к серверу.
 bool ConnectionBase::_checkConnection()
 {
     if (!this->connected()) {
@@ -60,7 +65,6 @@ bool ConnectionBase::_checkConnection()
 bool ConnectionBase::connect()
 {
     LOG_ENTER
-
     if (this->connected()) {
         LOG_LEAVE
         return true;
@@ -69,19 +73,19 @@ bool ConnectionBase::connect()
     this->lastError = 0;
 
     std::random_device rd;  //Will be used to obtain a seed for the random number engine
-    std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
-    std::uniform_int_distribution<> dis(100000, 900000);
+    std::mt19937 gen (rd()); //Standard mersenne_twister_engine seeded with rd()
+    std::uniform_int_distribution<> dis (100000, 900000);
 
-    AGAIN: this->clientId = dis(gen);
+    AGAIN: this->clientId = dis (gen);
     this->queryId = 1;
-    ClientQuery query(*this, "A");
-    query.addAnsi(this->username).newLine()
-            .addAnsi(this->password);
+    ClientQuery query (*this, "A");
+    query.addAnsi (this->username).newLine()
+            .addAnsi (this->password);
 
     try {
-        ServerResponse response(*this, query);
+        ServerResponse response (*this, query);
         if (!response.success()) {
-            LOG_ERROR(L"Network error")
+            LOG_ERROR (L"Network error")
             LOG_LEAVE
             return false;
         }
@@ -105,7 +109,7 @@ bool ConnectionBase::connect()
     }
     catch (...) {
         this->lastError = -100002;
-        LOG_ERROR(describeError(this->lastError))
+        LOG_ERROR (describeError(this->lastError))
         LOG_LEAVE
         return false;
     }
@@ -120,14 +124,17 @@ bool ConnectionBase::connect()
 /// Если при подключении был увеличен счётчик использованных лицензий, он соответственно уменьшается.
 void ConnectionBase::disconnect()
 {
+    LOG_ENTER
     if (!this->connected()) {
+        LOG_LEAVE
         return;
     }
 
-    ClientQuery query(*this, "B");
-    query.addAnsi(this->username).newLine();
-    this->execute(query);
+    ClientQuery query (*this, "B");
+    query.addAnsi (this->username).newLine();
+    this->execute (query);
     _connected = false;
+    LOG_LEAVE
 }
 
 /// \brief Результат исполнения запроса на сервере.
@@ -136,22 +143,25 @@ void ConnectionBase::disconnect()
 /// \warning Должно быть установлено подключение к серверу!
 ///
 /// Если метод вернул false, конкретный код ошибки находится в lastError.
-bool ConnectionBase::execute(ClientQuery &query)
+bool ConnectionBase::execute (ClientQuery &query)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
     bool result = false;
 
     try {
-        ServerResponse response(*this, query);
+        ServerResponse response (*this, query);
         result = response.checkReturnCode();
     }
     catch (...) {
         // Do nothing
     }
 
+    LOG_LEAVE
     return result;
 }
 
@@ -160,7 +170,9 @@ bool ConnectionBase::execute(ClientQuery &query)
 /// \return Максимальный MFN. 0 или отрицательное число означают ошибку.
 Mfn ConnectionBase::getMaxMfn (const String &databaseName)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return 0;
     }
 
@@ -168,10 +180,12 @@ Mfn ConnectionBase::getMaxMfn (const String &databaseName)
     query.addAnsi (databaseName);
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return 0;
     }
 
     const auto result = response.returnCode;
+    LOG_LEAVE
     return result;
 }
 
@@ -181,18 +195,24 @@ Mfn ConnectionBase::getMaxMfn (const String &databaseName)
 /// Используется для подтверждения подключения клиента
 /// при длительном бездействии пользователя.
 bool ConnectionBase::noOp() {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
-    ClientQuery query(*this, "N");
-    return this->execute(query);
+    ClientQuery query (*this, "N");
+    auto result = this->execute (query);
+    LOG_LEAVE
+    return result;
 }
 
 /// \brief Разбор строки подключения.
 /// \param connectionString Строка подключения.
 /// \throw IrbisException Ошибка в структуре строки подключения.
-void ConnectionBase::parseConnectionString (const String &connectionString) {
+void ConnectionBase::parseConnectionString (const String &connectionString)
+{
+    LOG_ENTER
     const auto items = split (connectionString, L";");
     for (auto &item : items) {
         auto parts = maxSplit(item, L'=', 2);
@@ -221,12 +241,15 @@ void ConnectionBase::parseConnectionString (const String &connectionString) {
             throw IrbisException();
         }
     }
+    LOG_LEAVE
 }
 
 /// \brief Разбор строки подключения.
 /// \param connectionString Строка подключения.
 /// \throw IrbisException Ошибка в структуре строки подключения.
-void ConnectionBase::parseConnectionString (const std::string &connectionString) {
+void ConnectionBase::parseConnectionString (const std::string &connectionString)
+{
+    LOG_ENTER
     const auto items = split (connectionString, ";");
     for (auto &item : items) {
         auto parts = maxSplit (item, '=', 2);
@@ -241,7 +264,7 @@ void ConnectionBase::parseConnectionString (const std::string &connectionString)
         if (name == "host" || name == "server" || name == "address") {
             this->host = fromUtf (value);
         } else if (name == "port") {
-            this->port = (short) fastParse32 (value);
+            this->port = static_cast<short > (fastParse32 (value));
         } else if (name == "user" || name == "username"
                    || name == "name" || name == "login") {
             this->username = fromUtf (value);
@@ -255,16 +278,18 @@ void ConnectionBase::parseConnectionString (const std::string &connectionString)
             throw IrbisException();
         }
     }
+    LOG_LEAVE
 }
 
 /// \brief Возврат к предыдущей базе данных.
 /// \return Имя базы данных, использовавшейся до возврата.
 String ConnectionBase::popDatabase()
 {
+    LOG_ENTER
     const auto result = this->database;
     this->database = _databaseStack.back();
     _databaseStack.pop_back();
-
+    LOG_LEAVE
     return result;
 }
 
@@ -273,21 +298,25 @@ String ConnectionBase::popDatabase()
 /// \return Имя базы данных, использовавшейся в качестве текущей.
 String ConnectionBase::pushDatabase (const String &newDatabase)
 {
+    LOG_ENTER
     const auto result = this->database;
     _databaseStack.push_back(newDatabase);
     this->database = newDatabase;
-
+    LOG_LEAVE
     return result;
 }
 
+/// \brief Получение актуальной строки подключения.
+/// \return Строка подключения
 String ConnectionBase::toConnectionString() const
 {
+    // Нет смысла логировать
     return String(L"host=") + this->host
-           + L";port=" + std::to_wstring(this->port)
-           + L";username=" + this->username
-           + L";password=" + this->password
-           + L";database" + this->database
-           + L";arm=" + this->workstation
+           + L";port="          + std::to_wstring (this->port)
+           + L";username="      + this->username
+           + L";password="      + this->password
+           + L";database"       + this->database
+           + L";arm="           + this->workstation
            + L";";
 }
 
