@@ -28,7 +28,7 @@ namespace irbis {
 SubField SubField::clone() const
 {
     SubField result;
-    result.code = this->code;
+    result.code  = this->code;
     result.value = this->value;
     return result;
 }
@@ -37,8 +37,8 @@ SubField SubField::clone() const
 /// \param line Строка с клиентским представлением (не должна быть пустой).
 void SubField::decode (const String &line)
 {
-    this->code = line[0];
-    this->value = line.substr(1);
+    this->code  = line[0];
+    this->value = line.substr (1);
 }
 
 /// \brief Пустое подполе?
@@ -58,7 +58,7 @@ std::wstring SubField::toString() const
 /// \brief Проверка, является подполе полноценным (с кодом и значением).
 /// \param throwOnError Бросать исключение, если подполе не полноценное.
 /// \return true, если с полем всё нормально.
-bool SubField::verify(bool throwOnError) const
+bool SubField::verify (bool throwOnError) const
 {
     const bool result = (this->code != NoCode) && !this->value.empty();
     if (!result && throwOnError) {

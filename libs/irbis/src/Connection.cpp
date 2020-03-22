@@ -19,7 +19,10 @@ namespace irbis {
 /// \return Признак успешного выполнения операции.
 bool Connection::actualizeDatabase (const String &databaseName)
 {
-    return this->actualizeRecord (databaseName, 0);
+    LOG_ENTER
+    const auto result = this->actualizeRecord (databaseName, 0);
+    LOG_LEAVE
+    return result;
 }
 
 /// \brief Актуализация на сервере записи по её MFN в базе данных с заданным именем.
@@ -30,7 +33,9 @@ bool Connection::actualizeDatabase (const String &databaseName)
 /// Если запись уже актуализирована, это не считается ошибкой.
 bool Connection::actualizeRecord (const String &databaseName, int mfn)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
@@ -38,7 +43,9 @@ bool Connection::actualizeRecord (const String &databaseName, int mfn)
     query.addAnsi (databaseName).newLine()
             .add(mfn);
 
-    return this->execute (query);
+    const auto result = this->execute (query);
+    LOG_LEAVE
+    return result;
 }
 
 // /// \brief Асинхронный вариант connect.
@@ -68,7 +75,9 @@ bool Connection::actualizeRecord (const String &databaseName, int mfn)
 /// \return Результат расформатирования.
 String Connection::formatRecord (const String &format, Mfn mfn)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return L"";
     }
 
@@ -81,10 +90,12 @@ String Connection::formatRecord (const String &format, Mfn mfn)
 
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return L"";
     }
 
     const auto result = response.readRemainingUtfText();
+    LOG_LEAVE
     return result;
 }
 
@@ -94,7 +105,9 @@ String Connection::formatRecord (const String &format, Mfn mfn)
 /// \return Результат расформатирования.
 std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return std::string();
     }
 
@@ -108,10 +121,12 @@ std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
 
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return "";
     }
 
     const auto result = response.getRemaining();
+    LOG_LEAVE
     return result;
 }
 
@@ -121,7 +136,9 @@ std::string Connection::formatRecordLite (const std::string &format, Mfn mfn)
 /// \return Результат расформатирования.
 String Connection::formatRecord (const String &format, const MarcRecord &record)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return L"";
     }
 
@@ -132,12 +149,14 @@ String Connection::formatRecord (const String &format, const MarcRecord &record)
             .add (-2).newLine()
             .add (record, Text::UnixDelimiter);
 
-    ServerResponse response(*this, query);
+    ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return L"";
     }
 
     const auto result = response.readRemainingUtfText();
+    LOG_LEAVE
     return result;
 }
 
@@ -146,20 +165,23 @@ String Connection::formatRecord (const String &format, const MarcRecord &record)
 /// \return Информация о базе данных.
 DatabaseInfo Connection::getDatabaseInfo (const String &databaseName)
 {
+    LOG_ENTER
     DatabaseInfo result;
-
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return result;
     }
 
     ClientQuery query (*this, "0");
-    query.addAnsi(databaseName);
+    query.addAnsi (databaseName);
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return result;
     }
 
-    result.parse(response);
+    result.parse (response);
+    LOG_LEAVE
     return result;
 }
 
@@ -168,20 +190,23 @@ DatabaseInfo Connection::getDatabaseInfo (const String &databaseName)
 /// \warning Операция доступна лишь администратору.
 std::vector<UserInfo> Connection::getUserList()
 {
+    LOG_ENTER
     std::vector<UserInfo> result;
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return result;
     }
 
     ClientQuery query (*this, "+9");
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return result;
     }
 
     const auto lines = response.readRemainingAnsiLines();
     result = UserInfo::parse (lines);
-
+    LOG_LEAVE
     return result;
 }
 
@@ -190,25 +215,28 @@ std::vector<UserInfo> Connection::getUserList()
 /// \return Результат выполнения глобальной корректировки.
 GblResult Connection::globalCorrection (const GblSettings &settings)
 {
+    LOG_ENTER
     GblResult result;
-
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return result;
     }
 
     // TODO implement
     const auto db = choose (settings.database, this->database);  // NOLINT(performance-unnecessary-copy-initialization)
     ClientQuery query (*this, "5");
-    query.addAnsi(db).newLine();
+    query.addAnsi (db).newLine();
 
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return result;
     }
 
     const auto lines = response.readRemainingAnsiLines();
-    result.parse(lines);
+    result.parse (lines);
 
+    LOG_LEAVE
     return result;
 }
 
@@ -224,7 +252,9 @@ GblResult Connection::globalCorrection (const GblSettings &settings)
 /// \return Результат расформатирования.
 String Connection::printTable (const TableDefinition &definition)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return L"";
     }
 
@@ -239,60 +269,69 @@ String Connection::printTable (const TableDefinition &definition)
             .addUtf (definition.sequentialQuery).newLine()
             .addAnsi (""); // instead of MFN list
 
-    ServerResponse response(*this, query);
+    ServerResponse response (*this, query);
     if (!response.success()) {
+        LOG_LEAVE
         return L"";
     }
     const auto result = response.readRemainingUtfText();
+    LOG_LEAVE
     return result;
 }
 
 RawRecord Connection::readRawRecord (Mfn mfn)
 {
+    LOG_ENTER
     RawRecord result;
-
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return result;
     }
 
-    ClientQuery query(*this, "C");
-    query.addAnsi(this->database).newLine()
-            .add(mfn);
+    ClientQuery query (*this, "C");
+    query.addAnsi (this->database).newLine()
+            .add (mfn);
 
-    ServerResponse response(*this, query);
+    ServerResponse response (*this, query);
     if (response.checkReturnCode (4, -201, -600, -602, -603)) {
         const auto lines = response.readRemainingUtfLines();
-        result.parseSingle(lines);
+        result.parseSingle (lines);
         result.database = database;
     }
 
+    LOG_LEAVE
     return result;
 }
 
 std::vector<SearchScenario> Connection::readSearchScenario (const FileSpecification &specification)
 {
+    LOG_ENTER
     std::vector<SearchScenario> result;
-
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return result;
     }
-
+    LOG_LEAVE
     return result;
 }
 
 String Connection::requireTextFile (const FileSpecification &specification)
 {
+    LOG_ENTER
     const auto result = readTextFile(specification);
     if (result.empty()) {
+        LOG_LEAVE
         throw FileNotFoundException(specification.toString());
     }
-
+    LOG_LEAVE
     return result;
 }
 
 bool Connection::updateIniFile (const StringList &lines)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
@@ -301,12 +340,16 @@ bool Connection::updateIniFile (const StringList &lines)
         query.addAnsi (line).newLine();
     }
 
-    return execute (query);
+    const auto result = execute (query);
+    LOG_LEAVE
+    return result;
 }
 
 bool Connection::updateUserList (const std::vector<UserInfo> &users)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
@@ -315,21 +358,27 @@ bool Connection::updateUserList (const std::vector<UserInfo> &users)
         query.addAnsi (user.toString()).newLine();
     }
 
-    return this->execute(query);
+    const auto result = this->execute(query);
+    LOG_LEAVE
+    return result;
 }
 
 bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag, bool actualize, bool dontParseResponse)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return false;
     }
 
     if (records.empty()) {
+        LOG_LEAVE
         return true;
     }
 
     if (records.size() == 1) {
         this->writeRecord (*records[0], lockFlag, actualize, dontParseResponse);
+        LOG_LEAVE
         return true;
     }
 
@@ -343,6 +392,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
     }
     ServerResponse response (*this, query);
     if (!response.success()) {
+        LOG_LEAVE
         return false;
     }
 
@@ -364,18 +414,29 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
         }
     }
 
+    LOG_LEAVE
     return true;
 }
 
 bool Connection::writeRecords (std::vector<MarcRecord> &records, bool lockFlag, bool actualize, bool dontParseResponse)
 {
+    LOG_ENTER
+    if (!this->_checkConnection()) {
+        LOG_LEAVE
+        return false;
+    }
+
     // TODO implement
+
+    LOG_LEAVE
     return false;
 }
 
 int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {
+    LOG_ENTER
     if (!this->_checkConnection()) {
+        LOG_LEAVE
         return 0;
     }
 
@@ -387,6 +448,7 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
     query.addUtf (record.encode(Text::IrbisDelimiter)).newLine();
     ServerResponse response (*this, query);
     if (!response.checkReturnCode()) {
+        LOG_LEAVE
         return 0;
     }
 
@@ -403,14 +465,22 @@ int Connection::writeRawRecord (RawRecord &record, bool lockFlag, bool actualize
         }
     }
 
+    LOG_LEAVE
     return response.returnCode;
 }
 
 void Connection::writeTextFile (const FileSpecification &specification)
 {
+    LOG_ENTER
+    if (!this->_checkConnection()) {
+        LOG_LEAVE
+        return;
+    }
+
     ClientQuery query (*this, "L");
     query.add (specification);
     execute (query);
+    LOG_LEAVE
 }
 
 }

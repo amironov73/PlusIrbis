@@ -14,7 +14,7 @@ namespace irbis {
 
 bool IRBIS_API isRfidSupported();
 
-/// \brief Поддержка Smart Cards
+/// \brief Поддержка Smart Cards.
 class IRBIS_API WinSmartCards final
 {
 public:

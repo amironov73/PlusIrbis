@@ -473,34 +473,37 @@ public:
     String serverVersion; ///< Версия сервера (в некоторых сценариях отсутствует).
 
     ServerResponse (ConnectionBase &connection, ClientQuery &query);
-    ServerResponse (ServerResponse &) = delete;
-    ServerResponse (ServerResponse &&) = delete;
-    ServerResponse& operator = (ServerResponse &) = delete;
-    ServerResponse& operator = (ServerResponse &&) = delete;
-    ~ServerResponse() = default;
+    ServerResponse (ServerResponse &)              = delete;  ///< Конструктор копирования.
+    ServerResponse (ServerResponse &&)             = delete;  ///< Конструктор перемещения.
+    ~ServerResponse ()                             = default; ///< Деструктор.
+    ServerResponse& operator = (ServerResponse &)  = delete;  ///< Оператор копирования.
+    ServerResponse& operator = (ServerResponse &&) = delete;  ///< Оператор перемещения.
 
-    bool eot() const;
-    bool success() const;
-
-    bool checkReturnCode();
-    bool checkReturnCode(int nargs, ...);
-    std::string getLine();
-    std::string getRemaining();
-    int getReturnCode();
-    String readAnsi();
-    int readInteger();
-    StringList readRemainingAnsiLines();
-    String readRemainingAnsiText();
-    StringList readRemainingUtfLines();
-    std::vector<std::string> readRemainingLinesUtf();
-    String readRemainingUtfText();
-    String readUtf();
+    bool                     checkReturnCode        ();
+    bool                     checkReturnCode        (int nargs, ...);
+    static ServerResponse*   emptyResonse           ();
+    bool                     eot                    () const;
+    std::string              getLine                ();
+    std::string              getRemaining           ();
+    int                      getReturnCode          ();
+    String                   readAnsi               ();
+    int                      readInteger            ();
+    StringList               readRemainingAnsiLines ();
+    String                   readRemainingAnsiText  ();
+    StringList               readRemainingUtfLines  ();
+    std::vector<std::string> readRemainingLinesUtf  ();
+    String                   readRemainingUtfText   ();
+    String                   readUtf                ();
+    bool                     success                () const;
 
 private:
     ConnectionBase *_connection;
     bool _success;
     std::size_t _position;
     Bytes _content;
+
+    ServerResponse() = default; ///< Конструктор по умолчанию (для тестов)
+
     void _write(const Byte *bytes, std::size_t size);
 };
 

@@ -12,9 +12,13 @@
 
 namespace irbis {
 
-std::vector<ProcessInfo> ProcessInfo::parse(ServerResponse &response)
+std::vector<ProcessInfo> ProcessInfo::parse (ServerResponse &response)
 {
     std::vector<ProcessInfo> result;
+    if (response.eot()) {
+        return result;
+    }
+
     const auto processCount = response.readInteger();
     const auto linesPerProcess = response.readInteger();
     if (processCount == 0 || linesPerProcess == 0) {

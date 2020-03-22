@@ -260,4 +260,11 @@ void ServerResponse::_write(const Byte *bytes, std::size_t size)
     }
 }
 
+/// \brief Создание пустого ответа сервера (для целей тестирования).
+ServerResponse* ServerResponse::emptyResonse()
+{
+    auto result = new ServerResponse();
+    return result;
+}
+
 }

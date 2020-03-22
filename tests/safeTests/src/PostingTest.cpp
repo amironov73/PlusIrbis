@@ -4,6 +4,17 @@
 #include "catch.hpp"
 #include "irbis.h"
 
+TEST_CASE("PostingParameters_constructor_1", "[posting]")
+{
+    irbis::PostingParameters parameters {};
+    CHECK (parameters.firstPosting     == 0);
+    CHECK (parameters.numberOfPostings == 0);
+    CHECK (parameters.database     .empty());
+    CHECK (parameters.term         .empty());
+    CHECK (parameters.listOfTerms  .empty());
+    CHECK (parameters.format       .empty());
+}
+
 TEST_CASE("TermPosting_constructor_1", "[term]")
 {
     irbis::TermPosting posting;

@@ -1867,8 +1867,17 @@ public:
 class IRBIS_API MenuEntry final
 {
 public:
-    String code;
-    String comment;
+    String code;    ///< Первая строка: содержит код.
+    String comment; ///< Вторая строка: содержит комментарий.
+
+    MenuEntry (const String &code_, const String &comment_) : code (code_), comment (comment_) {} ///< Конструктор.
+    MenuEntry (String &&code_, String &&comment_) : code (std::move (code_)), comment (std::move (comment_)) {} ///< Конструктор.
+    MenuEntry             ()                  = default; ///< Конструктор по умолчанию.
+    MenuEntry             (const MenuEntry &) = default; ///< Конструктор копирования.
+    MenuEntry             (MenuEntry &&)      = default; ///< Конструктор перемещения.
+    ~MenuEntry            ()                  = default; ///< Деструктор.
+    MenuEntry& operator = (const MenuEntry &) = default; ///< Оператор копирования.
+    MenuEntry& operator = (MenuEntry &&)      = default; ///< Оператор перемещения.
 
     String toString() const;
 };
@@ -1882,19 +1891,26 @@ public:
     const static String StopMarker;
     const static Chars Separators;
 
-    String fileName;
-    std::list<MenuEntry> entries;
+    String fileName;               ///< Имя MNU-файла (опционально).
+    std::list<MenuEntry> entries;  ///< Элементы меню.
 
-    MenuFile& add (const String &code, const String &comment);
-    MenuEntry* getEntry (const String &code) const noexcept;
-    MenuEntry* getEntrySensitive (const String &code) const noexcept;
-    String* getValue (const String &code) const noexcept;
-    String* getValueSensitive (const String &code) const noexcept;
-    const String& getValue (const String &code, const String &defaultValue) const noexcept;
-    const String& getValueSensitive (const String &code, const String &defaultValue) const noexcept;
-    void parse (std::istream &stream);
-    void parse (const StringList &lines);
-    void parseLocalFile (const std::wstring &filename /* const QTextCodec *encoding */);
+    MenuFile             ()                 = default; ///< Конструктор по умолчанию.
+    MenuFile             (const MenuFile &) = default; ///< Конструктор копирования.
+    MenuFile             (MenuFile &&)      = default; ///< Конструктор пермещения.
+    ~MenuFile            ()                 = default; ///< Деструктор.
+    MenuFile& operator = (const MenuFile &) = default; ///< Оператор копирования.
+    MenuFile& operator = (MenuFile &&)      = default; ///< Оператор перемещения.
+
+    MenuFile& add                (const String &code, const String &comment);
+    MenuFile& add                (String &&code, String &&comment);
+    MenuEntry* getEntry          (const String &code) const;
+    MenuEntry* getEntrySensitive (const String &code) const;
+    String getValue              (const String &code) const;
+    String getValueSensitive     (const String &code) const;
+    String getValue              (const String &code, const String &defaultValue) const;
+    String getValueSensitive     (const String &code, const String &defaultValue) const;
+    void parse                   (const StringList &lines);
+    void parseLocalFile          (const String &filename);
 };
 
 //=========================================================
@@ -2109,9 +2125,9 @@ public:
     PhantomRecord() = default;                                        ///< Конструктор по умолчанию.
     PhantomRecord (const PhantomRecord &other) = default;             ///< Конструктор копирования.
     PhantomRecord (PhantomRecord &&other) = default;                  ///< Конструктор перемещения.
+    ~PhantomRecord() = default;                                       ///< Деструктор.
     PhantomRecord& operator = (const PhantomRecord &other) = default; ///< Оператор копирования.
     PhantomRecord& operator = (PhantomRecord &&other) = default;      ///< Оператор перемещения.
-    ~PhantomRecord() = default;                                       ///< Деструктор.
 
     PhantomField& add (int tag, ByteSpan value);
     PhantomRecord clone() const;
@@ -2134,12 +2150,12 @@ public:
 class IRBIS_API PostingParameters final
 {
 public:
-    StringList listOfTerms;
-    String database;
-    String format;
-    String term;
-    int firstPosting { 0 };
-    int numberOfPostings { 0 };
+    StringList listOfTerms;            ///< Перечень термов.
+    String     database;               ///< Имя базы данных.
+    String     format;                 ///< Формат.
+    String     term;                   ///< Терм (взаимоисключающе с `listOfTerms`).
+    int        firstPosting     { 0 }; ///< Номер первого постинга.
+    int        numberOfPostings { 0 }; ///< Требуемое число постингов.
 };
 
 //=========================================================
@@ -2148,16 +2164,16 @@ public:
 class IRBIS_API ProcessInfo final
 {
 public:
-    String number;
-    String ipAddress;
-    String name;
-    String clientId;
-    String workstation;
-    String started;
-    String lastCommand;
-    String commandNumber;
-    String processId;
-    String state;
+    String number;        ///< Просто порядковый номер процесса.
+    String ipAddress;     ///< С каким клиентом взаимодействует.
+    String name;          ///< Логин оператора.
+    String clientId;      ///< Идентификатор клиента.
+    String workstation;   ///< Тип АРМ.
+    String started;       ///< Время запуска.
+    String lastCommand;   ///< Последняя выполненная (или выполняемая) команда.
+    String commandNumber; ///< Порядковый номер последней команды.
+    String processId;     ///< Идентификатор процесса.
+    String state;         ///< Состояние.
 
     static std::vector<ProcessInfo> parse (ServerResponse &response);
 };
@@ -2168,17 +2184,18 @@ public:
 class IRBIS_API RawRecord final
 {
 public:
-    Mfn mfn { 0 };
-    unsigned int status { 0 };
-    unsigned int version { 0 };
-    StringList fields;
-    String database;
+    Mfn          mfn     { 0 }; ///< MFN записи.
+    unsigned int status  { 0 }; ///< Статус записи.
+    unsigned int version { 0 }; ///< Версия записи.
+    StringList   fields;        ///< Поля записи.
+    String       database;      ///< Имя базы данных.
+
+
+    String encode      (const String &delimiter = L"\u001F\u001E") const;
+    void   parseSingle (const StringList &lines);
+    String toString    ()                                          const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RawRecord &record);
-
-    String encode (const String &delimiter = L"\u001F\u001E") const;
-    void parseSingle (const StringList &lines);
-    String toString() const;
 };
 
 //=========================================================
@@ -2189,32 +2206,32 @@ class IRBIS_API RecordField final
 public:
     //const static int NoTag = 0;
 
-    int tag { 0 };
-    String value;
-    std::list<SubField> subfields;
+    int tag { 0 };           ///< Метка поля.
+    String value;            ///< Значение поля до первого разделителя.
+    SubFieldList  subfields; ///< Подполя.
 
-    RecordField() = default;
-    RecordField (int tag_, const String &value_ = L"") : tag (tag_), value (value_) {}
-    RecordField (int tag_, String &&value_) : tag (tag_), value (std::move (value_)) {}
-    RecordField (const RecordField &other) = default;
-    RecordField (RecordField &&other) = default;
-    RecordField& operator = (const RecordField &other) = default;
-    RecordField& operator = (RecordField &&other) = default;
-    ~RecordField() = default;
+    explicit RecordField (int tag_, const String &value_ = L"") : tag (tag_), value (value_) {} ///< Конструктор.
+    RecordField (int tag_, String &&value_) : tag (tag_), value (std::move (value_)) {} ///< Конструктор.
+    RecordField  ()                               = default; ///< Конструктор по умолчанию.
+    RecordField  (const RecordField &)            = default; ///< Конструктор копирования.
+    RecordField  (RecordField &&)                 = default; ///< Конструктор перемещения.
+    ~RecordField ()                               = default; ///< Деструктор.
+    RecordField& operator = (const RecordField &) = default; ///< Оператор копирования.
+    RecordField& operator = (RecordField &&)      = default; ///< Оператор перемещения.
 
-    RecordField& add (Char code, const String &value = L"");
-    RecordField& add (Char code, String &&value);
-    RecordField& clear();
-    RecordField clone() const;
-    void decode (const String &line);
-    void decodeBody (const String &line);
-    bool empty() const noexcept;
-    SubField* getFirstSubfield( Char code) const noexcept;
-    String getFirstSubfieldValue (Char code) const noexcept;
-    RecordField& removeSubfield (Char code);
-    RecordField& setSubfield (Char code, const String &newValue);
-    RecordField& setSubfield (Char code, String &&newValue);
-    bool verify (bool throwOnError) const;
+    RecordField& add                   (Char code, const String &value = L"");
+    RecordField& add                   (Char code, String &&value);
+    RecordField& clear                 ();
+    RecordField  clone                 ()                                   const;
+    void         decode                (const String &line);
+    void         decodeBody            (const String &line);
+    bool         empty                 ()                                   const noexcept;
+    SubField*    getFirstSubfield      (Char code)                          const noexcept;
+    String       getFirstSubfieldValue (Char code)                          const noexcept;
+    RecordField& removeSubfield        (Char code);
+    RecordField& setSubfield           (Char code, const String &newValue);
+    RecordField& setSubfield           (Char code, String &&newValue);
+    bool         verify                (bool throwOnError)                  const;
     String toString() const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &field);
@@ -2342,18 +2359,17 @@ public:
     /// \brief Отсутствующий код подполя.
     const static Char NoCode { L'\0' };
 
-    /// \brief Одноисмвольный код подполя.
-    Char code { L'\0' };
-    String value; ///< Значение подполя (может быть пустой строкой).
+    Char code { L'\0' }; ///< Односимвольный код подполя.
+    String value;        ///< Значение подполя (может быть пустой строкой).
 
-    SubField() = default;
-    SubField (Char code_, const String &value_ = L"") : code (code_), value (value_) {}
-    SubField (Char code_, String &&value_) : code (code_), value (std::move (value_)) {}
-    SubField (const SubField &other) = default;
-    SubField (SubField &&other) = default;
-    SubField& operator = (const SubField &other) = default;
-    SubField& operator = (SubField &&other) = default;
-    ~SubField() = default;
+    explicit SubField (Char code_, const String &value_ = L"") : code (code_), value (value_) {} ///< Конструктор.
+    SubField (Char code_, String &&value_) : code (code_), value (std::move (value_)) {} ///< Конструктор.
+    SubField()                              = default; ///< Конструктор по умолчанию.
+    SubField (const SubField &)             = default; ///< Конструктор копирования.
+    SubField (SubField &&)                  = default; ///< Конструктор перемещения.
+    ~SubField()                             = default; ///< Деструктор.
+    SubField& operator = (const SubField &) = default; ///< Оператор копирования
+    SubField& operator = (SubField &&)      = default; ///< Оператор перемещения.
 
     SubField clone    ()                    const;
     void     decode   (const String &line);

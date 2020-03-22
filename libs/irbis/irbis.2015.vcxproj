@@ -116,8 +116,7 @@
     <ClCompile Include="src/MarcRecord.cpp" />
     <ClCompile Include="src/MemoryChunk.cpp" />
     <ClCompile Include="src/MemoryPool.cpp" />
-    <ClCompile Include="src/MenuEntry.cpp" />
-    <ClCompile Include="src/MenuFile.cpp" />
+    <ClCompile Include="src/Menu.cpp" />
     <ClCompile Include="src/MstControlRecord64.cpp" />
     <ClCompile Include="src/MstDictionaryEntry64.cpp" />
     <ClCompile Include="src/MstFile64.cpp" />

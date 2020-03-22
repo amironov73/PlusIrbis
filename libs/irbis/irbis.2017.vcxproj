@@ -579,15 +579,13 @@
     <ClCompile Include="src/IO.cpp" />
     <ClCompile Include="src/Isbn.cpp" />
     <ClCompile Include="src/irbis.cpp" />
-    <ClCompile Include="src/Text.cpp" />
     <ClCompile Include="src/Iso2709.cpp" />
     <ClCompile Include="src/Lite.cpp" />
     <ClCompile Include="src/Log.cpp" />
     <ClCompile Include="src/MarcRecord.cpp" />
     <ClCompile Include="src/MemoryChunk.cpp" />
     <ClCompile Include="src/MemoryPool.cpp" />
-    <ClCompile Include="src/MenuEntry.cpp" />
-    <ClCompile Include="src/MenuFile.cpp" />
+    <ClCompile Include="src/Menu.cpp" />
     <ClCompile Include="src/MstControlRecord64.cpp" />
     <ClCompile Include="src/MstDictionaryEntry64.cpp" />
     <ClCompile Include="src/MstFile64.cpp" />
@@ -612,6 +610,7 @@
     <ClCompile Include="src/Tcp4Socket.cpp" />
     <ClCompile Include="src/TermInfo.cpp" />
     <ClCompile Include="src/TermPosting.cpp" />
+    <ClCompile Include="src/Text.cpp" />
     <ClCompile Include="src/TextNavigator.cpp" />
     <ClCompile Include="src/TreeFile.cpp" />
     <ClCompile Include="src/TreeNode.cpp" />

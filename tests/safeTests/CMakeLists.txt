@@ -32,10 +32,13 @@ set(CppFiles
     src/main.cpp
     src/MarcRecordTest.cpp
     src/MemoryPoolTest.cpp
+    src/MenuTest.cpp
     src/OptFileTest.cpp
     src/OptionalTest.cpp
     src/ParFileTest.cpp
     src/PointerGuardTest.cpp
+    src/PostingTest.cpp
+    src/ProcessInfoTest.cpp
     src/RangeTest.cpp
     src/ReaderTest.cpp
     src/RecordFieldTest.cpp
@@ -44,7 +47,6 @@ set(CppFiles
     src/SpanTest.cpp
     src/SubFieldTest.cpp
     src/TermInfoTest.cpp
-    src/TermPostingTest.cpp
     src/TextNavigatorTest.cpp
     src/TextTest.cpp
     src/TitleTest.cpp
