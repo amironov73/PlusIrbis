@@ -6,6 +6,8 @@
 
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
+#include <utility>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -52,20 +54,34 @@ RecordField& MarcRecord::add (int tag, const String &value)
     return this->fields.back();
 }
 
+/// \brief Добавление в конец записи поля с указанными меткой и значением.
+/// \param tag Метка добавляемого поля.
+/// \param value Значение поля (может быть пустым).
+/// \return Вновь созданное поле.
+RecordField& MarcRecord::add (int tag, String &&value)
+{
+    this->fields.emplace_back (tag, std::move (value));
+    return this->fields.back();
+}
+
+/// \brief Создание клона записи.
+/// \return Клон записи.
 MarcRecord MarcRecord::clone() const
 {
     MarcRecord result;
-    result.mfn = this->mfn;
-    result.status = this->status;
-    result.version = this->version;
+    result.mfn      = this->mfn;
+    result.status   = this->status;
+    result.version  = this->version;
     result.database = this->database;
     for (const auto &one : this->fields) {
-        result.fields.push_back(one.clone());
+        result.fields.push_back (std::move (one.clone()));
     }
 
     return result;
 }
 
+/// \brief Разбор текстового представления записи.
+/// \param lines Строки с полями записи.
 void MarcRecord::decode (const StringList &lines)
 {
     if (lines.size() < 2) {
@@ -73,49 +89,58 @@ void MarcRecord::decode (const StringList &lines)
     }
 
     // mfn and status of the record
-    const auto firstLine = split(lines[0], L'#');
-    this->mfn = fastParseUnsigned32(firstLine[0]);
-    this->status = static_cast<RecordStatus> (fastParseUnsigned32 (safeAt(firstLine, 1)));
+    const auto firstLine = split (lines[0], L'#');
+    this->mfn = fastParseUnsigned32 (firstLine[0]);
+    this->status = static_cast<RecordStatus> (fastParseUnsigned32 (safeAt (firstLine, 1)));
 
     // version of the record
-    const auto secondLine = split(lines[1], L'#');
-    this->version = fastParseUnsigned32(safeAt(secondLine, 1));
+    const auto secondLine = split (lines[1], L'#');
+    this->version = fastParseUnsigned32 (safeAt (secondLine, 1));
 
     // fields
     for (std::size_t i = 2; i < lines.size(); i++) {
         const auto line = lines[i];
         if (!line.empty()) {
             RecordField field;
-            field.decode(line);
-            this->fields.push_back(field);
+            field.decode (line);
+            this->fields.push_back (field);
         }
     }
 }
 
+/// \brief Запись удалена (логически или физически)?
+/// \return true если удалена.
 bool MarcRecord::deleted() const noexcept
 {
     return (this->status & RecordStatus::Deleted) != RecordStatus::None;
 }
 
+/// \brief Кодирование записи в текстовую форму.
+/// \param delimiter Разделитель строк.
+/// \return Текстовое представление записи.
 String MarcRecord::encode (const String &delimiter) const
 {
     String result = std::to_wstring (this->mfn) + L"#"
             + std::to_wstring (static_cast<int> (this->status)) + delimiter
             + L"0#" + std::to_wstring(this->version) + delimiter;
     for (const auto &field : this->fields) {
-        result.append(field.toString());
-        result.append(delimiter);
+        result.append (field.toString());
+        result.append (delimiter);
     }
     return result;
 }
 
+/// \brief Получение значения поля/подполя.
+/// \param tag Метка поля.
+/// \param code Код подполя (опционально).
+/// \return Значение поля/подполя либо пустая строка.
 String MarcRecord::fm (int tag, Char code) const noexcept
 {
     for (const auto &field : this->fields) {
         if (field.tag == tag) {
             if (code) {
                 for (const auto &subfield : field.subfields) {
-                    if (sameChar(subfield.code, code)) {
+                    if (sameChar (subfield.code, code)) {
                         return subfield.value;
                     }
                 }
@@ -127,6 +152,10 @@ String MarcRecord::fm (int tag, Char code) const noexcept
     return String();
 }
 
+/// \brief Получение вектора значений поля/подполя.
+/// \param tag Метка поля.
+/// \param code Код подполя (опционально).
+/// \return Вектор значений (возможно, пустой).
 StringList MarcRecord::fma (int tag, Char code) const
 {
     StringList result;
@@ -134,15 +163,15 @@ StringList MarcRecord::fma (int tag, Char code) const
         if (field.tag == tag) {
             if (code) {
                 for (const auto &subfield : field.subfields) {
-                    if (sameChar(subfield.code, code)) {
+                    if (sameChar (subfield.code, code)) {
                         if (!subfield.value.empty()) {
-                            result.push_back(subfield.value);
+                            result.push_back (subfield.value);
                         }
                     }
                 }
             } else {
                 if (!field.value.empty()) {
-                    result.push_back(field.value);
+                    result.push_back (field.value);
                 }
             }
         }
@@ -150,6 +179,10 @@ StringList MarcRecord::fma (int tag, Char code) const
     return result;
 }
 
+/// \brief Получение указателя на поле с указанной меткой.
+/// \param tag Метка поля.
+/// \param occurrence Повторение поля (нумерация с 0).
+/// \return Указатель на поле либо `nullptr`.
 RecordField* MarcRecord::getField (int tag, int occurrence) const noexcept
 {
     for (const auto &field : this->fields) {
@@ -157,11 +190,15 @@ RecordField* MarcRecord::getField (int tag, int occurrence) const noexcept
             if (!occurrence) {
                 return const_cast<RecordField*> (&field);
             }
+            --occurrence;
         }
     }
     return nullptr;
 }
 
+/// \brief Получение вектора указателей на поля с указанной меткой.
+/// \param tag Метка поля.
+/// \return Вектор указателей (возможно, пустой).
 std::vector<RecordField*> MarcRecord::getFields (int tag) const
 {
     std::vector<RecordField*> result;
@@ -174,12 +211,19 @@ std::vector<RecordField*> MarcRecord::getFields (int tag) const
     return result;
 }
 
+/// \brief Удаление всех повторений поля с указанной меткой.
+/// \param tag Метка поля.
+/// \return this.
 MarcRecord& MarcRecord::removeField (int tag)
 {
-    // TODO implement
+    this->fields.remove_if ([tag] (RecordField &field) { return field.tag == tag; });
     return *this;
 }
 
+/// \brief Установка значения поля.
+/// \param tag Метка поля.
+/// \param value Новое значение поля.
+/// \return this.
 MarcRecord& MarcRecord::setField (int tag, const String &value)
 {
     if (value.empty()) {
@@ -187,12 +231,33 @@ MarcRecord& MarcRecord::setField (int tag, const String &value)
     }
     auto field = this->getField (tag);
     if (!field) {
-        field = &this->add (tag, value);
+        field = &this->add (tag);
     }
     field->value = value;
     return *this;
 }
 
+/// \brief Установка значения поля.
+/// \param tag Метка поля.
+/// \param value Новое значение поля.
+/// \return this.
+MarcRecord& MarcRecord::setField (int tag, String &&value)
+{
+    if (value.empty()) {
+        return this->removeField (tag);
+    }
+    auto field = this->getField (tag);
+    if (!field) {
+        field = &this->add (tag);
+    }
+    field->value = std::move (value);
+    return *this;
+}
+
+/// \brief Сброс состояния записи.
+/// \return this.
+/// \details Может потребоваться, например,
+/// при переносе записи в другую базу данных.
 MarcRecord& MarcRecord::reset() noexcept
 {
     this->mfn = 0;
@@ -202,9 +267,12 @@ MarcRecord& MarcRecord::reset() noexcept
     return *this;
 }
 
+/// \brief Верификация записи.
+/// \param throwOnError Бросать исключение?
+/// \return Результат верификации.
 bool MarcRecord::verify (bool throwOnError) const
 {
-    bool result = true;
+    bool result = !this->fields.empty();
     for (const auto &field : this->fields) {
         if (!field.verify(throwOnError)) {
             result = false;

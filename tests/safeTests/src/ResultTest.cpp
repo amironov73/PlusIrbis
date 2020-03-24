@@ -6,11 +6,49 @@
 
 TEST_CASE("Result_success_1", "[result]")
 {
-    auto r1 = irbis::Result<int>::Success (123);
+    auto r1 = irbis::Result <int>::Success (123);
     CHECK (r1.success);
     CHECK (r1);
     CHECK (r1.result == 123);
     CHECK ((int)r1 == 123);
+}
+
+TEST_CASE("Result_success_2", "[result]")
+{
+    auto r1 = irbis::Result <std::string>::Success ("123");
+    CHECK (r1.success);
+    CHECK (r1);
+    CHECK (r1.result == "123");
+    CHECK ((std::string)r1 == "123");
+}
+
+TEST_CASE("Result_success_3", "[result]")
+{
+    auto r1 = irbis::Result <irbis::String>::Success (L"123");
+    CHECK (r1.success);
+    CHECK (r1);
+    CHECK (r1.result == L"123");
+    CHECK ((irbis::String)r1 == L"123");
+}
+
+TEST_CASE("Result_success_4", "[result]")
+{
+    irbis::String text (L"123");
+    auto r1 = irbis::Result <irbis::String>::Success (std::move (text));
+    CHECK (r1.success);
+    CHECK (r1);
+    CHECK (r1.result == L"123");
+    CHECK ((irbis::String)r1 == L"123");
+}
+
+TEST_CASE("Result_success_5", "[result]")
+{
+    irbis::MenuEntry entry (L"code", L"comment");
+    auto r1 = irbis::Result <irbis::MenuEntry>::Success (std::move (entry));
+    CHECK (r1.success);
+    CHECK (r1);
+    CHECK (r1.result.code == L"code");
+    CHECK (r1.result.comment == L"comment");
 }
 
 TEST_CASE("Result_failure_1", "[result]")
@@ -18,7 +56,31 @@ TEST_CASE("Result_failure_1", "[result]")
     auto r1 = irbis::Result<int>::Failure (L"Can't do it");
     CHECK_FALSE (r1.success);
     CHECK_FALSE (r1);
-    CHECK (r1.errorMessage == irbis::String(L"Can't do it"));
+    CHECK (r1.errorMessage == irbis::String (L"Can't do it"));
+}
+
+TEST_CASE("Result_failure_2", "[result]")
+{
+    auto r1 = irbis::Result<std::string>::Failure (L"Can't do it");
+    CHECK_FALSE (r1.success);
+    CHECK_FALSE (r1);
+    CHECK (r1.errorMessage == irbis::String (L"Can't do it"));
+}
+
+TEST_CASE("Result_failure_3", "[result]")
+{
+    auto r1 = irbis::Result<irbis::String>::Failure (L"Can't do it");
+    CHECK_FALSE (r1.success);
+    CHECK_FALSE (r1);
+    CHECK (r1.errorMessage == irbis::String (L"Can't do it"));
+}
+
+TEST_CASE("Result_failure_4", "[result]")
+{
+    auto r1 = irbis::Result<irbis::MenuEntry>::Failure (L"Can't do it");
+    CHECK_FALSE (r1.success);
+    CHECK_FALSE (r1);
+    CHECK (r1.errorMessage == irbis::String (L"Can't do it"));
 }
 
 TEST_CASE("Result_operator_1", "[result]")

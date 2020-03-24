@@ -1837,26 +1837,28 @@ public:
     String database;                            ///< Имя базы данных.
     std::list<RecordField> fields;              ///< Список полей.
 
-    MarcRecord() = default;                                     ///< Конструктор по умолчанию.
-    MarcRecord (const MarcRecord &other) = default;              ///< Конструктор копирования.
-    MarcRecord (MarcRecord &&other) = default;                   ///< Конструктор перемещения.
-    MarcRecord& operator = (const MarcRecord &other) = default; ///< Оператор копирования.
-    MarcRecord& operator = (MarcRecord &&other) = default;      ///< Оператор перемещения.
-    ~MarcRecord() = default;                                    ///< Деструктор.
+    MarcRecord  ()                              = default; ///< Конструктор по умолчанию.
+    MarcRecord  (const MarcRecord &)            = default; ///< Конструктор копирования.
+    MarcRecord  (MarcRecord &&)                 = default; ///< Конструктор перемещения.
+    ~MarcRecord ()                              = default; ///< Деструктор.
+    MarcRecord& operator = (const MarcRecord &) = default; ///< Оператор копирования.
+    MarcRecord& operator = (MarcRecord &&)      = default; ///< Оператор перемещения.
 
-    RecordField& add (int tag, const String &value = L"");
-    MarcRecord clone() const;
-    void decode (const StringList &lines);
-    bool deleted() const noexcept;
-    String encode (const String &delimiter = L"\u001F\u001E") const;
-    String fm (int tag, Char code = 0) const noexcept;
-    StringList fma (int tag, Char code = 0) const;
-    RecordField* getField (int tag, int occurrence = 0) const noexcept;
-    std::vector<RecordField*> getFields (int tag) const;
-    MarcRecord& removeField (int tag);
-    MarcRecord& setField (int tag, const String &value);
-    MarcRecord& reset() noexcept;
-    bool verify (bool throwOnError) const;
+    RecordField&              add         (int tag, const String &value = L"");
+    RecordField&              add         (int tag, String &&value);
+    MarcRecord                clone       ()                                          const;
+    void                      decode      (const StringList &lines);
+    bool                      deleted     ()                                          const noexcept;
+    String                    encode      (const String &delimiter = L"\u001F\u001E") const;
+    String                    fm          (int tag, Char code = 0)                    const noexcept;
+    StringList                fma         (int tag, Char code = 0)                    const;
+    RecordField*              getField    (int tag, int occurrence = 0)               const noexcept;
+    std::vector<RecordField*> getFields   (int tag)                                   const;
+    MarcRecord&               removeField (int tag);
+    MarcRecord&               setField    (int tag, const String &value);
+    MarcRecord&               setField    (int tag, String &&value);
+    MarcRecord&               reset       ()                                          noexcept;
+    bool                      verify      (bool throwOnError)                         const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
 };

@@ -77,7 +77,7 @@ void RecordField::decodeBody (const String &body)
     } else {
         const auto parts2 = maxSplit (body, L'#', 2);
         this->value = parts2[0];
-        all = split (parts2[1], L'^');
+        all = parts2.size() == 1 ? StringList () : split (parts2[1], L'^');
     }
     for (const auto &one : all) {
         if (!one.empty()) {
