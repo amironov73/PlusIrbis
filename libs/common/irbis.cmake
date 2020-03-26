@@ -50,12 +50,8 @@ set(CppFiles
     ../irbis/src/MemoryChunk.cpp
     ../irbis/src/MemoryPool.cpp
     ../irbis/src/Menu.cpp
-    ../irbis/src/MstControlRecord64.cpp
-    ../irbis/src/MstDictionaryEntry64.cpp
-    ../irbis/src/MstFile64.cpp
-    ../irbis/src/MstRecord64.cpp
-    ../irbis/src/MstRecordLeader64.cpp
-    ../irbis/src/NumberChunk.cpp
+    ../irbis/src/Mst.cpp
+        ../irbis/src/NumberText.cpp
     ../irbis/src/OptFile.cpp
     ../irbis/src/ParFile.cpp
     ../irbis/src/Pft.cpp
@@ -84,6 +80,5 @@ set(CppFiles
     ../irbis/src/UserInfo.cpp
     ../irbis/src/Version.cpp
     ../irbis/src/Visit.cpp
-    ../irbis/src/XrfFile64.cpp
-    ../irbis/src/XrfRecord64.cpp
+    ../irbis/src/Xrf.cpp
 )

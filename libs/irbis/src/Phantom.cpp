@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -135,11 +135,19 @@ ByteSpan PhantomField::getFirstSubfieldValue (Byte code) const noexcept
     return {};
 }
 
+/// \brief Удаление подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \return this.
 PhantomField& PhantomField::removeSubfield (Byte code)
 {
-    std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
-                    [code] (PhantomSubField &sf) { return sf.code == code; }
-    );
+    const auto end = std::end (this->subfields);
+    const auto trash = std::remove_if
+        (
+            std::begin(this->subfields),
+            end,
+            [code] (PhantomSubField &sf) { return sf.code == code; }
+        );
+    this->subfields.erase (trash, end);
 
     return *this;
 }

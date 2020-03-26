@@ -117,10 +117,10 @@ class IRBIS_API XrfFile64 final
 public:
 
     XrfFile64 (const String &fileName, DirectAccessMode mode);
-    XrfFile64 (const XrfFile64 &) = delete;
-    XrfFile64 (const XrfFile64 &&) = delete;
+    XrfFile64             (const XrfFile64 &) = delete;
+    XrfFile64             (XrfFile64 &&)      = delete;
     XrfFile64& operator = (const XrfFile64 &) = delete;
-    XrfFile64& operator = (const XrfFile64 &&) = delete;
+    XrfFile64& operator = (XrfFile64 &&)      = delete;
     ~XrfFile64();
 
     void close();
@@ -136,7 +136,7 @@ private:
     DirectAccessMode _mode;
     std::mutex _mutex;
 
-    static Offset getOffset(Mfn mfn) noexcept;
+    static Offset getOffset (Mfn mfn) noexcept;
 };
 
 //=========================================================

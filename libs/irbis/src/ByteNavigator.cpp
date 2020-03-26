@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -156,9 +156,9 @@ int ByteNavigator::lookBehind (std::ptrdiff_t distance) const noexcept
 ByteNavigator& ByteNavigator::move (std::ptrdiff_t distance) noexcept
 {
     this->_position += distance;
-    if (this->_position < 0) {
-        this->_position = 0;
-    }
+    //if (this->_position < 0) {
+    //    this->_position = 0;
+    //}
     return *this;
 }
 
@@ -800,7 +800,7 @@ int ByteNavigator::find (ByteSpan array) const noexcept
 
     for (auto ptr = this->ccurrent(); ptr < this->cend(); ++ptr) {
         bool found = true;
-        for (std::ptrdiff_t offset = 0; offset < array.size(); ++offset) {
+        for (std::size_t offset = 0; offset < array.size(); ++offset) {
             if (ptr[offset] != array[offset]) {
                 found = false;
                 break;

@@ -423,3 +423,27 @@ TEST_CASE("fastParseUnsigned32_5", "[utils]")
     CHECK (irbis::fastParseUnsigned32 (text, 10) == 123456789u);
 }
 
+TEST_CASE("size_1", "[utils]")
+{
+    int a[] { 1, 2, 3, 4, 5 };
+    CHECK (irbis::size (a) == 5);
+}
+
+TEST_CASE("size_2", "[utils]")
+{
+    std::vector<int> v { 1, 2, 3, 4, 5 };
+    CHECK (irbis::size (v) == 5);
+}
+
+TEST_CASE("size_3", "[utils]")
+{
+    std::array<int, 5> a { 1, 2, 3, 4, 5 };
+    CHECK (irbis::size (a) == 5);
+}
+
+TEST_CASE("size_4", "[utils]")
+{
+    std::list<int> a { 1, 2, 3, 4, 5 };
+    CHECK (irbis::size (a) == 5);
+}
+

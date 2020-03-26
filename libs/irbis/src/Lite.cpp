@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -268,11 +268,19 @@ std::string LiteField::getFirstSubfieldValue (char code) const noexcept
     return std::string();
 }
 
+/// \brief Удаление подполя с указанным кодом.
+/// \param code Искомый код подполя.
+/// \return this.
 LiteField& LiteField::removeSubfield (char code)
 {
-    std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
-                    [code] (LiteSubField &sf) { return sf.code == code; }
-    );
+    const auto end = std::end (this->subfields);
+    const auto trash = std::remove_if
+        (
+            std::begin (this->subfields),
+            end,
+            [code] (LiteSubField &sf) { return sameChar (sf.code, code); }
+        );
+    this->subfields.erase (trash, end);
 
     return *this;
 }

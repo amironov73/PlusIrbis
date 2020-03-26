@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -47,12 +47,12 @@ MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
         return nullptr;
     }
 
-    const auto baseAddress = fastParse32 ((const char*)(record + 12), 5);
-    const auto indicatorLength = fastParse32 ((const char*)(record + 10), 1); // как правило, 2
+    const std::size_t baseAddress = fastParse32 ((const char*)(record + 12), 5);
+    const std::size_t indicatorLength = fastParse32 ((const char*)(record + 10), 1); // как правило, 2
     auto *result = new MarcRecord;
 
     // Пошли по полям при помощи справочника
-    for (int directory = MarkerLength;; directory += 12) {
+    for (std::size_t directory = MarkerLength;; directory += 12) {
         // Переходим к очередному полю.
         // Если нарвались на разделитель, значит, справочник закончился
         if (record[directory] == FieldDelimiter) {
@@ -229,13 +229,13 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
     bytes[baseAddress - 1] = FieldDelimiter;
 
     // Проходим по полям
-    int index = 0;
+    std::size_t index = 0;
     currentAddress = baseAddress;
     for (const auto &field : record.fields) {
         // Справочник
-        encode(bytes, dictionaryPosition, 3, field.tag);
-        encode(bytes, dictionaryPosition + 3, 4, fieldLength[index++]); //-V112
-        encode(bytes, dictionaryPosition + 7, 5, currentAddress - baseAddress);
+        encode (bytes, dictionaryPosition, 3, field.tag);
+        encode (bytes, dictionaryPosition + 3, 4, fieldLength[index++]); //-V112
+        encode (bytes, dictionaryPosition + 7, 5, currentAddress - baseAddress);
         dictionaryPosition += 12;
 
         // Собственно поле

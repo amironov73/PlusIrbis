@@ -107,15 +107,15 @@ TEST_CASE("MarcRecord_encode_1", "[record]")
 TEST_CASE("MarcRecord_fm_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
-    CHECK (record.fm (700, 'a') == L"Иванов");
-    CHECK (record.fm (701, 'a') == L"Петров");
-    CHECK (record.fm (300) == L"Первое примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    CHECK (record.fm (700, 'a') == L"\u0418\u0432\u0430\u043D\u043E\u0432");
+    CHECK (record.fm (701, 'a') == L"\u041F\u0435\u0442\u0440\u043E\u0432");
+    CHECK (record.fm (300) == L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     CHECK (record.fm (700, 'c').empty());
     CHECK (record.fm (310).empty());
 
@@ -124,23 +124,23 @@ TEST_CASE("MarcRecord_fm_1", "[record]")
 TEST_CASE("MarcRecord_fma_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     auto list = record.fma (700, 'a');
     REQUIRE (list.size() == 1);
-    CHECK (list[0] == L"Иванов");
+    CHECK (list[0] == L"\u0418\u0432\u0430\u043D\u043E\u0432");
     list = record.fma (701, 'a');
     REQUIRE (list.size() == 1);
-    CHECK (list[0] == L"Петров");
+    CHECK (list[0] == L"\u041F\u0435\u0442\u0440\u043E\u0432");
     list = record.fma (300);
     REQUIRE (list.size() == 3);
-    CHECK (list[0] == L"Первое примечание");
-    CHECK (list[1] == L"Второе примечание");
-    CHECK (list[2] == L"Третье примечание");
+    CHECK (list[0] == L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    CHECK (list[1] == L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    CHECK (list[2] == L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     list = record.fma (700, 'c');
     REQUIRE (list.empty());
     list = record.fma (301);
@@ -150,18 +150,18 @@ TEST_CASE("MarcRecord_fma_1", "[record]")
 TEST_CASE("MarcRecord_getField_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     auto field = record.getField (700);
     REQUIRE (field != nullptr);
     CHECK (field->tag == 700);
     field = record.getField (300, 1);
     REQUIRE (field != nullptr);
-    CHECK (field->value == L"Второе примечание");
+    CHECK (field->value == L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     field = record.getField (310);
     CHECK (field == nullptr);
 }
@@ -169,18 +169,18 @@ TEST_CASE("MarcRecord_getField_1", "[record]")
 TEST_CASE("MarcRecord_getFields_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     auto fields = record.getFields (700);
     REQUIRE (fields.size() == 1);
     CHECK (fields[0]->tag == 700);
     fields = record.getFields (300);
     REQUIRE (fields.size() == 3);
-    CHECK (fields[1]->value == L"Второе примечание");
+    CHECK (fields[1]->value == L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     fields = record.getFields (310);
     CHECK (fields.empty());
 
@@ -189,12 +189,12 @@ TEST_CASE("MarcRecord_getFields_1", "[record]")
 TEST_CASE("MarcRecord_removeField_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     record.removeField (700);
     CHECK (record.getField (700) == nullptr);
     record.removeField (300);
@@ -205,16 +205,16 @@ TEST_CASE("MarcRecord_removeField_1", "[record]")
 TEST_CASE("MarcRecord_setField_1", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
-    record.setField (701, L"Зайцев");
-    CHECK (record.fm (701) == L"Зайцев");
-    record.setField (702, L"Козлов");
-    CHECK (record.fm (702) == L"Козлов");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.setField (701, L"\u0417\u0430\u0439\u0446\u0435\u0432");
+    CHECK (record.fm (701) == L"\u0417\u0430\u0439\u0446\u0435\u0432");
+    record.setField (702, L"\u041A\u043E\u0437\u043B\u043E\u0432");
+    CHECK (record.fm (702) == L"\u041A\u043E\u0437\u043B\u043E\u0432");
     CHECK (record.fields.size() == 7);
     record.setField (702, L"");
     CHECK (record.fm (702).empty());
@@ -224,18 +224,18 @@ TEST_CASE("MarcRecord_setField_1", "[record]")
 TEST_CASE("MarcRecord_setField_2", "[record]")
 {
     irbis::MarcRecord record;
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
-    irbis::String text (L"Зайцев");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    irbis::String text (L"\u0417\u0430\u0439\u0446\u0435\u0432");
     record.setField (701, std::move (text));
-    CHECK (record.fm (701) == L"Зайцев");
-    text = L"Козлов";
+    CHECK (record.fm (701) == L"\u0417\u0430\u0439\u0446\u0435\u0432");
+    text = L"\u041A\u043E\u0437\u043B\u043E\u0432";
     record.setField (702, std::move (text));
-    CHECK (record.fm (702) == L"Козлов");
+    CHECK (record.fm (702) == L"\u041A\u043E\u0437\u043B\u043E\u0432");
     CHECK (record.fields.size() == 7);
     text.clear();
     record.setField (702, std::move (text));
@@ -261,11 +261,11 @@ TEST_CASE("MarcRecord_verify_1", "[record]")
 {
     irbis::MarcRecord record;
     CHECK_FALSE (record.verify (false));
-    record.add (700).add ('a', L"Иванов").add ('b', L"И. И.");
-    record.add (701).add ('a', L"Петров").add ('b', L"П. П.");
-    record.add (200).add ('a', L"Заглавие").add ('e', L"подзаголовочное").add ('f', L"И. И. Иванов, П. П. Петров");
-    record.add (300, L"Первое примечание");
-    record.add (300, L"Второе примечание");
-    record.add (300, L"Третье примечание");
+    record.add (700).add ('a', L"\u0418\u0432\u0430\u043D\u043E\u0432").add ('b', L"\u0418. \u0418.");
+    record.add (701).add ('a', L"\u041F\u0435\u0442\u0440\u043E\u0432").add ('b', L"\u041F. \u041F.");
+    record.add (200).add ('a', L"\u0417\u0430\u0433\u043B\u0430\u0432\u0438\u0435").add ('e', L"\u043F\u043E\u0434\u0437\u0430\u0433\u043E\u043B\u043E\u0432\u043E\u0447\u043D\u043E\u0435").add ('f', L"\u0418. \u0418. \u0418\u0432\u0430\u043D\u043E\u0432, \u041F. \u041F. \u041F\u0435\u0442\u0440\u043E\u0432");
+    record.add (300, L"\u041F\u0435\u0440\u0432\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
+    record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     CHECK (record.verify (false));
 }

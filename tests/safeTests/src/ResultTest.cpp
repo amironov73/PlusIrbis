@@ -4,6 +4,10 @@
 #include "catch.hpp"
 #include "irbis.h"
 
+#include <functional>
+#include <memory>
+#include <utility>
+
 TEST_CASE("Result_success_1", "[result]")
 {
     auto r1 = irbis::Result <int>::Success (123);
@@ -146,4 +150,45 @@ TEST_CASE("Result_resultOr_1", "[result]")
 
     auto r2 = irbis::Result<int>::Failure (L"Failed");
     CHECK (r2.resultOr (func) == 321);
+}
+
+template <typename T>
+using OptionalReference = irbis::Result<std::reference_wrapper<T>>;
+
+using OptionalNarrow = OptionalReference<std::string>;
+using OptionalWide = OptionalReference<irbis::String>;
+
+static int globalCounter { 123456 };
+
+static OptionalReference<int> func1()
+{
+    OptionalReference<int> result
+    {
+        true,
+        std::ref (globalCounter),
+        {}
+    };
+    return result;
+}
+
+static OptionalReference<int> func2()
+{
+    OptionalReference<int> result
+    {
+        false,
+        std::ref (globalCounter),
+        L"No reference"
+
+    };
+    return result;
+}
+
+TEST_CASE("Result_reference_1", "[result]")
+{
+    auto r1 = func1();
+    CHECK (r1.success);
+    CHECK (r1.result.get() == globalCounter);
+
+    auto r2 = func2();
+    CHECK_FALSE (r2.success);
 }

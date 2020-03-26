@@ -139,9 +139,14 @@ String RecordField::getFirstSubfieldValue (Char code) const noexcept
 /// \return this.
 RecordField& RecordField::removeSubfield (Char code)
 {
-    std::remove_if (std::begin(this->subfields), std::end(this->subfields), // NOLINT(bugprone-unused-return-value)
-            [code] (SubField &sf) { return sf.code == code; }
-            );
+    const auto end = std::end (this->subfields);
+    const auto trash = std::remove_if
+        (
+            std::begin(this->subfields),
+            end,
+            [code] (SubField &sf) { return sameChar (sf.code, code); }
+        );
+    this->subfields.erase (trash, end);
 
     return *this;
 }

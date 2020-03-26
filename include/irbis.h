@@ -209,7 +209,6 @@ class MenuEntry;
 class MenuFile;
 class NetworkException;
 class NotImplementedException;
-class NumberChunk;
 class NumberText;
 class OptFile;
 class OptLine;
@@ -267,8 +266,8 @@ class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 public:
     bool success { false }; ///< Признак успешного завершения.
-    T result; ///< Результирующее значение (имеет смысл при успешном завершении).
-    String errorMessage; ///< Сообщение об ошибке.
+    alignas(T) T result;    ///< Результирующее значение (имеет смысл при успешном завершении).
+    String errorMessage;    ///< Сообщение об ошибке.
 
     /// \brief Преобразование к логическому значению.
     /// \return true означает успех.
@@ -1972,35 +1971,45 @@ public:
 
 //=========================================================
 
-class IRBIS_API NumberChunk final
-{
-    bool setUp(const String &str, const String &number);
-
-    friend class NumberText;
-
-public:
-    String prefix;
-    int64_t value { 0 };
-    int length { 0 };
-    bool haveValue { false };
-
-    NumberChunk() = default;
-    NumberChunk(const NumberChunk &) = delete;
-    NumberChunk(NumberChunk &&) = delete;
-    NumberChunk& operator = (const NumberChunk &) = delete;
-    NumberChunk& operator = (NumberChunk &&) = delete;
-    ~NumberChunk() = default;
-
-    int compareTo(const NumberChunk &other) const;
-    bool havePrefix() const;
-    std::wstring toString() const;
-};
-
-//=========================================================
-
+/// \brief Текст, содержащий фрагменты с числами.
 class IRBIS_API NumberText final
 {
 public:
+
+    /// \brief Фрагмент текста.
+    class Chunk
+    {
+    public:
+        String  prefix    {};        ///< Префикс (может быть пустым).
+        int64_t value     { 0 };     ///< Число.
+        int     length    { 0 };     ///< Длина (используется при дополнении нулями).
+        bool    haveValue { false }; ///< Есть ли значение?
+
+        int    compareTo   (const Chunk &other) const noexcept;
+        bool   havePrefix  ()                   const noexcept;
+        String toString    ()                   const;
+
+    private:
+        bool setUp (const String &str, const String &number);
+        friend class NumberText;
+    };
+
+    std::vector<Chunk> chunks;
+
+    Chunk&      append    ();
+    NumberText& append    (const String &prefix);
+    NumberText& append    (int64_t value_, int length = 0);
+    NumberText& append    (const String &prefix_, int64_t value_, int length_ = 0);
+    Chunk&      back      () const noexcept;
+    int         compareTo (const NumberText &other) const;
+    bool        empty     () const noexcept;
+    Chunk&      front     () const noexcept;
+    NumberText& increment (std::ptrdiff_t index = -1, int64_t delta = 1);
+    std::size_t lastIndex () const noexcept;
+    std::size_t size      () const noexcept;
+    String      toString  () const;
+
+    static NumberText parse (const String &text);
 };
 
 //=========================================================

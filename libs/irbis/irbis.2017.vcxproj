@@ -586,12 +586,8 @@
     <ClCompile Include="src/MemoryChunk.cpp" />
     <ClCompile Include="src/MemoryPool.cpp" />
     <ClCompile Include="src/Menu.cpp" />
-    <ClCompile Include="src/MstControlRecord64.cpp" />
-    <ClCompile Include="src/MstDictionaryEntry64.cpp" />
-    <ClCompile Include="src/MstFile64.cpp" />
-    <ClCompile Include="src/MstRecord64.cpp" />
-    <ClCompile Include="src/MstRecordLeader64.cpp" />
-    <ClCompile Include="src/NumberChunk.cpp" />
+    <ClCompile Include="src/Mst.cpp" />
+    <ClCompile Include="src/NumberText.cpp" />
     <ClCompile Include="src/OptFile.cpp" />
     <ClCompile Include="src/ParFile.cpp" />
     <ClCompile Include="src/Pft.cpp" />
@@ -601,6 +597,7 @@
     <ClCompile Include="src/Reader.cpp" />
     <ClCompile Include="src/RecordField.cpp" />
     <ClCompile Include="src/RecordSerializer.cpp" />
+    <ClCompile Include="src/RecordStatus.cpp" />
     <ClCompile Include="src/Registration.cpp" />
     <ClCompile Include="src/Search.cpp" />
     <ClCompile Include="src/ServerResponse.cpp" />
@@ -612,16 +609,14 @@
     <ClCompile Include="src/TermPosting.cpp" />
     <ClCompile Include="src/Text.cpp" />
     <ClCompile Include="src/TextNavigator.cpp" />
+    <ClCompile Include="src/Title.cpp" />
     <ClCompile Include="src/TreeFile.cpp" />
     <ClCompile Include="src/TreeNode.cpp" />
     <ClCompile Include="src/Upc.cpp" />
     <ClCompile Include="src/UserInfo.cpp" />
     <ClCompile Include="src/Version.cpp" />
     <ClCompile Include="src/Visit.cpp" />
-    <ClCompile Include="src/XrfFile64.cpp" />
-    <ClCompile Include="src/XrfRecord64.cpp" />
-    <ClCompile Include="src\RecordStatus.cpp" />
-    <ClCompile Include="src\Title.cpp" />
+    <ClCompile Include="src/Xrf.cpp" />
   </ItemGroup>
   <!-- END -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

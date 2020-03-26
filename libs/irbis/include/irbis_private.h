@@ -6,6 +6,8 @@
 
 #include "irbis.h"
 
+#include <array>
+
 //=========================================================
 
 #if defined(_MSC_VER)
@@ -818,6 +820,62 @@ bool isDigit(T c)  { return (c >= '0') && (c <= '9'); }
 template<typename T, typename ... Args>
 std::unique_ptr<T> makeUnique (Args&& ... args)
 { return std::unique_ptr<T> (new T (std::forward<Args>(args)...)); }
+
+//=========================================================
+// borrow from C++17
+
+/// \brief Вычисляет размер обычного сишного массива.
+/// \tparam T Тип элементов массива.
+/// \tparam N Размер массива в элементах.
+/// \param array Собственно массив.
+/// \return Размер массива в элементах.
+/// \warning Не работает для массивов нулевой или переменной длины!
+template <typename T, std::size_t N>
+std::size_t size (const T (&array)[N])
+{
+    return N;
+}
+
+/// \brief Вычисляет размер вектора.
+/// \tparam T Тип элементов вектора.
+/// \param v Собственно вектор.
+/// \return Размер вектора в элементах.
+template <typename T>
+std::size_t size (const std::vector<T> &v)
+{
+    return v.size();
+}
+
+/// \brief Вычисляет размер массива.
+/// \tparam T Тип элементов массива.
+/// \tparam N Размер массива в элементах.
+/// \param v Собственно массив.
+/// \return Размер массива в элементах.
+template <typename T, std::size_t N>
+std::size_t size (const std::array<T, N> &a)
+{
+    return N;
+}
+
+/// \brief Вычисляет размер списка.
+/// \tparam T Тип элементов списка.
+/// \param v Собственно список.
+/// \return Размер списка в элементах.
+template <typename T>
+std::size_t size (const std::list<T> &l)
+{
+    return l.size();
+}
+
+/// \brief Вычисляет знак числа.
+/// \tparam T Тип числа (целое, длинное и т. д.).
+/// \param value Значение числа.
+/// \return -1, 0 или 1.
+template <typename T>
+int sign (T value)
+{
+    return (T(0) < value) - (value < T(0));
+}
 
 }
 

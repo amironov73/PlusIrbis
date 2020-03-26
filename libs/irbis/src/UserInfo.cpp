@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -47,14 +47,14 @@ std::vector<UserInfo> UserInfo::parse (const StringList &lines)
         return result;
     }
 
-    const auto userCount = fastParse32 (safeAt (lines, 0));
-    const auto linesPerUser = fastParse32 (safeAt (lines, 1));
+    const std::size_t userCount = fastParse32 (safeAt (lines, 0));
+    const std::size_t linesPerUser = fastParse32 (safeAt (lines, 1));
     if (userCount == 0 || linesPerUser == 0) {
         return result;
     }
 
-    auto index = 2;
-    for (auto i = 0; i < userCount; i++) {
+    std::size_t index = 2;
+    for (std::size_t i = 0; i < userCount; i++) {
         if ((lines.size() - index) < linesPerUser) {
             break;
         }
