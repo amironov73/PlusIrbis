@@ -10,6 +10,8 @@
 #pragma warning(disable: 4068)
 #endif
 
+// ReSharper disable CommentTypo
+
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 
 /*!
@@ -27,7 +29,7 @@ namespace irbis {
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-IRBIS_API bool IRBIS_CALL sameString (CharSpan first, CharSpan second)
+IRBIS_API bool IRBIS_CALL sameString (CharSpan first, CharSpan second) //-V813
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
@@ -44,7 +46,7 @@ IRBIS_API bool IRBIS_CALL sameString (CharSpan first, CharSpan second)
 /// \param first Первый спан.
 /// \param second Второй спан.
 /// \return `true` если спаны равны.
-IRBIS_API bool IRBIS_CALL sameString (WideSpan first, WideSpan second)
+IRBIS_API bool IRBIS_CALL sameString (WideSpan first, WideSpan second) //-V813
 {
     auto p1 = first.cbegin(), p2 = second.cbegin(), e1 = first.cend();
     while (p1 < e1) {
@@ -62,7 +64,7 @@ IRBIS_API bool IRBIS_CALL sameString (WideSpan first, WideSpan second)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan IRBIS_CALL trimStart (CharSpan text)
+CharSpan IRBIS_CALL trimStart (CharSpan text) //-V813
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -79,7 +81,7 @@ CharSpan IRBIS_CALL trimStart (CharSpan text)
 /// \return Спан, из которого убраны начальные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan IRBIS_CALL trimStart (WideSpan text)
+WideSpan IRBIS_CALL trimStart (WideSpan text) //-V813
 {
     auto p1 = text.cbegin(), e1 = text.cend();
     while (p1 < e1) {
@@ -96,7 +98,7 @@ WideSpan IRBIS_CALL trimStart (WideSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan IRBIS_CALL trimEnd (CharSpan text)
+CharSpan IRBIS_CALL trimEnd (CharSpan text) //-V813
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -113,7 +115,7 @@ CharSpan IRBIS_CALL trimEnd (CharSpan text)
 /// \return Спан, из которого убраны конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan IRBIS_CALL trimEnd (WideSpan text)
+WideSpan IRBIS_CALL trimEnd (WideSpan text) //-V813
 {
     auto p1 = text.cbegin(), e1 = text.cend() - 1;
     while (p1 < e1) {
@@ -130,7 +132,7 @@ WideSpan IRBIS_CALL trimEnd (WideSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-CharSpan IRBIS_CALL trim (CharSpan text)
+CharSpan IRBIS_CALL trim (CharSpan text) //-V813
 {
     return trimStart (trimEnd(text));
 }
@@ -140,7 +142,7 @@ CharSpan IRBIS_CALL trim (CharSpan text)
 /// \return Спан, из которого убраны начальные и конечные пробелы.
 ///
 /// Данные остаются неизменными, создаётся слайс.
-WideSpan IRBIS_CALL trim (WideSpan text)
+WideSpan IRBIS_CALL trim (WideSpan text) //-V813
 {
     return trimStart(trimEnd(text));
 }
@@ -148,7 +150,7 @@ WideSpan IRBIS_CALL trim (WideSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan IRBIS_CALL toUpper (CharSpan text)
+CharSpan IRBIS_CALL toUpper (CharSpan text) //-V813
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -161,7 +163,7 @@ CharSpan IRBIS_CALL toUpper (CharSpan text)
 /// \brief Перевод текста в спане в верхний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan IRBIS_CALL toUpper (WideSpan text)
+WideSpan IRBIS_CALL toUpper (WideSpan text) //-V813
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -174,7 +176,7 @@ WideSpan IRBIS_CALL toUpper (WideSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-CharSpan IRBIS_CALL toLower (CharSpan text)
+CharSpan IRBIS_CALL toLower (CharSpan text) //-V813
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {
@@ -187,7 +189,7 @@ CharSpan IRBIS_CALL toLower (CharSpan text)
 /// \brief Перевод текста в спане в нижний регистр "по месту".
 /// \param text Текст, подлежащий преобразованию.
 /// \return Тот же спан, но уже с преобразованным текстом.
-WideSpan IRBIS_CALL toLower (WideSpan text)
+WideSpan IRBIS_CALL toLower (WideSpan text) //-V813
 {
     auto p = text.begin(), e = text.end();
     while (p < e) {

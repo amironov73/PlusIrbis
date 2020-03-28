@@ -10,6 +10,7 @@ option(WITH_TESTS            "Build with tests"            ON)
 option(WITH_COVERAGE         "Build with code coverage"    OFF)
 option(WITH_APPS             "Build with apps"             ON)
 option(WITH_EXAMPLES         "Build with examples"         ON)
+option(WITH_SANITIZERS       "Build with sanitizers"       OFF)
 
 # top level project
 project(PlusIrbis)
@@ -24,10 +25,16 @@ if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
     # g++ or clang++
-    add_compile_options("--std=c++11") # for old CMake
+    if(${CMAKE_VERSION} VERSION_LESS "3.1.0")
+        set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --std=c++11") # for old CMake
+    endif()
     if (WITH_COVERAGE)
-      add_compile_options("--coverage")
-      add_link_options("--coverage")
+      set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} --coverage")
+      set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} --coverage")
+    endif()
+    if (WITH_SANITIZERS)
+        set (CMAKE_CXX_FLAGS    "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+        set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
     endif()
     if (MINGW)
         add_definitions(-DIRBIS_MINGW)
@@ -42,7 +49,7 @@ set(ARTIFACTS ${PROJECT_SOURCE_DIR}/artifacts)
 
 # installation settings
 install(FILES ${PROJECT_SOURCE_DIR}/include/irbis.h DESTINATION ${ARTIFACTS})
-install(FILES ${PROJECT_SOURCE_DIR}/include/rfid.h DESTINATION ${ARTIFACTS})
+install(FILES ${PROJECT_SOURCE_DIR}/include/rfid.h DESTINATION  ${ARTIFACTS})
 
 # subdirectories
 add_subdirectory(libs)

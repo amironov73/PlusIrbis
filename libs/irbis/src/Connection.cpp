@@ -400,7 +400,7 @@ bool Connection::writeRecords (std::vector<MarcRecord*> &records, bool lockFlag,
 
     if (!dontParseResponse) {
         const auto lines = response.readRemainingUtfLines();
-        for (auto i = 0; i < lines.size(); i++) {
+        for (std::size_t i = 0; i < lines.size(); i++) {
             const auto &line = lines[i];
             if (line.empty()) {
                 continue;

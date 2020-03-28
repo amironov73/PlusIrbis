@@ -128,7 +128,7 @@ std::vector<TermInfo> ConnectionSearch::readTerms(const TermParameters &paramete
 
 MfnList ConnectionSearch::search (const Search &search)
 {
-    SearchParameters parameters;
+    SearchParameters parameters {};
     parameters.database = this->database;
     parameters.searchExpression = search.toString();
     parameters.numberOfRecords = 0;
@@ -139,7 +139,7 @@ MfnList ConnectionSearch::search (const Search &search)
 
 MfnList ConnectionSearch::search (const String &expression)
 {
-    SearchParameters parameters;
+    SearchParameters parameters {};
     parameters.database = this->database;
     parameters.searchExpression = expression;
     parameters.numberOfRecords = 0;
@@ -150,8 +150,7 @@ MfnList ConnectionSearch::search (const String &expression)
 
 MfnList ConnectionSearch::search (const SearchParameters &parameters)
 {
-    MfnList result;
-
+    MfnList result {};
     if (!this->_checkConnection()) {
         return result;
     }

@@ -357,3 +357,7 @@ CMakeFiles/
 
 # temporary test data
 temp/
+
+# Coverity Scan
+/cov-int/
+cov-int.zip

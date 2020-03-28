@@ -347,6 +347,20 @@ int IRBIS_CALL fastParse32 (const String &text) noexcept
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
 /// \param text Текст для разбора.
 /// \return Мусор на входе - мусор на выходе!
+int64_t IRBIS_CALL fastParse64 (const String &text) noexcept
+{
+    int64_t result = 0;
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text.at(offset) - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
 int IRBIS_CALL fastParse32 (const CharSpan text) noexcept
 {
     auto result = 0;
@@ -392,6 +406,20 @@ unsigned int IRBIS_CALL fastParseUnsigned32 (const String &text) noexcept
 int IRBIS_CALL fastParse32 (const Char *text) noexcept
 {
     auto result = 0;
+    while (*text != 0) {
+        result = result * 10 + *text - '0';
+        text++;
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int64_t IRBIS_CALL fastParse64 (const Char *text) noexcept
+{
+    int64_t result = 0;
     while (*text != 0) {
         result = result * 10 + *text - '0';
         text++;
@@ -461,6 +489,20 @@ int IRBIS_CALL fastParse32 (const std::string &text) noexcept
 /// \brief Быстрый и грязный разбор строки как целого числа без знака.
 /// \param text Текст для разбора.
 /// \return Мусор на входе - мусор на выходе!
+int64_t IRBIS_CALL fastParse64 (const std::string &text) noexcept
+{
+    int64_t result = 0;
+    const std::size_t length = text.length();
+    for (std::size_t offset = 0; offset < length; offset++) {
+        result = result * 10 + text.at(offset) - '0';
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
 unsigned int IRBIS_CALL fastParseUnsigned32 (const std::string &text) noexcept
 {
     auto result = 0u;
@@ -478,6 +520,20 @@ unsigned int IRBIS_CALL fastParseUnsigned32 (const std::string &text) noexcept
 int IRBIS_CALL fastParse32 (const char *text) noexcept
 {
     auto result = 0;
+    while (*text != 0) {
+        result = result * 10 + *text - '0';
+        text++;
+    }
+
+    return result;
+}
+
+/// \brief Быстрый и грязный разбор строки как целого числа без знака.
+/// \param text Текст для разбора.
+/// \return Мусор на входе - мусор на выходе!
+int64_t IRBIS_CALL fastParse64 (const char *text) noexcept
+{
+    int64_t result = 0;
     while (*text != 0) {
         result = result * 10 + *text - '0';
         text++;

@@ -97,7 +97,11 @@ std::size_t File::read (Byte *buffer, std::size_t count)
 /// \return Позиция в файле.
 int64_t File::tell ()
 {
-    return ::ftell(this->_stream);
+#ifdef IRBIS_WINDOWS
+    return ::_ftelli64 (this->_stream);
+#else
+    return ::ftell (this->_stream);
+#endif
 }
 
 /// \brief Установка новой позиции в файле.
@@ -105,9 +109,13 @@ int64_t File::tell ()
 /// \return Смещение.
 int64_t File::seek (int64_t position)
 {
+#ifdef IRBIS_WINDOWS
+    return ::_fseeki64 (this->_stream, position, SEEK_SET);
+#else
     // TODO handle truncation
     const auto truncated = static_cast<long>(position);
     return ::fseek(this->_stream, truncated, SEEK_SET);
+#endif
 }
 
 /// \brief Запись в файл.

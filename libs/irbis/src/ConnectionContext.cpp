@@ -180,7 +180,7 @@ StringList ConnectionContext::readTextFiles (std::vector<FileSpecification> &spe
 
     ClientQuery query (*this, "L");
     for (const auto &specification : specifications) {
-        query.add(specification).newLine();
+        query.add (specification).newLine();
     }
 
     ServerResponse response (*this, query);
@@ -189,8 +189,8 @@ StringList ConnectionContext::readTextFiles (std::vector<FileSpecification> &spe
     }
 
     const auto lines = response.readRemainingAnsiLines();
-    for (std::wstring line : lines) {
-        result.push_back(Text::fromIrbisToDos(line));
+    for (String line : lines) {
+        result.push_back (std::move (Text::fromIrbisToDos (line)));
     }
 
     return result;

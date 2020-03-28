@@ -18,6 +18,9 @@
 
 #endif
 
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+
 namespace irbis
 {
 
@@ -36,6 +39,10 @@ class Frugal
 public:
 
     Frugal() = default; ///< Конструктор по умолчанию.
+    Frugal (const Frugal &) = delete; ///< Конструктор копирования.
+    Frugal (Frugal &&)      = delete; ///< Конструктор перемещения
+    Frugal& operator = (const Frugal &) = delete; ///< Оператор копирования.
+    Frugal& operator = (Frugal &&)      = delete; ///< Оператор перемещения.
     ~Frugal() ///< Деструктор
     {
         if (this->_array) {
@@ -774,6 +781,11 @@ IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const Char *text, std::si
 IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const std::string &text)              noexcept;
 IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const char *text)                     noexcept;
 IRBIS_API unsigned int IRBIS_CALL fastParseUnsigned32 (const char *text, std::size_t length) noexcept;
+
+IRBIS_API int64_t IRBIS_CALL fastParse64 (const String &text)      noexcept;
+IRBIS_API int64_t IRBIS_CALL fastParse64 (const Char *text)        noexcept;
+IRBIS_API int64_t IRBIS_CALL fastParse64 (const std::string &text) noexcept;
+IRBIS_API int64_t IRBIS_CALL fastParse64 (const char *text)        noexcept;
 
 IRBIS_API std::vector<std::string> IRBIS_CALL split    (const std::string &text, char delimiter);
 IRBIS_API StringList               IRBIS_CALL split    (const String &text, Char delimiter);

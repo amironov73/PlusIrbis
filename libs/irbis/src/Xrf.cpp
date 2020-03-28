@@ -52,7 +52,7 @@
 namespace irbis {
 
 /// \brief Размер одной записи в XRF-файле.
-const int XrfRecord64::RecordSize = sizeof(Offset) + sizeof (Mfn);
+const int XrfRecord64::RecordSize = sizeof(Offset) + sizeof (Mfn); //-V119
 
 /// \brief Запись логически или физически удалена?
 /// \return `true` если запись удалена.
@@ -81,7 +81,7 @@ String XrfRecord64::toString() const
 /// \brief Конструктор.
 /// \param fileName Имя файла.
 /// \param mode Режим доступа.
-    XrfFile64::XrfFile64 (const String &fileName, DirectAccessMode mode)
+    XrfFile64::XrfFile64 (const String &fileName, DirectAccessMode mode) 
     {
         auto *modeString = L"r+b";
         if (mode == DirectAccessMode::ReadOnly) {

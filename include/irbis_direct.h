@@ -50,7 +50,7 @@ public:
     static const char SubFieldDelimiter = 0x1F;
 
     static MarcRecord* readRecord (File *device, const Encoding *encoding);
-    static void writeRecord (File *device, const MarcRecord &record, const Encoding *encoding);
+    static bool writeRecord (File *device, const MarcRecord &record, const Encoding *encoding);
 };
 
 //=========================================================

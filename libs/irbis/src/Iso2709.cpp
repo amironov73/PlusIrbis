@@ -12,6 +12,8 @@
 #pragma warning(disable: 4068)
 #endif
 
+// ReSharper disable CommentTypo
+
 #pragma ide diagnostic ignored "OCUnusedGlobalDeclarationInspection"
 #pragma ide diagnostic ignored "cert-err58-cpp"
 
@@ -26,15 +28,15 @@ static const int LengthOfLength = 5;
 MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
 {
     // Считываем длину записи
-    Byte marker[LengthOfLength];
+    Byte marker [LengthOfLength];
     if (device->read (marker, LengthOfLength) != LengthOfLength) {
         return nullptr;
     }
 
     // а затем и ее остаток
-    const auto recordLength = static_cast<const std::size_t> (fastParse32 ((const char *) marker, LengthOfLength));
+    const auto recordLength = static_cast<const std::size_t> (fastParse32 (reinterpret_cast<const char*> (marker), LengthOfLength));
     const bool useHeap = recordLength >= 4096;
-    Byte *record = useHeap ? new Byte[recordLength] : (Byte*)alloca (recordLength);
+    Byte *record = useHeap ? new Byte [recordLength] : static_cast<Byte*> (alloca (recordLength));
     PointerGuard<Byte> guard (record, useHeap);
     const auto need = recordLength - LengthOfLength;
     if (device->read (record + LengthOfLength, need) != need) {
@@ -43,28 +45,28 @@ MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
 
     // Простая проверка, что мы имеем дело
     // с нормальной ISO-записью
-    if (record[recordLength - 1] != RecordDelimiter) {
+    if (record [recordLength - 1] != RecordDelimiter) {
         return nullptr;
     }
 
-    const std::size_t baseAddress = fastParse32 ((const char*)(record + 12), 5);
-    const std::size_t indicatorLength = fastParse32 ((const char*)(record + 10), 1); // как правило, 2
-    auto *result = new MarcRecord;
+    const auto baseAddress     = static_cast<std::size_t> (fastParse32 (reinterpret_cast<const char*> (record + 12), 5));
+    const auto indicatorLength = static_cast<std::size_t> (fastParse32 (reinterpret_cast<const char*> (record + 10), 1)); // как правило, 2
+    auto *result = new MarcRecord {};
 
     // Пошли по полям при помощи справочника
     for (std::size_t directory = MarkerLength;; directory += 12) {
         // Переходим к очередному полю.
         // Если нарвались на разделитель, значит, справочник закончился
-        if (record[directory] == FieldDelimiter) {
+        if (record [directory] == FieldDelimiter) {
             break;
         }
 
-        auto tag = fastParse32 ((const char*)(record + directory), 3);
-        const auto fieldLength = static_cast<const std::size_t>(fastParse32 ((const char *) (record + directory + 3), 4));
-        const std::size_t fieldOffset = baseAddress + fastParse32 ((const char *) (record + directory + 7), 5);
+        auto tag = fastParse32 (reinterpret_cast<const char*> (record + directory), 3);
+        const auto fieldLength = static_cast<const std::size_t> (fastParse32 (reinterpret_cast<const char*> (record + directory + 3), 4));
+        const std::size_t fieldOffset = baseAddress + fastParse32 (reinterpret_cast<const char*> (record + directory + 7), 5);
         RecordField field;
         field.tag = tag;
-        result->fields.push_back(field);
+        result->fields.push_back (field);
         if (tag < 10) {
             // Фиксированное поле
             // не может содержать подполей и индикаторов
@@ -81,7 +83,7 @@ MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
 
             // Ищем значение поля до первого разделителя
             while (position < stop) {
-                if (record[start] == SubFieldDelimiter) {
+                if (record [start] == SubFieldDelimiter) {
                     break;
                 }
                 position++;
@@ -89,7 +91,7 @@ MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
 
             // Если есть текст до первого разделителя, запоминаем его
             if (position != start) {
-                field.value = encoding->toUnicode(record + start, position - start);
+                field.value = encoding->toUnicode (record + start, position - start);
             }
 
             // Просматриваем подполя
@@ -97,15 +99,15 @@ MarcRecord* Iso2709::readRecord (File *device, const Encoding *encoding)
             while (start < stop) {
                 position = start + 1;
                 while (position < stop) {
-                    if (record[position] == SubFieldDelimiter) {
+                    if (record [position] == SubFieldDelimiter) {
                         break;
                     }
                     position++;
                 }
                 SubField subField;
-                subField.code = record[start + 1];
-                subField.value = encoding->toUnicode(record + start + 2, position - start - 1);
-                field.subfields.push_back(subField);
+                subField.code = record [start + 1];
+                subField.value = encoding->toUnicode (record + start + 2, position - start - 1);
+                field.subfields.push_back (subField);
                 start = position;
             }
         }
@@ -151,19 +153,19 @@ static std::size_t countBytes (const String &text, const Encoding *encoding)
 /// \param device Файл.
 /// \param record Запись.
 /// \param encoding Кодировка.
-void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encoding *encoding)
+bool Iso2709::writeRecord (File *device, const MarcRecord &record, const Encoding *encoding)
 {
     std::size_t recordLength = MarkerLength;
     std::size_t dictionaryLength = 1; // с учетом ограничителя справочника
-    std::vector<std::size_t> fieldLength;
-    fieldLength.reserve(record.fields.size());
+    std::vector <std::size_t> fieldLength;
+    fieldLength.reserve (record.fields.size());
 
     // Сначала подсчитываем общую длину
     for (const auto &field : record.fields) {
         dictionaryLength += 12; // одна статья справочника
 
-        if ((field.tag <= 0) || (field.tag >= 1000)) {
-            throw IrbisException();
+        if (field.tag <= 0 || field.tag >= 1000) {
+            return false;
         }
 
         std::size_t fldlen = 0;
@@ -174,8 +176,8 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
             fldlen += 2; // индиакторы
             fldlen += countBytes (field.value, encoding);
             for (const auto &subfield : field.subfields) {
-                if ((subfield.code) <= ' ' || (subfield.code >= 127)) {
-                    throw IrbisException();
+                if (subfield.code <= ' ' || subfield.code >= 127) {
+                    return false;
                 }
 
                 fldlen += 2; // признак подполя и его код
@@ -183,18 +185,18 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
             }
         }
 
-        fldlen++; // разделитель полей
+        ++fldlen; // разделитель полей
 
         if (fldlen >= 10000) {
-            throw IrbisException();
+            return false;
         }
 
-        fieldLength.push_back(fldlen);
+        fieldLength.push_back (fldlen);
         recordLength += fldlen;
     }
 
     recordLength += dictionaryLength; // справочник
-    recordLength++; // разделитель записей
+    ++recordLength; // разделитель записей
 
     if (recordLength >= 100000) {
         throw IrbisException();
@@ -203,11 +205,10 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
     // Приступаем к кодированию
     std::size_t dictionaryPosition = MarkerLength;
     const std::size_t baseAddress = MarkerLength + dictionaryLength;
-    std::size_t currentAddress = baseAddress;
     const bool useHeap = recordLength >= 4096;
-    Byte *bytes = useHeap ? new Byte[recordLength] : (Byte*)alloca (recordLength);
+    Byte *bytes = useHeap ? new Byte[recordLength] : static_cast<Byte*> (alloca (recordLength));
     PointerGuard<Byte> guard (bytes, useHeap);
-    memset(bytes, ' ', recordLength);
+    memset (bytes, ' ', recordLength);
 
     // Маркер записи
     encode(bytes,  0, 5, recordLength);
@@ -230,7 +231,7 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
 
     // Проходим по полям
     std::size_t index = 0;
-    currentAddress = baseAddress;
+    std::size_t currentAddress = baseAddress;
     for (const auto &field : record.fields) {
         // Справочник
         encode (bytes, dictionaryPosition, 3, field.tag);
@@ -254,7 +255,7 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
             for (const auto &subfield : field.subfields) {
                 bytes[currentAddress++] = SubFieldDelimiter;
                 bytes[currentAddress++] = static_cast<Byte>(subfield.code);
-                currentAddress = encode(bytes, currentAddress, subfield.value, encoding);
+                currentAddress = encode (bytes, currentAddress, subfield.value, encoding);
             }
         }
 
@@ -265,12 +266,14 @@ void Iso2709::writeRecord (File *device, const MarcRecord &record, const Encodin
     //assert(currentAddress == recordLength - 1);
 
     // Конец записи
-    bytes[recordLength - 1] = RecordDelimiter;
+    bytes [recordLength - 1] = RecordDelimiter;
 
     // Собственно запись в поток
     if (device->write (bytes, recordLength) != recordLength) {
         throw IrbisException();
     }
+
+    return true;
 }
 
 }

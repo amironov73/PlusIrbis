@@ -1,6 +1,17 @@
 # Pure C++ library for IRBIS64 system
 
-Universal client software for IRBIS64 library automation system (ManagedClient ported to plain C++ 11). Currently supported:
+Universal client software for IRBIS64 library automation system (ManagedClient ported to plain C++ 11). 
+
+### Features
+
+* Contains no references for external components. Doesn't require `irbis64_client.dll`.
+* Can be compiled as static library (`.lib` or `.a`) and as dynamic library (`.dll` or `.so`).
+* Supports both simple and complex search for database records with optional formatting.
+* Supports records creation and/or modification. Database records can be updated too. 
+* Support for database dictionary listing for terms and postings. 
+* Administrator functions: get list of (active) users, create/delete user, create/delete database and so on. 
+
+### Supported environments
 
 * 32-bit and 64-bit Windows (XP, 7, 8, 8.1, 10);
 * MacOS X 10.14 (64-bit);
@@ -10,7 +21,7 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 * GCC 4.8 or higher both on Windows (MinGW) and Linux/OS X;
 * Clang compiler 9 both on Windows and Linux.
 
-### Example
+### Simple example
 
 ```c++
 #include "irbis.h"
@@ -22,7 +33,7 @@ Universal client software for IRBIS64 library automation system (ManagedClient p
 
 int main()
 {
-    std::wcout.imbue( std::locale("") ); // for cyrillic output
+    std::wcout.imbue ( std::locale ("") ); // for cyrillic output
 
     irbis::Connection connection;
     connection.host = L"192.168.1.35";
@@ -39,19 +50,19 @@ int main()
     const auto version = connection.getServerVersion();
     std::wcout << L"Version: " << version.version << std::endl;
 
-    const auto maxMfn = connection.getMaxMfn(L"IBIS");
+    const auto maxMfn = connection.getMaxMfn (L"IBIS");
     std::wcout << L"max MFN: " << maxMfn << std::endl;
 
-    const auto formatted = connection.formatRecord(L"@brief", 1);
+    const auto formatted = connection.formatRecord (L"@brief", 1);
     std::wcout << L"FORMAT: " << formatted << std::endl;
 
-    const auto record = connection.readRecord(1);
-    std::wcout << L"READ: "  << record.fm(200, L'a') << std::endl;
+    const auto record = connection.readRecord (1);
+    std::wcout << L"READ: "  << record.fm (200, 'a') << std::endl;
 
-    irbis::MfnList found = connection.search(L"K=alg$");
+    irbis::MfnList found = connection.search (L"K=alg$");
     std::wcout << L"SEARCH:";
     for (auto mfn : found) {
-        std::wcout << L" " << std::to_wstring(mfn);
+        std::wcout << L" " << mfn;
     }
     std::wcout << std::endl;
 
@@ -74,6 +85,8 @@ int main()
 [![Issues](https://img.shields.io/github/issues/amironov73/PlusIrbis.svg)](https://github.com/amironov73/PlusIrbis/issues)
 [![Build status](https://img.shields.io/appveyor/ci/AlexeyMironov/plusirbis.svg)](https://ci.appveyor.com/project/AlexeyMironov/plusirbis/)
 [![Build status](https://api.travis-ci.org/amironov73/PlusIrbis.svg)](https://travis-ci.org/amironov73/PlusIrbis/)
+
+![Coverity Scan](https://scan.coverity.com/projects/20704/badge.svg?flat=1)
 
 #### Documentation (in russian)
 

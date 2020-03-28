@@ -7,6 +7,7 @@
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 
 // ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
+// ReSharper disable CommentTypo
 
 #include <ctime>
 #include <cstdio>
@@ -172,75 +173,75 @@
 namespace irbis
 {
 
-class AlphabetTable;
-class ChunkedBuffer;
-class ClientInfo;
-class ClientQuery;
-class ClientSocket;
-class Connection;
-class ConnectionFactory;
-class DatabaseInfo;
-class Date;
-class Ean13;
-class Ean8;
-class EmbeddedField;
-class Encoding;
-class Exemplar;
-class FileSpecification;
-class Format;
-class FoundLine;
-class GblResult;
-class GblSettings;
-class GblStatements;
-class IlfEntry;
-class IlfFile;
-class IniFile;
-class IniLine;
-class IniSection;
-class IrbisException;
-class Isbn;
-class Iso2709;
-class LiteField;
-class LiteRecord;
-class LiteSubField;
-class MarcRecord;
-class MarcRecordList;
-class MenuEntry;
-class MenuFile;
-class NetworkException;
-class NotImplementedException;
-class NumberText;
-class OptFile;
-class OptLine;
-class ParFile;
-class PhantomField;
-class PhantomRecord;
-class PhantomSubField;
-class PostingParameters;
-class ProcessInfo;
-class ProtocolText;
-class RawRecord;
-class RecordField;
-class RecordSerializer;
-class Search;
-class SearchParameters;
-class SearchScenario;
-class ServerResponse;
-class ServerStat;
-class StopWords;
-class SubField;
-class TableDefinition;
-class TermInfo;
-class TermParameters;
-class TermPosting;
-class Text;
-class TextNavigator;
-class TreeFile;
-class TreeNode;
-class Upc12;
-class UserInfo;
-class VerificationException;
-class Version;
+class  AlphabetTable;
+class  ChunkedBuffer;
+class  ClientInfo;
+class  ClientQuery;
+class  ClientSocket;
+class  Connection;
+class  ConnectionFactory;
+class  DatabaseInfo;
+class  Date;
+class  Ean13;
+class  Ean8;
+class  EmbeddedField;
+class  Encoding;
+class  Exemplar;
+class  FileSpecification;
+class  Format;
+class  FoundLine;
+class  GblResult;
+class  GblSettings;
+class  GblStatements;
+class  IlfEntry;
+class  IlfFile;
+class  IniFile;
+class  IniLine;
+class  IniSection;
+class  IrbisException;
+class  Isbn;
+class  Iso2709;
+class  LiteField;
+class  LiteRecord;
+class  LiteSubField;
+class  MarcRecord;
+class  MarcRecordList;
+class  MenuEntry;
+class  MenuFile;
+class  NetworkException;
+class  NotImplementedException;
+struct NumberText;
+class  OptFile;
+class  OptLine;
+class  ParFile;
+class  PhantomField;
+class  PhantomRecord;
+class  PhantomSubField;
+class  PostingParameters;
+class  ProcessInfo;
+class  ProtocolText;
+class  RawRecord;
+class  RecordField;
+class  RecordSerializer;
+class  Search;
+class  SearchParameters;
+class  SearchScenario;
+class  ServerResponse;
+class  ServerStat;
+class  StopWords;
+class  SubField;
+class  TableDefinition;
+class  TermInfo;
+class  TermParameters;
+class  TermPosting;
+class  Text;
+class  TextNavigator;
+class  TreeFile;
+class  TreeNode;
+class  Upc12;
+class  UserInfo;
+class  VerificationException;
+class  Version;
 
 //=========================================================
 
@@ -507,7 +508,7 @@ public:
     /// \brief Совпадает ли начало спана с другим спаном?
     /// \param prefix Префикс.
     /// \return `true` если совпадает.
-    bool startsWith (const Span<T> prefix) const noexcept
+    bool startsWith (const Span<T> prefix) const noexcept //-V801
     {
         if (prefix.size() > this->size()) {
             return false;
@@ -529,7 +530,7 @@ public:
     /// \brief Совпадает ли конец спана с другим спаном?
     /// \param suffix Суффикс.
     /// \return `true` если совпадает.
-    bool endsWith (const Span<T> suffix) const noexcept
+    bool endsWith (const Span<T> suffix) const noexcept //-V801
     {
         if (suffix.size() > this->size()) {
             return false;
@@ -552,7 +553,7 @@ public:
     /// \param other Диапазон для сравнения.
     /// \return Результат сравнения:
     /// 0 если все элементы совпадают.
-    int compare (const Span<T> other) const
+    int compare (const Span<T> other) const //-V801
     {
         auto size = this->size();
         if (other.size() < size) {
@@ -673,111 +674,111 @@ public:
 };
 
 template <class T>
-inline bool operator == (const Span<T> left, const Span<T> right)
+inline bool operator == (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) == 0;
 }
 
 template <class T>
-inline bool operator == (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator == (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) == 0;
+    return left.compare (Span<T> (right.data(), right.size())) == 0;
 }
 
 template <class T>
-inline bool operator == (const Span<T> left, const std::vector<T> &right)
+inline bool operator == (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) == 0;
+    return left.compare (Span<T> (right.data(), right.size())) == 0;
 }
 
 template <class T>
-inline bool operator != (const Span<T> left, const Span<T> right)
+inline bool operator != (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) != 0;
 }
 
 template <class T>
-inline bool operator != (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator != (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) != 0;
+    return left.compare (Span<T> (right.data(), right.size())) != 0;
 }
 
 template <class T>
-inline bool operator != (const Span<T> left, const std::vector<T> &right)
+inline bool operator != (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) != 0;
+    return left.compare (Span<T> (right.data(), right.size())) != 0;
 }
 
 template <class T>
-inline bool operator < (const Span<T> left, const Span<T> right)
+inline bool operator < (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) < 0;
 }
 
 template <class T>
-inline bool operator < (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator < (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) < 0;
+    return left.compare (Span<T> (right.data(), right.size())) < 0;
 }
 
 template <class T>
-inline bool operator < (const Span<T> left, const std::vector<T> &right)
+inline bool operator < (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) < 0;
+    return left.compare (Span<T> (right.data(), right.size())) < 0;
 }
 
 template <class T>
-inline bool operator <= (const Span<T> left, const Span<T> right)
+inline bool operator <= (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) <= 0;
 }
 
 template <class T>
-inline bool operator <= (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator <= (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) <= 0;
+    return left.compare (Span<T> (right.data(), right.size())) <= 0;
 }
 
 template <class T>
-inline bool operator <= (const Span<T> left, const std::vector<T> &right)
+inline bool operator <= (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) <= 0;
+    return left.compare (Span<T> (right.data(), right.size())) <= 0;
 }
 
 template <class T>
-inline bool operator > (const Span<T> left, const Span<T> right)
+inline bool operator > (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) > 0;
 }
 
 template <class T>
-inline bool operator > (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator > (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) > 0;
+    return left.compare (Span<T> (right.data(), right.size())) > 0;
 }
 
 template <class T>
-inline bool operator > (const Span<T> left, const std::vector<T> &right)
+inline bool operator > (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) > 0;
+    return left.compare (Span<T> (right.data(), right.size())) > 0;
 }
 
 template <class T>
-inline bool operator >= (const Span<T> left, const Span<T> right)
+inline bool operator >= (const Span<T> left, const Span<T> right) //-V801
 {
     return left.compare (right) >= 0;
 }
 
 template <class T>
-inline bool operator >= (const Span<T> left, const std::basic_string<T> &right)
+inline bool operator >= (const Span<T> left, const std::basic_string<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) >= 0;
+    return left.compare (Span<T> (right.data(), right.size())) >= 0;
 }
 
 template <class T>
-inline bool operator >= (const Span<T> left, const std::vector<T> &right)
+inline bool operator >= (const Span<T> left, const std::vector<T> &right) //-V801
 {
-    return left.compare (Span<T>(right.data(), right.size())) >= 0;
+    return left.compare (Span<T> (right.data(), right.size())) >= 0;
 }
 
 using CharSpan = Span<char>;
@@ -1972,14 +1973,11 @@ public:
 //=========================================================
 
 /// \brief Текст, содержащий фрагменты с числами.
-class IRBIS_API NumberText final
+struct IRBIS_API NumberText final
 {
-public:
-
     /// \brief Фрагмент текста.
-    class Chunk
+    struct Chunk
     {
-    public:
         String  prefix    {};        ///< Префикс (может быть пустым).
         int64_t value     { 0 };     ///< Число.
         int     length    { 0 };     ///< Длина (используется при дополнении нулями).
@@ -1987,11 +1985,8 @@ public:
 
         int    compareTo   (const Chunk &other) const noexcept;
         bool   havePrefix  ()                   const noexcept;
+        bool   setUp       (const String &str, const String &number);
         String toString    ()                   const;
-
-    private:
-        bool setUp (const String &str, const String &number);
-        friend class NumberText;
     };
 
     std::vector<Chunk> chunks;
@@ -2414,18 +2409,18 @@ public:
 class IRBIS_API TermInfo final
 {
 public:
-    int count { 0 }; ///< Количество ссылок на данный термин.
-    String text;     ///< Значение поискового термина.
+    int count   { 0 }; ///< Количество ссылок на данный термин.
+    String text {};    ///< Значение поискового термина.
 
-    TermInfo() = default;
-    TermInfo(int count_, const String text_) : count(count_), text(text_) {}
-    TermInfo(const TermInfo &other) = default;
-    TermInfo(TermInfo &&other) = default;
-    TermInfo& operator = (const TermInfo &other) = default;
-    TermInfo& operator = (TermInfo &&other) = default;
-    ~TermInfo() = default;
+    TermInfo  () = default; ///< Конструктор по умолчанию.
+    TermInfo  (int count_, const String &text_) : count(count_), text(text_) {} ///< Конструктор.
+    TermInfo  (const TermInfo &) = default; ///< Конструктор копирования.
+    TermInfo  (TermInfo &&)      = default; ///< Конструктор перемещения.
+    ~TermInfo ()                 = default; ///< Деструктор.
+    TermInfo& operator = (const TermInfo &other) = default; ///< Оператор копирования.
+    TermInfo& operator = (TermInfo &&other)      = default; ///< Оператор перемещения.
 
-    static std::vector<TermInfo> parse(const StringList &lines);
+    static std::vector<TermInfo> parse (const StringList &lines);
     String toString() const;
 };
 

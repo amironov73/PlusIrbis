@@ -47,8 +47,8 @@ std::vector<UserInfo> UserInfo::parse (const StringList &lines)
         return result;
     }
 
-    const std::size_t userCount = fastParse32 (safeAt (lines, 0));
-    const std::size_t linesPerUser = fastParse32 (safeAt (lines, 1));
+    const std::size_t userCount    = static_cast<std::size_t> (fastParse32 (safeAt (lines, 0)));
+    const std::size_t linesPerUser = static_cast<std::size_t> (fastParse32 (safeAt (lines, 1)));
     if (userCount == 0 || linesPerUser == 0) {
         return result;
     }

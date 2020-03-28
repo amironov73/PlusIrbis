@@ -12,15 +12,16 @@ namespace irbis {
 /// \return Признак успешности.
 bool NumberText::Chunk::setUp (const String &str, const String &number)
 {
-    auto result = false;
-    if (!str.empty()) {
-        result = true;
-        this->prefix = str;
+    auto result = !str.empty();
+    this->prefix = str;
+    if (number.empty()) {
+        this->haveValue = false;
+        this->value = 0;
     }
-    if (!number.empty()) {
+    else {
         result = true;
         this->haveValue = true;
-        this->value = fastParse32 (number); // TODO ???
+        this->value = fastParse64 (number);
     }
     this->length = 0;
     return result;
@@ -86,15 +87,15 @@ std::size_t NumberText::lastIndex() const noexcept
 /// \return Набор фрагментов.
 NumberText NumberText::parse (const String &text)
 {
-    NumberText result;
+    NumberText result {};
     if (text.empty()) {
         return result;
     }
 
-    Chunk &chunk = result.append();
-    String str;
-    String number;
-    auto textPart = true;
+    Chunk chunk {};
+    String str {};
+    String number {};
+    bool textPart { true };
     for (Char c : text) {
         if (textPart) {
             if (isDigit (c)) {
@@ -110,8 +111,10 @@ NumberText NumberText::parse (const String &text)
                 number.push_back (c);
             }
             else {
-                chunk.setUp (str, number);
-                chunk = result.append();
+                if (chunk.setUp (str, number)) {
+                    result.chunks.push_back (chunk);
+                }
+                chunk = Chunk {};
                 str.clear();
                 str.push_back (c);
                 number.clear();
@@ -120,8 +123,8 @@ NumberText NumberText::parse (const String &text)
         }
     }
 
-    if (!chunk.setUp (str, number)) {
-        result.chunks.pop_back();
+    if (chunk.setUp (str, number)) {
+        result.chunks.push_back (chunk);
     }
 
     return result;
@@ -145,7 +148,7 @@ NumberText& NumberText::increment (std::ptrdiff_t index, int64_t delta)
 
 /// \brief Добавление пустого фрагмента.
 /// \return Ссылка на добавленный фрагмент.
-NumberText::Chunk& NumberText::append ()
+NumberText::Chunk& NumberText::append()
 {
     NumberText::Chunk chunk {};
     this->chunks.push_back (chunk);

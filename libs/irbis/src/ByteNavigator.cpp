@@ -10,6 +10,7 @@
 #pragma warning(disable: 4068)
 #endif
 
+// ReSharper disable CommentTypo
 //-V::801
 
 /*!
@@ -680,7 +681,7 @@ bool ByteNavigator::writeUtf (unsigned int c) noexcept
 /// \brief Запись строки в кодировке UTF-8.
 /// \param text Текст для записи.
 /// \return Признак успешности завершения операции.
-bool ByteNavigator::writeUtf (WideSpan text) noexcept
+bool ByteNavigator::writeUtf (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
         if (!this->writeUtf(c)) {
@@ -690,7 +691,7 @@ bool ByteNavigator::writeUtf (WideSpan text) noexcept
     return true;
 }
 
-bool ByteNavigator::writeWideLE (WideSpan text) noexcept
+bool ByteNavigator::writeWideLE (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
         if (!this->writeWideLE(c)) {
@@ -700,7 +701,7 @@ bool ByteNavigator::writeWideLE (WideSpan text) noexcept
     return true;
 }
 
-bool ByteNavigator::writeWideBE (WideSpan text) noexcept
+bool ByteNavigator::writeWideBE (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
         if (!this->writeWideBE(c)) {
@@ -792,7 +793,7 @@ int ByteNavigator::find (Byte value) const noexcept
 /// \brief Поиск указанной последовательности байтов, начиная с текущей позиции.
 /// \param array Искомая последовательность байтов.
 /// \return Смещение в байтах от текущей позиции начала найденной позиции, либо `EOT`, если последовательность не найдена.
-int ByteNavigator::find (ByteSpan array) const noexcept
+int ByteNavigator::find (ByteSpan array) const noexcept //-V813
 {
     if (this->eot() || array.empty()) {
         return EOT;

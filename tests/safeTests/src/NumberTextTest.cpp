@@ -67,18 +67,38 @@ TEST_CASE("NumberText_parse_2", "[number]")
     CHECK (chunk.haveValue);
 }
 
-//TEST_CASE("NumberText_parse_3", "[number]")
-//{
-//    auto number = irbis::NumberText::parse (L"123suffix");
-//    REQUIRE (number.size() == 2);
-//    auto &chunk = number.front();
-//    CHECK_FALSE (chunk.havePrefix());
-//    CHECK (chunk.value == 123);
-//    CHECK (chunk.haveValue);
-//    chunk = number.back();
-//    CHECK (chunk.prefix == L"suffix");
-//    CHECK_FALSE (chunk.haveValue);
-//}
+TEST_CASE("NumberText_parse_3", "[number]")
+{
+    auto number = irbis::NumberText::parse (L"123suffix");
+    REQUIRE (number.size() == 2);
+    auto &chunk = number.front();
+    CHECK_FALSE (chunk.havePrefix());
+    CHECK (chunk.value == 123);
+    CHECK (chunk.haveValue);
+    chunk = number.back();
+    CHECK (chunk.prefix == L"suffix");
+    CHECK_FALSE (chunk.haveValue);
+}
+
+TEST_CASE("NumberText_parse_4", "[number]")
+{
+    auto number = irbis::NumberText::parse (L"123");
+    REQUIRE (number.size() == 1);
+    auto &chunk = number.front();
+    CHECK_FALSE (chunk.havePrefix());
+    CHECK (chunk.value == 123);
+    CHECK (chunk.haveValue);
+}
+
+TEST_CASE("NumberText_parse_5", "[number]")
+{
+    auto number = irbis::NumberText::parse (L"suffix");
+    REQUIRE (number.size() == 1);
+    auto &chunk = number.front();
+    CHECK (chunk.havePrefix());
+    CHECK_FALSE (chunk.haveValue);
+    CHECK (chunk.prefix == L"suffix");
+}
 
 TEST_CASE("NumberText_toString_1", "[number]")
 {
@@ -86,4 +106,15 @@ TEST_CASE("NumberText_toString_1", "[number]")
     CHECK (number.toString().empty());
     number.append (L"prefix", 123);
     CHECK (number.toString() == L"prefix123");
+}
+
+TEST_CASE("NumberText_toString_2", "[number]")
+{
+    irbis::NumberText number;
+    number.append (123);
+    CHECK (number.toString() == L"123");
+    number.append (456);
+    CHECK (number.toString() == L"123456");
+    number.back().prefix = L"|";
+    CHECK (number.toString() == L"123|456");
 }
