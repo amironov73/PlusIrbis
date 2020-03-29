@@ -155,6 +155,7 @@
     <ClCompile Include="src\AuthorTest.cpp" />
     <ClCompile Include="src\BookInfoTest.cpp" />
     <ClCompile Include="src\ByteNavigatorTest.cpp" />
+    <ClCompile Include="src\ChunkedBufferTest.cpp" />
     <ClCompile Include="src\CodesTest.cpp" />
     <ClCompile Include="src\ConnectionTest.cpp" />
     <ClCompile Include="src\DateTest.cpp" />

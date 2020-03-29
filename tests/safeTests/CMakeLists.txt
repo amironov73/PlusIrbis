@@ -11,6 +11,7 @@ set(CppFiles
     src/AuthorTest.cpp
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
+    src/ChunkedBufferTest.cpp
     src/CodesTest.cpp
     src/ConnectionTest.cpp
     src/DateTest.cpp

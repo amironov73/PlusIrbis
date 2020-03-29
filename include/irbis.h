@@ -1029,7 +1029,7 @@ public:
 //=========================================================
 
 /// \brief Этапы выполнения запроса к серверу.
-enum class IRBIS_API RequestStage
+enum class RequestStage
 {
     None,           ///< В состоянии простоя.
     BuildPackage,   ///< Формирование пакета запроса.
@@ -1062,20 +1062,20 @@ protected:
 
 public:
 
-    String       host;                    ///< Адрес сервера в виде строки.
-    short        port;                    ///< Номер порта сервера.
-    String       username;                ///< Логин пользователя.
-    String       password;                ///< Пароль пользователя.
-    String       database;                ///< Имя текущей базы данных.
-    String       workstation;             ///< Тип клиента.
-    int          clientId;                ///< Уникальный идентификатор клиента.
-    int          queryId;                 ///< Порядковый номер команды, отсылаемой на сервер.
-    int          lastError;               ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
-    String       serverVersion;           ///< Версия сервера (получается при подключении).
-    IniFile      iniFile;                 ///< Содержимое серверного INI-файла для данного клиента.
-    int          interval;                ///< Интервал автоматического подтверждения, секунды.
-    RequestStage stage;                   ///< Этап выполнения запроса
-    std::unique_ptr<ClientSocket> socket; ///< Клиентский сокет.
+    String       host;                     ///< Адрес сервера в виде строки.
+    short        port;                     ///< Номер порта сервера.
+    String       username;                 ///< Логин пользователя.
+    String       password;                 ///< Пароль пользователя.
+    String       database;                 ///< Имя текущей базы данных.
+    String       workstation;              ///< Тип клиента.
+    int          clientId;                 ///< Уникальный идентификатор клиента.
+    int          queryId;                  ///< Порядковый номер команды, отсылаемой на сервер.
+    int          lastError;                ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
+    String       serverVersion;            ///< Версия сервера (получается при подключении).
+    IniFile      iniFile;                  ///< Содержимое серверного INI-файла для данного клиента.
+    int          interval;                 ///< Интервал автоматического подтверждения, секунды.
+    RequestStage stage;                    ///< Этап выполнения запроса
+    std::unique_ptr <ClientSocket> socket; ///< Клиентский сокет.
 
     ConnectionBase  ();
     ~ConnectionBase ();
@@ -1129,26 +1129,26 @@ public:
 class IRBIS_API ConnectionAdmin : public virtual ConnectionBase
 {
 public:
-    bool createDatabase (const String &databaseName, const String &description, bool readerAccess);
-    bool createDictionary (const String &databaseName);
-    bool deleteDatabase (const String &databaseName);
-    ServerStat getServerStat();
-    Version getServerVersion();
-    std::vector<ProcessInfo> listProcesses();
-    bool reloadDictionary (const String &databaseName);
-    bool reloadMasterFile (const String &databaseName);
-    bool restartServer();
-    bool truncateDatabase (const String &databaseName);
-    bool unlockDatabase (const String &databaseName);
-    bool unlockRecords (const String &databaseName, const MfnList &mfnList);
+    bool                      createDatabase   (const String &databaseName, const String &description, bool readerAccess);
+    bool                      createDictionary (const String &databaseName);
+    bool                      deleteDatabase   (const String &databaseName);
+    ServerStat                getServerStat    ();
+    Version                   getServerVersion ();
+    std::vector <ProcessInfo> listProcesses    ();
+    bool                      reloadDictionary (const String &databaseName);
+    bool                      reloadMasterFile (const String &databaseName);
+    bool                      restartServer    ();
+    bool                      truncateDatabase (const String &databaseName);
+    bool                      unlockDatabase   (const String &databaseName);
+    bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
 };
 
 /// \brief Функции работы с фантомными записями
 class IRBIS_API ConnectionPhantom : public virtual ConnectionBase
 {
 public:
-    PhantomRecord readPhantomRecord (Mfn mfn);
-    int writePhantomRecord (PhantomRecord &record);
+    PhantomRecord readPhantomRecord  (Mfn mfn);
+    int           writePhantomRecord (PhantomRecord &record);
 };
 
 /// \brief Облегченные функции работы с записями
@@ -1162,13 +1162,12 @@ public:
 class IRBIS_API ConnectionFull : public virtual ConnectionBase
 {
 public:
-    bool deleteRecord (int mfn);
-    MarcRecord readRecord (Mfn mfn);
-    MarcRecord readRecord (const String &databaseName, Mfn mfn);
-    MarcRecord readRecord (const String &databaseName, Mfn mfn, int version);
-    std::vector<MarcRecord> readRecords (const MfnList &mfnList);
-    int writeRecord (MarcRecord &record, bool lockFlag = false,
-                     bool actualize = true, bool dontParseResponse = false);
+    bool                     deleteRecord (int mfn);
+    MarcRecord               readRecord  (Mfn mfn);
+    MarcRecord               readRecord  (const String &databaseName, Mfn mfn);
+    MarcRecord               readRecord  (const String &databaseName, Mfn mfn, int version);
+    std::vector <MarcRecord> readRecords (const MfnList &mfnList);
+    int                      writeRecord (MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false);
 };
 
 /// \brief Подключение к серверу ИРБИС64.
@@ -1247,9 +1246,10 @@ public:
     bool databaseLocked { false };    ///< Признак блокировки базы данных в целом.
     bool readOnly { false };          ///< База данных доступна только для чтения.
 
-    void parse (ServerResponse &response);
+    void   parse   (ServerResponse &response);
+    String toString()                        const;
+
     static std::vector<DatabaseInfo> parse (const MenuFile &menu);
-    String toString() const;
 };
 
 //=========================================================
@@ -1285,16 +1285,16 @@ public:
     Encoding() = default;
     virtual ~Encoding() = default;
 
-    virtual Bytes fromUnicode   (const String &text) const = 0;
-    virtual String toUnicode    (const Byte *bytes, std::size_t count) const = 0;
-    virtual std::size_t getSize (const String &text) const = 0;
+    virtual Bytes       fromUnicode   (const String &text)                   const = 0; ///< Преобразование в UNICODE.
+    virtual std::size_t getSize       (const String &text)                   const = 0; ///< Подсчет размера текста в данной кодировке.
+    virtual String      toUnicode     (const Byte *bytes, std::size_t count) const = 0; ///< Преобразование из UNICODE.
 
-    static Encoding* ansi();
+    static Encoding* ansi     ();
     static String    fromAnsi (const Byte *bytes, std::size_t count);
     static String    fromUtf  (const Byte *bytes, std::size_t count);
     static Bytes     toAnsi   (const String &text);
     static Bytes     toUtf    (const String &text);
-    static Encoding* utf();
+    static Encoding* utf      ();
 };
 
 class IRBIS_API Cp1251Encoding final

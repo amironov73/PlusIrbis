@@ -27,7 +27,6 @@ namespace irbis
 //=========================================================
 
 class File;
-class MemoryChunk;
 
 //=========================================================
 
@@ -251,34 +250,54 @@ private:
 
 //=========================================================
 
+/// \brief Буфер, состоящий из мелких отрезков.
 class IRBIS_API ChunkedBuffer final
 {
+public:
+
+    class IRBIS_API Chunk final
+    {
+    public:
+        Byte *data;
+        Chunk *next;
+
+        explicit Chunk (std::size_t size);
+        Chunk (const Chunk &other)             = delete; ///< Конструктор копирования.
+        Chunk (Chunk &&other)                  = delete; ///< Конструктор перемещения.
+        Chunk& operator = (const Chunk &other) = delete; ///< Оператор копирования.
+        Chunk& operator = (Chunk &&other)      = delete; ///< Оператор перемещения.
+        ~Chunk();
+    };
+
+    const static std::size_t DefaultChunkSize;
+
+    explicit ChunkedBuffer (std::size_t chunkSize = DefaultChunkSize);
+    ChunkedBuffer (const ChunkedBuffer &)            = delete; ///< Конструктор копирования.
+    ChunkedBuffer (ChunkedBuffer &&)                 = delete; ///< Конструктор перемещения.
+    ChunkedBuffer operator = (const ChunkedBuffer &) = delete; ///< Оператор копирования.
+    ChunkedBuffer operator = (ChunkedBuffer &&)      = delete; ///< Оператор перемещения.
+    ~ChunkedBuffer();
+
+    bool        empty     () const noexcept;
+    bool        eof       () const noexcept;
+    int         peek      ();
+    std::size_t position  () const noexcept;
+    std::size_t read      (Byte *buffer, std::size_t offset, std::size_t count);
+    int         readByte  ();
+    Bytes       readLine  ();
+    String      readLine  (Encoding *encoding);
+    void        rewind    ();
+    std::size_t size      () const noexcept;
+    void        write     (const Byte *buffer, std::size_t offset, std::size_t count);
+    void        writeByte (Byte value);
+    void        writeLine (const String &text, Encoding *encoding);
+
 private:
-    MemoryChunk *_first, *_current, *_last;
+    Chunk *_first, *_current, *_last;
     std::size_t _chunkSize, _position, _read;
 
     bool _advance();
     void _appendChunk();
-
-public:
-    const static std::size_t DefaultChunkSize;
-
-    explicit ChunkedBuffer (std::size_t chunkSize = DefaultChunkSize);
-    ChunkedBuffer (const ChunkedBuffer &) = delete;
-    ChunkedBuffer (ChunkedBuffer &&) = delete;
-    ChunkedBuffer operator = (const ChunkedBuffer &) = delete;
-    ChunkedBuffer operator = (ChunkedBuffer &&) = delete;
-    ~ChunkedBuffer();
-
-    bool eof() const;
-    int peek();
-    std::size_t read (char *buffer, std::size_t offset, std::size_t count);
-    int readByte();
-    //std::wstring readLine(QTextCodec *codec);
-    void rewind();
-    void write (const char *buffer, std::size_t offset, std::size_t count);
-    //void write(const std::wstring &text, QTextCodec *codec);
-    void writeByte (char value);
 };
 
 //=========================================================
@@ -454,22 +473,6 @@ public:
 
 //=========================================================
 
-class IRBIS_API MemoryChunk final
-{
-public:
-    char *data;
-    MemoryChunk *next;
-
-    explicit MemoryChunk(std::size_t size);
-    MemoryChunk(const MemoryChunk &other) = delete;
-    MemoryChunk(MemoryChunk &&other) = delete;
-    MemoryChunk& operator = (const MemoryChunk &other) = delete;
-    MemoryChunk& operator = (MemoryChunk &&other) = delete;
-    ~MemoryChunk();
-};
-
-//=========================================================
-
 /// \brief Ответ сервера на клиентский запрос.
 class IRBIS_API ServerResponse final
 {
@@ -518,6 +521,7 @@ private:
 
 //=========================================================
 
+/// \brief Клиентский сокет, работающий по TCP/IP v4.
 class IRBIS_API Tcp4Socket final
     : public ClientSocket
 {
@@ -525,12 +529,12 @@ class IRBIS_API Tcp4Socket final
     std::unique_ptr<TcpInternals> _impl;
 
 public:
-    explicit Tcp4Socket (const String &host=L"localhost", short port=6666);
-    Tcp4Socket (const Tcp4Socket &) = delete;
-    Tcp4Socket (Tcp4Socket &&) = delete;
-    Tcp4Socket& operator = (const Tcp4Socket &) = delete;
-    Tcp4Socket& operator = (Tcp4Socket &&) = delete;
-    ~Tcp4Socket() override;
+    explicit Tcp4Socket (const String &host=L"localhost", short port=6666); ///< Конструктор
+    Tcp4Socket (const Tcp4Socket &) = delete; ///< Конструктор копирования.
+    Tcp4Socket (Tcp4Socket &&)      = delete; ///< Конструктор перемещения.
+    ~Tcp4Socket()                   override; ///< Деструктор.
+    Tcp4Socket& operator = (const Tcp4Socket &) = delete; ///< Оператор коприрования.
+    Tcp4Socket& operator = (Tcp4Socket &&)      = delete; ///< Оператор перемещения.
 
     void open () override;
     void close () override;
@@ -546,12 +550,12 @@ class IRBIS_API ByteNavigator final
 public:
     const static int EOT;
 
-    ByteNavigator() noexcept;
-    ByteNavigator (ByteSpan data) noexcept; // NOLINT(google-explicit-constructor)
-    ByteNavigator (const ByteNavigator &other)             = default;
-    ByteNavigator (ByteNavigator &&other)                  = default;
-    ByteNavigator& operator = (const ByteNavigator &other) = default;
-    ByteNavigator& operator = (ByteNavigator &&other)      = default;
+    ByteNavigator () noexcept;
+    explicit ByteNavigator (ByteSpan data) noexcept;
+    ByteNavigator (const ByteNavigator &)             = default; ///< Конструктор копирования.
+    ByteNavigator (ByteNavigator &&)                  = default; ///< Конструктор перемещения.
+    ByteNavigator& operator = (const ByteNavigator &) = default; ///< Оператор копирования.
+    ByteNavigator& operator = (ByteNavigator &&)      = default; ///< Оператор присваивания.
 
     int         back()     const noexcept;
     Byte*       begin()    const noexcept;

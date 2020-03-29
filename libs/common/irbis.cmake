@@ -47,11 +47,10 @@ set(CppFiles
     ../irbis/src/Lite.cpp
     ../irbis/src/Log.cpp
     ../irbis/src/MarcRecord.cpp
-    ../irbis/src/MemoryChunk.cpp
     ../irbis/src/MemoryPool.cpp
     ../irbis/src/Menu.cpp
     ../irbis/src/Mst.cpp
-        ../irbis/src/NumberText.cpp
+    ../irbis/src/NumberText.cpp
     ../irbis/src/OptFile.cpp
     ../irbis/src/ParFile.cpp
     ../irbis/src/Pft.cpp

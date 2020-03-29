@@ -432,6 +432,9 @@ ByteSpan ByteNavigator::readUntil (Byte stopByte) noexcept
     return result;
 }
 
+/// \brief Чтение, пока встречается указанный байт.
+/// \param goodByte "Хороший" байт.
+/// \return Прочитанный фрагмент.
 ByteSpan ByteNavigator::readWhile (Byte goodByte) noexcept
 {
     ByteSpan result {this->ccurrent(), 0 };
@@ -446,6 +449,8 @@ ByteSpan ByteNavigator::readWhile (Byte goodByte) noexcept
     return result;
 }
 
+/// \brief Чтение слова.
+/// \return Прочитанный фрагмент.
 ByteSpan ByteNavigator::readWord() noexcept
 {
     ByteSpan result (this->ccurrent(), 0);
@@ -465,7 +470,7 @@ ByteSpan ByteNavigator::readWord() noexcept
 /// \return Полученные байты (сколько удалось получить).
 ByteSpan ByteNavigator::recent (std::ptrdiff_t length) const noexcept
 {
-    std::ptrdiff_t start = this->_position - length;
+    std::ptrdiff_t start = static_cast <std::ptrdiff_t> (this->_position) - length;
     if (start < 0) {
         length += start;
         start = 0;
@@ -480,7 +485,7 @@ ByteSpan ByteNavigator::recent (std::ptrdiff_t length) const noexcept
         length = 0;
     }
 
-    return this->slice (start, length);
+    return this->slice (start, static_cast <std::size_t> (length));
 }
 
 /// \brief Пропускаем пробельные символы, если есть.
@@ -684,13 +689,16 @@ bool ByteNavigator::writeUtf (unsigned int c) noexcept
 bool ByteNavigator::writeUtf (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
-        if (!this->writeUtf(c)) {
+        if (!this->writeUtf (static_cast <unsigned int> (c))) {
             return false;
         }
     }
     return true;
 }
 
+/// \brief Запись текста в кодировке UTF-16 Little Endian.
+/// \param text Текст.
+/// \return Признак успешности завершения операции.
 bool ByteNavigator::writeWideLE (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
@@ -701,6 +709,9 @@ bool ByteNavigator::writeWideLE (WideSpan text) noexcept //-V813
     return true;
 }
 
+/// \brief Запись текста в кодировке UTF-16 Big Endian.
+/// \param text Текст.
+/// \return Признак успешности завершения операции.
 bool ByteNavigator::writeWideBE (WideSpan text) noexcept //-V813
 {
     for (const Char c : text) {
@@ -711,6 +722,8 @@ bool ByteNavigator::writeWideBE (WideSpan text) noexcept //-V813
     return true;
 }
 
+/// \brief Подглядывание одного символа в кодировке UTF-16 Little Endian.
+/// \return Символ или EOT.
 int ByteNavigator::peekWideLE() const noexcept
 {
     if (this->_position + 1 >= this->_data.size()) {
@@ -720,6 +733,8 @@ int ByteNavigator::peekWideLE() const noexcept
     return ((ptr[1] << 8u) + ptr[0]);
 }
 
+/// \brief Чтение одного символа в кодировке UTF-16 Little Endian.
+/// \return Символ или EOT.
 int ByteNavigator::readWideLE() noexcept
 {
     if (this->_position + 1 >= this->_data.size()) {
@@ -730,6 +745,8 @@ int ByteNavigator::readWideLE() noexcept
     return ((ptr[1] << 8u) + ptr[0]);
 }
 
+/// \brief Подглядывание одного символа в кодировке UTF-16 Big Endian.
+/// \return Символ или EOT.
 int ByteNavigator::peekWideBE() const noexcept
 {
     if (this->_position + 1 >= this->_data.size()) {
@@ -739,6 +756,8 @@ int ByteNavigator::peekWideBE() const noexcept
     return ((ptr[0] << 8u) + ptr[1]);
 }
 
+/// \brief Чтение одного символа в кодировке UTF-16 Big Endian.
+/// \return Символ или EOT.
 int ByteNavigator::readWideBE() noexcept
 {
     if (this->_position + 1 >= this->_data.size()) {
