@@ -31,6 +31,9 @@ bool ConnectionFull::deleteRecord(int mfn) {
     return true;
 }
 
+/// \brief Чтение записи с сервера.
+/// \param mfn MFN записи.
+/// \return Запись.
 MarcRecord ConnectionFull::readRecord (Mfn mfn)
 {
     MarcRecord result;
@@ -51,10 +54,13 @@ MarcRecord ConnectionFull::readRecord (Mfn mfn)
     return result;
 }
 
+/// \brief Чтение записи с сервера.
+/// \param databaseName Имя базы данных.
+/// \param mfn MFN записи.
+/// \return Запись.
 MarcRecord ConnectionFull::readRecord (const String &databaseName, Mfn mfn)
 {
     MarcRecord result;
-
     if (!this->_checkConnection()) {
         return result;
     }
@@ -73,6 +79,11 @@ MarcRecord ConnectionFull::readRecord (const String &databaseName, Mfn mfn)
     return result;
 }
 
+/// \brief Чтение указанной версии записи.
+/// \param databaseName Имя базы данных.
+/// \param mfn MFN записи.
+/// \param version Номер версии.
+/// \return Запись.
 MarcRecord ConnectionFull::readRecord (const String &databaseName, Mfn mfn, int version)
 {
     MarcRecord result;
@@ -115,6 +126,12 @@ std::vector<MarcRecord> ConnectionFull::readRecords (const MfnList &mfnList)
     return result;
 }
 
+/// \brief Сохранение записи на серве.
+/// \param record Запись.
+/// \param lockFlag Оставить запись заблокированной.
+/// \param actualize Актуализировать запись.
+/// \param dontParseResponse Не разбирать ответ сервера.
+/// \return Новый максимальный MFN.
 int ConnectionFull::writeRecord (MarcRecord &record, bool lockFlag, bool actualize, bool dontParseResponse)
 {
     if (!this->_checkConnection()) {
@@ -126,7 +143,7 @@ int ConnectionFull::writeRecord (MarcRecord &record, bool lockFlag, bool actuali
     query.addAnsi (db).newLine();
     query.add (lockFlag).newLine();
     query.add (actualize).newLine();
-    query.addUtf (record.encode(Text::IrbisDelimiter)).newLine();
+    query.addUtf (record.encode (Text::IrbisDelimiter)).newLine();
     ServerResponse response(*this, query);
     if (!response.checkReturnCode()) {
         return 0;
@@ -137,10 +154,10 @@ int ConnectionFull::writeRecord (MarcRecord &record, bool lockFlag, bool actuali
         const auto temp1 = response.readRemainingUtfLines();
         if (temp1.size() > 1) {
             StringList lines;
-            lines.push_back(temp1[0]);
-            const auto temp2 = split(temp1[1], 0x1E);
-            lines.insert(lines.end(), temp2.begin(), temp2.end());
-            record.decode(lines);
+            lines.push_back (temp1 [0]);
+            const auto temp2 = split (temp1 [1], 0x1E);
+            lines.insert (std::end (lines), std::begin (temp2), std::end (temp2));
+            record.decode (lines);
             record.database = this->database;
         }
     }

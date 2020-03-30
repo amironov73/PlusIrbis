@@ -350,11 +350,11 @@ public:
     T *ptr { nullptr };  ///< Указатель на начала куска.
     size_t length { 0 }; ///< Длина куска в элементах.
 
-    Span() : ptr(nullptr), length(0) {}; ///< Конструктор по умолчанию.
-    Span (T *ptr_, std::size_t length_) noexcept : ptr(ptr_), length(length_) {}
-    Span (const T *ptr_, std::size_t length_) noexcept : ptr(const_cast<T*>(ptr_)), length(length_) {}
-    Span (const std::vector<T> &vec) : ptr(const_cast<T*>(vec.data())), length(vec.size()) {}
-    Span (const std::basic_string<T> &str) : ptr(const_cast<T*>(str.data())), length(str.size()) {}
+    Span() : ptr (nullptr), length (0) {}; ///< Конструктор по умолчанию.
+    Span (T *ptr_, std::size_t length_) noexcept : ptr (ptr_), length (length_) {} ///< Конструктор.
+    Span (const T *ptr_, std::size_t length_) noexcept : ptr (const_cast <T*> (ptr_)), length (length_) {} ///< Конструктор.
+    Span (const std::vector<T> &vec) : ptr (const_cast <T*> (vec.data())), length (vec.size()) {} ///< Конструктор.
+    Span (const std::basic_string<T> &str) : ptr(const_cast<T*> (str.data())), length (str.size()) {} ///< Конструктор.
 
     /// \brief Спан из ASCIIZ-строки.
     /// \param ptr Указатель на начало строки.
@@ -367,7 +367,7 @@ public:
             ++p;
             ++length;
         }
-        return Span<T> (const_cast<T*>(ptr), length);
+        return Span<T> (const_cast <T*> (ptr), length);
     }
 
     /// \brief Сырой указатель на данные.
@@ -1118,7 +1118,7 @@ class IRBIS_API ConnectionSearch : public virtual ConnectionBase
 public:
     StringList               listTerms    (const String &prefix);
     std::vector<TermPosting> readPostings (const PostingParameters &parameters);
-    std::vector<TermInfo>    readTerms    (const String &startTerm, int numberOfTerms);
+    std::vector<TermInfo>    readTerms    (const String &startTerm, int numberOfTerms = 100);
     std::vector<TermInfo>    readTerms    (const TermParameters &parameters);
     MfnList                  search       (const Search &search);
     MfnList                  search       (const String &expression);

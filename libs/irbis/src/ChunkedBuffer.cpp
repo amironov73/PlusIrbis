@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
 namespace irbis {
 
@@ -13,7 +14,9 @@ namespace irbis {
 /// \param size Размер куска.
 ChunkedBuffer::Chunk::Chunk (const std::size_t size)
 {
+    assert (size > 0);
     data = static_cast<Byte*> (malloc (size));
+    assert (data != nullptr);
     next = nullptr;
 }
 
@@ -31,8 +34,11 @@ const std::size_t ChunkedBuffer::DefaultChunkSize = 2048;
 /// \brief Коструктор.
 /// \param chunkSize Размер куска.
 ChunkedBuffer::ChunkedBuffer (std::size_t chunkSize)
-    : _first (nullptr), _current (nullptr), _last (nullptr),
-      _chunkSize (chunkSize), _position (0), _read (0) {}
+    : _first { nullptr }, _current { nullptr }, _last { nullptr },
+      _chunkSize { chunkSize }, _position { 0 }, _read { 0 }
+{
+    assert (chunkSize > 0);
+}
 
 /// \brief Деструктор.
 ChunkedBuffer::~ChunkedBuffer()
@@ -225,6 +231,78 @@ String ChunkedBuffer::readLine (Encoding *encoding)
     return encoding->toUnicode (bytes.data(), bytes.size());
 }
 
+/// \brief Получение непрочитанных байт одним большим куском.
+/// \return Вектор непрочитанных байт.
+/// \warning Позиция не сдвигается.
+Bytes ChunkedBuffer::readRemaining () const
+{
+    Bytes result;
+    Byte *data;
+    result.reserve (this->remainingLength());
+    if (this->_current) {
+        if (this->_current == this->_last) {
+            data = this->_current->data;
+            result.insert
+                (
+                    std::end (result),
+                    data + this->_read,
+                    data + this->_position
+                );
+        }
+        else {
+            data = this->_current->data;
+            result.insert
+                (
+                    std::end (result),
+                    data + this->_read,
+                    data + this->_chunkSize
+                );
+            for (Chunk *chunk = this->_current->next;
+                chunk != this->_last;
+                chunk = chunk->next) {
+                result.insert
+                    (
+                        std::end (result),
+                        chunk->data,
+                        chunk->data + this->_chunkSize
+                    );
+            }
+            data = this->_last->data;
+            result.insert
+                (
+                    std::end (result),
+                    data,
+                    data + this->_position
+                );
+        }
+    }
+
+    return result;
+}
+
+
+/// \brief Количество оставшихся непрочитанными байт.
+/// \return Количество байт.
+std::size_t ChunkedBuffer::remainingLength () const noexcept
+{
+    std::size_t result { 0 };
+    if (this->_current) {
+        if (this->_current == this->_last) {
+            result = this->_position - this->_read;
+        }
+        else {
+            result += (this->_chunkSize - this->_read);
+            for (Chunk *chunk = this->_current->next;
+                 chunk != this->_last;
+                 chunk = chunk->next) {
+                result += this->_chunkSize;
+            }
+            result += this->_position;
+        }
+    }
+    return result;
+}
+
 /// \brief Перемотка к началу.
 void ChunkedBuffer::rewind()
 {
@@ -241,6 +319,34 @@ std::size_t ChunkedBuffer::size() const noexcept
         (chunk != nullptr) && (chunk != this->_last);
         chunk = chunk->next) {
         result += this->_chunkSize;
+    }
+    return result;
+}
+
+/// \brief Получение всех данных из буфера.
+/// \return Все данные.
+Bytes ChunkedBuffer::toBytes () const
+{
+    Bytes result;
+    result.reserve (this->size());
+    for (Chunk *chunk = this->_first;
+         (chunk != nullptr) && (chunk != this->_last);
+         chunk = chunk->next) {
+        result.insert
+            (
+                std::end (result),
+                chunk->data,
+                chunk->data + this->_chunkSize
+            );
+    }
+    if (this->_position) {
+        Byte *data = this->_last->data;
+        result.insert
+            (
+                std::end (result),
+                data,
+                data + this->_position
+            );
     }
     return result;
 }

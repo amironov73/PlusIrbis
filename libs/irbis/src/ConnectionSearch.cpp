@@ -55,6 +55,9 @@ StringList ConnectionSearch::listTerms(const String &prefix)
     return result;
 }
 
+/// \brief Чтение постингов.
+/// \param parameters
+/// \return
 std::vector<TermPosting> ConnectionSearch::readPostings (const PostingParameters &parameters)
 {
     std::vector<TermPosting> result;
@@ -88,16 +91,23 @@ std::vector<TermPosting> ConnectionSearch::readPostings (const PostingParameters
     return result;
 }
 
-std::vector<TermInfo> ConnectionSearch::readTerms(const String &startTerm, int numberOfTerms = 100)
+/// \brief Чтение терминов словаря.
+/// \param startTerm Стартовый термин.
+/// \param numberOfTerms Максимальное число терминов.
+/// \return Вектор терминов.
+std::vector<TermInfo> ConnectionSearch::readTerms (const String &startTerm, int numberOfTerms)
 {
     auto parameters = TermParameters();
     parameters.startTerm = startTerm;
     parameters.numberOfTerms = numberOfTerms;
 
-    return this->readTerms(parameters);
+    return this->readTerms (parameters);
 }
 
-std::vector<TermInfo> ConnectionSearch::readTerms(const TermParameters &parameters)
+/// \brief Чтение терминов словаря.
+/// \param parameters Параметры терминов.
+/// \return Вектор терминов.
+std::vector<TermInfo> ConnectionSearch::readTerms (const TermParameters &parameters)
 {
     std::vector<TermInfo> result;
 
@@ -126,28 +136,37 @@ std::vector<TermInfo> ConnectionSearch::readTerms(const TermParameters &paramete
     return result;
 }
 
+/// \brief Поиск записей.
+/// \param search Поисковое выражение.
+/// \return Вектор найденных MFN (возможно, пустой).
 MfnList ConnectionSearch::search (const Search &search)
 {
     SearchParameters parameters {};
-    parameters.database = this->database;
+    parameters.database         = this->database;
     parameters.searchExpression = search.toString();
-    parameters.numberOfRecords = 0;
-    parameters.firstRecord = 1;
+    parameters.numberOfRecords  = 0;
+    parameters.firstRecord      = 1;
 
-    return this->search(parameters);
+    return this->search (parameters);
 }
 
+/// \brief Поиск записей.
+/// \param expression Поисковое выражение.
+/// \return Вектор найденных MFN (возможно, пустой).
 MfnList ConnectionSearch::search (const String &expression)
 {
     SearchParameters parameters {};
-    parameters.database = this->database;
+    parameters.database         = this->database;
     parameters.searchExpression = expression;
-    parameters.numberOfRecords = 0;
-    parameters.firstRecord = 1;
+    parameters.numberOfRecords  = 0;
+    parameters.firstRecord      = 1;
 
-    return this->search(parameters);
+    return this->search (parameters);
 }
 
+/// \brief Поиск записей.
+/// \param parameters Поисковое выражение.
+/// \return Вектор найденных MFN (возможно, пустой).
 MfnList ConnectionSearch::search (const SearchParameters &parameters)
 {
     MfnList result {};
@@ -177,9 +196,9 @@ MfnList ConnectionSearch::search (const SearchParameters &parameters)
     }
     for (auto i = 0; i < batchSize; i++) {
         const auto line = response.readAnsi();
-        StringList parts = maxSplit(line, L'#', 2);
-        const auto mfn = fastParse32(parts[0]);
-        result.push_back(mfn);
+        StringList parts = maxSplit (line, '#', 2);
+        const auto mfn = fastParse32 (parts[0]);
+        result.push_back (mfn);
     }
 
     return result;

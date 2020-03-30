@@ -5,12 +5,13 @@
 
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-option(WITH_SHARED_LIBRARIES "Build with shared libraries" OFF)
-option(WITH_TESTS            "Build with tests"            ON)
-option(WITH_COVERAGE         "Build with code coverage"    OFF)
-option(WITH_APPS             "Build with apps"             ON)
-option(WITH_EXAMPLES         "Build with examples"         ON)
-option(WITH_SANITIZERS       "Build with sanitizers"       OFF)
+option(WITH_SHARED_LIBRARIES "Build with shared libraries"        OFF)
+option(WITH_TESTS            "Build with tests"                   ON)
+option(WITH_COVERAGE         "Build with code coverage"           OFF)
+option(WITH_APPS             "Build with apps"                    ON)
+option(WITH_EXAMPLES         "Build with examples"                ON)
+option(WITH_SANITIZERS       "Build with sanitizers"              OFF)
+option(WITH_LTO              "Build with link-time optimizations" OFF)
 
 # top level project
 project(PlusIrbis)
@@ -23,6 +24,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 if(MSVC)
     add_compile_options(/UTF-8 /permissive-)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    if (WITH_LTO)
+        add_compile_options(/GL /LTCG)
+    endif()
 else()
     # g++ or clang++
     if(${CMAKE_VERSION} VERSION_LESS "3.1.0")

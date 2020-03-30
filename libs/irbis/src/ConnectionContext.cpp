@@ -14,7 +14,11 @@
 
 namespace irbis {
 
-std::vector<DatabaseInfo> ConnectionContext::listDatabases(const IniFile &theIni, const String &defaultFileName)
+/// \brief Получение списка баз данных.
+/// \param ini
+/// \param defaultFileName
+/// \return
+std::vector<DatabaseInfo> ConnectionContext::listDatabases (const IniFile &ini, const String &defaultFileName)
 {
     std::vector<DatabaseInfo> result;
 
@@ -25,7 +29,10 @@ std::vector<DatabaseInfo> ConnectionContext::listDatabases(const IniFile &theIni
     return result;
 }
 
-std::vector<DatabaseInfo> ConnectionContext::listDatabases(const FileSpecification &specification)
+/// \brief Получение списка баз данных.
+/// \param specification
+/// \return
+std::vector<DatabaseInfo> ConnectionContext::listDatabases (const FileSpecification &specification)
 {
     std::vector<DatabaseInfo> result;
 
@@ -33,7 +40,7 @@ std::vector<DatabaseInfo> ConnectionContext::listDatabases(const FileSpecificati
         return result;
     }
 
-    const auto menu = this->readMenuFile(specification);
+    const auto menu = this->readMenuFile (specification);
     if (menu.entries.empty()) {
         return result;
     }
@@ -46,7 +53,7 @@ std::vector<DatabaseInfo> ConnectionContext::listDatabases(const FileSpecificati
 /// \brief Получение списка файлов на сервере.
 /// \param specification Спецификация файла.
 /// \return Список файлов.
-StringList ConnectionContext::listFiles(const FileSpecification &specification)
+StringList ConnectionContext::listFiles (const FileSpecification &specification)
 {
     StringList result;
 
@@ -55,15 +62,15 @@ StringList ConnectionContext::listFiles(const FileSpecification &specification)
     }
 
     ClientQuery query(*this, "!");
-    query.add(specification);
+    query.add (specification);
 
-    ServerResponse response(*this, query);
+    ServerResponse response (*this, query);
     const auto lines = response.readRemainingAnsiLines();
     for (const auto &line : lines) {
-        auto converted = Text::fromFullDelimiter(line);
+        auto converted = Text::fromFullDelimiter (line);
         for (const auto &item : converted) {
             if (!item.empty()) {
-                result.push_back(item);
+                result.push_back (item);
             }
         }
     }
@@ -74,7 +81,7 @@ StringList ConnectionContext::listFiles(const FileSpecification &specification)
 /// \brief Получение списка файлов на сервере.
 /// \param specifications Вектор спецификаций файлов.
 /// \return Список файлов.
-StringList ConnectionContext::listFiles(const std::vector<FileSpecification> &specifications)
+StringList ConnectionContext::listFiles (const std::vector<FileSpecification> &specifications)
 {
     StringList result;
 
@@ -84,16 +91,16 @@ StringList ConnectionContext::listFiles(const std::vector<FileSpecification> &sp
 
     ClientQuery query(*this, "!");
     for (const auto &specification : specifications) {
-        query.add(specification);
+        query.add (specification);
     }
 
     ServerResponse response(*this, query);
     const auto lines = response.readRemainingAnsiLines();
     for (const auto &line : lines) {
-        auto converted = Text::fromFullDelimiter(line);
+        auto converted = Text::fromFullDelimiter (line);
         for (const auto &item : converted) {
             if (!item.empty()) {
-                result.push_back(item);
+                result.push_back (item);
             }
         }
     }
@@ -101,6 +108,9 @@ StringList ConnectionContext::listFiles(const std::vector<FileSpecification> &sp
     return result;
 }
 
+/// \brief Чтение двоичного файла с сервера.
+/// \param specification
+/// \return
 Bytes ConnectionContext::readBinaryFile (const FileSpecification &specification)
 {
     Bytes result;
@@ -112,24 +122,33 @@ Bytes ConnectionContext::readBinaryFile (const FileSpecification &specification)
     return result;
 }
 
+/// \brief Чтение INI-файла с сервера.
+/// \param specification Спецификация файла.
+/// \return Прочитанный INI-файл.
 IniFile ConnectionContext::readIniFile (const FileSpecification &specification)
 {
-    const auto lines = this->readTextLines(specification);
+    const auto lines = this->readTextLines (specification);
     IniFile result;
-    result.parse(lines);
+    result.parse (lines);
 
     return result;
 }
 
+/// \brief Чтение MNU-файла с сервера.
+/// \param specification
+/// \return
 MenuFile ConnectionContext::readMenuFile (const FileSpecification &specification)
 {
-    const auto lines = this->readTextLines(specification);
+    const auto lines = this->readTextLines (specification);
     MenuFile result;
     result.parse(lines);
 
     return result;
 }
 
+/// \brief Чтение текстового файла с сервера.
+/// \param specification Спецификация файла.
+/// \return Текст файла (пустой, если чтение не удалось).
 String ConnectionContext::readTextFile (const FileSpecification &specification)
 {
     String result;
@@ -138,18 +157,21 @@ String ConnectionContext::readTextFile (const FileSpecification &specification)
     }
 
     ClientQuery query (*this, "L");
-    query.add(specification);
+    query.add (specification);
     ServerResponse response (*this, query);
     if (!response.success()) {
         return result;
     }
 
     result = response.readAnsi();
-    result = Text::fromIrbisToDos(result);
+    result = Text::fromIrbisToDos (result);
 
     return result;
 }
 
+/// \brief Чтение файла с сервера в кодировке ANSI.
+/// \param specification Спецификация файла.
+/// \return Содержимое файла (пустое, если чтение не удалось).
 std::string ConnectionContext::readAnsiFile (const FileSpecification &specification)
 {
     std::string result;
@@ -170,6 +192,9 @@ std::string ConnectionContext::readAnsiFile (const FileSpecification &specificat
     return result;
 }
 
+/// \brief Чтение нескольких текстовых файлов с сервера.
+/// \param specifications
+/// \return
 StringList ConnectionContext::readTextFiles (std::vector<FileSpecification> &specifications)
 {
     StringList result;
@@ -196,16 +221,18 @@ StringList ConnectionContext::readTextFiles (std::vector<FileSpecification> &spe
     return result;
 }
 
+/// \brief Чтение файла с сервера в виде вектора строк.
+/// \param specification Спецификация файла.
+/// \return Вектор строк (пустой, если чтение не удалось).
 StringList ConnectionContext::readTextLines (const FileSpecification &specification)
 {
     StringList result;
-
     if (!this->_checkConnection()) {
         return result;
     }
 
     ClientQuery query (*this, "L");
-    query.add(specification);
+    query.add (specification);
     ServerResponse response (*this, query);
     if (!response.success()) {
         return result;
