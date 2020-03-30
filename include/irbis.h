@@ -1130,16 +1130,16 @@ class IRBIS_API ConnectionAdmin : public virtual ConnectionBase
 {
 public:
     bool                      createDatabase   (const String &databaseName, const String &description, bool readerAccess);
-    bool                      createDictionary (const String &databaseName);
-    bool                      deleteDatabase   (const String &databaseName);
+    bool                      createDictionary (const String &databaseName = L"");
+    bool                      deleteDatabase   (const String &databaseName = L"");
     ServerStat                getServerStat    ();
     Version                   getServerVersion ();
     std::vector <ProcessInfo> listProcesses    ();
-    bool                      reloadDictionary (const String &databaseName);
-    bool                      reloadMasterFile (const String &databaseName);
+    bool                      reloadDictionary (const String &databaseName = L"");
+    bool                      reloadMasterFile (const String &databaseName = L"");
     bool                      restartServer    ();
-    bool                      truncateDatabase (const String &databaseName);
-    bool                      unlockDatabase   (const String &databaseName);
+    bool                      truncateDatabase (const String &databaseName = L"");
+    bool                      unlockDatabase   (const String &databaseName = L"");
     bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
 };
 
@@ -1917,45 +1917,6 @@ public:
 
 //=========================================================
 
-#pragma pack(push, 1)
-class IRBIS_API MstControlRecord64 final
-{
-public:
-    const static int RecordSize;
-    const static long LockFlagPosition;
-
-    uint32_t ctlMfn       { 0 };
-    uint32_t nextMfn      { 0 };
-    int64_t  nextPosition { 0 };
-    uint32_t mftType      { 0 };
-    uint32_t recCnt       { 0 };
-    uint32_t reserv1      { 0 };
-    uint32_t reserv2      { 0 };
-    uint32_t blocked      { 0 };
-
-    void read(FILE *file);
-};
-#pragma pack(pop)
-
-//=========================================================
-
-#pragma pack(push, 1)
-class IRBIS_API MstDictionaryEntry64 final
-{
-public:
-    const static int EntrySize;
-
-    int tag { 0 };
-    int position { 0 };
-    int length { 0 };
-    String text;
-
-    void read(FILE *file);
-};
-#pragma pack(pop)
-
-//=========================================================
-
 class IRBIS_API NetworkException final
     : public IrbisException
 {
@@ -2443,11 +2404,11 @@ public:
 class IRBIS_API TermPosting final
 {
 public:
-    Mfn mfn { 0 };
-    Mfn tag { 0 };
-    Mfn occurrence { 0 };
-    Mfn count { 0 };
-    String text;
+    Mfn    mfn        { 0 };
+    Mfn    tag        { 0 };
+    Mfn    occurrence { 0 };
+    Mfn    count      { 0 };
+    String text       {   };
 
     static std::vector<TermPosting> parse(const StringList &lines);
     String toString() const;
@@ -2459,7 +2420,7 @@ public:
 class IRBIS_API TreeFile final
 {
 public:
-    std::vector<TreeNode> roots;
+    std::vector<TreeNode> roots; ///< Корневые элементы.
 
     void parse (const StringList &lines);
 };

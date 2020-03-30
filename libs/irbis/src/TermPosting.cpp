@@ -4,6 +4,24 @@
 #include "irbis.h"
 #include "irbis_private.h"
 
+/*!
+    \var irbis::TermPosting::mfn
+    \brief MFN записи с искомым термином.
+
+    \var irbis::TermPosting::tag
+    \brief Метка поля с искомым термином.
+
+    \var irbis::TermPosting::occurrence
+    \brief Номер повторения поля.
+
+    \var irbis::TermPosting::count
+    \brief Смещение (номер слова) в повторении поля.
+
+    \var irbis::TermPosting::text
+    \brief Результат форматирования (если есть).
+
+ */
+
 namespace irbis {
 
 /// \brief Разбор ответа сервера.

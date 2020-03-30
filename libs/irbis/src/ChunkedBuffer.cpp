@@ -11,7 +11,7 @@
 namespace irbis {
 
 /// \brief Конструктор.
-/// \param size Размер куска.
+/// \param size Размер блока.
 ChunkedBuffer::Chunk::Chunk (const std::size_t size)
 {
     assert (size > 0);

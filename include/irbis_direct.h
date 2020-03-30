@@ -55,6 +55,45 @@ public:
 
 //=========================================================
 
+#pragma pack(push, 1)
+class IRBIS_API MstControlRecord64 final
+{
+public:
+    const static int RecordSize;
+    const static long LockFlagPosition;
+
+    uint32_t ctlMfn       { 0 };
+    uint32_t nextMfn      { 0 };
+    int64_t  nextPosition { 0 };
+    uint32_t mftType      { 0 };
+    uint32_t recCnt       { 0 };
+    uint32_t reserv1      { 0 };
+    uint32_t reserv2      { 0 };
+    uint32_t locked       { 0 };
+
+    void read (FILE *file);
+};
+#pragma pack(pop)
+
+//=========================================================
+
+#pragma pack(push, 1)
+class IRBIS_API MstDictionaryEntry64 final
+{
+public:
+    const static int EntrySize;
+
+    int    tag      { 0 };
+    int    position { 0 };
+    int    length   { 0 };
+    String text;
+
+    void read (FILE *file);
+};
+#pragma pack(pop)
+
+//=========================================================
+
 /// \brief Мастер-файл.
 class IRBIS_API MstFile64 final
 {
@@ -71,7 +110,7 @@ public:
     MstFile64& operator = (const MstFile64 &&) = delete;
     ~MstFile64();
 
-    MstRecord64 readRecord(long position);
+    MstRecord64 readRecord (int64_t position);
 };
 
 //=========================================================

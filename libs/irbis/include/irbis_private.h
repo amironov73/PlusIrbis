@@ -250,11 +250,12 @@ private:
 
 //=========================================================
 
-/// \brief Буфер, состоящий из мелких отрезков.
+/// \brief Буфер, состоящий из мелких блоков.
 class IRBIS_API ChunkedBuffer final
 {
 public:
 
+    /// \brief Блок памяти.
     class IRBIS_API Chunk final
     {
     public:

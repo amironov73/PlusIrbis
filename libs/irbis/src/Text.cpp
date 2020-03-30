@@ -13,7 +13,10 @@
 
 namespace irbis {
 
+/// \brief Перевод строки, состоящий из пары `\r\n`.
 const char Text::CrLf[] = { 0x0D, 0x0A };
+
+/// \brief Перевод строки, состоящий из одного символа `\n`.
 const char Text::Lf[] = { 0x0A };
 
 /// \brief Разделитель строк в ИРБИС.
