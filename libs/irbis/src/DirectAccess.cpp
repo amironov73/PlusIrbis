@@ -33,6 +33,7 @@ DirectAccess64::DirectAccess64 (const String &parPath, const String &systemPath)
     this->xrf = new XrfFile64 (xrfPath, DirectAccessMode::ReadOnly);
 }
 
+/// \brief Деструктор.
 DirectAccess64::~DirectAccess64()
 {
     delete this->mst;
@@ -41,14 +42,15 @@ DirectAccess64::~DirectAccess64()
     this->xrf = nullptr;
 }
 
-MstRecord64 DirectAccess64::readRawRecord (unsigned int mfn)
+/// \brief Чтение сырой записи.
+MstRecord64 DirectAccess64::readMstRecord (Mfn mfn)
 {
-    // TODO implement
     MstRecord64 result;
+
     return result;
 }
 
-MarcRecord DirectAccess64::readRecord (unsigned int mfn)
+MarcRecord DirectAccess64::readRecord (Mfn mfn)
 {
     const auto xrf_ = this->xrf->readRecord (mfn);
     const auto mst_ = this->mst->readRecord (xrf_.offset);

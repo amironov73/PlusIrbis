@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
@@ -255,8 +255,7 @@ Byte* IRBIS_CALL toUtf (Byte *dst, const String &text)
 std::string IRBIS_CALL toUtf (const String &text)
 {
     const auto srcSize = text.length();
-    if (!srcSize)
-    {
+    if (!srcSize) {
         return std::string();
     }
 
@@ -264,8 +263,7 @@ std::string IRBIS_CALL toUtf (const String &text)
     const auto dstSize = countUtf(src, srcSize);
     auto *dst = new Byte[dstSize + 1];
     memset(dst, 0, sizeof(Byte)*(dstSize+1));
-    if (!toUtf(dst, src, srcSize))
-    {
+    if (!toUtf(dst, src, srcSize)) {
         return std::string();
     }
     std::string result(reinterpret_cast<const char*>(dst));

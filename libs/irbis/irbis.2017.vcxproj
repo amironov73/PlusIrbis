@@ -601,6 +601,7 @@
     <ClCompile Include="src/Search.cpp" />
     <ClCompile Include="src/ServerResponse.cpp" />
     <ClCompile Include="src/ServerStat.cpp" />
+    <ClCompile Include="src/SimpleFile.cpp" />
     <ClCompile Include="src/Span.cpp" />
     <ClCompile Include="src/SubField.cpp" />
     <ClCompile Include="src/Tcp4Socket.cpp" />

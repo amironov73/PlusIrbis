@@ -65,6 +65,7 @@ set(CppFiles
     ../irbis/src/Search.cpp
     ../irbis/src/ServerResponse.cpp
     ../irbis/src/ServerStat.cpp
+    ../irbis/src/SimpleFile.cpp
     ../irbis/src/Span.cpp
     ../irbis/src/SubField.cpp
     ../irbis/src/Tcp4Socket.cpp

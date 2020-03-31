@@ -58,6 +58,7 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <!-- BEGIN -->
   <ItemGroup>
     <ClCompile Include="src/AlphabetTableTest.cpp" />
     <ClCompile Include="src/AuthorTest.cpp" />
@@ -97,6 +98,7 @@
     <ClCompile Include="src/RecordFieldTest.cpp" />
     <ClCompile Include="src/ResultTest.cpp" />
     <ClCompile Include="src/SearchTest.cpp" />
+    <ClCompile Include="src/SimpleFileTest.cpp" />
     <ClCompile Include="src/SpanTest.cpp" />
     <ClCompile Include="src/SubFieldTest.cpp" />
     <ClCompile Include="src/main.cpp" />
@@ -112,6 +114,7 @@
     <ClCompile Include="src/VisitTest.cpp" />
     <ClCompile Include="src/XrfTest.cpp" />
   </ItemGroup>
+  <!-- END -->
   <ItemGroup>
     <ProjectReference Include="..\..\libs\irbis\irbis.2017.vcxproj">
       <Project>{f4b2c834-192a-47c4-bcf0-4be0fbc1f5ef}</Project>

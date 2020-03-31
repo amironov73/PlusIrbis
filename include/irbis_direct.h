@@ -7,15 +7,15 @@ namespace irbis {
 
 //=========================================================
 
-class DirectAccess64;
-class File; // from irbis_private.h
-class MstControlRecord64;
-class MstDictionaryEntry64;
-class MstFile64;
-class MstRecord64;
-class MstRecordLeader64;
-class XrfFile64;
-class XrfRecord64;
+class  DirectAccess64;
+class  File; // from irbis_private.h
+struct MstControlRecord64;
+struct MstDictionaryEntry64;
+class  MstFile64;
+class  MstRecord64;
+struct MstRecordLeader64;
+class  XrfFile64;
+class  XrfRecord64;
 
 //=========================================================
 
@@ -28,14 +28,14 @@ public:
     String database;
 
     DirectAccess64 (const String &parPath, const String &systemPath);
-    DirectAccess64 (const DirectAccess64 &) = delete;
-    DirectAccess64 (const DirectAccess64 &&) = delete;
-    DirectAccess64& operator = (const DirectAccess64 &) = delete;
-    DirectAccess64& operator = (const DirectAccess64 &&) = delete;
+    DirectAccess64 (const DirectAccess64 &) = delete; ///< Конструктор копирования.
+    DirectAccess64 (const DirectAccess64 &&) = delete; ///< Конструктор перемещения.
+    DirectAccess64& operator = (const DirectAccess64 &) = delete; ///< Оператор копирования.
+    DirectAccess64& operator = (const DirectAccess64 &&) = delete; ///< Оператор перемещения.
     ~DirectAccess64();
 
-    MstRecord64 readRawRecord (unsigned int mfn);
-    MarcRecord readRecord     (unsigned int mfn);
+    MstRecord64 readMstRecord (Mfn mfn);
+    MarcRecord readRecord     (Mfn mfn);
 };
 
 //=========================================================
@@ -56,9 +56,8 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class IRBIS_API MstControlRecord64 final
+struct IRBIS_API MstControlRecord64 final
 {
-public:
     const static int RecordSize;
     const static long LockFlagPosition;
 
@@ -71,24 +70,22 @@ public:
     uint32_t reserv2      { 0 };
     uint32_t locked       { 0 };
 
-    void read (FILE *file);
+    void read (File *file);
 };
 #pragma pack(pop)
 
 //=========================================================
 
 #pragma pack(push, 1)
-class IRBIS_API MstDictionaryEntry64 final
+struct IRBIS_API MstDictionaryEntry64 final
 {
-public:
     const static int EntrySize;
 
-    int    tag      { 0 };
-    int    position { 0 };
-    int    length   { 0 };
-    String text;
+    int32_t  tag      { 0 };
+    int32_t  position { 0 };
+    int32_t  length   { 0 };
 
-    void read (FILE *file);
+    void read (File *file);
 };
 #pragma pack(pop)
 
@@ -97,7 +94,7 @@ public:
 /// \brief Мастер-файл.
 class IRBIS_API MstFile64 final
 {
-    FILE *_file;
+    File *_file;
 
 public:
     MstControlRecord64 control;
@@ -116,9 +113,8 @@ public:
 //=========================================================
 
 #pragma pack(push, 1)
-class IRBIS_API MstRecordLeader64 final
+struct IRBIS_API MstRecordLeader64 final
 {
-public:
     const static int LeaderSize;
 
     uint32_t     mfn      { 0 };
@@ -129,7 +125,7 @@ public:
     RecordStatus status   { RecordStatus::None };
     uint32_t     version  { 0 };
 
-    void read (FILE *file);
+    void read (File *file);
 };
 #pragma pack(pop)
 

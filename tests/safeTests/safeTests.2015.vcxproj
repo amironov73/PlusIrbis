@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -150,60 +150,63 @@
       <Project>{670717f6-1eb6-4be8-8f8d-f13f44da30d4}</Project>
     </ProjectReference>
   </ItemGroup>
+  <!-- BEGIN -->
   <ItemGroup>
-    <ClCompile Include="src\AlphabetTableTest.cpp" />
-    <ClCompile Include="src\AuthorTest.cpp" />
-    <ClCompile Include="src\BookInfoTest.cpp" />
-    <ClCompile Include="src\ByteNavigatorTest.cpp" />
-    <ClCompile Include="src\ChunkedBufferTest.cpp" />
-    <ClCompile Include="src\CodesTest.cpp" />
-    <ClCompile Include="src\ConnectionTest.cpp" />
-    <ClCompile Include="src\DateTest.cpp" />
-    <ClCompile Include="src\DirectAccessTest.cpp" />
-    <ClCompile Include="src\EanTest.cpp" />
-    <ClCompile Include="src\EmbeddedFieldTest.cpp" />
-    <ClCompile Include="src\EncodingTest.cpp" />
-    <ClCompile Include="src\ExemplarTest.cpp" />
-    <ClCompile Include="src\FileSpecificationTest.cpp" />
-    <ClCompile Include="src\FormatTest.cpp" />
-    <ClCompile Include="src\FoundLineTest.cpp" />
-    <ClCompile Include="src\FrugalTest.cpp" />
-    <ClCompile Include="src\GblTest.cpp" />
-    <ClCompile Include="src\IlfTest.cpp" />
-    <ClCompile Include="src\IniTest.cpp" />
-    <ClCompile Include="src\IOTest.cpp" />
-    <ClCompile Include="src\IsbnTest.cpp" />
-    <ClCompile Include="src\Iso2709Test.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\MarcRecordTest.cpp" />
-    <ClCompile Include="src\MemoryPoolTest.cpp" />
-    <ClCompile Include="src\MenuTest.cpp" />
-    <ClCompile Include="src\NumberTextTest.cpp" />
-    <ClCompile Include="src\OptFileTest.cpp" />
-    <ClCompile Include="src\OptionalTest.cpp" />
-    <ClCompile Include="src\ParFileTest.cpp" />
-    <ClCompile Include="src\PointerGuardTest.cpp" />
-    <ClCompile Include="src\PostingTest.cpp" />
-    <ClCompile Include="src\ProcessInfoTest.cpp" />
-    <ClCompile Include="src\RangeTest.cpp" />
-    <ClCompile Include="src\ReaderTest.cpp" />
-    <ClCompile Include="src\RecordFieldTest.cpp" />
-    <ClCompile Include="src\ResultTest.cpp" />
-    <ClCompile Include="src\SearchTest.cpp" />
-    <ClCompile Include="src\SpanTest.cpp" />
-    <ClCompile Include="src\SubFieldTest.cpp" />
-    <ClCompile Include="src\TermInfoTest.cpp" />
-    <ClCompile Include="src\TextNavigatorTest.cpp" />
-    <ClCompile Include="src\TextTest.cpp" />
-    <ClCompile Include="src\TitleTest.cpp" />
-    <ClCompile Include="src\TreeFileTest.cpp" />
-    <ClCompile Include="src\UpcTest.cpp" />
-    <ClCompile Include="src\UserInfoTest.cpp" />
-    <ClCompile Include="src\UtilsTest.cpp" />
-    <ClCompile Include="src\VersionTest.cpp" />
-    <ClCompile Include="src\VisitTest.cpp" />
-    <ClCompile Include="src\XrfTest.cpp" />
+    <ClCompile Include="src/AlphabetTableTest.cpp" />
+    <ClCompile Include="src/AuthorTest.cpp" />
+    <ClCompile Include="src/BookInfoTest.cpp" />
+    <ClCompile Include="src/ByteNavigatorTest.cpp" />
+    <ClCompile Include="src/ChunkedBufferTest.cpp" />
+    <ClCompile Include="src/CodesTest.cpp" />
+    <ClCompile Include="src/ConnectionTest.cpp" />
+    <ClCompile Include="src/DateTest.cpp" />
+    <ClCompile Include="src/DirectAccessTest.cpp" />
+    <ClCompile Include="src/EanTest.cpp" />
+    <ClCompile Include="src/EmbeddedFieldTest.cpp" />
+    <ClCompile Include="src/EncodingTest.cpp" />
+    <ClCompile Include="src/ExemplarTest.cpp" />
+    <ClCompile Include="src/FileSpecificationTest.cpp" />
+    <ClCompile Include="src/FormatTest.cpp" />
+    <ClCompile Include="src/FoundLineTest.cpp" />
+    <ClCompile Include="src/FrugalTest.cpp" />
+    <ClCompile Include="src/GblTest.cpp" />
+    <ClCompile Include="src/IlfTest.cpp" />
+    <ClCompile Include="src/IniTest.cpp" />
+    <ClCompile Include="src/IOTest.cpp" />
+    <ClCompile Include="src/IsbnTest.cpp" />
+    <ClCompile Include="src/Iso2709Test.cpp" />
+    <ClCompile Include="src/MarcRecordTest.cpp" />
+    <ClCompile Include="src/MemoryPoolTest.cpp" />
+    <ClCompile Include="src/MenuTest.cpp" />
+    <ClCompile Include="src/NumberTextTest.cpp" />
+    <ClCompile Include="src/OptFileTest.cpp" />
+    <ClCompile Include="src/OptionalTest.cpp" />
+    <ClCompile Include="src/ParFileTest.cpp" />
+    <ClCompile Include="src/PointerGuardTest.cpp" />
+    <ClCompile Include="src/PostingTest.cpp" />
+    <ClCompile Include="src/ProcessInfoTest.cpp" />
+    <ClCompile Include="src/RangeTest.cpp" />
+    <ClCompile Include="src/ReaderTest.cpp" />
+    <ClCompile Include="src/RecordFieldTest.cpp" />
+    <ClCompile Include="src/ResultTest.cpp" />
+    <ClCompile Include="src/SearchTest.cpp" />
+    <ClCompile Include="src/SimpleFileTest.cpp" />
+    <ClCompile Include="src/SpanTest.cpp" />
+    <ClCompile Include="src/SubFieldTest.cpp" />
+    <ClCompile Include="src/main.cpp" />
+    <ClCompile Include="src/TermInfoTest.cpp" />
+    <ClCompile Include="src/TextTest.cpp" />
+    <ClCompile Include="src/TextNavigatorTest.cpp" />
+    <ClCompile Include="src/TitleTest.cpp" />
+    <ClCompile Include="src/TreeFileTest.cpp" />
+    <ClCompile Include="src/UpcTest.cpp" />
+    <ClCompile Include="src/UserInfoTest.cpp" />
+    <ClCompile Include="src/UtilsTest.cpp" />
+    <ClCompile Include="src/VersionTest.cpp" />
+    <ClCompile Include="src/VisitTest.cpp" />
+    <ClCompile Include="src/XrfTest.cpp" />
   </ItemGroup>
+  <!-- END -->
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

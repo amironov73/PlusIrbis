@@ -46,6 +46,7 @@ set(CppFiles
     src/RecordFieldTest.cpp
     src/ResultTest.cpp
     src/SearchTest.cpp
+    src/SimpleFileTest.cpp
     src/SpanTest.cpp
     src/SubFieldTest.cpp
     src/TermInfoTest.cpp

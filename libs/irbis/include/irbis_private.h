@@ -27,6 +27,7 @@ namespace irbis
 //=========================================================
 
 class File;
+class SimpleFile;
 
 //=========================================================
 
@@ -246,6 +247,51 @@ public:
 private:
 
     FILE *_stream;
+};
+
+//=========================================================
+
+/// \brief Простая обертка над системным файловым API.
+class IRBIS_API SimpleFile final
+{
+public:
+
+    SimpleFile (const SimpleFile &) = delete;
+    SimpleFile (SimpleFile &&other) noexcept;
+    ~SimpleFile() noexcept ;
+    SimpleFile& operator = (const SimpleFile &) = delete;
+    SimpleFile& operator = (SimpleFile && other) noexcept;
+
+    void              close      () noexcept;
+    static SimpleFile create     (const String &fileName);
+    static SimpleFile create     (const std::string &fileName);
+    static SimpleFile openRead   (const String &fileName);
+    static SimpleFile openRead   (const std::string &fileName);
+    static SimpleFile openWrite  (const String &fileName);
+    static SimpleFile openWrite  (const std::string &fileName);
+    int64_t           read       (Byte *buffer, int64_t nbytes);
+    std::string       readAll    ();
+    int               readByte   ();
+    int               readChar   ();
+    uint32_t          readInt32  ();
+    uint64_t          readInt64  ();
+    std::string       readNarrow ();
+    std::size_t       size       ();
+    int64_t           tell       ();
+    void              seek       (int64_t offset);
+    void              write      (const Byte* buffer, int64_t nbytes);
+    void              writeInt32 (uint32_t number);
+    void              writeInt64 (uint64_t number);
+
+private:
+#ifdef IRBIS_WINDOWS
+    void *_handle { nullptr };
+#else
+    int _handle { -1 };
+#endif
+
+    SimpleFile() = default; ///< Скрываем конструктор.
+    void _grabHandle (SimpleFile &other) noexcept;
 };
 
 //=========================================================

@@ -26,8 +26,26 @@
 
     \class irbis::MstControlRecord64
     \brief Первая запись в файле документов - управляющая.
-    Она формируется в момент создания базы данных
-    и поддерживается автоматически.
+    \details Она формируется в момент создания базы данных
+    и поддерживается автоматически. Ее содержание следующее:
+
+    ```
+    Число бит Параметр
+    32        CTLMFN – резерв;
+    32        NXTMFN –номер записи файла документов,
+              назначаемый для следующей записи,
+              создаваемой в базе данных;
+    32        NXT_LOW – младшее слово смещения на свободное место
+              в файле; (всегда указывает на конец файла MST)
+    32        NXT_HIGH – старшее слово смещения на свободное
+              место в файле
+    32        MFTYPE – резерв;
+    32        RECCNT – резерв;
+    32        MFCXX1 – резерв;
+    32        MFCXX2 – резерв;
+    32        MFCXX3 – индикатор блокировки базы данных
+              (0 – нет, >0 – да).
+    ```
 
     \var irbis::MstControlRecord64::RecordSize
     \brief Размер управляющей записи.
@@ -92,21 +110,39 @@
     \var irbis::MstRecordLeader64::version
     \brief Номер версии записи.
 
+    \class irbis::MstDictionaryEntry64
+    \brief Элемент справочника MST-записи, описывающий
+    поле переменной длины.
+
+    \var irbis::MstDictionaryEntry64::tag
+    \brief Метка поля.
+
+    \var irbis::MstDictionaryEntry64::position
+    \brief Смещение данных в байтах.
+
+    \var irbis::MstDictionaryEntry64::length
+    \brief Длина данных в байтах.
+
  */
 
 namespace irbis {
 
+/// \brief Длина элемента справочника MST-записи.
+const int MstDictionaryEntry64::EntrySize = 12;
+
+//=========================================================
+
 /// \brief Считывание управляющей записи с диска.
 /// \param file
-void MstControlRecord64::read (FILE *file) {
-    fread (this, sizeof(MstControlRecord64), 1, file);
+void MstControlRecord64::read (File *file) {
+    //fread (this, sizeof(MstControlRecord64), 1, file);
     throw NotImplementedException();
 }
 
 //=========================================================
 
-void MstDictionaryEntry64::read (FILE *file) {
-    fread (this, sizeof(MstDictionaryEntry64), 1, file);
+void MstDictionaryEntry64::read (File *file) {
+    //fread (this, sizeof(MstDictionaryEntry64), 1, file);
     throw NotImplementedException();
 }
 
@@ -115,18 +151,9 @@ void MstDictionaryEntry64::read (FILE *file) {
 /// \brief Конструктор.
 /// \param fileName
 /// \param mode
-MstFile64::MstFile64 (const std::wstring &fileName, DirectAccessMode mode = DirectAccessMode::ReadOnly)
+MstFile64::MstFile64 (const String &fileName, DirectAccessMode mode = DirectAccessMode::ReadOnly)
 {
-#ifdef IRBIS_WINDOWS
-        this->_file = nullptr;
-        _wfopen_s (&this->_file, fileName.c_str(), L"rb");
-#else
-        this->_file = fopen (toUtf (fileName).c_str(), "rb");
-#endif
-    if (!this->_file) {
-        throw IrbisException();
-    }
-
+    this->_file = new File (fileName, L"rb");
     this->fileName = fileName;
 }
 
@@ -134,7 +161,7 @@ MstFile64::MstFile64 (const std::wstring &fileName, DirectAccessMode mode = Dire
 MstFile64::~MstFile64()
 {
     if (this->_file) {
-        fclose (this->_file);
+        delete this->_file;
         this->_file = nullptr;
     }
 }
@@ -144,7 +171,8 @@ MstFile64::~MstFile64()
 /// \return
 MstRecord64 MstFile64::readRecord (int64_t position)
 {
-    fseek (this->_file, position, SEEK_SET);
+    this->_file->seek(position);
+    //fseek (this->_file, position, SEEK_SET);
     throw NotImplementedException();
 }
 
@@ -178,10 +206,10 @@ MarcRecord MstRecord64::toMarcRecord() const
 //=========================================================
 
 /// \brief Чтение лидера с диска.
-/// \param file
-void MstRecordLeader64::read (FILE *file)
+/// \param file Файл.
+void MstRecordLeader64::read (File *file)
 {
-    fread (this, sizeof(MstRecordLeader64), 1, file);
+    //fread (this, sizeof(MstRecordLeader64), 1, file);
     throw NotImplementedException();
 }
 
