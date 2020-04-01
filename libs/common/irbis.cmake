@@ -1,7 +1,7 @@
 set(HeaderFiles
     ../../include/irbis_pft.h
     ../../include/irbis_direct.h
-    ../irbis/include/irbis_private.h
+        ../irbis/include/irbis_internal.h
 )
 
 set(CppFiles

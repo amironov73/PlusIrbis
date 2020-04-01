@@ -3,7 +3,7 @@
 
 #include "irbis.h"
 #include "irbis_pft.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 namespace irbis {
 

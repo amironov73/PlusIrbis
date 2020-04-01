@@ -3,7 +3,7 @@
 
 #include "irbis.h"
 #include "irbis_direct.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 #include <sys/stat.h>
 #include <fcntl.h>

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 bool checkField (const irbis::RecordField &field, const irbis::String &number)
 {

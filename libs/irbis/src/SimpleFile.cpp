@@ -2,7 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4068)
@@ -135,8 +135,13 @@ SimpleFile SimpleFile::create (const String &fileName)
     const int flags = O_RDWR | O_CREAT | O_TRUNC;
     const ::mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
     const auto utfName = toUtf (fileName);
-    //result._handle = open (utfName.c_str(), flags, mode);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (utfName.c_str(), flags, mode);
+#else
     result._handle = open64 (utfName.c_str(), flags, mode);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -175,8 +180,13 @@ SimpleFile SimpleFile::create (const std::string &fileName)
     SimpleFile result;
     const int flags = O_RDWR | O_CREAT | O_TRUNC;
     const ::mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
-    //result._handle = open (fileName.c_str(), flags, mode);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (fileName.c_str(), flags, mode);
+#else
     result._handle = open64 (fileName.c_str(), flags, mode);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -215,8 +225,13 @@ SimpleFile SimpleFile::openRead (const String &fileName)
     SimpleFile result;
     const int flags = O_RDONLY;
     const auto utfName = toUtf (fileName);
-    //result._handle = open (utfName.c_str(), flags);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (utfName.c_str(), flags);
+#else
     result._handle = open64 (utfName.c_str(), flags);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -254,8 +269,13 @@ SimpleFile SimpleFile::openRead (const std::string &fileName)
 
     SimpleFile result;
     const int flags = O_RDONLY;
-    //result._handle = open (fileName.c_str(), flags);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (fileName.c_str(), flags);
+#else
     result._handle = open64 (fileName.c_str(), flags);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -294,8 +314,13 @@ SimpleFile SimpleFile::openWrite (const String &fileName)
     SimpleFile result;
     const int flags = O_RDWR;
     const auto utfName = toUtf (fileName);
-    //result._handle = open (utfName.c_str(), flags);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (utfName.c_str(), flags);
+#else
     result._handle = open64 (utfName.c_str(), flags);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -333,8 +358,13 @@ SimpleFile SimpleFile::openWrite (const std::string &fileName)
 
     SimpleFile result;
     const int flags = O_RDWR;
-    //result._handle = open (fileName.c_str(), flags);
+
+#ifdef IRBIS_APPLE
+    result._handle = open (fileName.c_str(), flags);
+#else
     result._handle = open64 (fileName.c_str(), flags);
+#endif
+
     if (result._handle < 0) {
         throw IrbisException();
     }
@@ -473,8 +503,11 @@ int64_t SimpleFile::tell ()
 
 #else
 
-    //return ::lseek (this->_handle, 0, SEEK_CUR);
+#ifdef IRBIS_APPLE
+    return ::lseek (this->_handle, 0, SEEK_CUR);
+#else
     return ::lseek64 (this->_handle, 0, SEEK_CUR);
+#endif
 
 #endif
 }
@@ -494,10 +527,21 @@ std::size_t SimpleFile::size ()
 
 #else
 
+#ifdef IRBIS_APPLE
+
     off_t previous = ::lseek (this->_handle, 0, SEEK_CUR);
     off_t result = ::lseek (this->_handle, 0, SEEK_END);
     ::lseek (this->_handle, previous, SEEK_SET);
     return result;
+
+#else
+
+    off64_t previous = ::lseek64 (this->_handle, 0, SEEK_CUR);
+    off64_t result = ::lseek64 (this->_handle, 0, SEEK_END);
+    ::lseek64 (this->_handle, previous, SEEK_SET);
+    return result;
+
+#endif
 
 #endif
 }
@@ -517,8 +561,11 @@ void SimpleFile::seek (int64_t offset)
 
 #else
 
-    //::lseek (this->_handle, offset, SEEK_SET);
+#ifdef IRBIS_APPLE
+    ::lseek (this->_handle, offset, SEEK_SET);
+#else
     ::lseek64 (this->_handle, offset, SEEK_SET);
+#endif
 
 #endif
 }

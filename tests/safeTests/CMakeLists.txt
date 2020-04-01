@@ -34,6 +34,7 @@ set(CppFiles
     src/MarcRecordTest.cpp
     src/MemoryPoolTest.cpp
     src/MenuTest.cpp
+    src/NotNullTest.cpp
     src/NumberTextTest.cpp
     src/OptFileTest.cpp
     src/OptionalTest.cpp

@@ -4,7 +4,7 @@
 #include "catch.hpp"
 #include "irbis.h"
 #include "irbis_direct.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 #include "safeTests.h"
 
 // ReSharper disable StringLiteralTypo

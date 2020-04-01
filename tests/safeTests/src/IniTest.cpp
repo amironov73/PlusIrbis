@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 #include "safeTests.h"
 
 TEST_CASE("IniLine_constructor_1", "[ini]")

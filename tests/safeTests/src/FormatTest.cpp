@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 TEST_CASE("removeComments_1", "[format]")
 {

@@ -2,7 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 /*!
     \var irbis::TermPosting::mfn

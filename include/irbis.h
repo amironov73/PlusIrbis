@@ -36,6 +36,12 @@
 
         #define IRBIS_UNIX
 
+        #if defined(__APPLE__) || defined(__APPLE_CC__) || defined (__OSX__)
+
+            #define IRBIS_APPLE
+
+        #endif
+
     #endif
 
 #endif
@@ -260,9 +266,104 @@ using RecordFieldList = std::vector<RecordField>;
 
 //=========================================================
 
+/// \brief Обертка над указателем, который не может быть равен `nullptr`.
+/// \tparam T Тип указателя.
+template <class T>
+struct notNull final
+{
+    T *_ptr;
+
+    notNull ()                           = delete;  ///< Конструктор по умолчанию.
+    notNull (const notNull&)             = default; ///< Конструктор копирования.
+    notNull& operator = (const notNull&) = default; ///< Оператор копирования.
+
+    /// \brief Универсальный конструктор.
+    /// \param ptr_ Указатель.
+    template <typename U>
+    notNull (U&& ptr_) : _ptr (std::forward <U> (ptr_))
+    {
+        if (this->_ptr == nullptr) {
+            throw std::exception();
+        }
+    }
+
+    /// \brief Универсальный оператор присваивания.
+    /// \tparam U Тип присваиваемого значения.
+    /// \param ptr_ Присваиваемое значения.
+    /// \return this.
+    template <typename U>
+    notNull& operator = (U&& ptr_)
+    {
+        _ptr = std::forward <U> (ptr_);
+        if (this->_ptr == nullptr) {
+            throw std::exception();
+        }
+        return *this;
+    }
+
+    T  operator*  () const { return *_ptr; }
+    T* operator-> () const { return _ptr; }
+
+    notNull (std::nullptr_t)             = delete;
+    notNull& operator = (std::nullptr_t) = delete;
+
+    notNull& operator ++ ()                 = delete;
+    notNull& operator -- ()                 = delete;
+    notNull  operator ++ (int)              = delete;
+    notNull  operator -- (int)              = delete;
+    notNull& operator += (std::ptrdiff_t)   = delete;
+    notNull& operator -= (std::ptrdiff_t)   = delete;
+    void operator [] (std::ptrdiff_t) const = delete;
+};
+
+template <class T>
+std::ostream& operator << (std::ostream &os, const notNull <T> &val)
+{
+    os << *val;
+    return os;
+}
+
+template <class T, class U>
+bool operator== (const notNull <T> &left, const notNull <U> &right)
+{
+    return left._ptr == right._ptr;
+}
+
+template <class T, class U>
+bool operator != (const notNull <T> &left, const notNull<U> &right)
+{
+    return left._ptr != right._ptr;
+}
+
+template <class T, class U>
+bool operator < (const notNull <T> &left, const notNull <U> &right)
+{
+    return left._ptr < right._ptr;
+}
+
+template <class T, class U>
+bool operator <= (const notNull <T> &left, const notNull <U> &right)
+{
+    return left._ptr <= right._ptr;
+}
+
+template <class T, class U>
+bool operator > (const notNull <T> &left, const notNull <U> &right)
+{
+    return left._ptr > right._ptr;
+}
+
+template <class T, class U>
+bool operator >= (const notNull <T> &left, const notNull <U> &right)
+{
+    return left._ptr >= right._ptr;
+}
+
+//=========================================================
+
 /// \brief Результат выполнения функции (с учетом успеха/ошибки).
 /// \tparam T Тип результата.
-template<class T>
+template <class T>
 class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 public:

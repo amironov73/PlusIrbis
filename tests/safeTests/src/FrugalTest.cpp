@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 TEST_CASE("Frugal_constructor_1", "[frugal]")
 {

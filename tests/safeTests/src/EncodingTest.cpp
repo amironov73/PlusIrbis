@@ -3,7 +3,7 @@
 
 #include "catch.hpp"
 #include "irbis.h"
-#include "irbis_private.h"
+#include "irbis_internal.h"
 
 TEST_CASE("Encoding_cp1251_1", "[encoding]")
 {
