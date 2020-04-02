@@ -21,6 +21,9 @@ TEST_CASE("Frugal_push_back_1", "[frugal]")
     CHECK_FALSE (data.empty());
     CHECK (data.size() == 3);
     CHECK (data.capacity() >= data.size());
+    CHECK (data[0] == 1);
+    CHECK (data[1] == 2);
+    CHECK (data[2] == 3);
 }
 
 TEST_CASE("Frugal_push_back_2", "[frugal]")
@@ -110,6 +113,17 @@ TEST_CASE("Frugal_front_1", "[frugal]")
     data.push_back (3);
     CHECK (data.front() == 1);
     CHECK (data.back() == 3);
+}
+
+TEST_CASE("Frugal_toList_1", "[frugal]")
+{
+    irbis::Frugal<int> data;
+    data.push_back (1);
+    data.push_back (2);
+    data.push_back (3);
+    const auto list = data.toList();
+    CHECK_FALSE (list.empty());
+    CHECK (list.size() == 3);
 }
 
 TEST_CASE("Frugal_toVector_1", "[frugal]")

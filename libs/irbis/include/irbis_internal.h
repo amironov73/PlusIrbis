@@ -7,6 +7,7 @@
 #include "irbis.h"
 
 #include <array>
+#include <memory>
 
 //=========================================================
 
@@ -33,35 +34,33 @@ class SimpleFile;
 
 /// \brief Простой контейнер для случаев,
 /// когда предполагается, что элементов будет мало - один или два.
-template <class T>
+/// \tparam T Тип элементов.
+/// \tparam N Количество элементов, размещаемых на стеке. Последующие элементы размещаются в куче.
+template <class T, int N = 2>
 class Frugal
 {
 public:
 
-    Frugal() = default; ///< Конструктор по умолчанию.
-    Frugal (const Frugal &) = delete; ///< Конструктор копирования.
-    Frugal (Frugal &&)      = delete; ///< Конструктор перемещения
-    Frugal& operator = (const Frugal &) = delete; ///< Оператор копирования.
-    Frugal& operator = (Frugal &&)      = delete; ///< Оператор перемещения.
-    ~Frugal() ///< Деструктор
-    {
-        if (this->_array) {
-            delete[] this->_array;
-        }
-    }
+    Frugal ()                           = default; ///< Конструктор по умолчанию.
+    Frugal (const Frugal &)             = delete;  ///< Конструктор копирования.
+    Frugal (Frugal &&)                  = delete;  ///< Конструктор перемещения.
+    ~Frugal ()                          = default; ///< Деструктор.
+    Frugal& operator = (const Frugal &) = delete;  ///< Оператор копирования.
+    Frugal& operator = (Frugal &&)      = delete;  ///< Оператор перемещения.
 
     /// \brief Итератор.
-    class iterator : public std::iterator<std::input_iterator_tag, T>
+    class iterator : public std::iterator <std::input_iterator_tag, T>
     {
     public:
-        iterator(Frugal<T> &container, std::size_t pos)
+        /// \brief Конструктор.
+        iterator (Frugal<T> &container, std::size_t pos)
                 : _container (container), _position (pos) {}
 
-        bool operator == (const iterator &other) { return this->_position == other._position; }
-        bool operator != (const iterator &other) { return this->_position != other._position; }
-        iterator& operator ++() { ++this->_position; return *this; }
-        T& operator *() { return this->_container[this->_position]; }
-        T& operator ->() { return this->_container[this->_position]; }
+        bool      operator == (const iterator &other) { return this->_position == other._position; } ///< Оператор сравнения на равенство.
+        bool      operator != (const iterator &other) { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
+        iterator& operator ++ ()                      { ++this->_position; return *this; }           ///< Оператор пре-инкремента.
+        T&        operator *  ()                      { return this->_container [this->_position]; } ///< Оператор разыменования.
+        T&        operator -> ()                      { return this->_container [this->_position]; } ///< Оператор доступа к члену.
 
     private:
         Frugal<T> &_container;
@@ -69,96 +68,115 @@ public:
     };
 
     /// \brief Оператор индексирования.
+    /// \return Ссылка на элемент.
+    /// \warning При выходе за границы UB.
     T& operator [] (std::size_t offset)
     {
-        switch (offset) {
-            case 0: return this->_first;
-            case 1: return this->_second;
-            default: return this->_array[offset - 2];
-        }
+        return (offset < N)
+            ? this->_static [offset]
+            : this->_dynamic.get() [offset - N];
     }
 
     /// \brief Указатель на первый элемент.
+    /// \return Указатель.
     iterator begin() { return iterator (*this, 0); }
 
     /// \brief Указатель за последним элементом.
+    /// \return Указатель.
     iterator end() { return iterator (*this, this->_size); }
 
     /// \brief Ссылка на первый элемент.
-    T& front() { return (*this)[0]; }
+    /// \return Ссылка.
+    /// \warning Для пустого контейнера UB.
+    T& front() { return (*this) [0]; }
 
     /// \brief Ссылка на последний элемент.
-    T& back() { return (*this)[this->_size - 1]; }
+    /// \return Ссылка.
+    /// \warning Для пустого контейнера UB.
+    T& back() { return (*this) [this->_size - 1]; }
 
     /// \brief Емкость контейнера.
-    std::size_t capacity() const noexcept { return this->_capacity + 2; }
+    /// \return Емкость контейнера в элементах.
+    std::size_t capacity() const noexcept { return this->_capacity + N; }
 
     /// \brief Очистка контейнера.
     void clear() noexcept { this->_size = 0; }
 
     /// \brief Проверка, не пустой ли контейнер.
+    /// \return true, если контейнер пустой.
     bool empty() const noexcept { return this->_size == 0; }
 
     /// \brief Текущий размер контейнера.
+    /// \return Размер контейнера в элементах.
     std::size_t size() const noexcept  { return this->_size; }
 
+    /// \brief Преобразование в стандартный список.
+    /// \return Список изо всех элементов, возможно, пустой.
+    std::list<T> toList()
+    {
+        std::list <T> result;
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
     /// \brief Преобразование в стандартный вектор.
+    /// \return Вектор изо всех элементов, возможно, пустой.
     std::vector<T> toVector()
     {
-        std::vector<T> result;
+        std::vector <T> result;
         result.reserve (this->size());
-        result.insert (std::end(result), std::begin(*this), std::end(*this));
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
         return result;
     }
 
     /// \brief Помещение элемента в конец.
+    /// \param value Помещаемое значение.
     void push_back (const T &value)
     {
-        switch (this->_size) {
-            case 0: this->_first = value; break;
-            case 1: this->_second = value; break;
-            default:
-                if (this->_size - 2 == this->_capacity) {
-                    this->_enlarge();
-                }
-                this->_array[this->_size - 2] = value;
-                break;
+        if (this->_size < N) {
+            this->_static [this->_size] = value;
+        }
+        else {
+            if (this->_size - N == this->_capacity) {
+                this->_enlarge();
+            }
+            this->_dynamic [this->_size - N] = value;
         }
         ++this->_size;
     }
 
-    /// \brief Помещение элемента в конец.
+    /// \brief Перемещение элемента в конец.
+    /// \param value Перемещаемое значение.
     void push_back (T &&value)
     {
-        switch (this->_size) {
-            case 0: this->_first = std::move (value); break;
-            case 1: this->_second = std::move (value); break;
-            default:
-                if (this->_size - 2 == this->_capacity) {
-                    this->_enlarge();
-                }
-                this->_array[this->_size - 2] = std::move (value);
-                break;
+        if (this->_size < N) {
+            this->_static [this->_size] = std::move (value);
+        }
+        else {
+            if (this->_size - N == this->_capacity) {
+                this->_enlarge();
+            }
+            this->_dynamic.get() [this->_size - N] = std::move (value);
         }
         ++this->_size;
     }
 
     /// \brief Помещение элемента в конец
+    /// \param args Аргументы конструктора.
     template <class... Args>
     T& emplace_back (Args&&... args)
     {
-        T * place;
-        switch (this->_size) {
-            case 0: place = &this->_first; break;
-            case 1: place = &this->_second; break;
-            default:
-                if (this->_size - 2 == this->_capacity) {
-                    this->_enlarge();
-                }
-                place = this->_array + this->_size - 2;
-                break;
+        T *place;
+        if (this->_size < N) {
+            place = this->_static + this->_size;
         }
-        T *value = new (place) T(std::forward<Args> (args)...);
+        else {
+            if (this->_size - N == this->_capacity) {
+                this->_enlarge();
+            }
+            place = this->_dynamic.get() + this->_size - N;
+        };
+        T *value = new (place) T (std::forward <Args> (args)...);
         ++this->_size;
         return *value;
     }
@@ -166,9 +184,8 @@ public:
 private:
     std::size_t _size { 0 };
     std::size_t _capacity { 0 };
-    T *_array { nullptr };
-    T _first {};
-    T _second {};
+    T _static [N];
+    std::unique_ptr<T[]> _dynamic {};
 
     void _enlarge() {
         std::size_t  oldSize = this->_capacity;
@@ -177,13 +194,12 @@ private:
             newSize = 4;
         }
 
-        T *newArray = new T[newSize];
-        if (this->_array) {
-            std::copy (this->_array, this->_array + oldSize, newArray);
-            delete[] this->_array;
+        T *oldArray = this->_dynamic.get();
+        T *newArray = new T [newSize];
+        if (oldArray) {
+            std::copy (oldArray, oldArray + oldSize, newArray);
         }
-
-        this->_array = newArray;
+        this->_dynamic.reset (newArray);
         this->_capacity = newSize;
     }
 };

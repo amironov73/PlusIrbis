@@ -471,16 +471,16 @@ std::string SimpleFile::readNarrow ()
         }
         else if (c == '\r') {
             c = this->readByte();
-            if (c < 0 || c == '\n') {
+            if (c == '\n' || c < 0) {
                 break;
             }
-            result.push_back (c);
+            result.push_back (static_cast <char> (c));
         }
         else if (c == '\n') {
             break;
         }
         else {
-            result.push_back (c);
+            result.push_back (static_cast <char> (c));
         }
     }
     return result;
@@ -523,7 +523,7 @@ std::size_t SimpleFile::size ()
         DisplayError();
         throw IrbisException();
     }
-    return result.QuadPart;
+    return static_cast <std::size_t> (result.QuadPart);
 
 #else
 
