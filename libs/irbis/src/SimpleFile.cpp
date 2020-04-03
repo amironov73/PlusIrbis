@@ -195,6 +195,66 @@ SimpleFile SimpleFile::create (const std::string &fileName)
 #endif
 }
 
+/// \brief Настойчивое создание файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistCreate (const String &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::create (fileName); });
+}
+
+/// \brief Настойчивое создание файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistCreate (const std::string &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::create (fileName); });
+}
+
+/// \brief Настойчивое открытие файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistOpenRead (const String &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::openRead (fileName); });
+}
+
+/// \brief Настойчивое открытие файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistOpenRead (const std::string &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::openRead (fileName); });
+}
+
+/// \brief Настойчивое открытие файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistOpenWrite (const String &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::openWrite (fileName); });
+}
+
+/// \brief Настойчивое открытие файла.
+/// \param fileName Имя файла.
+/// \param delay Задержка между попытками.
+/// \param retryLimit Количество попыток.
+/// \return Файл.
+SimpleFile SimpleFile::insistOpenWrite (const std::string &fileName, int delay, int retryLimit)
+{
+    return Retry (delay, retryLimit).execute ([&] { return SimpleFile::openWrite (fileName); });
+}
+
 /// \brief Открытие файла для чтения.
 /// \param fileName Имя файла.
 /// \return Файл.

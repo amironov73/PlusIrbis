@@ -186,6 +186,7 @@
     <ClCompile Include="src/ReaderTest.cpp" />
     <ClCompile Include="src/RecordFieldTest.cpp" />
     <ClCompile Include="src/ResultTest.cpp" />
+    <ClCompile Include="src/RetryTest.cpp" />
     <ClCompile Include="src/SearchTest.cpp" />
     <ClCompile Include="src/SimpleFileTest.cpp" />
     <ClCompile Include="src/SpanTest.cpp" />

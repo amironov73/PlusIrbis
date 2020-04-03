@@ -68,6 +68,62 @@ TEST_CASE("SimpleFile_create_2", "[file]")
     irbis::IO::deleteFile (fileName);
 }
 
+TEST_CASE("SimpleFile_insistCreate_1", "[file]")
+{
+    const auto tempDirectory = irbis::IO::getTempDirectory();
+    REQUIRE (irbis::IO::directoryExist (tempDirectory));
+    auto fileName = irbis::IO::combinePath (tempDirectory, L"irbis.tmp");
+    irbis::IO::deleteFile (fileName);
+
+    irbis::Byte original[] {3, 14, 15, 9, 26, 5};
+
+    {
+        auto file = irbis::SimpleFile::insistCreate (fileName);
+        file.write (original, irbis::size (original));
+        file.close();
+    }
+
+    CHECK (irbis::IO::getFileSize (fileName) == irbis::size (original));
+
+    {
+        irbis::Byte buffer [10];
+        auto file = irbis::SimpleFile::openRead (fileName);
+        const auto read = file.read (buffer, irbis::size (buffer));
+        CHECK (read == irbis::size (original));
+        file.close();
+    }
+
+    irbis::IO::deleteFile (fileName);
+}
+
+TEST_CASE("SimpleFile_insistCreate_2", "[file]")
+{
+    const auto tempDirectory = irbis::IO::getTempDirectoryNarrow();
+    REQUIRE (irbis::IO::directoryExist (tempDirectory));
+    auto fileName = irbis::IO::combinePath (tempDirectory, "irbis.tmp");
+    irbis::IO::deleteFile (fileName);
+
+    irbis::Byte original[] {3, 14, 15, 9, 26, 5};
+
+    {
+        auto file = irbis::SimpleFile::insistCreate (fileName);
+        file.write (original, irbis::size (original));
+        file.close();
+    }
+
+    CHECK (irbis::IO::getFileSize (fileName) == irbis::size (original));
+
+    {
+        irbis::Byte buffer [10];
+        auto file = irbis::SimpleFile::openRead (fileName);
+        const auto read = file.read (buffer, irbis::size (buffer));
+        CHECK (read == irbis::size (original));
+        file.close();
+    }
+
+    irbis::IO::deleteFile (fileName);
+}
+
 TEST_CASE("SimpleFile_openRead_1", "[file]")
 {
     auto path = whereTestData();
@@ -112,6 +168,50 @@ TEST_CASE("SimpleFile_openRead_2", "[file]")
     file.close();
 }
 
+TEST_CASE("SimpleFile_insistOpenRead_1", "[file]")
+{
+    auto path = whereTestData();
+    REQUIRE (!path.empty());
+    path = irbis::IO::combinePath (path, L"TEST1.ISO");
+    irbis::IO::convertSlashes (path);
+    irbis::Byte buffer[100];
+    auto file = irbis::SimpleFile::insistOpenRead (path);
+    auto position = file.tell();
+    CHECK (position == 0);
+    auto read = file.read (buffer, irbis::size (buffer));
+    CHECK (read == 100);
+    CHECK (buffer[0] == 0x30);
+    CHECK (buffer[1] == 0x30);
+    position = file.tell();
+    CHECK (position == 100);
+    file.seek (0);
+    position = file.tell();
+    CHECK (position == 0);
+    file.close();
+}
+
+TEST_CASE("SimpleFile_insistOpenRead_2", "[file]")
+{
+    auto path = irbis::toUtf (whereTestData());
+    REQUIRE (!path.empty());
+    path = irbis::IO::combinePath (path, "TEST1.ISO");
+    irbis::IO::convertSlashes (path);
+    irbis::Byte buffer[100];
+    auto file = irbis::SimpleFile::insistOpenRead (path);
+    auto position = file.tell();
+    CHECK (position == 0);
+    auto read = file.read (buffer, irbis::size (buffer));
+    CHECK (read == 100);
+    CHECK (buffer[0] == 0x30);
+    CHECK (buffer[1] == 0x30);
+    position = file.tell();
+    CHECK (position == 100);
+    file.seek (0);
+    position = file.tell();
+    CHECK (position == 0);
+    file.close();
+}
+
 TEST_CASE("SimpleFile_openWrite_1", "[file]")
 {
     auto path = whereTestData();
@@ -134,6 +234,36 @@ TEST_CASE("SimpleFile_openWrite_2", "[file]")
     path = irbis::IO::combinePath (path, "TEST1.ISO");
     irbis::IO::convertSlashes (path);
     auto file = irbis::SimpleFile::openWrite (path);
+    auto position = file.tell();
+    CHECK (position == 0);
+    file.seek (86);
+    position = file.tell();
+    CHECK (position == 86);
+    file.close();
+}
+
+TEST_CASE("SimpleFile_insistOpenWrite_1", "[file]")
+{
+    auto path = whereTestData();
+    REQUIRE (!path.empty());
+    path = irbis::IO::combinePath (path, L"TEST1.ISO");
+    irbis::IO::convertSlashes (path);
+    auto file = irbis::SimpleFile::insistOpenWrite (path);
+    auto position = file.tell();
+    CHECK (position == 0);
+    file.seek (86);
+    position = file.tell();
+    CHECK (position == 86);
+    file.close();
+}
+
+TEST_CASE("SimpleFile_insistOpenWrite_2", "[file]")
+{
+    auto path = irbis::toUtf (whereTestData());
+    REQUIRE (!path.empty());
+    path = irbis::IO::combinePath (path, "TEST1.ISO");
+    irbis::IO::convertSlashes (path);
+    auto file = irbis::SimpleFile::insistOpenWrite (path);
     auto position = file.tell();
     CHECK (position == 0);
     file.seek (86);

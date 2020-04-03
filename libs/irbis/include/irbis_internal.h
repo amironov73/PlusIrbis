@@ -8,6 +8,7 @@
 
 #include <array>
 #include <memory>
+#include <thread>
 
 //=========================================================
 
@@ -234,6 +235,57 @@ private:
 
 //=========================================================
 
+/// \brief Повторение действия необходимое число раз, пока не получится.
+class IRBIS_API Retry final
+{
+public:
+    int delayInterval { 100 }; ///< Задержка между повторами, миллисекунды.
+    int retryLimit    { 5 };   ///< Максимальное число повторов.
+
+    Retry () = default;
+    Retry (int delay_, int limit_) : delayInterval { delay_ }, retryLimit { limit_ } {}
+
+    template <class TFunc, class ... TArgs>
+    void action (TFunc func, TArgs ... args)
+    {
+        for (int i = 0; i < this->retryLimit; i++) {
+            try {
+                func (args ...);
+                return;
+            }
+            catch (...) {
+                this->_delay();
+            }
+        }
+        throw std::exception();
+    }
+
+    template <class TFunc, class ... TArgs>
+    auto execute (TFunc func, TArgs ... args) -> decltype(func(args...))
+    {
+        for (int i = 0; i < this->retryLimit; i++) {
+            try {
+                auto result = func (args ...);
+                return result;
+            }
+            catch (...) {
+                this->_delay();
+            }
+        }
+        throw std::exception();
+    }
+
+private:
+    void _delay()
+    {
+        if (this->delayInterval > 0) {
+            std::this_thread::sleep_for (std::chrono::microseconds (this->delayInterval));
+        }
+    }
+};
+
+//=========================================================
+
 /// \brief Простая обертка над файлом.
 class IRBIS_API File final
 {
@@ -278,26 +330,32 @@ public:
     SimpleFile& operator = (const SimpleFile &) = delete;
     SimpleFile& operator = (SimpleFile && other) noexcept;
 
-    void              close      () noexcept;
-    static SimpleFile create     (const String &fileName);
-    static SimpleFile create     (const std::string &fileName);
-    static SimpleFile openRead   (const String &fileName);
-    static SimpleFile openRead   (const std::string &fileName);
-    static SimpleFile openWrite  (const String &fileName);
-    static SimpleFile openWrite  (const std::string &fileName);
-    int64_t           read       (Byte *buffer, int64_t nbytes);
-    std::string       readAll    ();
-    int               readByte   ();
-    int               readChar   ();
-    uint32_t          readInt32  ();
-    uint64_t          readInt64  ();
-    std::string       readNarrow ();
-    std::size_t       size       ();
-    int64_t           tell       ();
-    void              seek       (int64_t offset);
-    void              write      (const Byte* buffer, int64_t nbytes);
-    void              writeInt32 (uint32_t number);
-    void              writeInt64 (uint64_t number);
+    void              close           () noexcept;
+    static SimpleFile create          (const String &fileName);
+    static SimpleFile create          (const std::string &fileName);
+    static SimpleFile insistCreate    (const String &fileName, int delay = 100, int retry = 5);
+    static SimpleFile insistCreate    (const std::string &fileName, int delay = 100, int retry = 5);
+    static SimpleFile insistOpenRead  (const String &fileName, int delay = 100, int retry = 5);
+    static SimpleFile insistOpenRead  (const std::string &fileName, int delay = 100, int retry = 5);
+    static SimpleFile insistOpenWrite (const String &fileName, int delay = 100, int retry = 5);
+    static SimpleFile insistOpenWrite (const std::string &fileName, int delay = 100, int retry = 5);
+    static SimpleFile openRead        (const String &fileName);
+    static SimpleFile openRead        (const std::string &fileName);
+    static SimpleFile openWrite       (const String &fileName);
+    static SimpleFile openWrite       (const std::string &fileName);
+    int64_t           read            (Byte *buffer, int64_t nbytes);
+    std::string       readAll         ();
+    int               readByte        ();
+    int               readChar        ();
+    uint32_t          readInt32       ();
+    uint64_t          readInt64       ();
+    std::string       readNarrow      ();
+    std::size_t       size            ();
+    int64_t           tell            ();
+    void              seek            (int64_t offset);
+    void              write           (const Byte* buffer, int64_t nbytes);
+    void              writeInt32      (uint32_t number);
+    void              writeInt64      (uint64_t number);
 
 private:
 #ifdef IRBIS_WINDOWS

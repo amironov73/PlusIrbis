@@ -367,13 +367,13 @@ template <class T>
 class Result // NOLINT(cppcoreguidelines-pro-type-member-init)
 {
 public:
+    T result;    ///< Результирующее значение (имеет смысл при успешном завершении).
     bool success { false }; ///< Признак успешного завершения.
-    alignas(T) T result;    ///< Результирующее значение (имеет смысл при успешном завершении).
     String errorMessage;    ///< Сообщение об ошибке.
 
     /// \brief Преобразование к логическому значению.
     /// \return true означает успех.
-    operator bool() const // NOLINT(hicpp-explicit-conversions)
+    operator bool() const noexcept // NOLINT(hicpp-explicit-conversions)
     {
         return this->success;
     }
@@ -421,22 +421,23 @@ template<class T>
 class Optional
 {
 public:
-    T value; ///< Хранимое значение (если есть)
+    T value; ///< Хранимое значение (если есть).
     bool hasValue { false }; ///< Содержит ли значение?
 
-    Optional() = default;
+    Optional () = default;
     explicit Optional (T value_) : value (value_), hasValue (true) {}
     Optional (const Optional<T> &other)
         : value (other.value), hasValue (other.hasValue) {}
     Optional& operator = (const Optional<T> &other)
-        { if (this != &other) { this->value = other.value; this->hasValue = other.value; } return *this; }
+        { if (this != &other) { this->value = other.value; this->hasValue = other.value; }
+            return *this; }
     Optional& operator = (const T &newValue)
         { this->value = newValue; this->hasValue = true; return *this; }
 
     explicit operator bool() const noexcept { return this->hasValue; }
-    T operator *() const noexcept { return value; }
-    void reset() noexcept { this->hasValue = false; }
-    T valueOr (const T& alternative) { return this->hasValue ? this->value : alternative; }
+    T operator *() const noexcept { return this->value; }
+    void reset() noexcept { this->hasValue = false; this->value = T(); }
+    T valueOr (const T&& alternative) { return this->hasValue ? this->value : alternative; }
     T valueOr (T (*func) ()) { return this->hasValue ? this->value : func(); }
 };
 
