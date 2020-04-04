@@ -232,9 +232,8 @@ TEST_CASE("Text_readAnsiLines_1", "[text]")
     irbis::IO::convertSlashes (path);
     REQUIRE (irbis::IO::fileExist (path));
     auto content = irbis::Text::readAnsiLines (path);
-    CHECK (content.size() == 12);
+    CHECK (content.size() == 11);
     CHECK (content[0] == L"1=.\\datai\\ibis\\");
-    CHECK (content[11].empty());
 }
 
 TEST_CASE("Text_readUtfLines_1", "[text]")

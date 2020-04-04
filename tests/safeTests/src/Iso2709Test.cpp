@@ -16,7 +16,7 @@ TEST_CASE("Iso2709_readRecord_1", "[iso]")
     REQUIRE (irbis::IO::fileExist (path));
     irbis::Encoding *encoding = irbis::Encoding::ansi();
     REQUIRE (encoding != nullptr);
-    irbis::File file (path, L"rb");
+    auto file = irbis::File::openRead (path);
     irbis::MarcRecord *record = irbis::Iso2709::readRecord (&file, encoding);
     CHECK (record != nullptr);
     CHECK (record->fields.size() == 16);
@@ -38,11 +38,11 @@ TEST_CASE("Iso2709_writeRecord_1", "[iso]")
     }
     irbis::IO::createFile (path);
     {
-        irbis::File file(path, L"wb");
+        auto file = irbis::File::create (path);
         irbis::MarcRecord record;
-        record.add(200, L"").add(L'a', L"Title");
-        record.add(300, L"Comment");
-        irbis::Iso2709::writeRecord(&file, record, encoding);
+        record.add (200, L"").add(L'a', L"Title");
+        record.add (300, L"Comment");
+        irbis::Iso2709::writeRecord (&file, record, encoding);
     }
     CHECK (irbis::IO::getFileSize(path) == 70);
 }

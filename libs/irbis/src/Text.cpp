@@ -113,7 +113,7 @@ StringList Text::fromShortDelimiter (const String &text)
 /// \return Прочитанный файл.
 String Text::readAllAnsi (const String &filename)
 {
-    auto temp = File::readAllBytes (filename);
+    auto temp = File::readAll (filename);
     auto result = cp1251_to_unicode (temp);
     return fromDosToUnix (result);
 }
@@ -123,7 +123,7 @@ String Text::readAllAnsi (const String &filename)
 /// \return Прочитанный файл.
 String Text::readAllUtf (const String &filename)
 {
-    auto temp = File::readAllBytes (filename);
+    auto temp = File::readAll (filename);
     auto result = fromUtf (temp);
     return fromDosToUnix (result);
 }
@@ -135,13 +135,11 @@ StringList Text::readAnsiLines (const String &filename)
 {
     StringList result;
 
-    {
-        File file (filename, L"rb");
-        while (!file.eof()) {
-            auto line = file.readLine();
-            auto item = cp1251_to_unicode (line);
-            result.push_back (item);
-        }
+    auto file = File::openRead (filename);
+    while (!file.eof()) {
+        auto line = file.readNarrow();
+        auto item = cp1251_to_unicode (line);
+        result.push_back (item);
     }
 
     return result;
@@ -150,17 +148,15 @@ StringList Text::readAnsiLines (const String &filename)
 /// \brief Считываем весь файл как массив строк в кодировке UTF-8.
 /// \param filename Имя файла.
 /// \return Вектор строк.
-StringList Text::readUtfLines(const String &filename)
+StringList Text::readUtfLines (const String &filename)
 {
     StringList result;
 
-    {
-        File file (filename, L"rb");
-        while (!file.eof()) {
-            auto line = file.readLine();
-            auto item = fromUtf (line);
-            result.push_back (item);
-        }
+    auto file = File::openRead (filename);
+    while (!file.eof()) {
+        auto line = file.readNarrow();
+        auto item = fromUtf (line);
+        result.push_back (item);
     }
 
     return result;

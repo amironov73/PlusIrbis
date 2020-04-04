@@ -164,6 +164,13 @@
 
 #endif // IRBIS_RESTRICT
 
+// для аргументов функций: int func (char* __restrict ptr1, int* __restrict ptr2).
+#ifndef IRBIS_NOEXCEPT
+
+    #define IRBIS_NOEXCEPT noexcept
+
+#endif // IRBIS_RESTRICT
+
 //=========================================================
 
 #if defined(_MSC_VER)

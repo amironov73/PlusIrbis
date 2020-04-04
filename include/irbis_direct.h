@@ -1,6 +1,8 @@
 #ifndef PLUSIRBIS_IRBIS_DIRECT_H
 #define PLUSIRBIS_IRBIS_DIRECT_H
 
+#include <memory>
+
 #include "irbis.h"
 
 namespace irbis {
@@ -94,20 +96,21 @@ struct IRBIS_API MstDictionaryEntry64 final
 /// \brief Мастер-файл.
 class IRBIS_API MstFile64 final
 {
-    File *_file;
-
 public:
     MstControlRecord64 control;
     String fileName;
 
-    MstFile64 (const String &fileName, DirectAccessMode mode);
-    MstFile64 (const MstFile64 &) = delete;
-    MstFile64 (const MstFile64 &&) = delete;
-    MstFile64& operator = (const MstFile64 &) = delete;
+    MstFile64 (const String &fileName, DirectAccessMode mode = DirectAccessMode::ReadOnly);
+    MstFile64 (const MstFile64 &)              = delete;
+    MstFile64 (const MstFile64 &&)             = delete;
+    MstFile64& operator = (const MstFile64 &)  = delete;
     MstFile64& operator = (const MstFile64 &&) = delete;
-    ~MstFile64();
+    ~MstFile64()                               = default;
 
     MstRecord64 readRecord (int64_t position);
+
+private:
+    std::unique_ptr<File> _file;
 };
 
 //=========================================================
@@ -156,9 +159,8 @@ public:
     XrfFile64             (XrfFile64 &&)      = delete;
     XrfFile64& operator = (const XrfFile64 &) = delete;
     XrfFile64& operator = (XrfFile64 &&)      = delete;
-    ~XrfFile64();
+    ~XrfFile64()                              = default;
 
-    void close();
     XrfRecord64 readRecord (Mfn mfn);
     void writeRecord (Mfn mfn, XrfRecord64 record);
 
@@ -167,7 +169,7 @@ public:
 private:
 
     String _fileName;
-    File *_file;
+    std::unique_ptr<File> _file;
     DirectAccessMode _mode;
     std::mutex _mutex;
 

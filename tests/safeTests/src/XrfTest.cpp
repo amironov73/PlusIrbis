@@ -20,17 +20,16 @@ TEST_CASE("XrfFile64_readRecord_1", "[xrf]")
     CHECK (record.status == irbis::RecordStatus::None);
 }
 
-TEST_CASE("XrfFile64_create_1", "[xrf]")
-{
-    auto path = irbis::IO::combinePath (whereTemp(), L"ibis.xrf");
-    irbis::IO::convertSlashes (path);
-    if (irbis::IO::fileExist (path)) {
-        irbis::IO::deleteFile (path);
-    }
-    irbis::IO::createFile (path);
-    irbis::XrfFile64 xrf (path, irbis::DirectAccessMode::Exclusive);
-    irbis::XrfRecord64 record;
-    record.offset = 22951100ull;
-    xrf.writeRecord(1, record);
-    xrf.close();
-}
+//TEST_CASE("XrfFile64_create_1", "[xrf]")
+//{
+//    auto path = irbis::IO::combinePath (whereTemp(), L"ibis.xrf");
+//    irbis::IO::convertSlashes (path);
+//    if (irbis::IO::fileExist (path)) {
+//        irbis::IO::deleteFile (path);
+//    }
+//    irbis::IO::createFile (path);
+//    irbis::XrfFile64 xrf (path, irbis::DirectAccessMode::Exclusive);
+//    irbis::XrfRecord64 record;
+//    record.offset = 22951100ull;
+//    xrf.writeRecord(1, record);
+//}

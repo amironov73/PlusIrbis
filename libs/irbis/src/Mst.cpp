@@ -148,22 +148,19 @@ void MstDictionaryEntry64::read (File *file) {
 
 //=========================================================
 
+static File* getFile (const String &fileName, DirectAccessMode mode)
+{
+    File file = File::openRead (fileName);
+    return file.toHeap();
+}
+
 /// \brief Конструктор.
 /// \param fileName
 /// \param mode
-MstFile64::MstFile64 (const String &fileName, DirectAccessMode mode = DirectAccessMode::ReadOnly)
+MstFile64::MstFile64 (const String &fileName, DirectAccessMode mode)
+    : _file (getFile (fileName, mode))
 {
-    this->_file = new File (fileName, L"rb");
     this->fileName = fileName;
-}
-
-/// \brief Деструктор.
-MstFile64::~MstFile64()
-{
-    if (this->_file) {
-        delete this->_file;
-        this->_file = nullptr;
-    }
 }
 
 /// \brief Чтение записи.

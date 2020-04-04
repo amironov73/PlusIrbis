@@ -29,7 +29,6 @@ namespace irbis
 //=========================================================
 
 class File;
-class SimpleFile;
 
 //=========================================================
 
@@ -286,76 +285,46 @@ private:
 
 //=========================================================
 
-/// \brief Простая обертка над файлом.
+/// \brief Простая обертка над системным файловым API.
 class IRBIS_API File final
 {
 public:
 
-    File (FILE *stream); // NOLINT(google-explicit-constructor)
-    File (const char *name, const char *mode);
-    File (const std::string &name, const std::string &mode);
-    File (const String &name, const String &mode);
-    File (const File &other) = delete;
-    File (File &&other) = delete;
-    File& operator = (const File &other) = delete;
-    File& operator = (File &&other) = delete;
-    ~File();
+    File (const File &) = delete;
+    File (File &&other) noexcept;
+    ~File() noexcept ;
+    File& operator = (const File &) = delete;
+    File& operator = (File && other) noexcept;
 
-    FILE* getStream() const noexcept;
-    bool eof() const;
-
-    std::size_t read (Byte *buffer, std::size_t count);
-    int64_t seek (int64_t position);
-    int64_t tell();
-    std::size_t write (const Byte *buffer, std::size_t count);
-    int readChar ();
-    std::string readLine ();
-    static std::string readAllBytes (const String &fileName);
-
-private:
-
-    FILE *_stream;
-};
-
-//=========================================================
-
-/// \brief Простая обертка над системным файловым API.
-class IRBIS_API SimpleFile final
-{
-public:
-
-    SimpleFile (const SimpleFile &) = delete;
-    SimpleFile (SimpleFile &&other) noexcept;
-    ~SimpleFile() noexcept ;
-    SimpleFile& operator = (const SimpleFile &) = delete;
-    SimpleFile& operator = (SimpleFile && other) noexcept;
-
-    void              close           () noexcept;
-    static SimpleFile create          (const String &fileName);
-    static SimpleFile create          (const std::string &fileName);
-    static SimpleFile insistCreate    (const String &fileName, int delay = 100, int retry = 5);
-    static SimpleFile insistCreate    (const std::string &fileName, int delay = 100, int retry = 5);
-    static SimpleFile insistOpenRead  (const String &fileName, int delay = 100, int retry = 5);
-    static SimpleFile insistOpenRead  (const std::string &fileName, int delay = 100, int retry = 5);
-    static SimpleFile insistOpenWrite (const String &fileName, int delay = 100, int retry = 5);
-    static SimpleFile insistOpenWrite (const std::string &fileName, int delay = 100, int retry = 5);
-    static SimpleFile openRead        (const String &fileName);
-    static SimpleFile openRead        (const std::string &fileName);
-    static SimpleFile openWrite       (const String &fileName);
-    static SimpleFile openWrite       (const std::string &fileName);
-    int64_t           read            (Byte *buffer, int64_t nbytes);
-    std::string       readAll         ();
-    int               readByte        ();
-    int               readChar        ();
-    uint32_t          readInt32       ();
-    uint64_t          readInt64       ();
-    std::string       readNarrow      ();
-    std::size_t       size            ();
-    int64_t           tell            ();
-    void              seek            (int64_t offset);
-    void              write           (const Byte* buffer, int64_t nbytes);
-    void              writeInt32      (uint32_t number);
-    void              writeInt64      (uint64_t number);
+    void        close           () noexcept;
+    static File create          (const String &fileName);
+    static File create          (const std::string &fileName);
+    bool        eof             ();
+    static File insistCreate    (const String &fileName, int delay = 100, int retry = 5);
+    static File insistCreate    (const std::string &fileName, int delay = 100, int retry = 5);
+    static File insistOpenRead  (const String &fileName, int delay = 100, int retry = 5);
+    static File insistOpenRead  (const std::string &fileName, int delay = 100, int retry = 5);
+    static File insistOpenWrite (const String &fileName, int delay = 100, int retry = 5);
+    static File insistOpenWrite (const std::string &fileName, int delay = 100, int retry = 5);
+    static File openRead        (const String &fileName);
+    static File openRead        (const std::string &fileName);
+    static File openWrite       (const String &fileName);
+    static File openWrite       (const std::string &fileName);
+    int64_t     read            (Byte *buffer, int64_t nbytes);
+    std::string readAll         ();
+    static std::string readAll  (const String &fileName);
+    int         readByte        ();
+    int         readChar        ();
+    uint32_t    readInt32       ();
+    uint64_t    readInt64       ();
+    std::string readNarrow      ();
+    std::size_t size            ();
+    int64_t     tell            ();
+    void        seek            (int64_t offset);
+    File*       toHeap          ();
+    int64_t     write           (const Byte* buffer, int64_t nbytes);
+    void        writeInt32      (uint32_t number);
+    void        writeInt64      (uint64_t number);
 
 private:
 #ifdef IRBIS_WINDOWS
@@ -364,8 +333,8 @@ private:
     int _handle { -1 };
 #endif
 
-    SimpleFile() = default; ///< Скрываем конструктор.
-    void _grabHandle (SimpleFile &other) noexcept;
+    File() = default; ///< Скрываем конструктор.
+    void _grabHandle (File &other) noexcept;
 };
 
 //=========================================================
@@ -808,6 +777,33 @@ private:
 
 //=========================================================
 
+// Assert
+
+struct Tracer;
+
+#define IRBIS_ASSERT(__x) /* nothing yet */
+#define IRBIS_VERIFY(__x) (__x)
+
+/// \brief Простой трассировщик сообщений.
+struct Tracer {
+    const char *filename;
+    unsigned int lineNumber;
+
+    Tracer (const char *filename_, unsigned int line_)
+        : filename (filename_), lineNumber (line_) {}
+
+    template <class ... Args>
+    void operator () (const char *format, Args ... args)
+    {
+        printf ("%s (%d): ", filename, lineNumber);
+        printf (format, args...);
+    }
+};
+
+#define IRBIS_TRACE irbis::Tracer(__FILE__, __LINE__)
+
+//=========================================================
+
 // Logging
 
 /// \brief Поддержка логирования.
@@ -821,8 +817,8 @@ public:
 
 #ifdef IRBIS_DEBUG
 
-    #define LOG_TRACE(__message) irbis::Log::write(__message);
-    #define LOG_ERROR(__message) irbis::Log::write(__message);
+    #define LOG_TRACE(__message) irbis::Log::write (__message);
+    #define LOG_ERROR(__message) irbis::Log::write (__message);
 
 #else
 
@@ -833,6 +829,64 @@ public:
 
 #define LOG_ENTER LOG_TRACE(__func__)
 #define LOG_LEAVE LOG_TRACE(__func__)
+
+//=========================================================
+
+// Handles
+
+/// \brief Обертка для хэндла.
+template <typename Traits>
+class uniqueHandle
+{
+public:
+
+    using Handle = typename Traits::handle;
+
+    explicit uniqueHandle (Handle value = Traits::invalid()) noexcept
+        : _value { value } {}
+    ~uniqueHandle() noexcept { this->_close(); }
+    uniqueHandle (const uniqueHandle&) = delete;
+    uniqueHandle (uniqueHandle &&other)  noexcept
+        : _value { other.release() } {}
+    uniqueHandle& operator = (const uniqueHandle&) = delete;
+    uniqueHandle& operator = (uniqueHandle &&other) noexcept
+    {
+        if (this != &other) {
+            this->reset (other.release());
+        }
+        return *this;
+    }
+
+    explicit operator bool() const noexcept
+    {
+        return this->_value != Traits::invalid();
+    }
+
+    Handle get() const noexcept
+    {
+        return this->_value;
+    }
+
+    bool release (Handle value = Traits::invalid()) const noexcept
+    {
+        if (value != this->_value) {
+            this->_close();
+            this->_value = value;
+        }
+        return static_cast <bool> (*this);
+    };
+
+private:
+
+    Handle _value;
+
+    void _close() noexcept
+    {
+        if (*this) {
+            Traits::close (this->value);
+        }
+    }
+};
 
 //=========================================================
 

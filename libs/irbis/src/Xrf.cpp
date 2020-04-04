@@ -81,89 +81,57 @@ String XrfRecord64::toString() const
 /// \brief Конструктор.
 /// \param fileName Имя файла.
 /// \param mode Режим доступа.
-    XrfFile64::XrfFile64 (const String &fileName, DirectAccessMode mode) 
-    {
-        auto *modeString = L"r+b";
-        if (mode == DirectAccessMode::ReadOnly) {
-            modeString = L"rb";
-        }
-        this->_file = new File (fileName, modeString);
-        this->_fileName = fileName;
-        this->_mode = mode;
-    }
-
-/// \brief Деструктор.
-    XrfFile64::~XrfFile64()
-    {
-        this->close();
-    }
-
-/// \brief Закрытие файла.
-    void XrfFile64::close()
-    {
-        if (this->_file) {
-            delete this->_file;
-            this->_file = nullptr;
-        }
-    }
+XrfFile64::XrfFile64 (const String &fileName, DirectAccessMode mode)
+    : _file { File::openRead(fileName).toHeap() },
+    _fileName { fileName }, _mode { mode }
+{
+}
 
 /// \brief Расчёт смещения в XRF-файле для указанного MFN.
 /// \param mfn MFN, для которого необходимо смещение.
 /// \return Вычисленное смещение.
-    Offset XrfFile64::getOffset(Mfn mfn) noexcept
-    {
-        return static_cast<Offset> (XrfRecord64::RecordSize) * static_cast<Offset> (mfn - 1);
-    }
+Offset XrfFile64::getOffset(Mfn mfn) noexcept
+{
+    return static_cast<Offset> (XrfRecord64::RecordSize) * static_cast<Offset> (mfn - 1);
+}
 
 /// \brief Считывание одной XRF-записи.
 /// \param mfn MFN записи.
 /// \return Прочитанная запись.
 /// \warning Очень неэффективно! Лучше читать "пачками".
-/// \throw irbis::IrbisException
-    XrfRecord64 XrfFile64::readRecord (Mfn mfn)
-    {
-        assert (mfn > 0);
-        std::lock_guard<std::mutex> guard (this->_mutex);
-        const auto offset = XrfFile64::getOffset (mfn);
-        if (this->_file->seek (offset) != offset) {
-            throw IrbisException();
-        }
-        XrfRecord64 result;
-        const auto stream = this->_file->getStream();
-        if (!IO::readInt64 (stream, &result.offset)
-            || !IO::readInt32 (stream, reinterpret_cast<uint32_t*> (&result.status))) {
-            throw IrbisException();
-        }
-        return result;
-    }
+XrfRecord64 XrfFile64::readRecord (Mfn mfn)
+{
+    assert (mfn > 0);
+    std::lock_guard<std::mutex> guard (this->_mutex);
+    const auto offset = XrfFile64::getOffset (mfn);
+    this->_file->seek (offset);
+    XrfRecord64 result;
+    result.offset = this->_file->readInt64();
+    result.status = (RecordStatus) this->_file->readInt32();
+    return result;
+}
 
 /// \brief Сохранение одной XRF-записи.
 /// \param mfn MFN записи.
 /// \param record Сохраняемая запись.
 /// \warning Очень неэффективно! Лучше писать "пачками".
-/// \throw irbis::IrbisException
-    void XrfFile64::writeRecord (Mfn mfn, XrfRecord64 record)
-    {
-        assert (mfn > 0);
-        std::lock_guard<std::mutex> guard (this->_mutex);
-        const auto offset = XrfFile64::getOffset (mfn);
-        if (this->_file->seek (offset) != offset) {
-            throw IrbisException();
-        }
-        const auto stream = this->_file->getStream();
-        if (!IO::writeInt64 (stream, record.offset)
-            || !IO::writeInt32 (stream, static_cast<uint32_t> (record.status))) {
-            throw IrbisException();
-        }
-    }
+void XrfFile64::writeRecord (Mfn mfn, XrfRecord64 record)
+{
+    assert (mfn > 0);
+    std::lock_guard<std::mutex> guard (this->_mutex);
+    const auto offset = XrfFile64::getOffset (mfn);
+    this->_file->seek (offset);
+    this->_file->writeInt64 (record.offset);
+    this->_file->writeInt32 ((uint32_t) record.status);
+}
 
 /// \brief Создание XRF-файла. Если файл уже существует, он усекается.
 /// \param fileName Имя файла.
 /// \return XRF-файл.
-    XrfFile64 XrfFile64::create (const String &fileName)
-    {
-        IO::createFile (fileName);
-        return { fileName, DirectAccessMode::Exclusive };
-    }
+XrfFile64 XrfFile64::create (const String &fileName)
+{
+    IO::createFile (fileName);
+    return { fileName, DirectAccessMode::Exclusive };
+}
 
 }

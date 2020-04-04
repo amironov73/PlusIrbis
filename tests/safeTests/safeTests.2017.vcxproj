@@ -100,7 +100,6 @@
     <ClCompile Include="src/ResultTest.cpp" />
     <ClCompile Include="src/RetryTest.cpp" />
     <ClCompile Include="src/SearchTest.cpp" />
-    <ClCompile Include="src/SimpleFileTest.cpp" />
     <ClCompile Include="src/SpanTest.cpp" />
     <ClCompile Include="src/SubFieldTest.cpp" />
     <ClCompile Include="src/main.cpp" />

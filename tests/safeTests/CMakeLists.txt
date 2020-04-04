@@ -20,6 +20,7 @@ set(CppFiles
     src/EmbeddedFieldTest.cpp
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
+    src/FileTest.cpp
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
     src/FoundLineTest.cpp
@@ -48,7 +49,6 @@ set(CppFiles
     src/ResultTest.cpp
     src/RetryTest.cpp
     src/SearchTest.cpp
-    src/SimpleFileTest.cpp
     src/SpanTest.cpp
     src/SubFieldTest.cpp
     src/TermInfoTest.cpp
