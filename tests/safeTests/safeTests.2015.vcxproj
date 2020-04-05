@@ -157,6 +157,7 @@
     <ClCompile Include="src/BookInfoTest.cpp" />
     <ClCompile Include="src/ByteNavigatorTest.cpp" />
     <ClCompile Include="src/ChunkedBufferTest.cpp" />
+    <ClCompile Include="src/ChunkedDataTest.cpp" />
     <ClCompile Include="src/CodesTest.cpp" />
     <ClCompile Include="src/ConnectionTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
@@ -192,7 +193,6 @@
     <ClCompile Include="src/ResultTest.cpp" />
     <ClCompile Include="src/RetryTest.cpp" />
     <ClCompile Include="src/SearchTest.cpp" />
-    <ClCompile Include="src/SimpleFileTest.cpp" />
     <ClCompile Include="src/SpanTest.cpp" />
     <ClCompile Include="src/SubFieldTest.cpp" />
     <ClCompile Include="src/main.cpp" />

@@ -49,17 +49,17 @@ public:
     Frugal& operator = (Frugal &&)      = delete;  ///< Оператор перемещения.
 
     /// \brief Итератор.
-    class iterator : public std::iterator <std::input_iterator_tag, T>
+    class Iterator : public std::iterator <std::input_iterator_tag, T>
     {
     public:
         /// \brief Конструктор.
-        iterator (Frugal<T> &container, std::size_t pos)
+        Iterator (Frugal<T> &container, std::size_t pos) noexcept
                 : _container (container), _position (pos) {}
 
-        bool      operator == (const iterator &other) { return this->_position == other._position; } ///< Оператор сравнения на равенство.
-        bool      operator != (const iterator &other) { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
-        iterator& operator ++ ()                      { ++this->_position; return *this; }           ///< Оператор пре-инкремента.
-        T&        operator *  ()                      { return this->_container [this->_position]; } ///< Оператор разыменования.
+        bool      operator == (const Iterator &other) noexcept { return this->_position == other._position; } ///< Оператор сравнения на равенство.
+        bool      operator != (const Iterator &other) noexcept { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
+        Iterator& operator ++ ()                      { ++this->_position; return *this; }           ///< Оператор пре-инкремента.
+        T&        operator *  () const                { return this->_container [this->_position]; } ///< Оператор разыменования.
         T&        operator -> ()                      { return this->_container [this->_position]; } ///< Оператор доступа к члену.
 
     private:
@@ -79,11 +79,11 @@ public:
 
     /// \brief Указатель на первый элемент.
     /// \return Указатель.
-    iterator begin() { return iterator (*this, 0); }
+    Iterator begin() const noexcept { return Iterator (*this, 0); }
 
     /// \brief Указатель за последним элементом.
     /// \return Указатель.
-    iterator end() { return iterator (*this, this->_size); }
+    Iterator end() const noexcept { return Iterator (*this, this->_size); }
 
     /// \brief Ссылка на первый элемент.
     /// \return Ссылка.

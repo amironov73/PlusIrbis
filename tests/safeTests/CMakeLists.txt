@@ -12,6 +12,7 @@ set(CppFiles
     src/BookInfoTest.cpp
     src/ByteNavigatorTest.cpp
     src/ChunkedBufferTest.cpp
+    src/ChunkedDataTest.cpp
     src/CodesTest.cpp
     src/ConnectionTest.cpp
     src/DateTest.cpp

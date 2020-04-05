@@ -23,6 +23,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 //=========================================================
 
@@ -169,7 +170,7 @@
 
     #define IRBIS_NOEXCEPT noexcept
 
-#endif // IRBIS_RESTRICT
+#endif // IRBIS_NOEXCEPT
 
 //=========================================================
 
@@ -380,13 +381,13 @@ public:
 
     /// \brief Преобразование к логическому значению.
     /// \return true означает успех.
-    operator bool() const noexcept // NOLINT(hicpp-explicit-conversions)
+    explicit operator bool() const noexcept
     {
         return this->success;
     }
 
     /// \brief Получение результирующего значения.
-    operator T() const // NOLINT(hicpp-explicit-conversions)
+    explicit operator T() const
     {
         return this->result;
     }
@@ -909,11 +910,316 @@ IRBIS_API WideSpan IRBIS_CALL toLower    (WideSpan text);
 
 //=========================================================
 
+/// \brief Данные, нарезанные ломтями.
+template <class T>
+class ChunkedData final
+{
+private:
+    /// \brief Ломоть данных.
+    struct Chunk final
+    {
+        T *begin;
+        T *end;
+    };
+
+public:
+
+    /// \brief Итератор.
+    struct Iterator final
+            : public std::iterator<std::bidirectional_iterator_tag, T>
+    {
+
+        Iterator (ChunkedData<T> *data, std::size_t index, T *currentIterator) noexcept
+            : _data { data }, _index { index }, _currentIterator { currentIterator } {}
+
+        bool operator == (const Iterator &other) const noexcept
+        {
+            return this->_currentIterator == other._currentIterator;
+        }
+
+        bool operator != (const Iterator &other) const noexcept
+        {
+            return this->_currentIterator != other._currentIterator;
+        }
+
+        /// \brief Преинкремент
+        /// \return
+        Iterator& operator ++ ()
+        {
+            ++this->_currentIterator;
+            if (this->_currentIterator == this->_data->_chunks [this->_index].end) {
+                ++this->_index;
+                if (this->_index == this->_data->_chunks.size()) {
+                    this->_currentIterator = this->_data->_chunks [this->_index - 1].end;
+                }
+                else {
+                    this->_currentIterator = this->_data->_chunks [this->_index].begin;
+                }
+            }
+            return *this;
+        }
+
+        /// \brief Постинкремент
+        /// \return
+        Iterator operator ++ (int)
+        {
+            Iterator copy (this->_data, this->_index, this->_currentIterator);
+
+            ++this->_currentIterator;
+            if (this->_currentIterator == this->_data->_chunks [this->_index].end) {
+                ++this->_index;
+                if (this->_index == this->_data->_chunks.size()) {
+                    this->_currentIterator = this->_data->_chunks [this->_index - 1].end;
+                }
+                else {
+                    this->_currentIterator = this->_data->_chunks [this->_index].begin;
+                }
+            }
+
+            return copy;
+        }
+
+        /// \brief Предекремент
+        /// \return
+        Iterator& operator -- ()
+        {
+            if (this->_index >= this->_data->_chunks.size()) {
+                this->_index = this->_data->_chunks.size() - 1;
+                this->_currentIterator = this->_data->_chunks [this->_index].end;
+            }
+            if (this->_currentIterator == this->_data->_chunks [this->_index].begin) {
+                --this->_index;
+                this->_currentIterator = this->_data->_chunks [this->_index].end;
+            }
+            --this->_currentIterator;
+            return *this;
+        }
+
+        /// \brief Постинкремент
+        Iterator operator -- (int)
+        {
+            Iterator copy (this->_data, this->_index, this->_currentIterator);
+
+            if (this->_index >= this->_data->_chunks.size()) {
+                this->_index = this->_data->_chunks.size() - 1;
+                this->_currentIterator = this->_data->_chunks [this->_index].end;
+            }
+            if (this->_currentIterator == this->_data->_chunks [this->_index].begin) {
+                --this->_index;
+                this->_currentIterator = this->_data->_chunks [this->_index].end;
+            }
+            --this->_currentIterator;
+
+            return copy;
+        }
+
+        T& operator *  () const { return *(this->_currentIterator); } ///< Оператор разыменования.
+        T& operator -> () const { return *(this->_currentIterator); } ///< Оператор доступа к члену.
+
+    private:
+        ChunkedData *_data;
+        std::size_t _index;
+        T *_currentIterator;
+    };
+
+    /// \brief Оператор индексирования.
+    /// \param offset Смещение.
+    /// \return Ссылка на полученный элемент.
+    T& operator[] (std::size_t offset)
+    {
+        for (const auto &chunk : this->_chunks) {
+            const auto length = static_cast <std::size_t> (chunk.end - chunk.begin);
+            if (offset < length) {
+                return chunk.begin [offset];
+            }
+            offset -= length;
+        }
+        // Вышли за пределы.
+        throw std::exception();
+    }
+
+    /// \brief Добавление ломтя данных.
+    /// \param begin Указатель на начало.
+    /// \param end Указатель за концом.
+    void append (T *begin, T *end)
+    {
+        if (begin != end) {
+            Chunk chunk;
+            chunk.begin = begin;
+            chunk.end = end;
+            this->_chunks.push_back (chunk);
+        }
+    }
+
+    /// \brief Добавление ломтя данных.
+    /// \param begin Указатель на начало.
+    /// \param length Размер ломтя в элементах.
+    void append (T *begin, std::size_t length)
+    {
+        if (length != 0) {
+            Chunk chunk;
+            chunk.begin = begin;
+            chunk.end = begin + length;
+            this->_chunks.push_back (chunk);
+        }
+    }
+
+    /// \brief Добавление ломтя-спана.
+    /// \param span Спан.
+    void append (Span<T> span)
+    {
+        if (!span.empty()) {
+            Chunk chunk;
+            chunk.begin = span.ptr;
+            chunk.end = span.ptr + span.size();
+            this->_chunks.push_back (chunk);
+        }
+    }
+
+    /// \brief Добавление строки.
+    /// \param text Добавляемый текст.
+    void append (const std::basic_string<T> &text)
+    {
+        if (!text.empty()) {
+            Chunk chunk;
+            chunk.begin = const_cast<T*> (text.data());
+            chunk.end = chunk.begin + text.size();
+            this->_chunks.push_back (chunk);
+        }
+    }
+
+    /// \brief Добавление вектора.
+    /// \param vector Добавляемый вектор.
+    void append (const std::vector<T> &vector)
+    {
+        if (!vector.empty()) {
+            Chunk chunk;
+            chunk.begin = vector.data();
+            chunk.end = chunk.begin + vector.size();
+            this->_chunks.push_back (chunk);
+        }
+    }
+
+    /// \brief Ссылка на последний элемент данных.
+    /// \return Ссылка.
+    T& back() noexcept
+    {
+        return this->_chunks.back().end[-1];
+    }
+
+    /// \brief Итератор на начало данных.
+    /// \return Итератор.
+    Iterator begin () const noexcept
+    {
+        auto This = const_cast <ChunkedData<T>*> (this);
+        if (This->_chunks.empty()) {
+            return Iterator (This, 0, nullptr);
+        }
+        return Iterator (This, 0, This->_chunks[0].begin);
+    }
+
+    /// \brief Контейнер пуст?
+    /// \return true если пуст.
+    bool empty () const noexcept
+    {
+        return this->_chunks.empty();
+    }
+
+    /// \brief Итератор за концом данных.
+    /// \return Итератор.
+    Iterator end () const noexcept
+    {
+        auto This = const_cast <ChunkedData<T>*> (this);
+        if (This->_chunks.empty()) {
+            return Iterator (This, 0, nullptr);
+        }
+        auto last = This->_chunks.size() - 1;
+        return Iterator (This, last, This->_chunks [last].end);
+    }
+
+    /// \brief Ссылка на первый элемент данных.
+    /// \return Ссылка.
+    T& front() noexcept
+    {
+        return *this->_chunks[0].begin;
+    }
+
+    /// \brief Общий размер контейнера.
+    /// \return Размер контейнера в элементах.
+    std::size_t size () const noexcept
+    {
+        std::size_t result = 0;
+        for (const auto &chunk : this->_chunks) {
+            //result += std::distance(chunk.end, chunk.begin);
+            result += chunk.end - chunk.begin;
+        }
+        return result;
+    }
+
+    /// \brief Выделение поддиапазона данных.
+    /// \param offset Смещение.
+    /// \param length Длина отрезка.
+    /// \return Выделенные данные.
+    ChunkedData<T> slice (std::size_t offset, std::size_t length)
+    {
+        ChunkedData<T> result;
+        for (const auto &chunk : this->_chunks) {
+            if (!length) {
+                break;
+            }
+            const auto chunkSize = static_cast<std::size_t> (chunk.end - chunk.begin);
+            if (offset < chunkSize) {
+                auto extent = length;
+                if (chunkSize < extent + offset) {
+                    extent = chunkSize - offset;
+                }
+                result.append (chunk.begin + offset, extent);
+                length -= extent;
+                offset = 0;
+            }
+            else {
+                offset -= chunkSize;
+            }
+        }
+        return result;
+    }
+
+    /// \brief Преобразование в стандартную строку.
+    /// \return Строка.
+    std::basic_string<T> toString()
+    {
+        std::basic_string<T> result;
+        result.reserve (this->size());
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+    /// \brief Преобразование в стандартный вектор.
+    /// \return Вектор изо всех элементов, возможно, пустой.
+    std::vector<T> toVector()
+    {
+        std::vector<T> result;
+        result.reserve (this->size());
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+private:
+    friend struct Chunk;
+    std::vector<Chunk> _chunks;
+};
+
+using ChunkedBytes  = ChunkedData <Byte>;
+using ChunkedString = ChunkedData <char>;
+using ChunkedWide   = ChunkedData <Char>;
+
+//=========================================================
+
 /// \brief Перечислитель объектов. Абстрактный базовый класс.
 /// \tparam T Тип перечисляемых объектов
 ///
 /// Поддерживает простой перебор по некоторой коллекции.
-template<class T>
+template <class T>
 class Enumerator
 {
 public:

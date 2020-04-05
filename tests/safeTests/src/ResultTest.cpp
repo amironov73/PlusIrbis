@@ -94,7 +94,7 @@ TEST_CASE("Result_operator_1", "[result]")
     {
         FAIL (L"Can't be!");
     }
-    const int n1 = r1;
+    const int n1 = static_cast<int> (r1);
     CHECK (n1 == 123);
 }
 
