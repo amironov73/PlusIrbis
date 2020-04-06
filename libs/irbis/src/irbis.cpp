@@ -68,6 +68,19 @@ bool IRBIS_CALL sameString (const String &first, const String &second) noexcept
         [] (Char a, Char b) { return towupper (a) == towupper (b); });
 }
 
+/// \param first Первая строка.
+/// \param second Вторая строка.
+/// \return Возвращает true, если строки равны с точностью до регистра,
+/// иначе false.
+bool IRBIS_CALL sameString (const std::string &first, const std::string &second) noexcept
+{
+    if (first.size() != second.size()) {
+        return false;
+    }
+    return std::equal (first.begin(), first.end(), second.begin(),
+        [] (Char a, Char b) { return towupper (a) == towupper (b); });
+}
+
 /// \brief Первый символ строки.
 /// \param text Текст.
 /// \return Первый символ либо 0.

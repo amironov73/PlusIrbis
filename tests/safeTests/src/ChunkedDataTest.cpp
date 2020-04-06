@@ -202,3 +202,28 @@ TEST_CASE("ChunkedData_string_2", "[chunked]")
     CHECK (text3 == "Hello, world");
 }
 
+TEST_CASE("ChunkedData_operator_1", "[chunked]")
+{
+    irbis::ChunkedBytes first;
+    irbis::Byte array1[] { 1, 2, 3, 4, 5 };
+    first.append (array1, irbis::size (array1));
+    irbis::ChunkedBytes second;
+    irbis::Byte array2[] { 6, 7, 8, 9, 10 };
+    second.append (array2, irbis::size (array2));
+    first += second;
+    CHECK (first.size() == 10);
+    CHECK (first.back() == 10);
+}
+
+TEST_CASE("ChunkedData_operator_2", "[chunked]")
+{
+    irbis::ChunkedBytes first;
+    irbis::Byte array1[] { 1, 2, 3, 4, 5 };
+    first.append (array1, irbis::size (array1));
+    irbis::ChunkedBytes second;
+    irbis::Byte array2[] { 6, 7, 8, 9, 10 };
+    second.append (array2, irbis::size (array2));
+    auto third = first + second;
+    CHECK (third.size() == 10);
+    CHECK (third.back() == 10);
+}

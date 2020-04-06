@@ -277,18 +277,18 @@ using RecordFieldList = std::vector<RecordField>;
 /// \brief Обертка над указателем, который не может быть равен `nullptr`.
 /// \tparam T Тип указателя.
 template <class T>
-struct notNull final
+struct NotNull final
 {
     T *_ptr;
 
-    notNull ()                           = delete;  ///< Конструктор по умолчанию.
-    notNull (const notNull&)             = default; ///< Конструктор копирования.
-    notNull& operator = (const notNull&) = default; ///< Оператор копирования.
+    NotNull ()                           = delete;  ///< Конструктор по умолчанию.
+    NotNull (const NotNull&)             = default; ///< Конструктор копирования.
+    NotNull& operator = (const NotNull&) = default; ///< Оператор копирования.
 
     /// \brief Универсальный конструктор.
     /// \param ptr_ Указатель.
     template <typename U>
-    notNull (U&& ptr_) : _ptr (std::forward <U> (ptr_))
+    NotNull (U&& ptr_) : _ptr (std::forward <U> (ptr_))
     {
         if (this->_ptr == nullptr) {
             throw std::exception();
@@ -300,7 +300,7 @@ struct notNull final
     /// \param ptr_ Присваиваемое значения.
     /// \return this.
     template <typename U>
-    notNull& operator = (U&& ptr_)
+    NotNull& operator = (U&& ptr_)
     {
         _ptr = std::forward <U> (ptr_);
         if (this->_ptr == nullptr) {
@@ -309,60 +309,59 @@ struct notNull final
         return *this;
     }
 
-    T  operator*  () const { return *_ptr; }
-    T* operator-> () const { return _ptr; }
+    T& operator*  () const { return *(this->_ptr); }
+    T* operator-> () const { return this->_ptr; }
 
-    notNull (std::nullptr_t)             = delete;
-    notNull& operator = (std::nullptr_t) = delete;
-
-    notNull& operator ++ ()                 = delete;
-    notNull& operator -- ()                 = delete;
-    notNull  operator ++ (int)              = delete;
-    notNull  operator -- (int)              = delete;
-    notNull& operator += (std::ptrdiff_t)   = delete;
-    notNull& operator -= (std::ptrdiff_t)   = delete;
+    NotNull              (std::nullptr_t)   = delete;
+    NotNull& operator =  (std::nullptr_t)   = delete;
+    NotNull& operator ++ ()                 = delete;
+    NotNull& operator -- ()                 = delete;
+    NotNull  operator ++ (int)              = delete;
+    NotNull  operator -- (int)              = delete;
+    NotNull& operator += (std::ptrdiff_t)   = delete;
+    NotNull& operator -= (std::ptrdiff_t)   = delete;
     void operator [] (std::ptrdiff_t) const = delete;
 };
 
 template <class T>
-std::ostream& operator << (std::ostream &os, const notNull <T> &val)
+std::ostream& operator << (std::ostream &os, const NotNull <T> &val)
 {
     os << *val;
     return os;
 }
 
 template <class T, class U>
-bool operator== (const notNull <T> &left, const notNull <U> &right)
+bool operator== (const NotNull <T> &left, const NotNull <U> &right)
 {
     return left._ptr == right._ptr;
 }
 
 template <class T, class U>
-bool operator != (const notNull <T> &left, const notNull<U> &right)
+bool operator != (const NotNull <T> &left, const NotNull<U> &right)
 {
     return left._ptr != right._ptr;
 }
 
 template <class T, class U>
-bool operator < (const notNull <T> &left, const notNull <U> &right)
+bool operator < (const NotNull <T> &left, const NotNull <U> &right)
 {
     return left._ptr < right._ptr;
 }
 
 template <class T, class U>
-bool operator <= (const notNull <T> &left, const notNull <U> &right)
+bool operator <= (const NotNull <T> &left, const NotNull <U> &right)
 {
     return left._ptr <= right._ptr;
 }
 
 template <class T, class U>
-bool operator > (const notNull <T> &left, const notNull <U> &right)
+bool operator > (const NotNull <T> &left, const NotNull <U> &right)
 {
     return left._ptr > right._ptr;
 }
 
 template <class T, class U>
-bool operator >= (const notNull <T> &left, const notNull <U> &right)
+bool operator >= (const NotNull <T> &left, const NotNull <U> &right)
 {
     return left._ptr >= right._ptr;
 }
@@ -1036,6 +1035,27 @@ public:
         }
         // Вышли за пределы.
         throw std::exception();
+    }
+
+    /// \brief Сложение двух контейнеров.
+    /// \param left
+    /// \param right
+    /// \return
+    friend ChunkedData<T> operator + (const ChunkedData<T> &left, const ChunkedData<T> &right)
+    {
+        ChunkedData<T> result (left);
+        return (result += right);
+    }
+
+    /// \brief Дописывание в конец другого контейнера.
+    /// \param other
+    /// \return
+    ChunkedData<T> operator += (const ChunkedData &other)
+    {
+        for (const auto &chunk : other._chunks) {
+            this->_chunks.push_back (chunk);
+        }
+        return *this;
     }
 
     /// \brief Добавление ломтя данных.

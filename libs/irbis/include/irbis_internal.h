@@ -79,11 +79,11 @@ public:
 
     /// \brief Указатель на первый элемент.
     /// \return Указатель.
-    Iterator begin() const noexcept { return Iterator (*this, 0); }
+    Iterator begin() noexcept { return Iterator (*this, 0); }
 
     /// \brief Указатель за последним элементом.
     /// \return Указатель.
-    Iterator end() const noexcept { return Iterator (*this, this->_size); }
+    Iterator end() noexcept { return Iterator (*this, this->_size); }
 
     /// \brief Ссылка на первый элемент.
     /// \return Ссылка.
@@ -281,6 +281,30 @@ private:
             std::this_thread::sleep_for (std::chrono::microseconds (this->delayInterval));
         }
     }
+};
+
+//=========================================================
+
+/// \brief Простая обертка над системным файловым API.
+class IRBIS_API Directory final
+{
+public:
+
+    explicit Directory (const std::string &name);
+    ~Directory ();
+    Directory  (const Directory&) = delete;  ///< Конструктор копирования.
+    Directory  (Directory &&)     = default; ///< Конструктор перемещения.
+    Directory& operator = (const Directory &) = delete;  ///< Оператор копирования.
+    Directory& operator = (Directory &&)      = default; ///< Оператор перемещения.
+
+    std::string               find    (const std::string &name);
+    std::string               read    ();
+    std::vector <std::string> readAll ();
+    void                      rewind  ();
+
+private:
+    struct Impl;
+    Impl *_impl;
 };
 
 //=========================================================
@@ -929,7 +953,8 @@ typename T1::value_type safeAt (const T1& container, T2 index)
 }
 
 IRBIS_API bool IRBIS_CALL sameChar   (Char first, Char second) noexcept;
-IRBIS_API bool IRBIS_CALL sameString (const String &first, const String &second) noexcept;
+IRBIS_API bool IRBIS_CALL sameString (const String &first, const String &second)           noexcept;
+IRBIS_API bool IRBIS_CALL sameString (const std::string &first, const std::string &second) noexcept;
 IRBIS_API Char IRBIS_CALL firstChar  (const String &text)      noexcept;
 IRBIS_API char IRBIS_CALL firstChar  (const std::string &text) noexcept;
 

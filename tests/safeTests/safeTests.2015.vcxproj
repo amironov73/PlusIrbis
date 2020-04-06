@@ -162,6 +162,7 @@
     <ClCompile Include="src/ConnectionTest.cpp" />
     <ClCompile Include="src/DateTest.cpp" />
     <ClCompile Include="src/DirectAccessTest.cpp" />
+    <ClCompile Include="src/DirectoryTest.cpp" />
     <ClCompile Include="src/EanTest.cpp" />
     <ClCompile Include="src/EmbeddedFieldTest.cpp" />
     <ClCompile Include="src/EncodingTest.cpp" />

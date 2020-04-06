@@ -17,6 +17,7 @@ set(CppFiles
     src/ConnectionTest.cpp
     src/DateTest.cpp
     src/DirectAccessTest.cpp
+    src/DirectoryTest.cpp
     src/EanTest.cpp
     src/EmbeddedFieldTest.cpp
     src/EncodingTest.cpp

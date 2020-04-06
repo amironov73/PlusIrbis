@@ -26,6 +26,7 @@ set(CppFiles
     ../irbis/src/DatabaseInfo.cpp
     ../irbis/src/Date.cpp
     ../irbis/src/DirectAccess.cpp
+    ../irbis/src/Directory.cpp
     ../irbis/src/Ean.cpp
     ../irbis/src/EmbeddedField.cpp
     ../irbis/src/Encoding.cp1251.cpp

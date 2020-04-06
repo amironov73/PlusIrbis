@@ -92,6 +92,7 @@
     <ClCompile Include="src/DatabaseInfo.cpp" />
     <ClCompile Include="src/Date.cpp" />
     <ClCompile Include="src/DirectAccess.cpp" />
+    <ClCompile Include="src/Directory.cpp" />
     <ClCompile Include="src/Ean.cpp" />
     <ClCompile Include="src/EmbeddedField.cpp" />
     <ClCompile Include="src/Encoding.cpp" />
