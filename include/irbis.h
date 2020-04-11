@@ -24,6 +24,8 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <type_traits>
+#include <iostream>
 
 //=========================================================
 
@@ -447,6 +449,75 @@ public:
     T valueOr (const T&& alternative) { return this->hasValue ? this->value : alternative; }
     T valueOr (T (*func) ()) { return this->hasValue ? this->value : func(); }
 };
+
+//=========================================================
+
+// Монада Maybe
+
+// предварительное объявление для функции maybe
+template <class T> struct Maybe;
+
+/// \brief Создание монады.
+template <class T>
+Maybe<T> maybe (T *context)
+{
+    return Maybe<T> { context };
+}
+
+/// \brief Шаблон монады.
+template <class T>
+struct Maybe
+{
+    T *context; ///< Контекст (хранимый указатель).
+
+    /// Конструктор.
+    explicit Maybe (T *context_) noexcept
+            : context { context_ } {}
+    Maybe (const Maybe<T>&) = default;
+    Maybe (Maybe<T> &&other) noexcept
+        : context (other.context) { other.context = nullptr; }
+    Maybe<T>& operator = (const Maybe<T>&) = default;
+    Maybe<T>& operator = (Maybe<T> &&other) noexcept
+    {
+        if (&other != this) {
+            this->context = other.context;
+            other.context = nullptr;
+        }
+        return *this;
+    }
+
+    /// \brief Обращение к члену класса.
+    template <class Func>
+    auto operator & (Func func) -> decltype (maybe (func (this->context)))
+    {
+        using ReturnType = typename std::result_of <Func(T*)>::type;
+        using WithoutPointer = typename std::remove_pointer <ReturnType>::type;
+        if (this->context) {
+            return maybe(func (this->context));
+        }
+        return maybe <WithoutPointer> (nullptr);
+    }
+
+    /// \brief Вызов функции.
+    template <class Func>
+    Maybe<T>& operator | (Func func)
+    {
+        if (this->context) {
+            func (context);
+        }
+        return *this;
+    }
+};
+
+/// \brief Вывод в поток
+template <class T>
+std::ostream& operator << (std::ostream &stream, const Maybe<T> &value)
+{
+    if (value.context) {
+        stream << *(value.context);
+    }
+    return stream;
+}
 
 //=========================================================
 

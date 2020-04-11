@@ -2,7 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "catch.hpp"
-#include "irbis.h"
 #include "irbis_internal.h"
 
 TEST_CASE("Retry_action_1", "[retry]")

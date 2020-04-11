@@ -35,6 +35,7 @@ set(CppFiles
     src/Iso2709Test.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
+    src/MaybeTest.cpp
     src/MemoryPoolTest.cpp
     src/MenuTest.cpp
     src/NotNullTest.cpp

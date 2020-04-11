@@ -4,6 +4,12 @@
 #include "catch.hpp"
 #include "irbis.h"
 
+#if defined(_MSC_VER)
+#pragma warning(disable: 4068)
+#endif
+
+#pragma ide diagnostic ignored "bugprone-infinite-loop"
+
 TEST_CASE("Optional_constructor_1", "[optional]")
 {
     irbis::Optional<int> opt;
@@ -36,6 +42,31 @@ TEST_CASE ("Optional_assignment_1", "[optional]")
     CHECK (opt.value == 5);
 }
 
+TEST_CASE ("Optional_assignment_2", "[optional]")
+{
+    irbis::Optional<int> opt1 (5);
+    irbis::Optional<int> opt2 (opt1);
+    CHECK (opt1.hasValue == opt2.hasValue);
+    CHECK (opt1.value == opt2.value);
+}
+
+TEST_CASE ("Optional_assignment_3", "[optional]")
+{
+    irbis::Optional<int> opt1 (5);
+    irbis::Optional<int> opt2  = opt1;
+    CHECK (opt1.hasValue == opt2.hasValue);
+    CHECK (opt1.value == opt2.value);
+}
+
+TEST_CASE ("Optional_assignment_4", "[optional]")
+{
+    irbis::Optional<int> opt1 (5);
+    irbis::Optional<int> opt2;
+    opt2 = opt1;
+    CHECK (opt1.hasValue == opt2.hasValue);
+    CHECK (opt1.value == opt2.value);
+}
+
 TEST_CASE("Optional_reset_1", "[optional]")
 {
     irbis::Optional<int> opt (5);
@@ -58,6 +89,6 @@ TEST_CASE("Optional_valueOr_2", "[optional]")
 TEST_CASE("Optional_valueOr_3", "[optional]")
 {
     irbis::Optional<int> opt;
-    int v = opt.valueOr([]() { return 3; });
+    auto v = opt.valueOr([]() { return 3; });
     CHECK (v == 3);
 }

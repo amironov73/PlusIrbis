@@ -76,6 +76,7 @@
     <ClCompile Include="src/EncodingTest.cpp" />
     <ClCompile Include="src/ExemplarTest.cpp" />
     <ClCompile Include="src/FileSpecificationTest.cpp" />
+    <ClCompile Include="src/FileTest.cpp" />
     <ClCompile Include="src/FormatTest.cpp" />
     <ClCompile Include="src/FoundLineTest.cpp" />
     <ClCompile Include="src/FrugalTest.cpp" />
@@ -85,7 +86,9 @@
     <ClCompile Include="src/IOTest.cpp" />
     <ClCompile Include="src/IsbnTest.cpp" />
     <ClCompile Include="src/Iso2709Test.cpp" />
+    <ClCompile Include="src/main.cpp" />
     <ClCompile Include="src/MarcRecordTest.cpp" />
+    <ClCompile Include="src/MaybeTest.cpp" />
     <ClCompile Include="src/MemoryPoolTest.cpp" />
     <ClCompile Include="src/MenuTest.cpp" />
     <ClCompile Include="src/NotNullTest.cpp" />
@@ -104,10 +107,9 @@
     <ClCompile Include="src/SearchTest.cpp" />
     <ClCompile Include="src/SpanTest.cpp" />
     <ClCompile Include="src/SubFieldTest.cpp" />
-    <ClCompile Include="src/main.cpp" />
     <ClCompile Include="src/TermInfoTest.cpp" />
-    <ClCompile Include="src/TextTest.cpp" />
     <ClCompile Include="src/TextNavigatorTest.cpp" />
+    <ClCompile Include="src/TextTest.cpp" />
     <ClCompile Include="src/TitleTest.cpp" />
     <ClCompile Include="src/TreeFileTest.cpp" />
     <ClCompile Include="src/UpcTest.cpp" />
