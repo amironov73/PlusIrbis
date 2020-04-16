@@ -33,6 +33,7 @@ set(CppFiles
     src/IOTest.cpp
     src/IsbnTest.cpp
     src/Iso2709Test.cpp
+    src/JoinedDataTest.cpp
     src/main.cpp
     src/MarcRecordTest.cpp
     src/MaybeTest.cpp

@@ -26,21 +26,20 @@ TEST_CASE("Maybe_operator_1", "[maybe]")
 {
     auto *address = new Address;
     address->city = new std::string ("Irkutsk");
-    auto *person = new Person;
+    auto *person  = new Person;
     person->address = address;
     std::size_t counter { 0 };
 
     auto m = irbis::maybe (person)
-             & [] (Person *p) { return p->address; }
+             & [] (Person *p)  { return p->address; }
              & [] (Address *a) { return a->city; }
-             | [&counter] (std::string *s) { counter = s->size(); }
-            ;
+             | [&counter] (std::string *s) { counter = s->size (); };
 
     CHECK (counter == 7);
 
     std::ostringstream stream;
     stream << m;
-    auto text = stream.str();
+    auto text = stream.str ();
     CHECK (text == "Irkutsk");
 }
 
@@ -48,22 +47,21 @@ TEST_CASE("Maybe_operator_2", "[maybe]")
 {
     auto *address = new Address;
     address->city = nullptr;
-    auto *person = new Person;
+    auto *person  = new Person;
     person->address = address;
     std::size_t counter { 0 };
 
     auto m = irbis::maybe (person)
-             & [] (Person *p) { return p->address; }
+             & [] (Person *p)  { return p->address; }
              & [] (Address *a) { return a->city; }
-             | [&counter] (std::string *s) { counter = s->size(); }
-            ;
+             | [&counter] (std::string *s) { counter = s->size (); };
 
     CHECK (counter == 0);
 
     std::ostringstream stream;
     stream << m;
-    auto text = stream.str();
-    CHECK (text.empty());
+    auto text = stream.str ();
+    CHECK (text.empty ());
 }
 
 TEST_CASE("Maybe_operator_3", "[maybe]")
@@ -73,43 +71,41 @@ TEST_CASE("Maybe_operator_3", "[maybe]")
     std::size_t counter { 0 };
 
     auto m = irbis::maybe (person)
-             & [] (Person *p) { return p->address; }
+             & [] (Person *p)  { return p->address; }
              & [] (Address *a) { return a->city; }
-             | [&counter] (std::string *s) { counter = s->size(); }
-            ;
+             | [&counter] (std::string *s) { counter = s->size (); };
 
     CHECK (counter == 0);
 
     std::ostringstream stream;
     stream << m;
-    auto text = stream.str();
-    CHECK (text.empty());
+    auto text = stream.str ();
+    CHECK (text.empty ());
 }
 
 TEST_CASE("Maybe_operator_4", "[maybe]")
 {
-    Person *person = nullptr ;
+    Person *person = nullptr;
     std::size_t counter { 0 };
 
     auto m = irbis::maybe (person)
              & [] (Person *p) { return p->address; }
              & [] (Address *a) { return a->city; }
-             | [&counter] (std::string *s) { counter = s->size(); }
-            ;
+             | [&counter] (std::string *s) { counter = s->size (); };
 
     CHECK (counter == 0);
 
     std::ostringstream stream;
     stream << m;
-    auto text = stream.str();
-    CHECK (text.empty());
+    auto text = stream.str ();
+    CHECK (text.empty ());
 }
 
 TEST_CASE("Maybe_copy_1", "[maybe]")
 {
-    auto *address = new Address;
-    address->city = new std::string ("Irkutsk");
-    auto *person = new Person;
+    auto *address   = new Address;
+    address->city   = new std::string ("Irkutsk");
+    auto *person    = new Person;
     person->address = address;
 
     auto maybe1 = irbis::maybe (person);
@@ -119,9 +115,9 @@ TEST_CASE("Maybe_copy_1", "[maybe]")
 
 TEST_CASE("Maybe_copy_2", "[maybe]")
 {
-    auto *address = new Address;
-    address->city = new std::string ("Irkutsk");
-    auto *person = new Person;
+    auto *address   = new Address;
+    address->city   = new std::string ("Irkutsk");
+    auto *person    = new Person;
     person->address = address;
 
     auto maybe1 = irbis::maybe (person);
@@ -131,11 +127,12 @@ TEST_CASE("Maybe_copy_2", "[maybe]")
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "bugprone-use-after-move"
+
 TEST_CASE("Maybe_move_1", "[maybe]")
 {
-    auto *address = new Address;
-    address->city = new std::string ("Irkutsk");
-    auto *person = new Person;
+    auto *address   = new Address;
+    address->city   = new std::string ("Irkutsk");
+    auto *person    = new Person;
     person->address = address;
 
     auto maybe1 = irbis::maybe (person);
@@ -146,9 +143,9 @@ TEST_CASE("Maybe_move_1", "[maybe]")
 
 TEST_CASE("Maybe_move_2", "[maybe]")
 {
-    auto *address = new Address;
-    address->city = new std::string ("Irkutsk");
-    auto *person = new Person;
+    auto *address   = new Address;
+    address->city   = new std::string ("Irkutsk");
+    auto *person    = new Person;
     person->address = address;
 
     auto maybe1 = irbis::maybe (person);
@@ -156,4 +153,17 @@ TEST_CASE("Maybe_move_2", "[maybe]")
     CHECK (maybe1.context == nullptr);
     CHECK (maybe2.context == person);
 }
+
 #pragma clang diagnostic pop
+
+TEST_CASE("Maybe_Optional_1", "[maybe]")
+{
+    auto *address   = new Address;
+    address->city   = new std::string ("Irkutsk");
+    auto *person    = new Person;
+    person->address = address;
+
+    irbis::Optional <Person *> anOptional (person);
+    auto maybe = irbis::maybe (anOptional);
+    CHECK (maybe.context == person);
+}

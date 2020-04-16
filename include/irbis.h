@@ -434,21 +434,38 @@ public:
     bool hasValue { false }; ///< Содержит ли значение?
 
     Optional () = default;
-    explicit Optional (T value_) : value (value_), hasValue (true) {}
+    explicit Optional (T value_) noexcept : value (value_), hasValue (true) {}
     Optional (const Optional<T> &other)
         : value (other.value), hasValue (other.hasValue) {}
+    Optional (Optional<T> &&other) noexcept
+        : value (std::move (other.value)), hasValue (other.hasValue) { other.reset(); }
     Optional& operator = (const Optional<T> &other)
         { if (this != &other) { this->value = other.value; this->hasValue = other.value; }
             return *this; }
-    Optional& operator = (const T &newValue)
+    Optional& operator = (const T &newValue) noexcept
         { this->value = newValue; this->hasValue = true; return *this; }
+    Optional& operator = (std::nullptr_t) noexcept
+        { this->hasValue = false; return *this; }
+    Optional& operator = (Optional<T> &&other) noexcept
+        { this->value = std::move (other.value); this->hasValue = other.hasValue;
+          other.reset(); return *this; }
 
-    explicit operator bool() const noexcept { return this->hasValue; }
-    T operator *() const noexcept { return this->value; }
+    constexpr explicit operator bool() noexcept { return this->hasValue; }
+    constexpr T operator *() noexcept { return this->value; }
     void reset() noexcept { this->hasValue = false; this->value = T(); }
-    T valueOr (const T&& alternative) { return this->hasValue ? this->value : alternative; }
-    T valueOr (T (*func) ()) { return this->hasValue ? this->value : func(); }
+    constexpr T valueOr (const T&& alternative) noexcept { return this->hasValue ? this->value : alternative; }
+    T valueOr (T (*func) ()) const { return this->hasValue ? this->value : func(); }
 };
+
+/// \brief Вывод в поток
+template <class T>
+std::ostream& operator << (std::ostream &stream, const Optional<T> &value)
+{
+    if (value.hasValue) {
+        stream << value.value;
+    }
+    return stream;
+}
 
 //=========================================================
 
@@ -459,14 +476,28 @@ template <class T> struct Maybe;
 
 /// \brief Создание монады.
 template <class T>
-Maybe<T> maybe (T *context)
+Maybe<T> maybe (T *context) noexcept
 {
     return Maybe<T> { context };
 }
 
+/// \brief Создание монады.
+template <class T>
+Maybe<T> maybe (Optional <T*> optional) noexcept
+{
+    return Maybe<T> { optional.value };
+}
+
+/// \brief Преобразование в опциональное значение.
+template <class T>
+Optional<T*> optional (Maybe<T> maybe) noexcept
+{
+    return Optional<T*> (maybe.context);
+}
+
 /// \brief Шаблон монады.
 template <class T>
-struct Maybe
+struct Maybe final
 {
     T *context; ///< Контекст (хранимый указатель).
 
@@ -493,7 +524,7 @@ struct Maybe
         using ReturnType = typename std::result_of <Func(T*)>::type;
         using WithoutPointer = typename std::remove_pointer <ReturnType>::type;
         if (this->context) {
-            return maybe(func (this->context));
+            return maybe (func (this->context));
         }
         return maybe <WithoutPointer> (nullptr);
     }
@@ -1251,7 +1282,7 @@ public:
     /// \param offset Смещение.
     /// \param length Длина отрезка.
     /// \return Выделенные данные.
-    ChunkedData<T> slice (std::size_t offset, std::size_t length)
+    ChunkedData<T> slice (std::size_t offset, std::size_t length) const
     {
         ChunkedData<T> result;
         for (const auto &chunk : this->_chunks) {
@@ -1303,6 +1334,260 @@ private:
 using ChunkedBytes  = ChunkedData <Byte>;
 using ChunkedString = ChunkedData <char>;
 using ChunkedWide   = ChunkedData <Char>;
+
+//=========================================================
+
+/// \brief Данные, рассованные по контейнерам.
+/// \tparam DataType Тип данных.
+/// \tparam IteratorType Тип итератора.
+template <class DataType, class IteratorType>
+class JoinedData final
+{
+private:
+
+    /// \brief Пара итераторов.
+    struct Pair final
+    {
+        IteratorType m_begin; ///< Начало данных.
+        IteratorType m_end;   ///< Прямо за концом данных.
+
+        Pair () = default;
+        Pair (IteratorType begin, IteratorType end)
+            : m_begin { begin }, m_end { end } {}
+        ~Pair() = default;
+
+        std::size_t size() const noexcept
+        {
+            return std::distance(m_begin, m_end);
+        }
+    };
+
+    std::vector <Pair> m_data {};
+
+public:
+
+    /// \brief Итератор.
+    struct iterator final
+        : public std::iterator<std::bidirectional_iterator_tag, DataType>
+    {
+        JoinedData *m_joiner;
+        std::size_t m_offset;
+
+        iterator() : m_joiner { nullptr }, m_offset { 0 } {}
+        iterator (JoinedData *joiner, std::size_t offset)
+            : m_joiner { joiner }, m_offset { offset } {}
+
+        iterator (const iterator&) = default;
+        iterator (iterator&&) noexcept = default;
+        iterator& operator = (const iterator&) = default;
+        iterator& operator = (iterator&&) noexcept = default;
+
+        bool operator == (const iterator &other) const noexcept
+        {
+            return m_offset == other.m_offset;
+        }
+
+        bool operator != (const iterator &other) const noexcept
+        {
+            return m_offset != other.m_offset;
+        }
+
+        iterator& operator ++ () noexcept
+        {
+            ++m_offset;
+            return *this;
+        }
+
+        iterator operator ++ (int) noexcept
+        {
+            iterator copy (*this);
+            ++m_offset;
+            return copy;
+        }
+
+        iterator& operator -- () noexcept
+        {
+            --m_offset;
+            return *this;
+        }
+
+        iterator operator -- (int) & noexcept
+        {
+            iterator copy (*this);
+            --m_offset;
+            return copy;
+        }
+
+        DataType& operator *  () const noexcept { return *((*m_joiner) [m_offset]); }
+        DataType& operator -> () const noexcept { return *((*m_joiner) [m_offset]); }
+    };
+
+    JoinedData () = default; ///< Конструктор по умолчанию.
+
+    /// \brief Конструктор со списком.
+    JoinedData (std::initializer_list<IteratorType> pairs)
+    {
+        const auto end = std::end (pairs);
+        auto it = std::begin (pairs);
+        while (it != end) {
+            const auto begin_ = *it;
+            ++it;
+            if (it != end) {
+                const auto end_ = *it;
+                ++it;
+                this->append (begin_, end_);
+            }
+        }
+    }
+
+    ~JoinedData () = default; ///< Деструктор.
+
+    IteratorType operator [] (std::size_t offset) const
+    {
+        for (const auto &item : m_data) {
+            const auto itemSize = item.size();
+            if (offset < itemSize) {
+                return std::next (item.m_begin, offset);
+            }
+            offset -= itemSize;
+        }
+        return m_data.back().m_end;
+    }
+
+    /// \brief Сложение двух контейнеров.
+    /// \param left
+    /// \param right
+    /// \return
+    friend JoinedData operator + (const JoinedData &left, const JoinedData &right)
+    {
+        JoinedData result (left);
+        return (result += right);
+    }
+
+    /// \brief Дописывание в конец другого контейнера.
+    /// \param other
+    /// \return
+    JoinedData operator += (const JoinedData &other)
+    {
+        for (const auto &data : other.m_data) {
+            m_data.push_back (data);
+        }
+        return *this;
+    }
+
+    JoinedData& append (IteratorType begin, IteratorType end)
+    {
+        if (begin != end) {
+            m_data.emplace_back (begin, end);
+        }
+        return *this;
+    }
+
+    JoinedData& append (Span<DataType> span)
+    {
+        return append (span.begin(), span.end());
+    }
+
+    template <class Container>
+    JoinedData& append (Container &&container)
+    {
+        return append (std::begin (container), std::end (container));
+    }
+
+    /// \brief Ссылка на последний элемент данных.
+    /// \return Ссылка.
+    DataType& back() noexcept
+    {
+        return *(--this->end());
+    }
+
+    iterator begin () const noexcept
+    {
+        return iterator (const_cast<JoinedData*>(this), 0);
+    }
+
+    /// \brief Контейнер пуст?
+    /// \return true, если пуст.
+    bool empty () const noexcept
+    {
+        return m_data.empty();
+    }
+
+    iterator end () const noexcept
+    {
+        auto This = const_cast<JoinedData*>(this);
+        iterator result (This, this->size());
+        return result;
+    }
+
+    /// \brief Ссылка на первый элемент данных.
+    /// \return Ссылка.
+    DataType& front() noexcept
+    {
+        return *(this->begin());
+    }
+
+    /// \brief Размер контейнера в элементах.
+    /// \return Общий размер.
+    std::size_t size() const noexcept
+    {
+        std::size_t result = 0;
+        for (const auto &item : m_data) {
+            result += item.size();
+        }
+        return result;
+    }
+
+    JoinedData slice (std::size_t offset, std::size_t length) const
+    {
+        JoinedData<DataType, IteratorType> result;
+        result.m_data.reserve (m_data.size());
+        for (const auto &item : m_data) {
+            if (!length) {
+                break;
+            }
+            const auto itemSize = item.size();
+            if (offset < itemSize) {
+                auto extent = length;
+                if (itemSize < extent + offset) {
+                    extent = itemSize - offset;
+                }
+                auto end_ = item.m_end;
+                if ((offset + extent) < itemSize) {
+                    end_ = std::next (item.m_begin, offset + extent);
+                }
+                result.append (std::next (item.m_begin, offset), end_);
+                length -= extent;
+                offset = 0;
+            }
+            else {
+                offset -= itemSize;
+            }
+        }
+        return result;
+    }
+
+    /// \brief Преобразование в стандартную строку.
+    /// \return Строка.
+    std::basic_string<DataType> toString()
+    {
+        std::basic_string<DataType> result;
+        result.reserve (this->size());
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+    /// \brief Преобразование в стандартный вектор.
+    /// \return Вектор изо всех элементов, возможно, пустой.
+    std::vector<DataType> toVector() const
+    {
+        std::vector<DataType> result;
+        result.reserve (this->size());
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+};
 
 //=========================================================
 
