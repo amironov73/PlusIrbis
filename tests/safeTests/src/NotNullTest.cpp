@@ -54,7 +54,7 @@ TEST_CASE("NotNull_assignment_1", "[notNull]")
 {
     int value;
     irbis::NotNull<int> pointer1 (&value);
-    irbis::NotNull<int> pointer2 (pointer1._ptr);
+    irbis::NotNull<int> pointer2 (pointer1.m_ptr);
     CHECK (*pointer1 == *pointer2);
 }
 

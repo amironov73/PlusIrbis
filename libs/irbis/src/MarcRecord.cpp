@@ -44,6 +44,13 @@
 
 namespace irbis {
 
+/// \brief Конструктор.
+/// \param fields_ Список полей.
+MarcRecord::MarcRecord  (std::initializer_list <RecordField> fields_)
+    : fields { fields_ }
+{
+}
+
 /// \brief Добавление в конец записи поля с указанными меткой и значением.
 /// \param tag Метка добавляемого поля.
 /// \param value Значение поля (может быть пустым).

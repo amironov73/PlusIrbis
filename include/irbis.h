@@ -167,7 +167,7 @@
 
 #endif // IRBIS_RESTRICT
 
-// для аргументов функций: int func (char* __restrict ptr1, int* __restrict ptr2).
+// для функций: int func () noexcept.
 #ifndef IRBIS_NOEXCEPT
 
     #define IRBIS_NOEXCEPT noexcept
@@ -281,38 +281,38 @@ using RecordFieldList = std::vector<RecordField>;
 template <class T>
 struct NotNull final
 {
-    T *_ptr;
+    T *m_ptr;
 
     NotNull ()                           = delete;  ///< Конструктор по умолчанию.
     NotNull (const NotNull&)             = default; ///< Конструктор копирования.
     NotNull& operator = (const NotNull&) = default; ///< Оператор копирования.
 
     /// \brief Универсальный конструктор.
-    /// \param ptr_ Указатель.
+    /// \param ptr Указатель.
     template <typename U>
-    NotNull (U&& ptr_) : _ptr (std::forward <U> (ptr_))
+    explicit NotNull (U&& ptr) : m_ptr (std::forward <U> (ptr))
     {
-        if (this->_ptr == nullptr) {
+        if (m_ptr == nullptr) {
             throw std::exception();
         }
     }
 
     /// \brief Универсальный оператор присваивания.
     /// \tparam U Тип присваиваемого значения.
-    /// \param ptr_ Присваиваемое значения.
+    /// \param ptr Присваиваемое значения.
     /// \return this.
     template <typename U>
-    NotNull& operator = (U&& ptr_)
+    NotNull& operator = (U&& ptr)
     {
-        _ptr = std::forward <U> (ptr_);
-        if (this->_ptr == nullptr) {
+        m_ptr = std::forward <U> (ptr);
+        if (m_ptr == nullptr) {
             throw std::exception();
         }
         return *this;
     }
 
-    T& operator*  () const { return *(this->_ptr); }
-    T* operator-> () const { return this->_ptr; }
+    T& operator*  () const { return *m_ptr; }
+    T* operator-> () const { return m_ptr; }
 
     NotNull              (std::nullptr_t)   = delete;
     NotNull& operator =  (std::nullptr_t)   = delete;
@@ -335,37 +335,37 @@ std::ostream& operator << (std::ostream &os, const NotNull <T> &val)
 template <class T, class U>
 bool operator== (const NotNull <T> &left, const NotNull <U> &right)
 {
-    return left._ptr == right._ptr;
+    return left.m_ptr == right.m_ptr;
 }
 
 template <class T, class U>
 bool operator != (const NotNull <T> &left, const NotNull<U> &right)
 {
-    return left._ptr != right._ptr;
+    return left.m_ptr != right.m_ptr;
 }
 
 template <class T, class U>
 bool operator < (const NotNull <T> &left, const NotNull <U> &right)
 {
-    return left._ptr < right._ptr;
+    return left.m_ptr < right.m_ptr;
 }
 
 template <class T, class U>
 bool operator <= (const NotNull <T> &left, const NotNull <U> &right)
 {
-    return left._ptr <= right._ptr;
+    return left.m_ptr <= right.m_ptr;
 }
 
 template <class T, class U>
 bool operator > (const NotNull <T> &left, const NotNull <U> &right)
 {
-    return left._ptr > right._ptr;
+    return left.m_ptr > right.m_ptr;
 }
 
 template <class T, class U>
 bool operator >= (const NotNull <T> &left, const NotNull <U> &right)
 {
-    return left._ptr >= right._ptr;
+    return left.m_ptr >= right.m_ptr;
 }
 
 //=========================================================
@@ -434,7 +434,7 @@ public:
     bool hasValue { false }; ///< Содержит ли значение?
 
     Optional () = default;
-    explicit Optional (T value_) noexcept : value (value_), hasValue (true) {}
+    explicit Optional (T value_) noexcept : value { value_ }, hasValue { true } {}
     Optional (const Optional<T> &other)
         : value (other.value), hasValue (other.hasValue) {}
     Optional (Optional<T> &&other) noexcept
@@ -450,10 +450,10 @@ public:
         { this->value = std::move (other.value); this->hasValue = other.hasValue;
           other.reset(); return *this; }
 
-    constexpr explicit operator bool() noexcept { return this->hasValue; }
-    constexpr T operator *() noexcept { return this->value; }
+    constexpr explicit operator bool() const noexcept { return this->hasValue; }
+    constexpr T operator *() const noexcept { return this->value; }
     void reset() noexcept { this->hasValue = false; this->value = T(); }
-    constexpr T valueOr (const T&& alternative) noexcept { return this->hasValue ? this->value : alternative; }
+    constexpr T valueOr (const T&& alternative) const noexcept { return this->hasValue ? this->value : alternative; }
     T valueOr (T (*func) ()) const { return this->hasValue ? this->value : func(); }
 };
 
@@ -1405,6 +1405,12 @@ public:
             return copy;
         }
 
+        iterator& operator += (std::size_t n) noexcept
+        {
+            m_offset += n;
+            return *this;
+        }
+
         iterator& operator -- () noexcept
         {
             --m_offset;
@@ -1418,8 +1424,26 @@ public:
             return copy;
         }
 
+        iterator& operator -= (std::size_t n) noexcept
+        {
+            m_offset -= n;
+            return *this;
+        }
+
         DataType& operator *  () const noexcept { return *((*m_joiner) [m_offset]); }
         DataType& operator -> () const noexcept { return *((*m_joiner) [m_offset]); }
+
+        friend iterator& operator + (const iterator &left, std::size_t right) noexcept
+        {
+            auto result = left;
+            result += right;
+            return result;
+        }
+
+        friend std::ptrdiff_t operator - (const iterator &left, const iterator &right) noexcept
+        {
+            return static_cast<std::ptrdiff_t> (left.m_offset - right.m_offset);
+        }
     };
 
     JoinedData () = default; ///< Конструктор по умолчанию.
@@ -2628,6 +2652,7 @@ public:
     String database;                            ///< Имя базы данных.
     std::list<RecordField> fields;              ///< Список полей.
 
+    MarcRecord  (std::initializer_list <RecordField> fields_);
     MarcRecord  ()                              = default; ///< Конструктор по умолчанию.
     MarcRecord  (const MarcRecord &)            = default; ///< Конструктор копирования.
     MarcRecord  (MarcRecord &&)                 = default; ///< Конструктор перемещения.
@@ -2968,8 +2993,11 @@ public:
     String value;            ///< Значение поля до первого разделителя.
     SubFieldList  subfields; ///< Подполя.
 
-    explicit RecordField (int tag_, const String &value_ = L"") : tag (tag_), value (value_) {} ///< Конструктор.
-    RecordField (int tag_, String &&value_) : tag (tag_), value (std::move (value_)) {} ///< Конструктор.
+    explicit RecordField (int tag_, const String &value_ = L"")
+        : tag { tag_ }, value { value_ } {} ///< Конструктор.
+    RecordField (int tag_, String &&value_)
+        : tag { tag_ }, value { std::move (value_) } {} ///< Конструктор.
+    RecordField (int tag_, std::initializer_list <SubField> subfields_);
     RecordField  ()                               = default; ///< Конструктор по умолчанию.
     RecordField  (const RecordField &)            = default; ///< Конструктор копирования.
     RecordField  (RecordField &&)                 = default; ///< Конструктор перемещения.
@@ -3122,7 +3150,7 @@ public:
 
     explicit SubField (Char code_, const String &value_ = L"") : code (code_), value (value_) {} ///< Конструктор.
     SubField (Char code_, String &&value_) : code (code_), value (std::move (value_)) {} ///< Конструктор.
-    SubField()                              = default; ///< Конструктор по умолчанию.
+    SubField ()                             = default; ///< Конструктор по умолчанию.
     SubField (const SubField &)             = default; ///< Конструктор копирования.
     SubField (SubField &&)                  = default; ///< Конструктор перемещения.
     ~SubField()                             = default; ///< Деструктор.

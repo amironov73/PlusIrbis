@@ -27,6 +27,7 @@
 
 ##### Visual Studio 2015/2017/2019
 
+* `IRBIS_WINDOWS` -- сборка для Windows (определяется автоматически при сборке под Windows);
 * `_DEBUG` -- отладочная версия;
 * `NDEBUG` -- релизная версия;
 * `_CONSOLE` -- консольное приложение;
@@ -35,5 +36,22 @@
 ##### MinGW
 
 * `IRBIS_MINGW`
+
+##### Linux
+
+* `IRBIS_UNIX` -- сборка для UNIX-подобной системы (определяется автоматически при сборке под соответствующей системой);
+
+##### Mac OS X
+
+* `IRBIS_UNIX` -- сборка для UNIX-подобной системы (определяется автоматически при сборке под OS X);
+* `IRBIS_APPLE` -- сборка для OS X (определяется автоматически при сборке под OS X);
+
+##### Прочие определения
+
+* `IRBIS_CALL` -- соглашение о вызовах: `int __fastcall func (int arg)`;
+* `IRBIS_NAKED` -- функция без пролога/эпилога: `__declspec(naked) int func (int arg)`;
+* `IRBIS_NOTHROW` -- nothrow-функция: `void __declspec(nothrow) func (int arg)`;
+* `IRBIS_RESTRICT` -- для аргументов функции: `int func (char* __restrict ptr1, int* __restrict ptr2)`;
+* `IRBIS_NOEXCEPT` -- для функций: `int func() noexcept`;
 
 [Следующая глава](chapter2.md)

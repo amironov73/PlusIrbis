@@ -14,6 +14,48 @@ TEST_CASE("MarcRecord_constructor_1", "[record]")
     CHECK (record.fields.empty());
 }
 
+TEST_CASE("MarcRecord_constructor_2", "[record]")
+{
+    using RF = irbis::RecordField;
+    using SF = irbis::SubField;
+    irbis::MarcRecord record ({
+        RF ( 200, { SF { 'a', L"SubA" }, SF { 'b', L"SubB" } } ),
+        RF ( 300, L"Field300" )
+    });
+    CHECK (record.mfn == 0u);
+    CHECK (record.status == irbis::RecordStatus::None);
+    CHECK (record.version == 0u);
+    CHECK (record.database.empty());
+    CHECK (record.fields.size() == 2);
+}
+
+TEST_CASE("MarcRecord_constructor_3", "[record]")
+{
+    using RF = irbis::RecordField;
+    irbis::MarcRecord record ({
+        RF { 200, { { 'a', L"SubA" }, { 'b', L"SubB" } } },
+        RF { 300, L"Field300" }
+    });
+    CHECK (record.mfn == 0u);
+    CHECK (record.status == irbis::RecordStatus::None);
+    CHECK (record.version == 0u);
+    CHECK (record.database.empty());
+    CHECK (record.fields.size() == 2);
+}
+
+TEST_CASE("MarcRecord_constructor_4", "[record]")
+{
+    irbis::MarcRecord record ({
+        { 200, { { 'a', L"SubA" }, { 'b', L"SubB" } } },
+        { 300, L"Field300" }
+    });
+    CHECK (record.mfn == 0u);
+    CHECK (record.status == irbis::RecordStatus::None);
+    CHECK (record.version == 0u);
+    CHECK (record.database.empty());
+    CHECK (record.fields.size() == 2);
+}
+
 TEST_CASE("MarcRecord_add_1", "[record]")
 {
     irbis::MarcRecord record;

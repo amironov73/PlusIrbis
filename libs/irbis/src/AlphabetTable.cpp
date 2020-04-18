@@ -60,7 +60,7 @@ void AlphabetTable::setup (const Bytes &bytes)
     }
 }
 
-static Byte _bytes[] =
+static Byte g_bytes[] =
 {
      38,  64,  65,  66,  67,  68,  69,  70,  71,  72,
      73,  74,  75,  76,  77,  78,  79,  80,  81,  82,
@@ -83,19 +83,19 @@ static Byte _bytes[] =
     254, 255
 };
 
-static AlphabetTable *_instance;
+static AlphabetTable *g_instance;
 
 /// \brief Общий глобальный экземпляр.
 /// \return Экземпляр.
 const AlphabetTable& AlphabetTable::instance()
 {
-    if (_instance == nullptr) {
-        _instance = new AlphabetTable();
+    if (g_instance == nullptr) {
+        g_instance = new AlphabetTable();
         Bytes bytes;
-        bytes.insert (std::end (bytes), _bytes, _bytes + sizeof (_bytes));
-        _instance->setup (bytes);
+        bytes.insert (std::end (bytes), std::begin (g_bytes), std::end (g_bytes));
+        g_instance->setup (bytes);
     }
-    return *_instance;
+    return *g_instance;
 }
 
 /// \brief Проверка, является ли указанный символ буквой.

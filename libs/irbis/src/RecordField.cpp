@@ -24,8 +24,15 @@
 
  */
 
-
 namespace irbis {
+
+/// \brief Конструктор.
+/// \param tag Метка поля.
+/// \param subfields_ Перечень подполей.
+RecordField::RecordField (int tag_, std::initializer_list <SubField> subfields_)
+    : tag { tag_ }, subfields { subfields_ }
+{
+}
 
 /// \brief Добавление подполя.
 /// \param subFieldCode Код подполя.
@@ -52,7 +59,7 @@ RecordField& RecordField::add (Char subFieldCode,  String &&subFieldValue)
 RecordField& RecordField::clear()
 {
     value.clear();
-    subfields.clear();
+    this->subfields.clear();
     return *this;
 }
 
