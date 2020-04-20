@@ -22,6 +22,7 @@ set(CppFiles
     src/EmbeddedFieldTest.cpp
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
+    src/FastBufferTest.cpp
     src/FileTest.cpp
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp

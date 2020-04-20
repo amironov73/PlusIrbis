@@ -167,6 +167,7 @@
     <ClCompile Include="src/EmbeddedFieldTest.cpp" />
     <ClCompile Include="src/EncodingTest.cpp" />
     <ClCompile Include="src/ExemplarTest.cpp" />
+    <ClCompile Include="src/FastBufferTest.cpp" />
     <ClCompile Include="src/FileSpecificationTest.cpp" />
     <ClCompile Include="src/FileTest.cpp" />
     <ClCompile Include="src/FormatTest.cpp" />

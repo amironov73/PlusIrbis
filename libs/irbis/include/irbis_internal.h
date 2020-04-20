@@ -9,6 +9,7 @@
 #include <array>
 #include <memory>
 #include <thread>
+#include <cstring>
 
 //=========================================================
 
@@ -29,6 +30,239 @@ namespace irbis
 //=========================================================
 
 class File;
+
+//=========================================================
+
+/// \brief Унифицированный итератор для контейнеров, поддерживающих обращение к элементам по индексу.
+/// \tparam ContainerType Тип контейнера.
+/// \tparam DataType Тип отдельного элемента в контейнере.
+template <class ContainerType, class DataType>
+struct RandomAccessIterator final
+    : std::iterator<std::random_access_iterator_tag, Byte>
+{
+    ContainerType *m_buffer;
+    std::size_t  m_position;
+
+    RandomAccessIterator () noexcept : m_buffer { nullptr }, m_position { 0 } {}
+    RandomAccessIterator (ContainerType *buffer, std::size_t position) noexcept
+        : m_buffer { buffer }, m_position { position } {}
+
+    RandomAccessIterator             (const RandomAccessIterator&) noexcept = default;
+    RandomAccessIterator             (RandomAccessIterator&&)      noexcept = default;
+    RandomAccessIterator& operator = (const RandomAccessIterator&) noexcept = default;
+    RandomAccessIterator& operator = (RandomAccessIterator&&)      noexcept = default;
+
+    bool operator == (const RandomAccessIterator &other) const noexcept
+    {
+        return m_position == other.m_position;
+    }
+
+    bool operator != (const RandomAccessIterator &other) const noexcept
+    {
+        return m_position != other.m_position;
+    }
+
+    bool operator < (const RandomAccessIterator &other) const noexcept
+    {
+        return m_position < other.m_position;
+    }
+
+    RandomAccessIterator& operator ++ () noexcept
+    {
+        ++m_position;
+        return *this;
+    }
+
+    RandomAccessIterator operator ++ (int) & noexcept
+    {
+        iterator copy (*this);
+        ++m_position;
+        return copy;
+    }
+
+    RandomAccessIterator& operator += (std::size_t n) noexcept
+    {
+        m_position += n;
+        return *this;
+    }
+
+    RandomAccessIterator& operator -- () noexcept
+    {
+        --m_position;
+        return *this;
+    }
+
+    RandomAccessIterator operator -- (int) & noexcept
+    {
+        iterator copy (*this);
+        --m_position;
+        return copy;
+    }
+
+    RandomAccessIterator& operator -= (std::size_t n) noexcept
+    {
+        m_position -= n;
+        return *this;
+    }
+
+    DataType& operator *  () const noexcept { return (*m_buffer) [m_position]; }
+    DataType& operator -> () const noexcept { return (*m_buffer) [m_position]; }
+
+    friend RandomAccessIterator operator + (const RandomAccessIterator &left, std::size_t right) noexcept
+    {
+        auto result = left;
+        result += right;
+        return result;
+    }
+
+    friend std::ptrdiff_t operator - (const RandomAccessIterator &left, const RandomAccessIterator &right) noexcept
+    {
+        return static_cast<std::ptrdiff_t> (left.m_position - right.m_position);
+    }
+};
+
+//=========================================================
+
+/// \brief Буфер, накапливающий сначала данные в массиве на стеке, а при нехватке места использующий кучу.
+/// \tparam StaticSize Размер массива на стеке.
+template <std::size_t StaticSize = 256>
+struct FastBuffer final
+{
+    static_assert (StaticSize >= 8, "Less is stupid");
+
+    using iterator = RandomAccessIterator<FastBuffer<StaticSize>, Byte>;
+
+    std::size_t m_capacity;
+    std::size_t m_size;
+    Byte       *m_dynamicBuffer;
+    Byte        m_staticBuffer[StaticSize];
+
+    FastBuffer() noexcept
+    {
+        m_capacity = StaticSize;
+        m_size = 0;
+        m_dynamicBuffer = nullptr;
+    };
+
+    ~FastBuffer()
+    {
+        delete m_dynamicBuffer;
+    }
+
+    Byte& operator [] (std::size_t offset) noexcept
+    {
+        if (offset < StaticSize) {
+            return m_staticBuffer [offset];
+        }
+
+        return m_dynamicBuffer [offset - StaticSize];
+    }
+
+    /// \brief Ссылка на последний элемент данных.
+    /// \return Ссылка.
+    Byte& back() noexcept
+    {
+        return *(--this->end());
+    }
+
+    iterator begin () const noexcept
+    {
+        return iterator { const_cast <FastBuffer <StaticSize>*> (this), 0};
+    }
+
+    std::size_t capacity () const noexcept
+    {
+        return m_capacity;
+    }
+
+    void clear () noexcept
+    {
+        m_size = 0;
+    }
+
+    /// \brief Контейнер пуст?
+    /// \return true, если пуст.
+    bool empty () const noexcept
+    {
+        return m_size == 0;
+    }
+
+    iterator end () const noexcept
+    {
+        return iterator { const_cast <FastBuffer <StaticSize>*> (this), m_size };
+    }
+
+    /// \brief Ссылка на первый элемент данных.
+    /// \return Ссылка.
+    Byte& front() noexcept
+    {
+        return *(this->begin());
+    }
+
+    void push_back (Byte value)
+    {
+        if (m_size == m_capacity) {
+            const auto newSize = m_size * 2;
+            this->_grow (newSize);
+        }
+        (*this) [m_size++] = value;
+    }
+
+    void reserve (std::size_t newSize)
+    {
+        this->_grow (newSize);
+    }
+
+    void resize (std::size_t newSize)
+    {
+        this->_grow (newSize);
+        m_size = newSize;
+    }
+
+    /// \brief Размер контейнера в элементах.
+    /// \return Общий размер.
+    std::size_t size() const noexcept
+    {
+        return m_size;
+    }
+
+    /// \brief Преобразование в стандартную строку.
+    /// \return Строка.
+    std::string toString()
+    {
+        std::string result;
+        result.reserve (m_size);
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+    /// \brief Преобразование в стандартный вектор.
+    /// \return Вектор изо всех элементов, возможно, пустой.
+    std::vector<Byte> toVector() const
+    {
+        std::vector <Byte> result;
+        result.reserve (this->size());
+        result.insert (std::end (result), std::begin (*this), std::end (*this));
+        return result;
+    }
+
+private:
+
+    /// \brief Увеличиваем емкость.
+    /// \param newCapacity Требуемая емкость.
+    void _grow (std::size_t newCapacity)
+    {
+        if (newCapacity > m_capacity) {
+            auto newDynamicBuffer = new Byte[newCapacity - StaticSize];
+            if (m_dynamicBuffer) {
+                std::memcpy (newDynamicBuffer, m_dynamicBuffer, m_size - StaticSize);
+                delete m_dynamicBuffer;
+            }
+            m_dynamicBuffer = newDynamicBuffer;
+            m_capacity = newCapacity;
+        }
+    }
+};
 
 //=========================================================
 
