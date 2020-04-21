@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "irbis.h"
+#include "irbis_internal.h"
 
 int main (int argc, char *argv[])
 {
@@ -25,7 +26,7 @@ int main (int argc, char *argv[])
             return -1;
         }
 
-        if (!irbis::sameString(connection.workstation, irbis::String(L"A"))) {
+        if (!irbis::sameString (connection.workstation, irbis::String(L"A"))) {
             std::cerr << "Not administrator! Exiting" << std::endl;
             return -1;
         }

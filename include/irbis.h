@@ -26,6 +26,7 @@
 #include <algorithm>
 #include <type_traits>
 #include <iostream>
+#include <functional>
 
 //=========================================================
 
@@ -467,6 +468,8 @@ std::ostream& operator << (std::ostream &stream, const Optional<T> &value)
     return stream;
 }
 
+using OptionalString = Optional<String>;
+
 //=========================================================
 
 // Монада Maybe
@@ -561,11 +564,14 @@ public:
     T *ptr { nullptr };  ///< Указатель на начала куска.
     size_t length { 0 }; ///< Длина куска в элементах.
 
-    Span() : ptr (nullptr), length (0) {}; ///< Конструктор по умолчанию.
+    Span() noexcept : ptr (nullptr), length (0) {}; ///< Конструктор по умолчанию.
     Span (T *ptr_, std::size_t length_) noexcept : ptr (ptr_), length (length_) {} ///< Конструктор.
-    Span (const T *ptr_, std::size_t length_) noexcept : ptr (const_cast <T*> (ptr_)), length (length_) {} ///< Конструктор.
-    Span (const std::vector<T> &vec) : ptr (const_cast <T*> (vec.data())), length (vec.size()) {} ///< Конструктор.
-    Span (const std::basic_string<T> &str) : ptr(const_cast<T*> (str.data())), length (str.size()) {} ///< Конструктор.
+    Span (const T *ptr_, std::size_t length_) noexcept
+        : ptr (const_cast <T*> (ptr_)), length (length_) {} ///< Конструктор.
+    explicit Span (const std::vector<T> &vec) noexcept
+        : ptr (const_cast <T*> (vec.data())), length (vec.size()) {} ///< Конструктор.
+    explicit Span (const std::basic_string<T> &str) noexcept
+        : ptr(const_cast<T*> (str.data())), length (str.size()) {} ///< Конструктор.
 
     /// \brief Спан из ASCIIZ-строки.
     /// \param ptr Указатель на начало строки.
@@ -1678,6 +1684,102 @@ Range<typename T::iterator> makeRange (T& value)
 {
     return Range<typename T::iterator> (std::begin (value), std::end (value));
 }
+
+//=========================================================
+
+/// \brief Реализация идиомы PImpl, не требующая динамической аллокации.
+/// \tparam HiddenData Тип скрываемых данных (интерфейс).
+/// \tparam DataSize Размер скрываемых данных, байты.
+/// \tparam DataAlignment Выравнивание скрываемых данных, байты.
+/// \details См. выступление Антона Полухина
+/// "C++ трюки из Такси" на CoreHard Autumn 2019
+/// https://www.youtube.com/watch?v=_AkF8SpUV3k&t=3s
+template <class HiddenData, std::size_t DataSize,
+    std::size_t DataAlignment = std::alignment_of <HiddenData>::value>
+class FastPImpl
+{
+public:
+
+    /// \brief Конструктор.
+    /// \tparam Args Тип данных.
+    /// \param args Данные для инициализации.
+    template <class ... Args>
+    explicit FastPImpl (Args&& ... args)
+    {
+        validate <sizeof (HiddenData), alignof (HiddenData)>();
+        new (this->ptr()) HiddenData (args...);
+    }
+
+    /// \brief Конструктор копирования.
+    /// \param other Объект, подлежащий копированию.
+    FastPImpl (const FastPImpl &other)
+    {
+        auto &another = const_cast <FastPImpl&> (other);
+        const auto &otherData = *(another.ptr());
+        new (this->ptr()) HiddenData (otherData);
+    }
+
+    /// \brief Оператор копирования.
+    /// \param other Объект, подлежащий копированию.
+    /// \return this.
+    FastPImpl& operator = (const FastPImpl &other)
+    {
+        *this->ptr() = *other.ptr();
+        return *this;
+    }
+
+    /// \brief Конструктор перемещения.
+    /// \param other Объект, из которого происходит перемещение.
+    FastPImpl (FastPImpl &&other) noexcept
+    {
+        validate <sizeof (HiddenData), alignof (HiddenData)>();
+        *this->ptr() = std::move (*other.ptr());
+    }
+
+    /// \brief Оператор перемещения.
+    /// \param other Объект, их которого происходит перемещение.
+    /// \return this.
+    FastPImpl& operator = (FastPImpl &&other) noexcept
+    {
+        validate <sizeof (HiddenData), alignof (HiddenData)>();
+        *this->ptr() = std::move (*other.ptr());
+        return *this;
+    }
+
+    /// \brief Деструктор.
+    ~FastPImpl()
+    {
+        validate <sizeof (HiddenData), alignof (HiddenData)>();
+        this->ptr()-> ~HiddenData();
+    }
+
+    HiddenData* operator -> () noexcept { return this->ptr(); } ///< Обращение к членам.
+    HiddenData& operator *  () noexcept  { return this->ptr(); } ///< Получение значения.
+
+    /// \brief Получение указателя на объект.
+    /// \return
+    HiddenData* ptr() noexcept
+    {
+        return reinterpret_cast <HiddenData*> (&m_data);
+    }
+
+private:
+
+    /// \brief Валидация.
+    /// \tparam ActualSize Актуальный размер данных.
+    /// \tparam ActualAlignment Актулаьное выравнивание.
+    template <std::size_t ActualSize, std::size_t ActualAlignment>
+    void validate ()
+    {
+        static_assert (DataSize >= ActualSize,
+            "DataSize and ActualSize mismatch");
+        static_assert (DataAlignment == ActualAlignment,
+            "DataAlignment and ActualAlignment mismatch");
+    }
+
+    /// \brief Буфер для данных.
+    typename std::aligned_storage <DataSize, DataAlignment>::type m_data;
+};
 
 //=========================================================
 

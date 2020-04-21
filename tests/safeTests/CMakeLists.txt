@@ -23,6 +23,7 @@ set(CppFiles
     src/EncodingTest.cpp
     src/ExemplarTest.cpp
     src/FastBufferTest.cpp
+    src/FastPImplTest.cpp
     src/FileTest.cpp
     src/FileSpecificationTest.cpp
     src/FormatTest.cpp
