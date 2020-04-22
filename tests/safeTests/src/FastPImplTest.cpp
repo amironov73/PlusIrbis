@@ -18,7 +18,6 @@ struct TestStruct
 
     int getArea ();
 
-private:
     irbis::FastPImpl <impl, 8, 4> m_pimpl;
 };
 
@@ -80,4 +79,18 @@ TEST_CASE("FastPImpl_move_2", "[pimpl]")
     TestStruct test1 (10, 20);
     TestStruct test2 = std::move (test1);
     CHECK (test2.getArea() == 200);
+}
+
+TEST_CASE("FastPImpl_star_1", "[pimpl]")
+{
+    TestStruct test (10, 20);
+    const TestStruct::impl &ref = *test.m_pimpl;
+    CHECK (ref.width == 20);
+    CHECK (ref.height == 10);
+}
+TEST_CASE("FastPImpl_arrow_1", "[pimpl]")
+{
+    TestStruct test (10, 20);
+    CHECK (test.m_pimpl->width == 20);
+    CHECK (test.m_pimpl->height == 10);
 }

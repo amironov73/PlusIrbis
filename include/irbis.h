@@ -1753,8 +1753,8 @@ public:
         this->ptr()-> ~HiddenData();
     }
 
-    HiddenData* operator -> () noexcept { return this->ptr(); } ///< Обращение к членам.
-    HiddenData& operator *  () noexcept  { return this->ptr(); } ///< Получение значения.
+    HiddenData* operator -> () noexcept { return this->ptr();  } ///< Обращение к членам.
+    HiddenData& operator *  () noexcept { return *this->ptr(); } ///< Получение значения.
 
     /// \brief Получение указателя на объект.
     /// \return
