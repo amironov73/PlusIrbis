@@ -1125,7 +1125,7 @@ public:
         return this->_value;
     }
 
-    bool release (Handle value = Traits::invalid()) const noexcept
+    bool release (Handle value = Traits::invalid()) noexcept
     {
         if (value != this->_value) {
             this->_close();
