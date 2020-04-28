@@ -175,6 +175,20 @@
 
 #endif // IRBIS_NOEXCEPT
 
+// для функций [[nodiscard]]
+#ifndef IRBIS_NODISCARD
+
+    #define IRBIS_NODISCARD
+
+#endif
+
+// для функций: [[maybe_unused]]
+#ifdef IRBIS_MAYBE_UNUSED
+
+    #define IRBIS_MAYBE_UNUSED
+
+#endif
+
 //=========================================================
 
 #if defined(_MSC_VER)
