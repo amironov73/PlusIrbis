@@ -287,15 +287,13 @@ public:
     {
     public:
         /// \brief Конструктор.
-        Iterator (Frugal<T> &container, std::size_t pos) noexcept
+        Iterator (Frugal<T, N> *container, std::size_t pos) noexcept
                 : _container (container), _position (pos) {}
 
-        //bool      operator == (const Iterator &other) noexcept { return this->_position == other._position; } ///< Оператор сравнения на равенство.
-        //bool      operator != (const Iterator &other) noexcept { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
-        Iterator& operator ++ ()                      { ++this->_position; return *this; }           ///< Оператор пре-инкремента.
-        Iterator& operator -- ()                      { --this->_position; return *this; }           ///< Оператор пре-инкремента.
-        T&        operator *  () const                { return this->_container [this->_position]; } ///< Оператор разыменования.
-        T&        operator -> ()                      { return this->_container [this->_position]; } ///< Оператор доступа к члену.
+        Iterator& operator ++ ()                      { ++this->_position; return *this; }              ///< Оператор пре-инкремента.
+        Iterator& operator -- ()                      { --this->_position; return *this; }              ///< Оператор пре-инкремента.
+        T&        operator *  () const                { return (*this->_container) [this->_position]; } ///< Оператор разыменования.
+        T&        operator -> ()                      { return (*this->_container) [this->_position]; } ///< Оператор доступа к члену.
 
         friend bool operator == (const Iterator &left, const Iterator &right) noexcept
         {
@@ -320,7 +318,7 @@ public:
         }
 
     private:
-        Frugal<T> &_container;
+        Frugal<T, N> *_container;
         std::size_t _position;
     };
 
@@ -336,11 +334,11 @@ public:
 
     /// \brief Указатель на первый элемент.
     /// \return Указатель.
-    Iterator begin() noexcept { return Iterator (*this, 0); }
+    Iterator begin() noexcept { return Iterator (this, 0); }
 
     /// \brief Указатель за последним элементом.
     /// \return Указатель.
-    Iterator end() noexcept { return Iterator (*this, this->_size); }
+    Iterator end() noexcept { return Iterator (this, this->_size); }
 
     /// \brief Ссылка на первый элемент.
     /// \return Ссылка.
