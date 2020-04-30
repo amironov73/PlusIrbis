@@ -183,7 +183,7 @@
 #endif
 
 // для функций: [[maybe_unused]]
-#ifdef IRBIS_MAYBE_UNUSED
+#ifndef IRBIS_MAYBE_UNUSED
 
     #define IRBIS_MAYBE_UNUSED
 
@@ -2015,16 +2015,16 @@ public:
     /// \brief Подключено ли к серверу?
     bool   connected() const noexcept { return this->_connected; }
 
-    bool   connect               ();
-    void   disconnect            ();
-    bool   execute               (ClientQuery &query);
-    Mfn    getMaxMfn             (const String &databaseName);
-    bool   noOp                  ();
-    void   parseConnectionString (const std::string &connectionString);
-    void   parseConnectionString (const String &connectionString);
-    String popDatabase           ();
-    String pushDatabase          (const String &newDatabase);
-    String toConnectionString    () const;
+    IRBIS_MAYBE_UNUSED bool   connect               ();
+                       void   disconnect            ();
+    IRBIS_MAYBE_UNUSED bool   execute               (ClientQuery &query);
+                       Mfn    getMaxMfn             (const String &databaseName);
+    IRBIS_MAYBE_UNUSED bool   noOp                  ();
+                       void   parseConnectionString (const std::string &connectionString);
+                       void   parseConnectionString (const String &connectionString);
+                       String popDatabase           ();
+                       String pushDatabase          (const String &newDatabase);
+                       String toConnectionString    () const;
 };
 
 /// \brief Функции работы с контекстом
@@ -2061,26 +2061,26 @@ public:
 class IRBIS_API ConnectionAdmin : public virtual ConnectionBase
 {
 public:
-    bool                      createDatabase   (const String &databaseName, const String &description, bool readerAccess);
-    bool                      createDictionary (const String &databaseName = L"");
-    bool                      deleteDatabase   (const String &databaseName = L"");
-    ServerStat                getServerStat    ();
-    Version                   getServerVersion ();
-    std::vector <ProcessInfo> listProcesses    ();
-    bool                      reloadDictionary (const String &databaseName = L"");
-    bool                      reloadMasterFile (const String &databaseName = L"");
-    bool                      restartServer    ();
-    bool                      truncateDatabase (const String &databaseName = L"");
-    bool                      unlockDatabase   (const String &databaseName = L"");
-    bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
+    IRBIS_MAYBE_UNUSED bool                      createDatabase   (const String &databaseName, const String &description, bool readerAccess);
+    IRBIS_MAYBE_UNUSED bool                      createDictionary (const String &databaseName = L"");
+    IRBIS_MAYBE_UNUSED bool                      deleteDatabase   (const String &databaseName = L"");
+                       ServerStat                getServerStat    ();
+                       Version                   getServerVersion ();
+                       std::vector <ProcessInfo> listProcesses    ();
+    IRBIS_MAYBE_UNUSED bool                      reloadDictionary (const String &databaseName = L"");
+    IRBIS_MAYBE_UNUSED bool                      reloadMasterFile (const String &databaseName = L"");
+    IRBIS_MAYBE_UNUSED bool                      restartServer    ();
+    IRBIS_MAYBE_UNUSED bool                      truncateDatabase (const String &databaseName = L"");
+    IRBIS_MAYBE_UNUSED bool                      unlockDatabase   (const String &databaseName = L"");
+    IRBIS_MAYBE_UNUSED bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
 };
 
 /// \brief Функции работы с фантомными записями
 class IRBIS_API ConnectionPhantom : public virtual ConnectionBase
 {
 public:
-    PhantomRecord readPhantomRecord  (Mfn mfn);
-    int           writePhantomRecord (PhantomRecord &record);
+                       PhantomRecord readPhantomRecord  (Mfn mfn);
+    IRBIS_MAYBE_UNUSED int           writePhantomRecord (PhantomRecord &record);
 };
 
 /// \brief Облегченные функции работы с записями
@@ -2094,12 +2094,12 @@ public:
 class IRBIS_API ConnectionFull : public virtual ConnectionBase
 {
 public:
-    bool                     deleteRecord (int mfn);
-    MarcRecord               readRecord  (Mfn mfn);
-    MarcRecord               readRecord  (const String &databaseName, Mfn mfn);
-    MarcRecord               readRecord  (const String &databaseName, Mfn mfn, int version);
-    std::vector <MarcRecord> readRecords (const MfnList &mfnList);
-    int                      writeRecord (MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false);
+    IRBIS_MAYBE_UNUSED bool                     deleteRecord (Mfn mfn);
+                       MarcRecord               readRecord   (Mfn mfn);
+                       MarcRecord               readRecord   (const String &databaseName, Mfn mfn);
+                       MarcRecord               readRecord   (const String &databaseName, Mfn mfn, int version);
+                       std::vector <MarcRecord> readRecords  (const MfnList &mfnList);
+    IRBIS_MAYBE_UNUSED int                      writeRecord  (MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false);
 };
 
 /// \brief Подключение к серверу ИРБИС64.
@@ -2567,14 +2567,14 @@ public:
     String filename;                      ///< Имя файла (обязательно).
     String content;                       ///< Содержимое файла (если необходимо).
 
-    FileSpecification() = default;                                            ///< Конструктор по умолчанию.
+    FileSpecification() = default;                                                ///< Конструктор по умолчанию.
     FileSpecification (IrbisPath path, const String &filename);
     FileSpecification (IrbisPath path, const String &database, const String &filename);
-    FileSpecification (const FileSpecification &other) = default;             ///< Конструктор копирования.
-    FileSpecification (FileSpecification &&other) = default;                  ///< Конструктор перемещения.
-    FileSpecification& operator = (const FileSpecification &other) = default; ///< Оператор копирования.
-    FileSpecification& operator = (FileSpecification &&other) = default;      ///< Оператор перемещения.
-    ~FileSpecification() = default;                                           ///< Деструктор.
+    FileSpecification (const FileSpecification &other) = default;                 ///< Конструктор копирования.
+    FileSpecification (FileSpecification &&other) noexcept = default;             ///< Конструктор перемещения.
+    FileSpecification& operator = (const FileSpecification &other)  = default;    ///< Оператор копирования.
+    FileSpecification& operator = (FileSpecification &&other) noexcept = default; ///< Оператор перемещения.
+    ~FileSpecification() = default;                                               ///< Деструктор.
 
     static FileSpecification parse (const String &text);
     bool verify (bool throwException) const;
@@ -2712,7 +2712,14 @@ class IRBIS_API Date final
 {
 public:
     String text;          ///< Текстовое представление в формате YYYYMMDD.
-    struct tm date { 0 }; ///< Разбиение даты на компоненты.
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#endif
+    struct tm date; ///< Разбиение даты на компоненты.
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
     Date() = default;                               ///< Конструктор перемещения.
     Date (int year, int month, int day);
@@ -3112,30 +3119,30 @@ public:
 
     explicit RecordField (int tag_, const String &value_ = L"")
         : tag { tag_ }, value { value_ } {} ///< Конструктор.
-    RecordField (int tag_, String &&value_)
+    RecordField (int tag_, String &&value_) noexcept
         : tag { tag_ }, value { std::move (value_) } {} ///< Конструктор.
     RecordField (int tag_, std::initializer_list <SubField> subfields_);
-    RecordField  ()                               = default; ///< Конструктор по умолчанию.
-    RecordField  (const RecordField &)            = default; ///< Конструктор копирования.
-    RecordField  (RecordField &&)                 = default; ///< Конструктор перемещения.
-    ~RecordField ()                               = default; ///< Деструктор.
-    RecordField& operator = (const RecordField &) = default; ///< Оператор копирования.
-    RecordField& operator = (RecordField &&)      = default; ///< Оператор перемещения.
+    RecordField  ()                                   = default; ///< Конструктор по умолчанию.
+    RecordField  (const RecordField &)                = default; ///< Конструктор копирования.
+    RecordField  (RecordField &&) noexcept            = default; ///< Конструктор перемещения.
+    ~RecordField ()                                   = default; ///< Деструктор.
+    RecordField& operator = (const RecordField &)     = default; ///< Оператор копирования.
+    RecordField& operator = (RecordField &&) noexcept = default; ///< Оператор перемещения.
 
-    RecordField& add                   (Char code, const String &value = L"");
-    RecordField& add                   (Char code, String &&value);
-    RecordField& clear                 ();
-    RecordField  clone                 ()                                   const;
-    void         decode                (const String &line);
-    void         decodeBody            (const String &line);
-    bool         empty                 ()                                   const noexcept;
-    SubField*    getFirstSubfield      (Char code)                          const noexcept;
-    String       getFirstSubfieldValue (Char code)                          const noexcept;
-    RecordField& removeSubfield        (Char code);
-    RecordField& setSubfield           (Char code, const String &newValue);
-    RecordField& setSubfield           (Char code, String &&newValue);
-    bool         verify                (bool throwOnError)                  const;
-    String toString() const;
+    IRBIS_MAYBE_UNUSED RecordField& add                   (Char code, const String &value = L"");
+    IRBIS_MAYBE_UNUSED RecordField& add                   (Char code, String &&value);
+    IRBIS_MAYBE_UNUSED RecordField& clear                 ();
+                       RecordField  clone                 ()                                   const;
+                       void         decode                (const String &line);
+                       void         decodeBody            (const String &line);
+                       bool         empty                 ()                                   const noexcept;
+                       SubField*    getFirstSubfield      (Char code)                          const noexcept;
+                       String       getFirstSubfieldValue (Char code)                          const noexcept;
+                       RecordField& removeSubfield        (Char code);
+                       RecordField& setSubfield           (Char code, const String &newValue);
+                       RecordField& setSubfield           (Char code, String &&newValue);
+                       bool         verify                (bool throwOnError)                  const;
+                       String       toString()                                                 const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &field);
 };
@@ -3247,8 +3254,8 @@ class IRBIS_API ServerStat final
 {
 public:
     std::vector<ClientInfo> runningClients; ///< Подключенные в данный момент клиенты.
-    int clientCount { 0 }; ///< Число клиентов, подключенных в данный момент.
-    int totalCommandCount { 0 }; ///< Общее количество команд, выполненных сервером с момента запуска.
+    int clientCount { 0 };                  ///< Число клиентов, подключенных в данный момент.
+    int totalCommandCount { 0 };            ///< Общее количество команд, выполненных сервером с момента запуска.
 
     void parse (ServerResponse &response);
 };
@@ -3266,13 +3273,13 @@ public:
     String value;        ///< Значение подполя (может быть пустой строкой).
 
     explicit SubField (Char code_, const String &value_ = L"") : code (code_), value (value_) {} ///< Конструктор.
-    SubField (Char code_, String &&value_) : code (code_), value (std::move (value_)) {} ///< Конструктор.
-    SubField ()                             = default; ///< Конструктор по умолчанию.
-    SubField (const SubField &)             = default; ///< Конструктор копирования.
-    SubField (SubField &&)                  = default; ///< Конструктор перемещения.
-    ~SubField()                             = default; ///< Деструктор.
-    SubField& operator = (const SubField &) = default; ///< Оператор копирования
-    SubField& operator = (SubField &&)      = default; ///< Оператор перемещения.
+             SubField (Char code_, String &&value_) noexcept : code (code_), value (std::move (value_)) {} ///< Конструктор.
+             SubField ()                                 = default; ///< Конструктор по умолчанию.
+             SubField (const SubField &)                 = default; ///< Конструктор копирования.
+             SubField  (SubField &&) noexcept            = default; ///< Конструктор перемещения.
+             SubField& operator = (const SubField &)     = default; ///< Оператор копирования
+             SubField& operator = (SubField &&) noexcept = default; ///< Оператор перемещения.
+            ~SubField             ()                     = default; ///< Деструктор.
 
     SubField clone    ()                    const;
     void     decode   (const String &line);
@@ -3309,13 +3316,14 @@ public:
     int count   { 0 }; ///< Количество ссылок на данный термин.
     String text {};    ///< Значение поискового термина.
 
-    TermInfo  () = default; ///< Конструктор по умолчанию.
-    TermInfo  (int count_, const String &text_) : count(count_), text(text_) {} ///< Конструктор.
-    TermInfo  (const TermInfo &) = default; ///< Конструктор копирования.
-    TermInfo  (TermInfo &&)      = default; ///< Конструктор перемещения.
-    ~TermInfo ()                 = default; ///< Деструктор.
-    TermInfo& operator = (const TermInfo &other) = default; ///< Оператор копирования.
-    TermInfo& operator = (TermInfo &&other)      = default; ///< Оператор перемещения.
+    TermInfo             () = default;                              ///< Конструктор по умолчанию.
+    TermInfo             (int count_, const String &text_) : count (count_), text (text_) {} ///< Конструктор.
+    TermInfo             (int count_, String &&text_) noexcept : count (count_), text (std::move (text_)) {} ///< Конструктор.
+    TermInfo             (const TermInfo &)              = default; ///< Конструктор копирования.
+    TermInfo             (TermInfo &&) noexcept          = default; ///< Конструктор перемещения.
+    TermInfo& operator = (const TermInfo &other)         = default; ///< Оператор копирования.
+    TermInfo& operator = (TermInfo &&other) noexcept     = default; ///< Оператор перемещения.
+    ~TermInfo            ()                              = default; ///< Деструктор.
 
     static std::vector<TermInfo> parse (const StringList &lines);
     String toString() const;
@@ -3346,7 +3354,7 @@ public:
     Mfn    count      { 0 };
     String text       {   };
 
-    static std::vector<TermPosting> parse(const StringList &lines);
+    static std::vector<TermPosting> parse (const StringList &lines);
     String toString() const;
 };
 
@@ -3372,16 +3380,16 @@ public:
     int level { 0 }; ///< Уровень вложенности узла (отслеживается автоматически).
 
     explicit TreeNode    (const String &value_) : value (value_) {} ///< Конструктор.
-    explicit TreeNode    (String &&value_) : value (std::move (value_)) {} ///< Конструктор.
-    TreeNode             ()                  = default; ///< Конструктор по умолчанию.
-    TreeNode             (const TreeNode &)  = default; ///< Конструктор копирования.
-    TreeNode             (TreeNode &&)       = default; ///< Конструктор перемещения.
-    ~TreeNode            ()                  = default; ///< Деструктор.
-    TreeNode& operator = (const TreeNode &)  = default; ///< Оператор копирования.
-    TreeNode& operator = (TreeNode &&)       = default; ///< Оператор перемещения.
+    explicit TreeNode    (String &&value_) noexcept : value (std::move (value_)) {} ///< Конструктор.
+             TreeNode             ()                     = default; ///< Конструктор по умолчанию.
+             TreeNode             (const TreeNode &)     = default; ///< Конструктор копирования.
+             TreeNode             (TreeNode &&) noexcept = default; ///< Конструктор перемещения.
+             TreeNode& operator = (const TreeNode &)     = default; ///< Оператор копирования.
+             TreeNode& operator = (TreeNode &&) noexcept = default; ///< Оператор перемещения.
+            ~TreeNode             ()                     = default; ///< Деструктор.
 
-    TreeNode& add (const String &name);
-    TreeNode& add (String &&name);
+    IRBIS_MAYBE_UNUSED TreeNode& add (const String &name);
+    IRBIS_MAYBE_UNUSED TreeNode& add (String &&name);
 };
 
 //=========================================================
@@ -3400,12 +3408,12 @@ public:
     String provision;     ///< Доступность АРМ Книгообеспеченность.
     String administrator; ///< Доступность АРМ Администратор.
 
-    UserInfo             ()                 = default; ///< Конструктор по умолчанию.
-    UserInfo             (const UserInfo &) = default; ///< Конструктор копирования.
-    UserInfo             (UserInfo &&)      = default; ///< Конструктор перемещения.
-    ~UserInfo            ()                 = default; ///< Деструктор.
-    UserInfo& operator = (const UserInfo &) = default; ///< Оператор копирования.
-    UserInfo& operator = (UserInfo &&)      = default; ///< Оператор перемещения.
+    UserInfo             ()                     = default; ///< Конструктор по умолчанию.
+    UserInfo             (const UserInfo &)     = default; ///< Конструктор копирования.
+    UserInfo             (UserInfo &&) noexcept = default; ///< Конструктор перемещения.
+    ~UserInfo            ()                     = default; ///< Деструктор.
+    UserInfo& operator = (const UserInfo &)     = default; ///< Оператор копирования.
+    UserInfo& operator = (UserInfo &&) noexcept = default; ///< Оператор перемещения.
 
     String toString() const;
     static std::vector<UserInfo> parse(const StringList &lines);
@@ -3417,31 +3425,31 @@ public:
 class IRBIS_API LiteField final
 {
 public:
-    int tag { 0 };
-    std::string value;
-    std::list<LiteSubField> subfields;
+    int                     tag { 0 }; ///< Метка поля.
+    std::string             value;     ///< Значение до первого разделителя.
+    std::list<LiteSubField> subfields; ///< Подполя.
 
-    LiteField() = default;
-    LiteField (int tag_, const std::string &value_ = "") : tag(tag_), value(value_) {}
-    LiteField (const LiteField &other) = default;
-    LiteField (LiteField &&other) = default;
-    LiteField& operator = (const LiteField &other) = default;
-    LiteField& operator = (LiteField &&other) = default;
-    ~LiteField() = default;
+             LiteField             ()                                = default; ///< Конструктор по умолчанию.
+    explicit LiteField             (int tag_, const std::string &value_ = "") : tag (tag_), value (value_) {}
+    explicit LiteField             (int tag_, std::string &&value_ = "") noexcept : tag (tag_), value (std::move (value_)) {}
+             LiteField             (const LiteField &other)          = default; ///< Конструктор копирования.
+             LiteField             (LiteField &&other) noexcept      = default; ///< Конструктор перемещения.
+             LiteField& operator = (const LiteField &other)          = default; ///< Оператор копирования.
+             LiteField& operator = (LiteField &&other)      noexcept = default; ///< Оператор перемещения.
+            ~LiteField             ()                                = default; ///< Деструктор.
 
-    LiteField& add (char code, const std::string &value = "");
-    LiteField& clear();
-    LiteField clone() const;
-    void decode (const std::string &line);
-    bool empty() const noexcept;
-    LiteSubField* getFirstSubfield (char code) const noexcept;
-    std::string getFirstSubfieldValue (char code) const noexcept;
-    LiteField& removeSubfield (char code);
-    LiteField& setSubfield (char code, const std::string &newValue);
-    bool verify (bool throwOnError) const;
-    std::string toString() const;
-
-    RecordField materialize() const;
+    IRBIS_MAYBE_UNUSED LiteField&    add (char code, const std::string &value = "");
+    IRBIS_MAYBE_UNUSED LiteField&    clear()                                 noexcept;
+                       LiteField     clone()                           const;
+                       void          decode (const std::string &line);
+                       bool          empty()                           const noexcept;
+                       LiteSubField* getFirstSubfield (char code)      const noexcept;
+                       std::string   getFirstSubfieldValue (char code) const noexcept;
+                       RecordField   materialize()                     const;
+    IRBIS_MAYBE_UNUSED LiteField&    removeSubfield (char code);
+    IRBIS_MAYBE_UNUSED LiteField&    setSubfield (char code, const std::string &newValue);
+                       std::string   toString()                        const;
+                       bool          verify (bool throwOnError)        const;
 };
 
 //=========================================================
@@ -3450,32 +3458,32 @@ public:
 class IRBIS_API LiteRecord final
 {
 public:
-    Mfn mfn { 0u };                             ///< MFN (порядковый номер в базе) записи.
-    RecordStatus status { RecordStatus::None }; ///< Статус записи. Представляет собой набор флагов.
-    unsigned int version { 0u };                ///< Номер версии записи.
-    std::list<LiteField> fields;                ///< Список полей.
-    std::string database;                       ///< База данных.
+    Mfn                  mfn     { 0u };                 ///< MFN (порядковый номер в базе) записи.
+    RecordStatus         status  { RecordStatus::None }; ///< Статус записи. Представляет собой набор флагов.
+    unsigned int         version { 0u };                 ///< Номер версии записи.
+    std::list<LiteField> fields;                         ///< Список полей.
+    std::string          database;                       ///< База данных.
 
-    LiteRecord() = default;                                     ///< Конструктор по умолчанию.
-    LiteRecord (const LiteRecord &other) = default;             ///< Конструктор копирования.
-    LiteRecord (LiteRecord &&other) = default;                  ///< Конструктор перемещения.
-    LiteRecord& operator = (const LiteRecord &other) = default; ///< Оператор копирования.
-    LiteRecord& operator = (LiteRecord &&other) = default;      ///< Оператор перемещения.
-    ~LiteRecord() = default;                                    ///< Деструктор.
+    LiteRecord             ()                                 = default; ///< Конструктор по умолчанию.
+    LiteRecord             (const LiteRecord &other)          = default; ///< Конструктор копирования.
+    LiteRecord             (LiteRecord &&other)      noexcept = default; ///< Конструктор перемещения.
+    LiteRecord& operator = (const LiteRecord &other)          = default; ///< Оператор копирования.
+    LiteRecord& operator = (LiteRecord &&other)      noexcept = default; ///< Оператор перемещения.
+    ~LiteRecord            ()                                 = default; ///< Деструктор.
 
-    LiteField& add (int tag, const std::string &value);
-    LiteRecord clone() const;
-    void decode (const std::vector<std::string> &lines);
-    bool deleted() const noexcept;
-    std::string encode (const std::string &delimiter = "\x1F\x1E") const;
-    std::string fm (int tag, char code = 0) const noexcept;
-    std::vector<std::string> fma (int tag, char code = 0) const;
-    LiteField* getField (int tag, int occurrence = 0) const noexcept;
-    std::vector<LiteField*> getFields (int tag) const;
-    LiteRecord& reset() noexcept;
-    bool verify (bool throwOnError) const;
+    IRBIS_MAYBE_UNUSED LiteField&               add         (int tag, const std::string &value);
+                       LiteRecord               clone       ()                                          const;
+                       void                     decode      (const std::vector<std::string> &lines);
+                       bool                     deleted     ()                                          const noexcept;
+                       std::string              encode      (const std::string &delimiter = "\x1F\x1E") const;
+                       std::string              fm          (int tag, char code = 0)                    const noexcept;
+                       std::vector<std::string> fma         (int tag, char code = 0)                    const;
+                       LiteField*               getField    (int tag, int occurrence = 0)               const noexcept;
+                       std::vector<LiteField*>  getFields   (int tag)                                   const;
+                       MarcRecord               materialize ()                                          const;
+    IRBIS_MAYBE_UNUSED LiteRecord&              reset       ()                                                noexcept;
+    IRBIS_MAYBE_UNUSED bool                     verify      (bool throwOnError)                         const;
 
-    MarcRecord materialize() const;
 };
 
 //=========================================================
@@ -3489,7 +3497,7 @@ public:
     std::string value; ///< Значение подполя (может быть пустым).
 
     LiteSubField() = default;
-    LiteSubField (char code_, const std::string &value_ = "") : code(code_), value(value_) {}
+    explicit LiteSubField (char code_, const std::string &value_ = "") : code(code_), value(value_) {}
     LiteSubField (const LiteSubField &other) = default;
     LiteSubField (LiteSubField &&other) = default;
     LiteSubField& operator = (const LiteSubField &other) = default;

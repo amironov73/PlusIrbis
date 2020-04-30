@@ -202,7 +202,7 @@ LiteField& LiteField::add (char subFieldCode, const std::string &subFieldValue)
     return *this;
 }
 
-LiteField& LiteField::clear()
+LiteField& LiteField::clear() noexcept
 {
     this->value.clear();
     this->subfields.clear();

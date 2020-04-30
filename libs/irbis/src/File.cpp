@@ -456,7 +456,7 @@ int64_t File::read (Byte *buffer, int64_t nbytes)
         throw IrbisException();
     }
 
-    return numberOfBytesRead;
+    return static_cast<int64_t> (numberOfBytesRead);
 
 #else
 
@@ -573,7 +573,7 @@ std::string File::readNarrow ()
 
 /// \brief Получение текущего положения указателя файла.
 /// \return Смещение от начала в байтах.
-int64_t File::tell ()
+std::size_t File::tell ()
 {
 #ifdef IRBIS_WINDOWS
 
@@ -584,14 +584,14 @@ int64_t File::tell ()
         DisplayError();
         throw IrbisException();
     }
-    return result.QuadPart;
+    return static_cast<std::size_t> (result.QuadPart);
 
 #else
 
 #ifdef IRBIS_APPLE
-    return ::lseek (this->_handle, 0, SEEK_CUR);
+    return static_cast<std::size_t> (::lseek (this->_handle, 0, SEEK_CUR));
 #else
-    return ::lseek64 (this->_handle, 0, SEEK_CUR);
+    return static_cast<std::size_t> (::lseek64 (this->_handle, 0, SEEK_CUR));
 #endif
 
 #endif
@@ -614,19 +614,37 @@ std::size_t File::size ()
 
 #ifdef IRBIS_APPLE
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
     struct stat buf { 0 };
     if (::fstat (this->_handle, &buf) < 0) {
         throw IrbisException();
     }
-    return buf.st_size;
+    return static_cast<std::size_t> (buf.st_size);
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #else
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
 
     struct stat64 buf { 0 };
     if (::fstat64 (this->_handle, &buf) < 0) {
         throw IrbisException();
     }
-    return buf.st_size;
+    return static_cast<std::size_t> (buf.st_size);
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 #endif
 

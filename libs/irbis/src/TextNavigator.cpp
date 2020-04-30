@@ -29,7 +29,6 @@ const Char TextNavigator::EOT = L'\0';
 /// \param length Длина текста в символах.
 TextNavigator::TextNavigator (const Char* text, std::size_t length) noexcept
 {
-    assert (length >= 0);
     this->_text     = text;
     this->_length   = length;
     this->_position = 0;

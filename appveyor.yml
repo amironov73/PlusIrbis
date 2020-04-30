@@ -9,7 +9,7 @@ build:
 after_build:
   - cmd: utils\doxygen
 
-test_script: tests.cmd
+test_script: run_tests.cmd
 
 artifacts:
   - path: x64

@@ -26,7 +26,13 @@ std::vector<DatabaseInfo> ConnectionContext::listDatabases (const IniFile &ini, 
         return result;
     }
 
-    return result;
+    auto filename = ini.getValue (L"Main", L"DBNNAMECAT", defaultFileName);
+    if (filename.empty ()) {
+        return result;
+    }
+
+    FileSpecification specification (IrbisPath::Data, filename);
+    return this->listDatabases (specification);
 }
 
 /// \brief Получение списка баз данных.
@@ -118,6 +124,19 @@ Bytes ConnectionContext::readBinaryFile (const FileSpecification &specification)
     if (!this->_checkConnection()) {
         return result;
     }
+
+    // На случай, если пользователь не установил флаг binaryFile.
+    FileSpecification spec (specification);
+    spec.binaryFile = true;
+    ClientQuery query (*this, "L");
+    query.add (spec);
+    ServerResponse response (*this, query);
+    if (!response.success()) {
+        return result;
+    }
+
+    // TODO implement
+    // result = response.getBytes();
 
     return result;
 }

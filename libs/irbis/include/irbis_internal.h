@@ -283,18 +283,41 @@ public:
     Frugal& operator = (Frugal &&)      = delete;  ///< Оператор перемещения.
 
     /// \brief Итератор.
-    class Iterator : public std::iterator <std::input_iterator_tag, T>
+    class Iterator : public std::iterator <std::bidirectional_iterator_tag, T>
     {
     public:
         /// \brief Конструктор.
         Iterator (Frugal<T> &container, std::size_t pos) noexcept
                 : _container (container), _position (pos) {}
 
-        bool      operator == (const Iterator &other) noexcept { return this->_position == other._position; } ///< Оператор сравнения на равенство.
-        bool      operator != (const Iterator &other) noexcept { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
+        //bool      operator == (const Iterator &other) noexcept { return this->_position == other._position; } ///< Оператор сравнения на равенство.
+        //bool      operator != (const Iterator &other) noexcept { return this->_position != other._position; } ///< Оператор сравнения на неравенство.
         Iterator& operator ++ ()                      { ++this->_position; return *this; }           ///< Оператор пре-инкремента.
+        Iterator& operator -- ()                      { --this->_position; return *this; }           ///< Оператор пре-инкремента.
         T&        operator *  () const                { return this->_container [this->_position]; } ///< Оператор разыменования.
         T&        operator -> ()                      { return this->_container [this->_position]; } ///< Оператор доступа к члену.
+
+        friend bool operator == (const Iterator &left, const Iterator &right) noexcept
+        {
+            return left._position == right._position;
+        }
+
+        friend bool operator != (const Iterator &left, const Iterator &right) noexcept
+        {
+            return left._position != right._position;
+        }
+
+        friend Iterator& operator + (const Iterator &left, std::size_t right) noexcept
+        {
+            auto result = left;
+            result._position += right;
+            return result;
+        }
+
+        friend std::ptrdiff_t operator - (const Iterator &left, const Iterator &right) noexcept
+        {
+            return static_cast<std::ptrdiff_t> (left._position - right._position);
+        }
 
     private:
         Frugal<T> &_container;
@@ -577,7 +600,7 @@ public:
     uint64_t    readInt64       ();
     std::string readNarrow      ();
     std::size_t size            ();
-    int64_t     tell            ();
+    std::size_t tell            ();
     void        seek            (int64_t offset);
     File*       toHeap          ();
     int64_t     write           (const Byte* buffer, int64_t nbytes);
@@ -1283,11 +1306,18 @@ std::unique_ptr<T> makeUnique (Args&& ... args)
 /// \param array Собственно массив.
 /// \return Размер массива в элементах.
 /// \warning Не работает для массивов нулевой или переменной длины!
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 template <typename T, std::size_t N>
 std::size_t size (const T (&array)[N])
 {
     return N;
 }
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
 
 /// \brief Вычисляет размер вектора.
 /// \tparam T Тип элементов вектора.

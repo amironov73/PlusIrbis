@@ -17,7 +17,7 @@ namespace irbis {
 /// \return Признак успешности выполнения операции.
 ///
 /// Если запись уже удалена, это не считается ошибкой.
-bool ConnectionFull::deleteRecord(int mfn) {
+bool ConnectionFull::deleteRecord(Mfn mfn) {
     if (!this->_checkConnection()) {
         return false;
     }
