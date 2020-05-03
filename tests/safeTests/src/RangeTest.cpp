@@ -46,3 +46,15 @@ TEST_CASE("Range_reset_1", "[range]")
     range.reset();
     CHECK (*range.current() == 1);
 }
+
+TEST_CASE("Range_value_1", "[range]")
+{
+    std::vector<int> v { 1, 2, 3 };
+    auto range = irbis::makeRange (v);
+    CHECK (range.value() == 1);
+    CHECK (range.moveNext());
+    CHECK (range.value() == 2);
+    CHECK (range.moveNext());
+    CHECK (range.value() == 3);
+    CHECK_FALSE (range.moveNext());
+}

@@ -35,7 +35,7 @@ ConnectionBase::ConnectionBase()
 
 /// \brief Деструктор.
 ///
-/// Если необходимо, выполняет отключение от сервера.
+/// \details Если необходимо, выполняет отключение от сервера.
 ConnectionBase::~ConnectionBase() {
     this->disconnect();
     // this->socket.release();

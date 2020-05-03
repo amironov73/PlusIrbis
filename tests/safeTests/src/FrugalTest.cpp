@@ -95,14 +95,14 @@ TEST_CASE("Frugal_iterator_1", "[frugal]")
     data.push_back (2);
     data.push_back (3);
     auto iter = std::begin (data);
-    //auto end = std::end (data);
+    auto end = std::end (data);
     CHECK (*iter == 1);
     ++iter;
     CHECK (*iter == 2);
     ++iter;
     CHECK (*iter == 3);
-    //++iter;
-    //CHECK (iter == end);
+    ++iter;
+    CHECK (iter == end);
 }
 
 TEST_CASE("Frugal_front_1", "[frugal]")

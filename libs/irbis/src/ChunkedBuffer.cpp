@@ -15,15 +15,15 @@ namespace irbis {
 ChunkedBuffer::Chunk::Chunk (const std::size_t size)
 {
     assert (size > 0);
-    data = static_cast<Byte*> (malloc (size));
-    assert (data != nullptr);
-    next = nullptr;
+    this->data = static_cast<Byte*> (::malloc (size));
+    assert (this->data != nullptr);
+    this->next = nullptr;
 }
 
 /// \brief Деструктор.
 ChunkedBuffer::Chunk::~Chunk()
 {
-    free(data);
+    free (this->data);
 }
 
 //=========================================================
@@ -46,7 +46,7 @@ ChunkedBuffer::~ChunkedBuffer()
     auto *chunk = this->_first;
     while (chunk) {
         auto *next = chunk->next;
-        chunk->~Chunk();
+        delete chunk;
         chunk = next;
     }
 }
@@ -63,6 +63,7 @@ bool ChunkedBuffer::_advance()
     return true;
 }
 
+/// \brief Добавление куска.
 void ChunkedBuffer::_appendChunk()
 {
     auto *newChunk = new Chunk (this->_chunkSize);
@@ -126,7 +127,7 @@ int ChunkedBuffer::peek()
     return this->_current->data [this->_read];
 }
 
-/// \brief Текущая позиция в буфере.
+/// \brief Текущая позиция в буфере (для чтения).
 /// \return Смещение от начала в байтах.
 std::size_t ChunkedBuffer::position() const noexcept
 {
@@ -351,9 +352,9 @@ Bytes ChunkedBuffer::toBytes () const
     return result;
 }
 
-/// \brief Запись буфера.
+/// \brief Запись данных из буфера.
 /// \param buffer Буфер.
-/// \param offset Смещение.
+/// \param offset Смещение относительно начала данных, байты.
 /// \param count Количество байт для записи.
 void ChunkedBuffer::write (const Byte *buffer, std::size_t offset, std::size_t count)
 {
@@ -402,6 +403,43 @@ void ChunkedBuffer::writeLine (const String &text, Encoding *encoding)
 {
     Bytes bytes = encoding->fromUnicode (text);
     this->write (bytes.data(), 0, bytes.size());
+}
+
+/// \brief Оператор доступа по индексу.
+/// \param index Индекс (отсчет от 0).
+/// \return Ссылка на элемент.
+Byte& ChunkedBuffer::operator [] (std::size_t index) noexcept
+{
+    for (Chunk *chunk = this->_first;
+         (chunk != nullptr) && (chunk != this->_last);
+         chunk = chunk->next) {
+        if (index < this->_chunkSize) {
+            return chunk->data [index];
+        }
+        index -= this->_chunkSize;
+    }
+    return this->_last->data [index];
+}
+
+/// \brief Итератор на начало данных.
+/// \return Итератор.
+ChunkedBuffer::iterator ChunkedBuffer::begin() noexcept
+{
+    return iterator { this, 0 };
+}
+
+/// \brief Итератор на текущую позицию.
+/// \return Итератор.
+ChunkedBuffer::iterator ChunkedBuffer::current() noexcept
+{
+    return iterator { this, this->position() };
+}
+
+/// \brief Итератор на конец данных.
+/// \return Итератор.
+ChunkedBuffer::iterator ChunkedBuffer::end() noexcept
+{
+    return iterator { this, this->size() };
 }
 
 }

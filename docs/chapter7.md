@@ -93,15 +93,89 @@ bool flag = result == std::end (span); // true
 
 Контейнер, предназначенный для уменьшения использования динамической памяти (кучи). Первые N элементов сохраняются на стеке.
 
+```c++
+Frugal<int, 4> data;
+data.push_back (1);
+data.push_back (2);
+data.push_back (3);
+...
+auto iter = std::begin (data);
+
+```
+
+#### FastBuffer&lt;std::size_t N&gt;
+
+Буфер, накапливающий сначала данные в массиве на стеке, а при нехватке места использующий кучу.
+
+```c++
+FastBuffer buf;
+Byte data[16];
+
+buf.write(data, 16);
+...
+auto iter = std::begin (buf);
+```
+
+#### Range&lt;Iterator&gt;
+
+Диапазон, задаваемый двумя итераторами.
+
+
 #### PointerGuard&lt;T&gt;
+
+#### Retry
+
+Повторение действия необходимое число раз, пока не получится.
+
+```c++
+Retry().action ([] {
+    callSomeFunction();
+});
+
+auto value = Retry().execute ([] {
+    return someFunction() + 123;
+});
+
+```
+
+#### Directory
+
+Простая обертка над системным файловым API.
+
+```c++
+std::string path ("resources/images")
+path = IO::convertSlashes (path);
+Directory directory (path);
+const auto allFiles = directory.readAll();
+```
 
 #### File
 
 Обертка над файлом.
 
+```c++
+std::string path ("resources/data")
+path = IO::convertSlashes (path);
+auto fileName = IO::combinePath (path, L"irbis.img");
+Byte original[] {3, 14, 15, 9, 26, 5};
+auto file = File::create (fileName);
+file.write (original, irbis::size (original));
+file.close();
+```
+
 #### ChunkedBuffer
 
-Буфер, состоящий из отрезков равной длины (`MemoryChink`). 
+Буфер, состоящий из отрезков равной длины (`Chunk`).
+
+```c++
+ChunkedBuffer buffer;
+Byte data1[] { 'H', 'e', 'l', 'l', 'o' };
+buffer.write (data1, sizeof (data1));
+buffer.rewind();
+
+Byte data2[5];
+buffer.read (data2, sizeof (data2));
+``` 
 
 #### ClientSocket
 

@@ -1453,7 +1453,7 @@ public:
         DataType& operator *  () const noexcept { return *((*m_joiner) [m_offset]); }
         DataType& operator -> () const noexcept { return *((*m_joiner) [m_offset]); }
 
-        friend iterator& operator + (const iterator &left, std::size_t right) noexcept
+        friend iterator operator + (const iterator &left, std::size_t right) noexcept
         {
             auto result = left;
             result += right;
@@ -1650,47 +1650,51 @@ public:
 //=========================================================
 
 /// \brief Диапазон, задаваемый двумя итераторами.
-/// \tparam T Тип итератора.
-template<class T>
-class Range
+/// \tparam IteratorType Тип итератора.
+template<class IteratorType>
+struct Range
 {
-public:
+    IteratorType m_begin;   // Начало диапазона (включается).
+    IteratorType m_current; // Текущая позиция.
+    IteratorType m_end;     // Конец диапазона (не включается).
 
-    Range (T begin_, T end_) : _begin (begin_), _current (begin_), _end (end_) {}
+    Range (IteratorType begin, IteratorType end) noexcept
+        : m_begin { begin }, m_current { begin }, m_end { end } {}
+    Range             (const Range &) noexcept = default;
+    Range             (Range &&)      noexcept = default;
+    Range& operator = (const Range &) noexcept = default;
+    Range& operator = (Range &&)      noexcept = default;
+    ~Range            ()                       = default;
 
     /// \brief Начало диапазона (включительно).
-    T begin() const noexcept { return this->_begin; }
+    IteratorType begin() const noexcept { return this->m_begin; }
 
     /// \brief Текущая позиция итератора (может указывать на конец).
-    T current() const noexcept { return this->_current; }
+    IteratorType current() const noexcept { return this->m_current; }
 
     /// \brief Пустой диапазон?
     /// \return true, если пустой.
-    bool empty() const noexcept { return !(this->_begin != this->_end); }
+    bool empty() const noexcept { return !(this->m_begin != this->m_end); }
 
     /// \brief Конец диапазона (не включается).
-    T end() const noexcept { return this->_end; }
+    IteratorType end() const noexcept { return this->m_end; }
 
     /// \brief Переход к следующему элементу.
     /// \return true, если был выполнен шаг вперед.
     bool moveNext()
     {
-        if (this->_current != this->_end) {
-            ++this->_current;
-            return this->_current != this->_end;
+        if (this->m_current != this->m_end) {
+            ++this->m_current;
+            return this->m_current != this->m_end;
         }
         return false;
     }
 
-    void reset() noexcept { this->_current = this->_begin; }
+    /// \brief Возврат к начальной позиции.
+    void reset() noexcept { this->m_current = this->m_begin; }
 
-    // /// \brief Значение в текущей позиции.
-    // typename T::iter_value_t value() { return *(this->current()); }
-
-private:
-    T _begin;   // Начало диапазона (включается).
-    T _current; // Текущая позиция.
-    T _end;     // Конец диапазона (не включается).
+    /// \brief Значение в текущей позиции.
+    auto value() -> decltype (*(this->current())) { return *(this->current()); }
 };
 
 template<class T>

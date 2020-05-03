@@ -96,3 +96,80 @@ TEST_CASE("ChunkedBuffer_writeLine_1", "[chunked]")
         CHECK (bytes[i] == all[i]);
     }
 }
+
+TEST_CASE("ChunkedBuffer_indexer_1", "[chunked]")
+{
+    irbis::ChunkedBuffer buffer;
+    buffer.writeByte ('H');
+    buffer.writeByte ('e');
+    buffer.writeByte ('l');
+    buffer.writeByte ('l');
+    buffer.writeByte ('o');
+    CHECK (buffer[0] == 'H');
+    CHECK (buffer[1] == 'e');
+    CHECK (buffer[2] == 'l');
+    CHECK (buffer[3] == 'l');
+    CHECK (buffer[4] == 'o');
+}
+
+TEST_CASE("ChunkedBuffer_begin_1", "[chunked]")
+{
+    irbis::ChunkedBuffer buffer;
+    irbis::Byte bytes[] { 'H', 'e', 'l', 'l', 'o', '\r', '\n', '1' };
+    buffer.write (bytes, 0, sizeof (bytes));
+    auto begin = std::begin (buffer);
+    auto iter = begin;
+    auto end   = std::end (buffer);
+    CHECK (end - begin == buffer.size());
+    CHECK (*iter == 'H');
+    ++iter;
+    CHECK (*iter == 'e');
+    ++iter;
+    CHECK (*iter == 'l');
+    ++iter;
+    CHECK (*iter == 'l');
+    ++iter;
+    CHECK (*iter == 'o');
+    ++iter;
+    CHECK (*iter == '\r');
+    ++iter;
+    CHECK (*iter == '\n');
+    ++iter;
+    CHECK (*iter == '1');
+    ++iter;
+    CHECK (iter == end);
+
+    --iter;
+    CHECK (*iter == '1');
+    --iter;
+    CHECK (*iter == '\n');
+    --iter;
+    CHECK (*iter == '\r');
+    --iter;
+    CHECK (*iter == 'o');
+    --iter;
+    CHECK (*iter == 'l');
+    --iter;
+    CHECK (*iter == 'l');
+    --iter;
+    CHECK (*iter == 'e');
+    --iter;
+    CHECK (*iter == 'H');
+    CHECK (iter == begin);
+}
+
+TEST_CASE("ChunkedBuffer_alogorithm_1", "[chunked]")
+{
+    irbis::ChunkedBuffer buffer;
+    irbis::Byte bytes[] { 'H', 'e', 'l', 'l', 'o', '\r', '\n', '1' };
+    buffer.write (bytes, 0, sizeof (bytes));
+    std::reverse (std::begin (buffer), std::end (buffer));
+    CHECK (buffer[0] == '1');
+    CHECK (buffer[1] == '\n');
+    CHECK (buffer[2] == '\r');
+    CHECK (buffer[3] == 'o');
+    CHECK (buffer[4] == 'l');
+    CHECK (buffer[5] == 'l');
+    CHECK (buffer[6] == 'e');
+    CHECK (buffer[7] == 'H');
+}

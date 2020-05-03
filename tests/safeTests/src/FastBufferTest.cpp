@@ -342,3 +342,28 @@ TEST_CASE("FastBuffer_toVector_1", "[fast]")
     CHECK (vector[3] == 'l');
     CHECK (vector[4] == 'o');
 }
+
+TEST_CASE("FastBuffer_write_1", "[fast]")
+{
+    irbis::FastBuffer<8> buffer;
+    irbis::Byte data[16] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+    buffer.write (data, irbis::size (data));
+    CHECK (buffer.size () == 16);
+    CHECK (buffer[0] == 1);
+    CHECK (buffer[1] == 2);
+    CHECK (buffer[2] == 3);
+    CHECK (buffer[3] == 4);
+    CHECK (buffer[4] == 5);
+    CHECK (buffer[5] == 6);
+    CHECK (buffer[6] == 7);
+    CHECK (buffer[7] == 8);
+    CHECK (buffer[8] == 9);
+    CHECK (buffer[9] == 10);
+    CHECK (buffer[10] == 11);
+    CHECK (buffer[11] == 12);
+    CHECK (buffer[12] == 13);
+    CHECK (buffer[13] == 14);
+    CHECK (buffer[14] == 15);
+    CHECK (buffer[15] == 16);
+}
+

@@ -10,6 +10,7 @@
 #include <memory>
 #include <thread>
 #include <cstring>
+#include <cassert>
 
 //=========================================================
 
@@ -38,19 +39,19 @@ class File;
 /// \tparam DataType Тип отдельного элемента в контейнере.
 template <class ContainerType, class DataType>
 struct RandomAccessIterator final
-    : std::iterator<std::random_access_iterator_tag, Byte>
+    : public std::iterator<std::random_access_iterator_tag, DataType>
 {
     ContainerType *m_buffer;
     std::size_t  m_position;
 
-    RandomAccessIterator () noexcept : m_buffer { nullptr }, m_position { 0 } {}
+    RandomAccessIterator () noexcept : m_buffer { nullptr }, m_position { 0 } {} ///< Конструктор.
     RandomAccessIterator (ContainerType *buffer, std::size_t position) noexcept
-        : m_buffer { buffer }, m_position { position } {}
+        : m_buffer { buffer }, m_position { position } {} ///< Конструктор.
 
-    RandomAccessIterator             (const RandomAccessIterator&) noexcept = default;
-    RandomAccessIterator             (RandomAccessIterator&&)      noexcept = default;
-    RandomAccessIterator& operator = (const RandomAccessIterator&) noexcept = default;
-    RandomAccessIterator& operator = (RandomAccessIterator&&)      noexcept = default;
+    RandomAccessIterator             (const RandomAccessIterator&) noexcept = default; ///< Конструктор копирования.
+    RandomAccessIterator             (RandomAccessIterator&&)      noexcept = default; ///< Конструктор перемещения.
+    RandomAccessIterator& operator = (const RandomAccessIterator&) noexcept = default; ///< Оператор копирования.
+    RandomAccessIterator& operator = (RandomAccessIterator&&)      noexcept = default; ///< Оператор перемещения.
 
     bool operator == (const RandomAccessIterator &other) const noexcept
     {
@@ -75,7 +76,7 @@ struct RandomAccessIterator final
 
     RandomAccessIterator operator ++ (int) & noexcept
     {
-        iterator copy (*this);
+        RandomAccessIterator copy (*this);
         ++m_position;
         return copy;
     }
@@ -94,7 +95,7 @@ struct RandomAccessIterator final
 
     RandomAccessIterator operator -- (int) & noexcept
     {
-        iterator copy (*this);
+        RandomAccessIterator copy (*this);
         --m_position;
         return copy;
     }
@@ -130,13 +131,15 @@ struct FastBuffer final
 {
     static_assert (StaticSize >= 8, "Less is stupid");
 
-    using iterator = RandomAccessIterator<FastBuffer<StaticSize>, Byte>;
+    using iterator = RandomAccessIterator <FastBuffer <StaticSize>, Byte>;
 
     std::size_t m_capacity;
     std::size_t m_size;
     Byte       *m_dynamicBuffer;
     Byte        m_staticBuffer[StaticSize];
 
+    /// \brief Конструктор.
+    /// \details На момент конструирования создается только буфер в стеке.
     FastBuffer() noexcept
     {
         m_capacity = StaticSize;
@@ -144,13 +147,19 @@ struct FastBuffer final
         m_dynamicBuffer = nullptr;
     };
 
+    /// \brief Деструктор.
     ~FastBuffer()
     {
         delete m_dynamicBuffer;
     }
 
+    /// \brief Индексатор.
+    /// \param offset Индекс необходимого элемента.
+    /// \return Ссылка на элемент.
     Byte& operator [] (std::size_t offset) noexcept
     {
+        assert (offset < m_size);
+
         if (offset < StaticSize) {
             return m_staticBuffer [offset];
         }
@@ -160,21 +169,27 @@ struct FastBuffer final
 
     /// \brief Ссылка на последний элемент данных.
     /// \return Ссылка.
-    Byte& back() noexcept
+    Byte& back () noexcept
     {
         return *(--this->end());
     }
 
+    /// \brief Указатель на начало буфера.
+    /// \return Итератор.
     iterator begin () const noexcept
     {
-        return iterator { const_cast <FastBuffer <StaticSize>*> (this), 0};
+        return iterator { const_cast <FastBuffer <StaticSize>*> (this), 0 };
     }
 
+    /// \brief Емкость буфера в байтах.
+    /// \return Емкость.
     std::size_t capacity () const noexcept
     {
         return m_capacity;
     }
 
+    /// \brief Очистка буфера.
+    /// \details Емкость не уменьшается, динамический буфер (если он выделен) не освобождается.
     void clear () noexcept
     {
         m_size = 0;
@@ -187,6 +202,8 @@ struct FastBuffer final
         return m_size == 0;
     }
 
+    /// \brief Указатель за концом буфера.
+    /// \return Итератор.
     iterator end () const noexcept
     {
         return iterator { const_cast <FastBuffer <StaticSize>*> (this), m_size };
@@ -194,11 +211,13 @@ struct FastBuffer final
 
     /// \brief Ссылка на первый элемент данных.
     /// \return Ссылка.
-    Byte& front() noexcept
+    Byte& front () noexcept
     {
         return *(this->begin());
     }
 
+    /// \brief Добавление элемента в конец буфера.
+    /// \param value Добавляемый байт.
     void push_back (Byte value)
     {
         if (m_size == m_capacity) {
@@ -208,11 +227,16 @@ struct FastBuffer final
         (*this) [m_size++] = value;
     }
 
+    /// \brief Увеличение размера буфера, если необходимо.
+    /// \param newSize Необходимый размер буфера в байтах.
     void reserve (std::size_t newSize)
     {
         this->_grow (newSize);
     }
 
+    /// \brief Увеличение размера буфера до указанного.
+    /// \param newSize Необходимый размер буфера в байтах.
+    /// \details Высвобождения динамического буфера (если он выделен), не происходит.
     void resize (std::size_t newSize)
     {
         this->_grow (newSize);
@@ -221,7 +245,7 @@ struct FastBuffer final
 
     /// \brief Размер контейнера в элементах.
     /// \return Общий размер.
-    std::size_t size() const noexcept
+    std::size_t size () const noexcept
     {
         return m_size;
     }
@@ -244,6 +268,19 @@ struct FastBuffer final
         result.reserve (this->size());
         result.insert (std::end (result), std::begin (*this), std::end (*this));
         return result;
+    }
+
+    /// \brief Запись данных в буфер.
+    /// \param data Данные для записи.
+    /// \param size Размер данных в байтах.
+    void write (const Byte *data, size_t size)
+    {
+        // TODO implement smarter
+        while (size) {
+            this->push_back (*data);
+            ++data;
+            --size;
+        }
     }
 
 private:
@@ -275,52 +312,14 @@ class Frugal
 {
 public:
 
+    using iterator = RandomAccessIterator<Frugal<T, N>, T>;
+
     Frugal ()                           = default; ///< Конструктор по умолчанию.
     Frugal (const Frugal &)             = delete;  ///< Конструктор копирования.
-    Frugal (Frugal &&)                  = delete;  ///< Конструктор перемещения.
+    Frugal (Frugal &&)                  = default; ///< Конструктор перемещения.
     ~Frugal ()                          = default; ///< Деструктор.
     Frugal& operator = (const Frugal &) = delete;  ///< Оператор копирования.
-    Frugal& operator = (Frugal &&)      = delete;  ///< Оператор перемещения.
-
-    /// \brief Итератор.
-    class Iterator : public std::iterator <std::bidirectional_iterator_tag, T>
-    {
-    public:
-        /// \brief Конструктор.
-        Iterator (Frugal<T, N> *container, std::size_t pos) noexcept
-                : _container (container), _position (pos) {}
-
-        Iterator& operator ++ ()                      { ++this->_position; return *this; }              ///< Оператор пре-инкремента.
-        Iterator& operator -- ()                      { --this->_position; return *this; }              ///< Оператор пре-инкремента.
-        T&        operator *  () const                { return (*this->_container) [this->_position]; } ///< Оператор разыменования.
-        T&        operator -> ()                      { return (*this->_container) [this->_position]; } ///< Оператор доступа к члену.
-
-        friend bool operator == (const Iterator &left, const Iterator &right) noexcept
-        {
-            return left._position == right._position;
-        }
-
-        friend bool operator != (const Iterator &left, const Iterator &right) noexcept
-        {
-            return left._position != right._position;
-        }
-
-        friend Iterator& operator + (const Iterator &left, std::size_t right) noexcept
-        {
-            auto result = left;
-            result._position += right;
-            return result;
-        }
-
-        friend std::ptrdiff_t operator - (const Iterator &left, const Iterator &right) noexcept
-        {
-            return static_cast<std::ptrdiff_t> (left._position - right._position);
-        }
-
-    private:
-        Frugal<T, N> *_container;
-        std::size_t _position;
-    };
+    Frugal& operator = (Frugal &&)      = default; ///< Оператор перемещения.
 
     /// \brief Оператор индексирования.
     /// \return Ссылка на элемент.
@@ -334,11 +333,11 @@ public:
 
     /// \brief Указатель на первый элемент.
     /// \return Указатель.
-    Iterator begin() noexcept { return Iterator (this, 0); }
+    iterator begin() noexcept { return iterator (this, 0); }
 
     /// \brief Указатель за последним элементом.
     /// \return Указатель.
-    Iterator end() noexcept { return Iterator (this, this->_size); }
+    iterator end() noexcept { return iterator (this, this->_size); }
 
     /// \brief Ссылка на первый элемент.
     /// \return Ссылка.
@@ -530,6 +529,7 @@ public:
     }
 
 private:
+
     void _delay()
     {
         if (this->delayInterval > 0) {
@@ -545,12 +545,12 @@ class IRBIS_API Directory final
 {
 public:
 
-    explicit Directory (const std::string &name);
-    ~Directory ();
-    Directory  (const Directory&) = delete;  ///< Конструктор копирования.
-    Directory  (Directory &&)     = default; ///< Конструктор перемещения.
-    Directory& operator = (const Directory &) = delete;  ///< Оператор копирования.
-    Directory& operator = (Directory &&)      = default; ///< Оператор перемещения.
+    explicit Directory             (const std::string &name);
+             Directory             (const Directory&)  = delete;  ///< Конструктор копирования.
+             Directory             (Directory &&)      = default; ///< Конструктор перемещения.
+             Directory& operator = (const Directory &) = delete;  ///< Оператор копирования.
+             Directory& operator = (Directory &&)      = default; ///< Оператор перемещения.
+            ~Directory             ();
 
     std::string               find    (const std::string &name);
     std::string               read    ();
@@ -623,6 +623,8 @@ class IRBIS_API ChunkedBuffer final
 {
 public:
 
+    using iterator = RandomAccessIterator <ChunkedBuffer, Byte>;
+
     /// \brief Блок памяти.
     class IRBIS_API Chunk final
     {
@@ -630,24 +632,29 @@ public:
         Byte *data;
         Chunk *next;
 
-        explicit Chunk (std::size_t size);
-        Chunk (const Chunk &other)             = delete; ///< Конструктор копирования.
-        Chunk (Chunk &&other)                  = delete; ///< Конструктор перемещения.
-        Chunk& operator = (const Chunk &other) = delete; ///< Оператор копирования.
-        Chunk& operator = (Chunk &&other)      = delete; ///< Оператор перемещения.
-        ~Chunk();
+        explicit Chunk             (const std::size_t size);
+                 Chunk             (const Chunk&) = delete; ///< Конструктор копирования.
+                 Chunk             (Chunk&&)      = delete; ///< Конструктор перемещения.
+                 Chunk& operator = (const Chunk&) = delete; ///< Оператор копирования.
+                 Chunk& operator = (Chunk&&)      = delete; ///< Оператор перемещения.
+                ~Chunk();
     };
 
     const static std::size_t DefaultChunkSize;
 
-    explicit ChunkedBuffer (std::size_t chunkSize = DefaultChunkSize);
-    ChunkedBuffer (const ChunkedBuffer &)            = delete; ///< Конструктор копирования.
-    ChunkedBuffer (ChunkedBuffer &&)                 = delete; ///< Конструктор перемещения.
-    ChunkedBuffer operator = (const ChunkedBuffer &) = delete; ///< Оператор копирования.
-    ChunkedBuffer operator = (ChunkedBuffer &&)      = delete; ///< Оператор перемещения.
-    ~ChunkedBuffer();
+    explicit ChunkedBuffer             (std::size_t chunkSize = DefaultChunkSize);
+             ChunkedBuffer             (const ChunkedBuffer &) = delete;  ///< Конструктор копирования.
+             ChunkedBuffer             (ChunkedBuffer &&)      = default; ///< Конструктор перемещения.
+             ChunkedBuffer& operator = (const ChunkedBuffer &) = delete;  ///< Оператор копирования.
+             ChunkedBuffer& operator = (ChunkedBuffer &&)      = default; ///< Оператор перемещения.
+            ~ChunkedBuffer             ();
 
+    Byte& operator [] (std::size_t index) noexcept;
+
+    iterator    begin           () noexcept;
+    iterator    current         () noexcept;
     bool        empty           () const noexcept;
+    iterator    end             () noexcept;
     bool        eof             () const noexcept;
     int         peek            ();
     std::size_t position        () const noexcept;
@@ -1115,20 +1122,20 @@ public:
 
 /// \brief Обертка для хэндла.
 template <typename Traits>
-class uniqueHandle
+class UniqueHandle
 {
 public:
 
     using Handle = typename Traits::handle;
 
-    explicit uniqueHandle (Handle value = Traits::invalid()) noexcept
+    explicit UniqueHandle (Handle value = Traits::invalid()) noexcept
         : _value { value } {}
-    ~uniqueHandle() noexcept { this->_close(); }
-    uniqueHandle (const uniqueHandle&) = delete;
-    uniqueHandle (uniqueHandle &&other)  noexcept
+    ~UniqueHandle() noexcept { this->_close(); }
+    UniqueHandle (const UniqueHandle&) = delete;
+    UniqueHandle (UniqueHandle &&other)  noexcept
         : _value { other.release() } {}
-    uniqueHandle& operator = (const uniqueHandle&) = delete;
-    uniqueHandle& operator = (uniqueHandle &&other) noexcept
+    UniqueHandle& operator = (const UniqueHandle&) = delete;
+    UniqueHandle& operator = (UniqueHandle &&other) noexcept
     {
         if (this != &other) {
             this->reset (other.release());

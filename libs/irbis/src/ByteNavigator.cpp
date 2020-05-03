@@ -345,7 +345,6 @@ bool ByteNavigator::isWhitespace() const noexcept
 {
     const auto c = this->peekByte();
     return std::isspace (c);
-
 }
 
 /// \brief Считывание целого без знака.
