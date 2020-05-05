@@ -314,12 +314,12 @@ public:
 
     using iterator = RandomAccessIterator<Frugal<T, N>, T>;
 
-    Frugal ()                           = default; ///< Конструктор по умолчанию.
-    Frugal (const Frugal &)             = delete;  ///< Конструктор копирования.
-    Frugal (Frugal &&)                  = default; ///< Конструктор перемещения.
-    ~Frugal ()                          = default; ///< Деструктор.
-    Frugal& operator = (const Frugal &) = delete;  ///< Оператор копирования.
-    Frugal& operator = (Frugal &&)      = default; ///< Оператор перемещения.
+    Frugal             ()                   = default; ///< Конструктор по умолчанию.
+    Frugal             (const Frugal &)     = delete;  ///< Конструктор копирования.
+    Frugal             (Frugal &&) noexcept = default; ///< Конструктор перемещения.
+    ~Frugal            ()                   = default; ///< Деструктор.
+    Frugal& operator = (const Frugal &)     = delete;  ///< Оператор копирования.
+    Frugal& operator = (Frugal &&) noexcept = default; ///< Оператор перемещения.
 
     /// \brief Оператор индексирования.
     /// \return Ссылка на элемент.
