@@ -13,6 +13,7 @@
 #include "irbis_internal.h"
 
 #include <cctype>
+#include <limits>
 
 template <class CharType>
 struct ByteTraits final
@@ -28,6 +29,7 @@ struct ByteTraits final
     static int  compare (CharType left, CharType right) { return static_cast <int> (left - right); }
     static bool equals  (CharType left, CharType right) { return left == right; }
     static bool less    (CharType left, CharType right) { return left < right; }
+    static std::size_t length (const CharType *text)    { return ::strlen (text); }
 
     static bool isAlpha      (CharType c) { return static_cast <bool> (::isalpha (static_cast <int> (c))); }
     static bool isControl    (CharType c) { return c < ' '; }
@@ -52,6 +54,7 @@ struct NarrowTraits final
     static int  compare (CharType left, CharType right) { return static_cast <int> (left - right); }
     static bool equals  (CharType left, CharType right) { return left == right; }
     static bool less    (CharType left, CharType right) { return left < right; }
+    static std::size_t length (const CharType *text)    { return ::strlen (text); }
 
     static bool isAlpha      (CharType c) { return static_cast <bool> (::isalpha (c)); }
     static bool isControl    (CharType c) { return c < ' '; }
@@ -76,6 +79,7 @@ struct WideTraits final
     static int  compare (CharType left, CharType right) { return static_cast <int> (left - right); }
     static bool equals  (CharType left, CharType right) { return left == right; }
     static bool less    (CharType left, CharType right) { return left < right; }
+    static std::size_t length (const CharType *text)    { return ::wcslen (text); }
 
     static bool isAlpha      (CharType c) { return static_cast <bool> (::iswalpha (c)); }
     static bool isControl    (CharType c) { return c < ' '; }
@@ -392,6 +396,34 @@ struct TextRange final
         return *this;
     }
 
+    /// \brief Быстрый и грязный разбор фрагмента (начиная с текущей позиции) как целого числа.
+    /// \return Результат разбора.
+    /// \warning Знак числа не ожидается. Мусор на входе -- мусор на выходе.
+    int32_t parseInt32() const noexcept
+    {
+        int32_t result = 0;
+        auto ptr = m_current;
+        while (ptr != m_end) {
+            result = result * 10 + (*ptr - '0');
+            ++ptr;
+        }
+        return result;
+    }
+
+    /// \brief Быстрый и грязный разбор фрагмента (начиная с текущей позиции) как целого числа.
+    /// \return Результат разбора.
+    /// \warning Знак числа не ожидается. Мусор на входе -- мусор на выходе.
+    int64_t parseInt64() const noexcept
+    {
+        int64_t result = 0;
+        auto ptr = m_current;
+        while (ptr != m_end) {
+            result = result * 10 + (*ptr - '0');
+            ++ptr;
+        }
+        return result;
+    }
+
     /// \brief Подсматриваем текущий символ.
     /// \return Подсмотренный символ либо EOT.
     IRBIS_NODISCARD
@@ -615,6 +647,50 @@ struct TextRange final
         return result;
     }
 
+    /// \brief Считывание начиная с открывающего символа до закрывающего (включая их).
+    /// \param openChar Открывающий символ.
+    /// \param closeChar Закрывающий символ.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readOpenClose (const CharType openChar, const CharType closeChar) noexcept
+    {
+        TextRange result { m_current, m_current };
+        if (CharTraits::equals (this->peek(), openChar)) {
+            this->read();
+            while (m_current != m_end) {
+                if (CharTraits::equals (this->read(), closeChar)) {
+                    this->read();
+                    result.m_end = m_current;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /// \brief Считывание начиная с открывающего символа до закрывающего (включая их).
+    /// \param openChar C-строка с возможными открывающими символами.
+    /// \param closeChar C-строка с возможными закрывающими символами.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readOpenClose (const CharType *openChars, const CharType *closeChars) noexcept
+    {
+        const auto openEnd = openChars + CharTraits::length (openChars);
+        const auto closeEnd = closeChars + CharTraits::length (closeChars);
+        TextRange result { m_current, m_current };
+        if (CharTraits::find (openChars, openEnd, this->peek()) != openEnd) {
+            this->read();
+            while (m_current != m_end) {
+                if (CharTraits::find (closeChars, m_current, this->peek()) != closeEnd) {
+                    this->read();
+                    result.m_end = m_current;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     /// \brief Считываем следующий символ, пропуская указанные (если они появятся). Происходит движение по тексту.
     /// \tparam Args Тип символов.
     /// \param args Игнорируемые символы.
@@ -673,6 +749,52 @@ struct TextRange final
         return result;
     }
 
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение, однако, считывается).
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало ограничителя.
+    /// \param end Конец ограничителя.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    template <class Iter>
+    IRBIS_MAYBE_UNUSED
+    TextRange readTo (const Iter begin, const Iter end) noexcept
+    {
+        auto size = static_cast <std::size_t> (end - begin);
+        TextRange result { m_current, m_current };
+        if (size != 0) {
+            const auto found = this->search (begin, end);
+            if (found != m_end) {
+                while (m_current != found) {
+                    this->read (); // проматываем до начала ограничителя
+                }
+                result.m_end = m_current;
+                while (size != 0) {
+                    this->read(); // проматываем ограничитель
+                    --size;
+                }
+            }
+        }
+        return result;
+    }
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение, однако, считывается).
+    /// \param text C-строка-ограничитель.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readTo (const CharType *text) noexcept
+    {
+        return this->readTo (text, text + CharTraits::length (text));
+    }
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение, однако, считывается).
+    /// \param text C++-строка-ограничитель.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readTo (const std::basic_string <CharType> &text) noexcept
+    {
+        return this->readTo (std::begin (text), std::end (text));
+    }
+
     /// \brief Считывание текста вплоть до любого из указанных стоп-символов (не включая его). Происходит движение по тексту.
     /// \tparam Args Тип символов.
     /// \param args Стоп-символы.
@@ -694,6 +816,47 @@ struct TextRange final
         }
         result.m_end = m_current;
         return result;
+    }
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение и не считывается).
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало ограничителя.
+    /// \param end Конец ограничителя.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    template <class Iter>
+    IRBIS_MAYBE_UNUSED
+    TextRange readUntil (const Iter begin, const Iter end) noexcept
+    {
+        auto size = static_cast <std::size_t> (end - begin);
+        TextRange result { m_current, m_current };
+        if (size != 0) {
+            const auto found = this->search (begin, end);
+            if (found != m_end) {
+                while (m_current != found) {
+                    this->read (); // проматываем до начала ограничителя
+                }
+                result.m_end = m_current;
+            }
+        }
+        return result;
+    }
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение и не считывается).
+    /// \param text C-строка-ограничитель.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readUntil (const CharType *text) noexcept
+    {
+        return this->readUntil (text, text + CharTraits::length (text));
+    }
+
+    /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение и не считывается).
+    /// \param text C++-строка-ограничитель.
+    /// \return Прочитанный фрагмент (возможно, пустой).
+    IRBIS_MAYBE_UNUSED
+    TextRange readUntil (const std::basic_string <CharType> &text) noexcept
+    {
+        return this->readUntil (std::begin (text), std::end (text));
     }
 
     /// \brief Считывание текста до тех пор, пока он состоит из указанных разрешенных символов. Происходит движение по тексту.
@@ -727,6 +890,28 @@ struct TextRange final
         while (m_current != m_end) {
             const auto c = this->value();
             if (!CharTraits::isAlpha (c)) {
+                break;
+            }
+            this->read();
+        }
+        result.m_end = m_current;
+        return result;
+    }
+
+    /// \brief Чтение слова (состоящего из алфавитно-цифровых символов). Происходит движение по тексту.
+    /// \tparam Args Тип символов.
+    /// \param args Дополнительные символы, засчитываемые как входящие в слово.
+    /// \return Прочитанное слово (возможно, пустое).
+    template <class ... Args>
+    IRBIS_MAYBE_UNUSED
+    TextRange readWord (const Args ... args) noexcept
+    {
+        const auto list = { args ... };
+        TextRange result { m_current, m_current };
+        while (m_current != m_end) {
+            const auto c = this->value();
+            if (!CharTraits::isAlpha (c)
+                && !CharTraits::find (std::begin (list), std::end (list)), c) {
                 break;
             }
             this->read();
@@ -772,10 +957,88 @@ struct TextRange final
         return *this;
     }
 
+    /// \brief Поиск подстроки, заданной с помощью итераторов. Движения по тексту не происходит.
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало строки.
+    /// \param end Конец строки.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    template <class Iter>
+    IRBIS_NODISCARD
+    IteratorType search (const Iter begin, const Iter end) const noexcept
+    {
+        if (begin != end && m_current != m_end) {
+            const auto otherLength = static_cast <std::size_t> (end - begin);
+            const auto thisEnd = m_end - otherLength + 1;
+            for (auto thisPtr = m_current; thisPtr != thisEnd; ++thisPtr) {
+                auto found = true;
+                auto ptr = thisPtr;
+                for (auto thatPtr = begin; thatPtr != end; ++thatPtr, ++ptr) {
+                    const auto thisChar = static_cast <CharType> (*ptr);
+                    const auto thatChar = static_cast <CharType> (*thatPtr);
+                    if (!CharTraits::equals (thisChar, thatChar)) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) {
+                    return thisPtr;
+                }
+            }
+        }
+        return m_end;
+    }
+
+    /// \brief Поиск подстроки. Движения по тексту не происходит.
+    /// \param text Искомая C-строка.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType search (const CharType *text) const noexcept
+    {
+        return this->search (text, text + CharTraits::length (text));
+    }
+
+    /// \brief Поиск подстроки. Движения по тексту не происходит.
+    /// \param text Искомая C++-строка.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType search (const std::basic_string <CharType> &text) const noexcept
+    {
+        return this->search (std::begin (text), std::end (text));
+    }
+
     /// \brief Длина текста в символах (включая все служебные).
     /// \return Длина текста.
     IRBIS_NODISCARD
     std::size_t size() const noexcept { return static_cast <std::size_t> (m_end - m_begin); }
+
+    /// \brief Пропустить указанное количество символов. Происходит движение по тексту вперед.
+    /// \param nchars Число символов.
+    /// \return this.
+    IRBIS_MAYBE_UNUSED
+    TextRange& skip (std::size_t nchars) noexcept
+    {
+        while (nchars != 0) {
+            this->read();
+            --nchars;
+        }
+        return *this;
+    }
+
+    /// \brief Пропустить следующий символ, если он совпадает с одним из перечисленных. Происходит движение по тексту вперед.
+    /// \tparam Args Тип символов.
+    /// \param args Разрешенные символы для пропуска.
+    /// \return this.
+    template <class ... Args>
+    IRBIS_MAYBE_UNUSED
+    TextRange& skipOne (Args ... args) noexcept
+    {
+        const auto list = { args... };
+        const auto c = this->peek();
+        if (CharTraits::find (list.begin(), list.end(), c) != list.end()) {
+            this->read();
+        }
+        return *this;
+    }
 
     /// \brief Пропуск символов, пока не встретится любой из перечисленных. Происходит движение по тексту.
     /// \tparam Args Тип символов.
@@ -818,7 +1081,7 @@ struct TextRange final
     /// \brief Пропуск до начала следующей строки. Происходит движение по тексту.
     /// \return this.
     IRBIS_MAYBE_UNUSED
-    TextRange& skipLine () noexcept
+    TextRange& skipLine() noexcept
     {
         while (!this->eot()) {
             const auto c = this->read();
@@ -834,6 +1097,41 @@ struct TextRange final
                 }
                 break;
             }
+        }
+        return *this;
+    }
+
+    /// \brief Пропуск символов, не составляющих идентификатор. Происходит движение по тексту.
+    /// \return this.
+    IRBIS_MAYBE_UNUSED
+    TextRange& skipNonWord() noexcept
+    {
+        while (m_current != m_end) {
+            const auto c = this->value();
+            if (CharTraits::isLetter(c)) {
+                break;
+            }
+            this->read();
+        }
+        return *this;
+    }
+
+    /// \brief Пропуск символов, не составляющих идентификатор. Происходит движение по тексту.
+    /// \tparam Args Тип символов.
+    /// \param args Дополнительные символы, считающиеся принадлежащими идентификатору.
+    /// \return this.
+    template <class ... Args>
+    IRBIS_MAYBE_UNUSED
+    TextRange& skipNonWord (const Args ... args) noexcept
+    {
+        const auto list = { args ... };
+        while (m_current != m_end) {
+            const auto c = this->value();
+            if (CharTraits::isLetter(c)
+                || CharTraits::find (list.begin(), list.end(), c) != list.end()) {
+                break;
+            }
+            this->read();
         }
         return *this;
     }
@@ -884,40 +1182,15 @@ struct TextRange final
         return { start, start + length };
     }
 
-    /// \brief Совпадает ли текущая позиция с текущей позицией другого диапазона? Движения по тексту не происходит.
-    /// \param prefix Диапазон для сравнения.
-    /// \return true если совпадает.
-    IRBIS_NODISCARD
-    bool startsWith (const TextRange &prefix) const noexcept
-    {
-        const auto prefixSize = prefix.remainingSize();
-        if ((prefixSize > this->remainingSize()) || (prefixSize == 0)) {
-            return false;
-        }
-
-        auto thisPtr = m_current;
-        auto prefixPtr = prefix.m_current;
-        const auto prefixEnd = prefix.m_end;
-
-        while (prefixPtr != prefixEnd) {
-            if (!CharTraits::equals (*thisPtr, *prefixPtr)) {
-                return false;
-            }
-            ++thisPtr;
-            ++prefixPtr;
-        }
-
-        return true;
-    }
-
     /// \brief Разбиение текста на фрагменты по указанному разделителю.
     /// \param delimiter Символ-разделитель.
     /// \param nelem Максимальное количество элементов в результате.
     /// \return Вектор фрагментов.
     IRBIS_NODISCARD
-    std::vector<TextRange> split (const CharType delimiter, std::size_t nelem) const
+    std::vector <TextRange> split (const CharType delimiter,
+        std::size_t nelem = std::numeric_limits<std::size_t>::max()) const
     {
-        std::vector<TextRange> result;
+        std::vector <TextRange> result;
         auto start = m_current;
         auto current = start;
         --nelem;
@@ -942,18 +1215,122 @@ struct TextRange final
         return result;
     }
 
-    /// \brief Быстрый и грязный разбор фрагмента (начиная с текущей позиции) как целого числа.
-    /// \return Результат разбора.
-    /// \warning Знак числа не ожидается. Мусор на входе -- мусор на выходе.
-    int64_t parseInt64() const noexcept
+    /// \brief Разбиение текста на фрагменты по указанным разделителям.
+    /// \tparam Args Тип разделителей.
+    /// \param delimiter Символы-разделители.
+    /// \param nelem Максимальное количество элементов в результате.
+    /// \return Вектор фрагментов.
+    template <class ... Args>
+    IRBIS_NODISCARD
+    std::vector <TextRange> split (const Args ... args,
+        std::size_t nelem = std::numeric_limits<std::size_t>::max()) const
     {
-        int64_t result = 0;
-        auto ptr = m_current;
-        while (ptr != m_end) {
-            result = result * 10 + (*ptr - '0');
-            ++ptr;
+        std::vector <TextRange> result;
+        const auto list = { args... };
+        auto start = m_current;
+        auto current = start;
+        --nelem;
+        while ((nelem != 0) && (start != m_end)) {
+            while (current != m_end) {
+                if (CharTraits::find (*current, list)) {
+                    break;
+                }
+                ++current;
+            }
+            if (current != start) {
+                result.emplace_back (start, current);
+            }
+            start = ++current;
+            --nelem;
         }
+
+        if ((nelem == 0) && (start != m_end)) {
+            result.emplace_back (start, m_end);
+        }
+
         return result;
+    }
+
+    /// \brief Разбиение текста на фрагменты по указанному разделителю, заданному парой итераторов. Движения по тексту не происходит.
+    /// \tparam Iter Тип итераторов.
+    /// \param begin Начало строки-разделителя.
+    /// \param end Конец строки-разделителя.
+    /// \param nelem Максимальное количество элементов в результате.
+    /// \return Вектор фрагментов.
+    template <class Iter>
+    IRBIS_NODISCARD
+    std::vector <TextRange> split (const Iter begin, const Iter end,
+        std::size_t nelem = std::numeric_limits<std::size_t>::max()) const
+    {
+        std::vector<TextRange> result;
+        const auto size = static_cast <std::size_t> (end - begin);
+        const auto saveCurrent = m_current;
+        --nelem;
+
+        while ((nelem != 0) && (m_current != m_end)) {
+            const auto found = this->search (begin, end);
+            if (found == m_end) {
+                result.emplace_back (m_current, m_end);
+                break;
+            }
+            result.emplace_back (m_current, found);
+            m_current = found + size;
+            --nelem;
+        }
+
+        m_current = saveCurrent;
+        return result;
+    }
+
+    /// \brief Разбиение текста на фрагменты по указанному разделителю, заданному C-строкой. Движения по тексту не происходит.
+    /// \param delimiter Строка-разделитель.
+    /// \param nelem Максимальное количество элементов в результате.
+    /// \return Вектор фрагментов.
+    IRBIS_NODISCARD
+    std::vector <TextRange> split (const CharType *delimiter,
+        std::size_t nelem = std::numeric_limits<std::size_t>::max()) const
+    {
+        const auto length = CharTraits::length (delimiter);
+        assert (length != 0);
+        return this->split (delimiter, delimiter + length, nelem);
+    }
+
+    /// \brief Разбиение текста на фрагменты по указанному разделителю, заданному C++-строкой. Движения по тексту не происходит.
+    /// \param delimiter Строка-разделитель.
+    /// \param nelem Максимальное количество элементов в результате.
+    /// \return Вектор фрагментов.
+    IRBIS_NODISCARD
+    std::vector <TextRange> split (const std::basic_string <CharType> &delimiter,
+        std::size_t nelem = std::numeric_limits<std::size_t>::max()) const
+    {
+        assert (!delimiter.empty());
+        return this->split (std::begin (delimiter), std::end (delimiter), nelem);
+    }
+
+    /// \brief Совпадает ли текущая позиция с текущей позицией другого диапазона? Движения по тексту не происходит.
+    /// \param prefix Диапазон для сравнения.
+    /// \return true если совпадает.
+    IRBIS_NODISCARD
+    bool startsWith (const TextRange &prefix) const noexcept
+    {
+        const auto prefixSize = prefix.remainingSize();
+        if ((prefixSize > this->remainingSize()) || (prefixSize == 0)) {
+            return false;
+        }
+
+        auto thisPtr = m_current;
+        auto prefixPtr = prefix.m_current;
+        const auto prefixEnd = prefix.m_end;
+
+        while (prefixPtr != prefixEnd) {
+            if (!CharTraits::equals (*thisPtr, *prefixPtr)) {
+                return false;
+            }
+            ++thisPtr;
+            ++prefixPtr;
+        }
+
+        return true;
     }
 
     /// \brief Материализация в строку (начиная с текущей позиции). Движения по тексту не происходит.
@@ -1480,6 +1857,7 @@ int main()
 
     {
         const char *hello = "Hello\nworld";
+        const char *needle = "world";
         auto range = makeRange (hello);
         std::cout << range.front () << std::endl;
         std::cout << range.peek () << std::endl;
@@ -1490,6 +1868,7 @@ int main()
         std::cout << range.isDigit () << std::endl;
         std::cout << range.isWhitespace () << std::endl;
         std::cout << range.contains ('u', 'H') << std::endl;
+        std::cout << range.search (needle, needle + 5) << std::endl;
         while (true) {
             const auto c = range.read ();
             if (!c) {
