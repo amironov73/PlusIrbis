@@ -1742,8 +1742,8 @@ public:
     /// \return this.
     FastPImpl& operator = (const FastPImpl &other)
     {
-        auto another = const_cast <FastPImpl&> (other);
-        *this->ptr() = *another.ptr();
+        auto another = const_cast <FastPImpl*> (&other);
+        *(this->ptr()) = *(another->ptr());
         return *this;
     }
 

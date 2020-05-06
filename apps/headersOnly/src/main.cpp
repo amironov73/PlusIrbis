@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 //==============================================================================
@@ -14,6 +14,7 @@
 
 #include <cctype>
 #include <limits>
+#include <iterator>
 
 template <class CharType>
 struct ByteTraits final
@@ -125,7 +126,7 @@ struct TextRange final
         if (index >= this->size()) {
             return EOT();
         }
-        return static_cast <CharType> (* (m_begin + index));
+        return static_cast <CharType> (* (m_begin + static_cast <std::ptrdiff_t> (index)));
     }
 
     /// \brief Последний символ в тексте.
@@ -144,9 +145,20 @@ struct TextRange final
     IRBIS_NODISCARD
     std::size_t column() const noexcept { return m_column; }
 
+    /// \brief Сравнение двух символов.
+    /// \param left Первый символ.
+    /// \param right Второй символ.
+    /// \return Результат сравнения
+    IRBIS_NODISCARD
+    static int compare (const CharType left, const CharType right) noexcept
+    {
+        return CharTraits::compare (left, right);
+    }
+
     /// \brief Сравнивает поэлементно два диапазона (оба начиная с текущей позиции).
     /// \param other Диапазон для сравнения.
     /// \return 0, если диапазоны поэлементно равны, меньше 0, если this меньше, больше 0, если this больше.
+    IRBIS_NODISCARD
     int compareTo (const TextRange &other) const noexcept
     {
         auto thisPtr = m_current;
@@ -162,7 +174,7 @@ struct TextRange final
             if (otherPtr == otherEnd) {
                 return 1;
             }
-            const auto result = CharTraits::compare (*thisPtr, *otherPtr);
+            const auto result = compare (*thisPtr, *otherPtr);
             if (result != 0) {
                 return result;
             }
@@ -220,7 +232,7 @@ struct TextRange final
         const auto suffixEnd = suffix.m_end;
 
         while (suffixPtr != suffixEnd) {
-            if (!CharTraits::equals (*thisPtr, *suffixPtr)) {
+            if (!equals (*thisPtr, *suffixPtr)) {
                 return false;
             }
             ++thisPtr;
@@ -230,13 +242,69 @@ struct TextRange final
         return true;
     }
 
+    /// \brief Совпадает ли конец данного диапазона с указанным диапазоном? Движения по тексту не происходитт.
+    /// \tparam Iter Тип итератора.
+    /// \param suffixBegin Начало другого диапазона.
+    /// \param suffixEnd Конец другого диапазона.
+    /// \return true если совпадает.
+    template <class Iter>
+    IRBIS_NODISCARD
+    bool endsWith (const Iter suffixBegin, const Iter suffixEnd) const noexcept
+    {
+        const auto suffixSize = static_cast <std::size_t> (suffixEnd - suffixBegin);
+        if ((suffixSize > this->remainingSize()) || (suffixSize == 0)) {
+            return false;
+        }
+
+        auto thisPtr = m_end - suffixSize;
+        auto suffixPtr = suffixBegin;
+        while (suffixPtr != suffixEnd) {
+            if (!equals (*thisPtr, *suffixPtr)) {
+                return false;
+            }
+            ++thisPtr;
+            ++suffixPtr;
+        }
+
+        return true;
+    }
+
+    /// \brief Совпадает ли конец данного диапазона с указанной строкой? Движения по тексту не происходит.
+    /// \param suffix C-строка для сравнения.
+    /// \return true если совпадает.
+    IRBIS_NODISCARD
+    bool endsWith (const CharType *suffix) const noexcept
+    {
+        return this->endsWith (suffix, suffix + CharTraits::length (suffix));
+    }
+
+    /// \brief Совпадает ли конец данного диапазона с указанной строкой? Движения по тексту не происходит.
+    /// \param suffix C++-строка для сравнения.
+    /// \return true если совпадает.
+    IRBIS_NODISCARD
+    bool endsWidth (const std::basic_string <CharType> &suffix) const noexcept
+    {
+        return this->endsWith (std::begin (suffix), std::end (suffix));
+    }
+
     /// \brief Достигнут конец текста?
     /// \return true если достигнут.
     IRBIS_NODISCARD
     bool eot() const noexcept { return m_current == m_end; }
 
+    /// \brief Проверка двух символов на равенство.
+    /// \param left Первый символ.
+    /// \param right Второй символ.
+    /// \return true, если символы считаются равными.
+    IRBIS_NODISCARD
+    static bool equals (const CharType left, const CharType right) noexcept
+    {
+        return CharTraits::equals (left, right);
+    }
+
     /// \brief Извлечение целого числа без знака.
     /// \return Поддиапазон с числом (возможно, пустой).
+    IRBIS_NODISCARD
     TextRange extractInteger () noexcept
     {
         // Сначала пропускаем нечисловые символы
@@ -270,7 +338,7 @@ struct TextRange final
     /// \brief Поиск первого вхождения любого из указанных символов (начиная с текущей позиции).
     /// \tparam Args Тип символов.
     /// \param args Искомые символы.
-    /// \return Итератор на указанный символ либо итератор за концом текста.
+    /// \return Итератор на найденный символ либо итератор за концом текста.
     template <class ... Args>
     IRBIS_NODISCARD
     IteratorType find (const Args ... args) const noexcept
@@ -280,6 +348,29 @@ struct TextRange final
             const auto c = static_cast <CharType> (*ptr);
             if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
                 return ptr;
+            }
+        }
+        return m_end;
+    }
+
+    /// \brief Поиск последнего вхождения любого из указанных символов (начиная с текущей позиции).
+    /// \tparam Args Тип символы.
+    /// \param args Искомые символы.
+    /// \return Итератор на найденный символ либо итератор за концом текста.
+    template <class ... Args>
+    IRBIS_NODISCARD
+    IteratorType findLast (const Args ... args) const noexcept
+    {
+        const auto list = { args... };
+        if (m_current != m_end) {
+            for (auto ptr = m_end - 1; ptr != m_current; --ptr) {
+                const char c = static_cast <CharType> (*ptr);
+                if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
+                    return ptr;
+                }
+            }
+            if (CharTraits::find (std::begin (list), std::end (list), this->value()) != std::end (list)) {
+                return m_current;
             }
         }
         return m_end;
@@ -444,7 +535,7 @@ struct TextRange final
         auto ptr = m_current;
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
-            if (CharTraits::find (list.begin(), list.end(), c) == list.end()) {
+            if (CharTraits::find (std::begin (list), std::end (list), c) == std::end (list)) {
                 return ptr;
             }
             ++ptr;
@@ -461,7 +552,7 @@ struct TextRange final
         auto ptr = m_current;
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
-            if (CharTraits::equal (c, '\r') || CharTraits::equal (c, '\n')) {
+            if (equals (c, '\r') || equals (c, '\n')) {
                 break;
             }
             ++ptr;
@@ -482,7 +573,7 @@ struct TextRange final
         auto ptr = m_current;
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
-            if (CharTraits::find (list.begin(), list.end(), c) != list.end()) {
+            if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
                 return ptr;
             }
             ++ptr;
@@ -524,7 +615,7 @@ struct TextRange final
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
             ++ptr;
-            if (CharTraits::find (list.begin(), list.end(), c) != list.end()) {
+            if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
                 break;
             }
         }
@@ -545,7 +636,7 @@ struct TextRange final
         IteratorType ptr = m_current;
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
-            if (CharTraits::find (list.begin(), list.end(), c) != list.end()) {
+            if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
                 break;
             }
             ++ptr;
@@ -567,7 +658,7 @@ struct TextRange final
         auto ptr = m_current;
         while (ptr != m_end) {
             const auto c = static_cast <CharType> (*ptr);
-            if (CharTraits::find (list.begin(), list.end(), result) == list.end()) {
+            if (CharTraits::find (std::begin (list), std::end (list), result) == std::end (list)) {
                 break;
             }
             ++ptr;
@@ -614,7 +705,7 @@ struct TextRange final
     {
         TextRange result { m_current, m_current };
         while (this->isDigit()) {
-            ++m_current;
+            this->read();
         }
         result.m_end = m_current;
 
@@ -629,21 +720,19 @@ struct TextRange final
     {
         TextRange result { m_current, m_current };
         while (m_current != m_end) {
-            const auto c = static_cast <CharType> (*m_current);
-            if (CharTraits::equals (c, '\r') || CharTraits::equals (c, '\n')) {
+            const auto c = this->read();
+            if (equals (c, '\r')) {
+                result.m_end = m_current - 1;
+                if (equals (this->peek(), '\n')) {
+                    this->read();
+                }
                 break;
             }
-            this->read();
+            if (equals (c, '\n')) {
+                result.m_end = m_current - 1;
+                break;
+            }
         }
-        result.m_end = m_current;
-
-        if (CharTraits::equals (this->peek(), '\r')) {
-            this->read();
-        }
-        if (CharTraits::equals (this->peek(), '\n')) {
-            this->read();
-        }
-
         return result;
     }
 
@@ -655,10 +744,10 @@ struct TextRange final
     TextRange readOpenClose (const CharType openChar, const CharType closeChar) noexcept
     {
         TextRange result { m_current, m_current };
-        if (CharTraits::equals (this->peek(), openChar)) {
+        if (equals (this->peek(), openChar)) {
             this->read();
             while (m_current != m_end) {
-                if (CharTraits::equals (this->read(), closeChar)) {
+                if (equals (this->read(), closeChar)) {
                     this->read();
                     result.m_end = m_current;
                     break;
@@ -911,7 +1000,7 @@ struct TextRange final
         while (m_current != m_end) {
             const auto c = this->value();
             if (!CharTraits::isAlpha (c)
-                && !CharTraits::find (std::begin (list), std::end (list)), c) {
+                && CharTraits::find (std::begin (list), std::end (list), c) == std::end (list)) {
                 break;
             }
             this->read();
@@ -943,7 +1032,7 @@ struct TextRange final
     /// \return Длина непрочитанного остатка в символах.
     std::size_t remainingSize() const noexcept
     {
-        return static_cast<std::size_t> (m_end - m_current);
+        return static_cast <std::size_t> (m_end - m_current);
     }
 
     /// \brief Перемотка в начало.
@@ -957,6 +1046,37 @@ struct TextRange final
         return *this;
     }
 
+    /// \brief Поиск подстроки, заданной другим диапазоном. Движения по тексту не происходит.
+    /// \param that Искомая подстрока.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType search (const TextRange &that) const noexcept
+    {
+        if (!that.empty() && m_current != m_end) {
+            const auto thatSize = that.size();
+            if (thatSize > this->size()) {
+                return m_end;
+            }
+            const auto thisEnd = m_end - thatSize + 1;
+            for (auto thisPtr = m_current; thisPtr != thisEnd; ++thisPtr) {
+                auto found = true;
+                auto ptr = thisPtr;
+                for (auto thatPtr = that.m_current; thatPtr != that.m_end; ++thatPtr) {
+                   const auto thisChar = static_cast <CharType> (*ptr);
+                   const auto thatChar = static_cast <CharType> (*thatPtr);
+                   if (!equals (thisChar, thatChar)) {
+                       found = false;
+                       break;
+                   }
+                }
+                if (found) {
+                    return thisPtr;
+                }
+            }
+        }
+        return m_end;
+    }
+
     /// \brief Поиск подстроки, заданной с помощью итераторов. Движения по тексту не происходит.
     /// \tparam Iter Тип итератора.
     /// \param begin Начало строки.
@@ -967,15 +1087,18 @@ struct TextRange final
     IteratorType search (const Iter begin, const Iter end) const noexcept
     {
         if (begin != end && m_current != m_end) {
-            const auto otherLength = static_cast <std::size_t> (end - begin);
-            const auto thisEnd = m_end - otherLength + 1;
+            const auto thatSize = static_cast <std::size_t> (end - begin);
+            if (thatSize > this->size()) {
+                return m_end;
+            }
+            const auto thisEnd = m_end - thatSize + 1;
             for (auto thisPtr = m_current; thisPtr != thisEnd; ++thisPtr) {
                 auto found = true;
                 auto ptr = thisPtr;
                 for (auto thatPtr = begin; thatPtr != end; ++thatPtr, ++ptr) {
                     const auto thisChar = static_cast <CharType> (*ptr);
                     const auto thatChar = static_cast <CharType> (*thatPtr);
-                    if (!CharTraits::equals (thisChar, thatChar)) {
+                    if (!equals (thisChar, thatChar)) {
                         found = false;
                         break;
                     }
@@ -1004,6 +1127,93 @@ struct TextRange final
     IteratorType search (const std::basic_string <CharType> &text) const noexcept
     {
         return this->search (std::begin (text), std::end (text));
+    }
+
+    /// \brief Поиск последнего вхождения подстроки, заданной другим диапазоном. Движения по тексту не происходит.
+    /// \param that Искомая подстрока.
+    /// \return Итератор на последнюю найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType searchLast (const TextRange &that) const noexcept
+    {
+        if (!that.empty() && m_current != m_end) {
+            const auto thatSize = that.size();
+            if (thatSize > this->size()) {
+                return m_end;
+            }
+            for (auto thisPtr = m_end - thatSize + 1; thisPtr != m_current; --thisPtr) {
+                auto found = true;
+                auto ptr = thisPtr;
+                for (auto thatPtr = that.m_current; thatPtr != that.m_end; ++thatPtr) {
+                    const auto thisChar = static_cast <CharType> (*ptr);
+                    const auto thatChar = static_cast <CharType> (*thatPtr);
+                    if (!equals (thisChar, thatChar)) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) {
+                    return thisPtr;
+                }
+            }
+            if (this->startsWith (that)) {
+                return m_current;
+            }
+        }
+        return m_end;
+    }
+
+    /// \brief Поиск последнего вхождения подстроки, заданной с помощью итераторов. Движения по тексту не происходит.
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало строки.
+    /// \param end Конец строки.
+    /// \return Итератор на последнюю найденную позицию либо за концом диапазона.
+    template <class Iter>
+    IRBIS_NODISCARD
+    IteratorType searchLast (const Iter begin, const Iter end) const noexcept
+    {
+        if (begin != end && m_current != m_end) {
+            const auto thatSize = static_cast <std::size_t> (end - begin);
+            if (thatSize > this->size()) {
+                return m_end;
+            }
+            for (auto thisPtr = m_end - thatSize + 1; thisPtr != m_current; --thisPtr) {
+                auto found = true;
+                auto ptr = thisPtr;
+                for (auto thatPtr = begin; thatPtr != end; ++thatPtr) {
+                    const auto thisChar = static_cast <CharType> (*ptr);
+                    const auto thatChar = static_cast <CharType> (*thatPtr);
+                    if (!equals (thisChar, thatChar)) {
+                        found = false;
+                        break;
+                    }
+                }
+                if (found) {
+                    return thisPtr;
+                }
+            }
+            if (this->startsWith (begin, end)) {
+                return m_current;
+            }
+        }
+        return m_end;
+    }
+
+    /// \brief Поиск последнего вхождения подстроки. Движения по тексту не происходит.
+    /// \param text Искомая C-строка.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType searchLast (const CharType *text) const noexcept
+    {
+        return this->searchLast (text, text + CharTraits::length (text));
+    }
+
+    /// \brief Поиск последнего вхождения подстроки. Движения по тексту не происходит.
+    /// \param text Искомая C++-строка.
+    /// \return Итератор на первую найденную позицию либо за концом диапазона.
+    IRBIS_NODISCARD
+    IteratorType searchLast (const std::basic_string <CharType> &text) const noexcept
+    {
+        return this->searchLast (std::begin (text), std::end (text));
     }
 
     /// \brief Длина текста в символах (включая все служебные).
@@ -1192,9 +1402,9 @@ struct TextRange final
     {
         std::vector <TextRange> result;
         auto start = m_current;
-        auto current = start;
         --nelem;
         while ((nelem != 0) && (start != m_end)) {
+            auto current = start;
             while (current != m_end) {
                 if (CharTraits::equal (*current, delimiter)) {
                     break;
@@ -1208,7 +1418,7 @@ struct TextRange final
             --nelem;
         }
 
-        if ((nelem == 0) && (start != m_end)) {
+        if (start != m_end) {
             result.emplace_back (start, m_end);
         }
 
@@ -1228,9 +1438,9 @@ struct TextRange final
         std::vector <TextRange> result;
         const auto list = { args... };
         auto start = m_current;
-        auto current = start;
         --nelem;
         while ((nelem != 0) && (start != m_end)) {
+            auto current = start;
             while (current != m_end) {
                 if (CharTraits::find (*current, list)) {
                     break;
@@ -1244,7 +1454,7 @@ struct TextRange final
             --nelem;
         }
 
-        if ((nelem == 0) && (start != m_end)) {
+        if (start != m_end) {
             result.emplace_back (start, m_end);
         }
 
@@ -1271,11 +1481,16 @@ struct TextRange final
             const auto found = this->search (begin, end);
             if (found == m_end) {
                 result.emplace_back (m_current, m_end);
+                m_current = m_end;
                 break;
             }
             result.emplace_back (m_current, found);
             m_current = found + size;
             --nelem;
+        }
+
+        if (m_current != m_end) {
+            result.emplace_back (m_current, m_end);
         }
 
         m_current = saveCurrent;
@@ -1333,6 +1548,50 @@ struct TextRange final
         return true;
     }
 
+    /// \brief Совпадает ли текущая позиция данного диапазона с указанным фрагментом? Движения по тексту не происходит.
+    /// \param prefix Диапазон для сравнения.
+    /// \return true если совпадает.
+    template <class Iter>
+    IRBIS_NODISCARD
+    bool startsWith (const Iter prefixBegin, const Iter prefixEnd) const noexcept
+    {
+        const auto prefixSize = static_cast <std::size_t> (prefixEnd - prefixBegin);
+        if ((prefixSize > this->remainingSize()) || (prefixSize == 0)) {
+            return false;
+        }
+
+        auto thisPtr = m_current;
+        auto prefixPtr = prefixBegin;
+
+        while (prefixPtr != prefixEnd) {
+            if (!CharTraits::equals (*thisPtr, *prefixPtr)) {
+                return false;
+            }
+            ++thisPtr;
+            ++prefixPtr;
+        }
+
+        return true;
+    }
+
+    /// \brief Совпадает ли текущая позиция данного диапазона с указанной строкой? Движения по тексту не происходит.
+    /// \param prefix C-строка для сравнения.
+    /// \return true если совпадает.
+    IRBIS_NODISCARD
+    bool startsWith (const CharType *prefix) const noexcept
+    {
+        return this->startsWith (prefix, prefix + CharTraits::length (prefix));
+    }
+
+    /// \brief Совпадает ли текущая позиция данного диапазона с указанной строкой? Движения по тексту не происходит.
+    /// \param prefix C++-строка для сравнения.
+    /// \return true если совпадает.
+    IRBIS_NODISCARD
+    bool startsWith (const std::basic_string <CharType> &prefix) const noexcept
+    {
+        return this->startsWith (std::begin (prefix), std::end (prefix));
+    }
+
     /// \brief Материализация в строку (начиная с текущей позиции). Движения по тексту не происходит.
     /// \return Строка (возможно, пустая).
     IRBIS_NODISCARD
@@ -1353,6 +1612,179 @@ struct TextRange final
         result.reserve (this->size());
         result.insert (std::end (result), m_current, m_end);
         return result;
+    }
+
+    /// \brief Преобразование символов (начиная с текущей позиции) к нижнему регистру.
+    /// \return this.
+    IRBIS_MAYBE_UNUSED
+    TextRange& toLower() noexcept
+    {
+        for (auto ptr = m_current; ptr != m_end; ++ptr) {
+            *ptr = CharTraits::toLower (*ptr);
+        }
+        return *this;
+    }
+
+    /// \brief Преобразование символов (начиная с текущей позиции) к нижнему регистру.
+    /// \return this.
+    IRBIS_MAYBE_UNUSED
+    TextRange& toUpper() noexcept
+    {
+        for (auto ptr = m_current; ptr != m_end; ++ptr) {
+            *ptr = CharTraits::toUpper (*ptr);
+        }
+        return *this;
+    }
+
+    /// \brief Удаление указанных символов с конца строки.
+    /// \tparam Args Тип символов.
+    /// \param args Символы, подлежащие удалению.
+    /// \return Диапазон с удаленными символами.
+    template <class ... Args>
+    IRBIS_NODISCARD
+    TextRange trimEnd (const Args ... args) const noexcept
+    {
+        const auto list = { args ... };
+        TextRange result { m_current, m_end };
+        if (m_current != m_end) {
+            for (auto current = m_end - 1; current != m_current; --current) {
+                const auto c = static_cast <CharType> (*current);
+                if (CharTraits::find (list.begin (), list.end (), c) == list.end ()) {
+                    result.m_end = current + 1;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    /// \brief Удаление указанных символов с конца строки.
+    /// \tparam Iter Тип итератор.
+    /// \param begin Начало символов, подлежащих удалению.
+    /// \param end Конец.
+    /// \return Диапазон с удаленными символами.
+    template <class Iter>
+    IRBIS_NODISCARD
+    TextRange trimEnd (const Iter begin, const Iter end) const noexcept
+    {
+        TextRange result { m_current, m_end };
+        if (m_current != m_end) {
+        for (auto current = m_end - 1; current != m_current; --current) {
+            const auto c = static_cast <CharType> (*current);
+            if (CharTraits::find (begin, end, c) == end) {
+                result.m_end = current + 1;
+                break;
+            }
+        }
+        }
+        return result;
+    }
+
+    /// \brief Удаление указанных символов с конца строки.
+    /// \param symbols C-строка с символами, подлежашими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trimEnd (const CharType *symbols) const noexcept
+    {
+        return this->trimEnd (symbols, symbols + CharTraits::length (symbols));
+    }
+
+    /// \brief Удаление указанных символов с конца строки.
+    /// \param symbols C++-строка с символами, подлежащими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trimEnd (const std::basic_string <CharType> &symbols) const noexcept
+    {
+        return this->trimEnd (std::begin (symbols), std::end (symbols));
+    }
+
+    /// \brief Удаление указанных символов с начала строки.
+    /// \tparam Args Тип символов.
+    /// \param args Символы, подлежащие удалению.
+    /// \return Диапазон с удаленными символами.
+    template <class ... Args>
+    IRBIS_NODISCARD
+    TextRange trimStart (const Args ... args) const noexcept
+    {
+        const auto list = { args ... };
+        TextRange result { m_current, m_end };
+        for (auto current = m_current; current != m_end; ++current) {
+            const auto c = static_cast <CharType> (*current);
+            if (CharTraits::find (list.begin(), list.end(), c) == list.end()) {
+                result.m_begin = current;
+                result.m_current = current;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /// \brief Удаление указанных символов с начала строки.
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало символов, подлежащих удалению.
+    /// \param end Конец.
+    /// \return Диапазон с удаленными символами.
+    template <class Iter>
+    IRBIS_NODISCARD
+    TextRange trimStart (const Iter begin, const Iter end) const noexcept
+    {
+        TextRange result { m_current, m_end };
+        for (auto current = m_current; current != m_end; ++current) {
+            const auto c = static_cast <CharType> (*current);
+            if (CharTraits::find (begin, end, c) == end) {
+                result.m_begin = current;
+                result.m_current = current;
+                break;
+            }
+        }
+        return result;
+    }
+
+    /// \brief Удаление указанных символов с начала строки.
+    /// \param symbols C-строка с символами, подлежащими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trimStart (const CharType *symbols) const noexcept
+    {
+        return this->trimStart (symbols, symbols + CharTraits::length (symbols));
+    }
+
+    /// \brief Удаление указанных символов с начала строки.
+    /// \param symbols C++-строка с символами, подлежащими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trimStart (const std::basic_string <CharType> &symbols) const noexcept
+    {
+        return this->trimStart (std::begin (symbols), std::end (symbols));
+    }
+
+    /// \brief Удаление указанных символов с начала и с конца строки.
+    /// \tparam Args Тип символов.
+    /// \param args Символы, подлежащие удалению.
+    /// \return Диапазон с удаленными символами.
+    template <class ... Args>
+    IRBIS_NODISCARD
+    TextRange trim (const Args ... args) const noexcept
+    {
+        return this->trimStart (args...).trimEnd (args...);
+    }
+
+    /// \brief Удаление указанных символов с начала и с конца строки.
+    /// \param symbols C-строка с символами, подлежащими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trim (const CharType *symbols) const noexcept
+    {
+        return this->trimStart (symbols).trimEnd (symbols);
+    }
+
+    /// \brief Удаление указанных символов с начала и с конца строки.
+    /// \param symbols C++-строка с символами, подлежашими удалению.
+    /// \return Диапазон с удаленными символами.
+    IRBIS_NODISCARD
+    TextRange trim (const std::basic_string <CharType> &symbols) const noexcept
+    {
+        return this->trimStart (symbols).trimEnd (symbols);
     }
 
     /// \brief Символ в текущей позиции. Для пустого диапазона или по достижении конца текста UB!
@@ -1381,28 +1813,48 @@ struct TextRange final
         return true;
     }
 
+    /// \brief Оператор сравнения на равенство.
+    /// \param left
+    /// \param right
+    /// \return
     friend bool operator == (const TextRange &left, const TextRange &right)
     {
         return left.compareTo (right) == 0;
     }
 
+    /// \brief Оператор сравнение на равенство.
+    /// \param left
+    /// \param right
+    /// \return
     friend bool operator == (const TextRange &left, const std::basic_string <CharType> &right)
     {
         TextRange temp (std::begin (right), std::end (right));
         return left.compareTo (temp) == 0;
     }
 
+    /// \brief Оператор сравнения на равенство.
+    /// \param left
+    /// \param right
+    /// \return
     friend bool operator == (const TextRange &left, const std::vector <CharType> &right)
     {
         TextRange temp (std::begin (right), std::end (right));
         return left.compareTo (temp) == 0;
     }
 
+    /// \brief Оператор сравнения на неравенство.
+    /// \param left
+    /// \param right
+    /// \return
     friend bool operator != (const TextRange &left, const TextRange &right)
     {
         return left.compareTo (right) != 0;
     }
 
+    /// \brief Оператор сравнения на неравенство.
+    /// \param left
+    /// \param right
+    /// \return
     friend bool operator != (const TextRange &left, const std::basic_string <CharType> &right)
     {
         TextRange temp (std::begin (right), std::end (right));
@@ -1481,6 +1933,13 @@ struct TextRange final
     {
         TextRange temp (std::begin (right), std::end (right));
         return left.compareTo (temp) >= 0;
+    }
+
+    friend std::ostream& operator << (std::ostream &stream, const TextRange &range)
+    {
+        std::ostream_iterator<CharType> it (stream);
+        std::copy (range.current(), range.end (), it);
+        return stream;
     }
 
 };
@@ -1868,6 +2327,8 @@ int main()
         std::cout << range.isDigit () << std::endl;
         std::cout << range.isWhitespace () << std::endl;
         std::cout << range.contains ('u', 'H') << std::endl;
+        std::cout << "equals=" << RawNarrowRange::equals ('H', 'h') << std::endl;
+        std::cout << "equals=" << RawNarrowRange::equals ('h', 'h') << std::endl;
         std::cout << range.search (needle, needle + 5) << std::endl;
         while (true) {
             const auto c = range.read ();
@@ -1877,6 +2338,17 @@ int main()
             std::cout << c;
         }
         std::cout << std::endl;
+    }
+
+    std::cout << "=============================================" << std::endl;
+
+    {
+        const char *hello = "\t \n12345\t \n";
+        auto range = makeRange (hello);
+        const auto trimmed = range.trim (' ', '\t', '\n');
+        std::cout << "trimmed=" << trimmed << std::endl;
+        const auto number = range.extractInteger();
+        std::cout << "extractInteger=" << number << std::endl;
     }
 
     return 0;

@@ -150,7 +150,7 @@ struct FastBuffer final
     /// \brief Деструктор.
     ~FastBuffer()
     {
-        delete m_dynamicBuffer;
+        delete []m_dynamicBuffer;
     }
 
     /// \brief Индексатор.
@@ -290,10 +290,10 @@ private:
     void _grow (std::size_t newCapacity)
     {
         if (newCapacity > m_capacity) {
-            auto newDynamicBuffer = new Byte[newCapacity - StaticSize];
+            auto newDynamicBuffer = new Byte [newCapacity - StaticSize];
             if (m_dynamicBuffer) {
                 std::memcpy (newDynamicBuffer, m_dynamicBuffer, m_size - StaticSize);
-                delete m_dynamicBuffer;
+                delete []m_dynamicBuffer;
             }
             m_dynamicBuffer = newDynamicBuffer;
             m_capacity = newCapacity;
@@ -307,7 +307,7 @@ private:
 /// когда предполагается, что элементов будет мало - один или два.
 /// \tparam T Тип элементов.
 /// \tparam N Количество элементов, размещаемых на стеке. Последующие элементы размещаются в куче.
-template <class T, int N = 2>
+template <class T, std::size_t N = 2>
 class Frugal
 {
 public:
@@ -444,8 +444,8 @@ private:
     void _enlarge() {
         std::size_t  oldSize = this->_capacity;
         std::size_t newSize = oldSize * 2;
-        if (newSize <= 4) {
-            newSize = 4;
+        if (newSize <= sizeof (int32_t)) {
+            newSize = sizeof (int32_t);
         }
 
         T *oldArray = this->_dynamic.get();
@@ -1081,7 +1081,7 @@ struct Tracer {
     template <class ... Args>
     void operator () (const char *format, Args ... args)
     {
-        printf ("%s (%d): ", filename, lineNumber);
+        printf ("%s (%d): ", filename, (static_cast<int> (lineNumber)));
         printf (format, args...);
     }
 };
