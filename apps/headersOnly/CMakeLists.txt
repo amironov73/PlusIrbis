@@ -8,6 +8,9 @@ project(headersOnly)
 
 set(CppFiles
     src/main.cpp
+    src/mmap.cpp
+    src/ByteRange.cpp
+    src/TextRange.cpp
 )
 
 add_executable(${PROJECT_NAME}

@@ -571,7 +571,7 @@ public:
 
     File (const File &) = delete;
     File (File &&other) noexcept;
-    ~File() noexcept ;
+    ~File() noexcept;
     File& operator = (const File &) = delete;
     File& operator = (File && other) noexcept;
 
