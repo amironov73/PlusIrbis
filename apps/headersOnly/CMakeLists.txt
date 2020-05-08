@@ -11,6 +11,7 @@ set(CppFiles
     src/mmap.cpp
     src/ByteRange.cpp
     src/TextRange.cpp
+    src/System.cpp
 )
 
 add_executable(${PROJECT_NAME}
