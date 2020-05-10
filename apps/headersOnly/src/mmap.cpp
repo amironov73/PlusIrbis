@@ -336,7 +336,7 @@ bool MemoryFile::open (const std::string &fileName)
 
     const int flags = O_RDONLY;
 
-#ifdef IRBIS_APPLE
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
     m_fileHandle = ::open (fileName.c_str(), flags);
 #else
     m_fileHandle = ::open64 (fileName.c_str(), flags);
@@ -346,7 +346,7 @@ bool MemoryFile::open (const std::string &fileName)
         return false;
     }
 
-#ifdef IRBIS_APPLE
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
     struct stat buf { 0 };
     if (::fstat (m_fileHandle, &buf) < 0) {
         return false;
@@ -458,7 +458,7 @@ void MemoryRegion::_init()
 
 #else
 
-    #ifdef IRBIS_APPLE
+    #if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
     m_pointer = (irbis::Byte*) mmap
         (
             nullptr,

@@ -76,7 +76,7 @@ struct Directory::Impl
 
     std::string read() const
     {
-#ifdef IRBIS_APPLE
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
 
         struct dirent *entry;
 
@@ -87,7 +87,7 @@ struct Directory::Impl
 
         return { entry->d_name };
 
-#else
+#else	
 
         struct dirent64 *entry;
 

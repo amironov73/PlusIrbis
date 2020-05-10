@@ -40,6 +40,12 @@
 
         #define IRBIS_UNIX
 
+        #if defined(__FreeBSD__)
+
+           #define IRBIS_FREEBSD
+
+	#endif
+
         #if defined(__APPLE__) || defined(__APPLE_CC__) || defined (__OSX__)
 
             #define IRBIS_APPLE

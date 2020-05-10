@@ -13,7 +13,7 @@ int main()
     try {
 
         irbis::Connection connection;
-        connection.host = L"127.0.0.1";
+        connection.host = L"192.168.1.43";
         connection.port = 6666;
         connection.username = L"librarian";
         connection.password = L"secret";
