@@ -584,8 +584,8 @@ public:
     T *ptr { nullptr };  ///< Указатель на начала куска.
     size_t length { 0 }; ///< Длина куска в элементах.
 
-    Span() noexcept : ptr (nullptr), length (0) {}; ///< Конструктор по умолчанию.
-    Span (T *ptr_, std::size_t length_) noexcept : ptr (ptr_), length (length_) {} ///< Конструктор.
+    constexpr Span() noexcept : ptr { nullptr }, length  { 0 } {}; ///< Конструктор по умолчанию.
+    constexpr Span (T *ptr_, std::size_t length_) noexcept : ptr { ptr_ }, length { length_ } {} ///< Конструктор.
     Span (const T *ptr_, std::size_t length_) noexcept
         : ptr (const_cast <T*> (ptr_)), length (length_) {} ///< Конструктор.
     explicit Span (const std::vector<T> &vec) noexcept
@@ -617,11 +617,11 @@ public:
 
     /// \brief Пустой спан?
     /// \return `true` если пустой.
-    bool empty() const noexcept { return this->length == 0; }
+    constexpr bool empty() const noexcept { return this->length == 0; }
 
     /// \brief Длина данных в элементах.
     /// \return Длина.
-    std::size_t size() const noexcept { return this->length; }
+    constexpr std::size_t size() const noexcept { return this->length; }
 
     /// \brief Оператор индексирования.
     /// \param offset Смещение.
@@ -660,7 +660,7 @@ public:
     {
         for (std::size_t i = 0; i < this->length; ++i) {
             if (this->ptr[i] == val) {
-                return static_cast<std::ptrdiff_t > (i);
+                return static_cast <std::ptrdiff_t > (i);
             }
         }
         return -1;
@@ -670,9 +670,9 @@ public:
     /// \param val Искомое значение.
     /// \return Индекс последнего вхождения найденного элемента,
     /// либо отрицательное значение.
-    std::ptrdiff_t lastIndexOf(const T val) const noexcept
+    std::ptrdiff_t lastIndexOf (const T val) const noexcept
     {
-        for (auto i = static_cast<std::ptrdiff_t> (this->length - 1); i >= 0; --i) {
+        for (auto i = static_cast <std::ptrdiff_t> (this->length - 1); i >= 0; --i) {
             if (this->ptr[i] == val) {
                 return i;
             }
@@ -1056,7 +1056,7 @@ public:
             : public std::iterator<std::bidirectional_iterator_tag, T>
     {
 
-        Iterator (ChunkedData<T> *data, std::size_t index, T *currentIterator) noexcept
+        constexpr Iterator (ChunkedData<T> *data, std::size_t index, T *currentIterator) noexcept
             : _data { data }, _index { index }, _currentIterator { currentIterator } {}
 
         bool operator == (const Iterator &other) const noexcept
@@ -1378,13 +1378,13 @@ private:
         IteratorType m_end;   ///< Прямо за концом данных.
 
         Pair () = default;
-        Pair (IteratorType begin, IteratorType end)
+        constexpr Pair (IteratorType begin, IteratorType end) noexcept
             : m_begin { begin }, m_end { end } {}
         ~Pair() = default;
 
         std::size_t size() const noexcept
         {
-            return std::distance(m_begin, m_end);
+            return std::distance (m_begin, m_end);
         }
     };
 
@@ -1399,8 +1399,8 @@ public:
         JoinedData *m_joiner;
         std::size_t m_offset;
 
-        iterator() : m_joiner { nullptr }, m_offset { 0 } {}
-        iterator (JoinedData *joiner, std::size_t offset)
+        constexpr iterator() : m_joiner { nullptr }, m_offset { 0 } {}
+        constexpr iterator (JoinedData *joiner, std::size_t offset)
             : m_joiner { joiner }, m_offset { offset } {}
 
         iterator (const iterator&) = default;
@@ -1664,7 +1664,7 @@ struct Range
     IteratorType m_current; // Текущая позиция.
     IteratorType m_end;     // Конец диапазона (не включается).
 
-    Range (IteratorType begin, IteratorType end) noexcept
+    constexpr Range (IteratorType begin, IteratorType end) noexcept
         : m_begin { begin }, m_current { begin }, m_end { end } {}
     Range             (const Range &) noexcept = default;
     Range             (Range &&)      noexcept = default;
@@ -1706,7 +1706,7 @@ struct Range
 template<class T>
 Range<typename T::iterator> makeRange (T& value)
 {
-    return Range<typename T::iterator> (std::begin (value), std::end (value));
+    return Range <typename T::iterator> (std::begin (value), std::end (value));
 }
 
 //=========================================================
@@ -3139,6 +3139,8 @@ public:
     RecordField& operator = (const RecordField &)     = default; ///< Оператор копирования.
     RecordField& operator = (RecordField &&) noexcept = default; ///< Оператор перемещения.
 
+                       RecordField& _                     (const char *value);
+                       RecordField& _                     (const wchar_t *value);
     IRBIS_MAYBE_UNUSED RecordField& add                   (Char code, const String &value = L"");
     IRBIS_MAYBE_UNUSED RecordField& add                   (Char code, String &&value);
     IRBIS_MAYBE_UNUSED RecordField& clear                 ();
@@ -3155,7 +3157,12 @@ public:
                        String       toString()                                                 const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &field);
+
 };
+
+RecordField operator "" _field (unsigned long long int tag);
+RecordField operator "" _field (const char *text, std::size_t size);
+RecordField operator "" _field (const wchar_t *text, std::size_t size);
 
 //=========================================================
 
@@ -3291,14 +3298,21 @@ public:
              SubField& operator = (SubField &&) noexcept = default; ///< Оператор перемещения.
             ~SubField             ()                     = default; ///< Деструктор.
 
-    SubField clone    ()                    const;
-    void     decode   (const String &line);
-    bool     empty    ()                    const noexcept;
-    String   toString ()                    const;
-    bool     verify   (bool throwOnError)   const;
+    SubField& _        (const char *value);
+    SubField& _        (const wchar_t *value);
+    SubField  clone    ()                    const;
+    void      decode   (const String &line);
+    bool      empty    ()                    const noexcept;
+    String    toString ()                    const;
+    bool      verify   (bool throwOnError)   const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &subfield);
+
 };
+
+SubField operator "" _sub (char code);
+SubField operator "" _sub (const char *text, std::size_t size);
+SubField operator "" _sub (const wchar_t *text, std::size_t size);
 
 //=========================================================
 

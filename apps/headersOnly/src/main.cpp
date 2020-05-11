@@ -23,20 +23,11 @@ void testTextRange();
 
 int main()
 {
-//    std::cout << "=============================================" << std::endl;
-//    try
-//    {
-//        testSystem();
-//    }
-//    catch (const std::exception &exception)
-//    {
-//        std::cout << exception.what() << std::endl;
-//    }
-
     std::cout << "=============================================" << std::endl;
 
     try
     {
+        //testTextRange();
         testMmap ();
     }
     catch (const std::exception &exception)

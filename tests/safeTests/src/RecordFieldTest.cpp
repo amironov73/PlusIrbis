@@ -63,24 +63,56 @@ TEST_CASE("RecordField_constructor_6", "[field]")
 TEST_CASE("RecordField_verify_1", "[field]")
 {
     const irbis::RecordField field;
-    CHECK_FALSE(field.verify(false));
+    CHECK_FALSE (field.verify (false));
 }
 
 TEST_CASE("RecordField_verify_2", "[field]")
 {
-    const irbis::RecordField field(100);
-    CHECK_FALSE(field.verify(false));
+    const irbis::RecordField field (100);
+    CHECK_FALSE (field.verify (false));
 }
 
 TEST_CASE("RecordField_verify_3", "[field]")
 {
-    const irbis::RecordField field(100, L"Field100");
-    CHECK(field.verify(false));
+    const irbis::RecordField field (100, L"Field100");
+    CHECK (field.verify (false));
 }
 
 TEST_CASE("RecordField_verify_4", "[field]")
 {
     irbis::RecordField field(100);
-    field.add('a', L"SubA").add('b', L"SubB");
-    CHECK(field.verify(false));
+    field.add ('a', L"SubA").add ('b', L"SubB");
+    CHECK (field.verify(false));
+}
+
+using irbis::operator "" _field;
+
+TEST_CASE("RecordField_udl_1", "[field]")
+{
+    const auto field = 200_field ._ ("Hello");
+    CHECK (field.tag == 200);
+    CHECK (field.value == L"Hello");
+}
+
+TEST_CASE("RecordField_udl_2", "[field]")
+{
+    const auto field = "200#Hello"_field;
+    CHECK (field.tag == 200);
+    CHECK (field.value == L"Hello");
+}
+
+TEST_CASE("RecordField_udl_3", "[field]")
+{
+    const auto field = L"200#Hello"_field;
+    CHECK (field.tag == 200);
+    CHECK (field.value == L"Hello");
+}
+
+TEST_CASE("RecordField_udl_4", "[field]")
+{
+    const auto field = L"200#^aTitle"_field;
+    CHECK (field.tag == 200);
+    CHECK (field.value.empty());
+    CHECK (field.subfields[0].code == 'a');
+    CHECK (field.subfields[0].value == L"Title");
 }

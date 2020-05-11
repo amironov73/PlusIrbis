@@ -34,6 +34,48 @@ RecordField::RecordField (int tag_, std::initializer_list <SubField> subfields_)
 {
 }
 
+/// \brief Пользовательский литерал для формирования поля.
+/// \param tag Метка поля.
+/// \return Сконструированное поле.
+RecordField operator "" _field (unsigned long long int tag)
+{
+    return RecordField (static_cast <int> (tag));
+}
+
+/// \brief Пользовательский литерал для формирования поля.
+/// \param text Закодированное представление поля.
+/// \param size Размер закодированного представления.
+/// \return Сконструированное поле.
+RecordField operator "" _field (const char *text, std::size_t size)
+{
+    RecordField result;
+    result.decode (fromUtf (text));
+    return result;
+}
+
+/// \brief Пользовательский литерал для формирования поля.
+/// \param text Закодированное представление поля.
+/// \param size Размер закодированного представления.
+/// \return Сконструированное поле.
+RecordField operator "" _field (const wchar_t *text, std::size_t size)
+{
+    RecordField result;
+    result.decode (text);
+    return result;
+}
+
+RecordField& RecordField::_ (const char *value_)
+{
+    this->value = fromUtf (value_);
+    return *this;
+}
+
+RecordField& RecordField::_ (const wchar_t *value_)
+{
+    this->value = String (value_);
+    return *this;
+}
+
 /// \brief Добавление подполя.
 /// \param subFieldCode Код подполя.
 /// \param subFieldValue Значение подполя.

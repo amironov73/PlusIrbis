@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 #include "irbis.h"
+#include "irbis_internal.h"
 
 #include <iomanip>
 #include <iostream>
@@ -33,7 +34,48 @@ SubField SubField::clone() const
     return result;
 }
 
-/// \brief Декодирование подполя из клиентского представления.
+/// \brief Пользовательский литерал для формирования подполя.
+/// \param code Код подполя.
+/// \return Сконструированное подполе.
+SubField operator "" _sub (char code)
+{
+    return SubField (code);
+}
+
+/// \brief Пользовательский литерал для формирования подполя.
+/// \param text Закодированное представление подполя.
+/// \param size Размер закодированного представления.
+/// \return Сконструированное подполе.
+SubField operator "" _sub (const char *text, std::size_t size)
+{
+    SubField result;
+    result.decode (String (fromUtf (text)));
+    return result;
+}
+
+/// \brief Пользовательский литерал для формирования подполя.
+/// \param text Закодированное представление подполя.
+/// \param size Размер закодированного представления.
+/// \return Сконструированное подполе.
+SubField operator "" _sub (const wchar_t *text, std::size_t size)
+{
+    SubField result;
+    result.decode (String (text));
+    return result;
+}
+
+SubField& SubField::_ (const char *value_)
+{
+    this->value = fromUtf (value_);
+    return *this;
+}
+SubField& SubField::_ (const wchar_t *value_)
+{
+    this->value = String (value_);
+    return *this;
+}
+
+    /// \brief Декодирование подполя из клиентского представления.
 /// \param line Строка с клиентским представлением (не должна быть пустой).
 void SubField::decode (const String &line)
 {

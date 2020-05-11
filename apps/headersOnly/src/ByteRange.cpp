@@ -46,7 +46,7 @@ struct ByteRange final
     IteratorType m_current; ///< Текущая позиция.
     IteratorType m_end;     ///< За концом данных.
 
-    ByteRange (IteratorType begin, IteratorType end) noexcept
+    constexpr ByteRange (IteratorType begin, IteratorType end) noexcept
         : m_begin { begin }, m_current { begin }, m_end { end }{}
 
     ByteRange             (const ByteRange &) noexcept = default; ///< Конструктор копирования.

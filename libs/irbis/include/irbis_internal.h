@@ -44,8 +44,8 @@ struct RandomAccessIterator final
     ContainerType *m_buffer;
     std::size_t  m_position;
 
-    RandomAccessIterator () noexcept : m_buffer { nullptr }, m_position { 0 } {} ///< Конструктор.
-    RandomAccessIterator (ContainerType *buffer, std::size_t position) noexcept
+    constexpr RandomAccessIterator () noexcept : m_buffer { nullptr }, m_position { 0 } {} ///< Конструктор.
+    constexpr RandomAccessIterator (ContainerType *buffer, std::size_t position) noexcept
         : m_buffer { buffer }, m_position { position } {} ///< Конструктор.
 
     RandomAccessIterator             (const RandomAccessIterator&) noexcept = default; ///< Конструктор копирования.
@@ -141,11 +141,7 @@ struct FastBuffer final
     /// \brief Конструктор.
     /// \details На момент конструирования создается только буфер в стеке.
     FastBuffer() noexcept
-    {
-        m_capacity = StaticSize;
-        m_size = 0;
-        m_dynamicBuffer = nullptr;
-    };
+        : m_capacity { StaticSize }, m_size { 0 }, m_dynamicBuffer { nullptr } {}
 
     /// \brief Деструктор.
     ~FastBuffer()
@@ -495,8 +491,8 @@ public:
     int delayInterval { 100 }; ///< Задержка между повторами, миллисекунды.
     int retryLimit    { 5 };   ///< Максимальное число повторов.
 
-    Retry () = default;
-    Retry (int delay_, int limit_) : delayInterval { delay_ }, retryLimit { limit_ } {}
+    constexpr Retry () = default;
+    constexpr Retry (int delay_, int limit_) : delayInterval { delay_ }, retryLimit { limit_ } {}
 
     template <class TFunc, class ... TArgs>
     void action (TFunc func, TArgs ... args)
@@ -632,7 +628,7 @@ public:
         Byte *data;
         Chunk *next;
 
-        explicit Chunk             (const std::size_t size);
+        explicit Chunk             (std::size_t size);
                  Chunk             (const Chunk&) = delete; ///< Конструктор копирования.
                  Chunk             (Chunk&&)      = delete; ///< Конструктор перемещения.
                  Chunk& operator = (const Chunk&) = delete; ///< Оператор копирования.

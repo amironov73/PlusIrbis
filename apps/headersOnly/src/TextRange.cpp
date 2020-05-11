@@ -13,7 +13,7 @@
 template <class CharType>
 struct NarrowTraits final
 {
-    static CharType eot() { return 0; }
+    static constexpr CharType eot() { return 0; }
 
     template <class IteratorType>
     static IteratorType find (IteratorType begin, IteratorType end, CharType c)
@@ -38,7 +38,7 @@ struct NarrowTraits final
 template <class CharType>
 struct WideTraits final
 {
-    static CharType eot() { return 0; }
+    static constexpr CharType eot() { return 0; }
 
     template <class IteratorType>
     static IteratorType find (IteratorType begin, IteratorType end, CharType c)
@@ -72,7 +72,7 @@ struct TextRange final
     std::size_t  m_column;   ///< Номер колонки, нумерация с 1.
     std::size_t  m_line;     ///< Номер строки, нумерация с 1.
 
-    TextRange (IteratorType begin, IteratorType end) noexcept
+    constexpr TextRange (IteratorType begin, IteratorType end) noexcept
         : m_begin { begin }, m_current { begin }, m_end { end },
           m_column { 1 }, m_line { 1 } {}
 
@@ -84,7 +84,7 @@ struct TextRange final
     /// \brief Символ, возвращаемый в качестве признака конца текста.
     /// \return "Невозможный символ".
     IRBIS_NODISCARD
-    static CharType EOT() { return CharTraits::eot(); }
+    static constexpr CharType EOT() { return CharTraits::eot(); }
 
     /// \brief Подглядываем символ в указанной позиции.
     /// \param index Позиция символа (отсчет от начала текста, от 0).
