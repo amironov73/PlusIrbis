@@ -64,17 +64,6 @@ SubField operator "" _sub (const wchar_t *text, std::size_t size)
     return result;
 }
 
-SubField& SubField::_ (const char *value_)
-{
-    this->value = fromUtf (value_);
-    return *this;
-}
-SubField& SubField::_ (const wchar_t *value_)
-{
-    this->value = String (value_);
-    return *this;
-}
-
     /// \brief Декодирование подполя из клиентского представления.
 /// \param line Строка с клиентским представлением (не должна быть пустой).
 void SubField::decode (const String &line)
@@ -113,6 +102,45 @@ IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &sub
 {
     return stream << std::wstring (L"^") << std::wstring (subfield.code, 1)
         << subfield.value;
+}
+
+/// \brief Изменение значения подполя.
+/// \param value_ Новое значение подполя.
+/// \return this.
+SubField& SubField::operator << (const String &value_)
+{
+    this->value = value_;
+    return *this;
+}
+
+/// \brief Изменение значения подполя.
+/// \param value_ Новое значение подполя.
+/// \return this.
+SubField& SubField::operator << (String &&value_)
+{
+    this->value = std::move (value_);
+    return *this;
+}
+
+/// \brief Изменение значения подполя.
+/// \param value_ Новое значение подполя.
+/// \return this.
+SubField& SubField::operator << (const Char *value_)
+{
+    this->value = value_;
+    return *this;
+}
+
+SubField& SubField::operator << (const std::string &value_)
+{
+    this->value = fromUtf (value_);
+    return *this;
+}
+
+SubField& SubField::operator << (const char *value_)
+{
+    this->value = fromUtf (value_);
+    return *this;
 }
 
 }

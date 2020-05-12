@@ -304,4 +304,121 @@ IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &r
     return stream;
 }
 
+/// \brief Добавление поля в конец записи.
+/// \param field Поле для дополнения.
+/// \return this.
+MarcRecord& MarcRecord::operator << (const RecordField &field)
+{
+    this->fields.push_back (field);
+    return *this;
+}
+
+/// \brief Добавление поля в конец записи.
+/// \param field Поле для дополнения.
+/// \return this.
+MarcRecord& MarcRecord::operator << (RecordField &&field)
+{
+    this->fields.push_back (std::move (field));
+    return *this;
+}
+
+/// \brief Добавление поля в конец записи.
+/// \param text Поле для дополнения в закодированном виде.
+/// \return this.
+MarcRecord& MarcRecord::operator << (const String &text)
+{
+    if (contains (text, '#')) {
+        this->fields.emplace_back ();
+        auto &field = this->fields.back ();
+        field.decode (text);
+    }
+    else {
+        auto &field = this->fields.back ();
+        if (contains (text, '^')) {
+            field.decodeBody (text);
+        }
+        else {
+            if (field.subfields.empty ()) {
+                field.value = text;
+            }
+            else {
+                field.subfields.back().value = text;
+            }
+        }
+    }
+    return *this;
+}
+
+/// \brief Добавление поля в конец записи.
+/// \param text Поле для дополнения в закодированном виде.
+/// \return this.
+MarcRecord& MarcRecord::operator << (const std::string &text)
+{
+    auto wide = fromUtf (text);
+    if (contains (text, '#')) {
+        this->fields.emplace_back ();
+        auto &field = this->fields.back ();
+        field.decode (wide);
+    }
+    else {
+        auto &field = this->fields.back ();
+        if (contains (text, '^')) {
+            field.decodeBody (wide);
+        }
+        else {
+            if (field.subfields.empty ()) {
+                field.value = std::move (wide);
+            }
+            else {
+                field.subfields.back().value = std::move (wide);
+            }
+        }
+    }
+    return *this;
+}
+
+/// \brief Добавление поля в конец записи.
+/// \param tag Метка поля.
+/// \return this.
+MarcRecord& MarcRecord::operator << (int tag)
+{
+    return *this << RecordField (tag);
+}
+
+/// \brief Добавление подполя в конец последнего поля записи.
+/// \param code Код подполя.
+/// \return this.
+MarcRecord& MarcRecord::operator << (char code)
+{
+    this->fields.back() << code;
+    return *this;
+}
+
+/// \brief Добавление подполя в конец последнего поля записи.
+/// \param code Код подполя.
+/// \return this.
+MarcRecord& MarcRecord::operator << (Char code)
+{
+    this->fields.back() << code;
+    return *this;
+}
+
+/// \brief Установка значения последнего подполя последнего поля записи.
+/// \param value Значение.
+/// \return this.
+MarcRecord& MarcRecord::operator && (const String &value)
+{
+    this->fields.back().subfields.back().value = value;
+    return *this;
+}
+
+/// \brief Установка значения последнего подполя последнего поля записи.
+/// \param value Значение.
+/// \return this.
+MarcRecord& MarcRecord::operator && (const Char *value)
+{
+    this->fields.back().subfields.back().value = value;
+    return *this;
+}
+
 }

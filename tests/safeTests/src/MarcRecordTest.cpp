@@ -54,6 +54,14 @@ TEST_CASE("MarcRecord_constructor_4", "[record]")
     CHECK (record.version == 0u);
     CHECK (record.database.empty());
     CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->tag == 200);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    ++field;
+    CHECK (field->tag == 300);
+    CHECK (field->value == L"Field300");
+    CHECK (field->subfields.empty());
 }
 
 TEST_CASE("MarcRecord_add_1", "[record]")
@@ -310,4 +318,224 @@ TEST_CASE("MarcRecord_verify_1", "[record]")
     record.add (300, L"\u0412\u0442\u043E\u0440\u043E\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     record.add (300, L"\u0422\u0440\u0435\u0442\u044C\u0435 \u043F\u0440\u0438\u043C\u0435\u0447\u0430\u043D\u0438\u0435");
     CHECK (record.verify (false));
+}
+
+using irbis::operator""_field;
+using irbis::operator""_sub;
+
+TEST_CASE("MarcRecord_shift_1", "[record]")
+{
+    irbis::MarcRecord record;
+    record << (100_field << ('a'_sub << "SubA") << ('b'_sub << "SubB"))
+        << (200_field << ('a'_sub << "SubA") << ('b'_sub << "SubB"))
+        << (300_field << "Field300");
+
+    CHECK (record.fields.size() == 3);
+    auto field = std::begin (record.fields);
+    CHECK (field->tag == 100);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->tag == 200);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->tag == 300);
+    CHECK (field->value == L"Field300");
+    CHECK (field->subfields.empty());
+}
+
+TEST_CASE("MarcRecord_shift_2", "[record]")
+{
+    irbis::MarcRecord record;
+    record << (100_field << L"^aSubA^bSubB")
+        << (200_field << L"^aSubA^bSubB")
+        << (300_field << L"Field300");
+
+    CHECK (record.fields.size() == 3);
+    auto field = std::begin (record.fields);
+    CHECK (field->tag == 100);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->tag == 200);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->tag == 300);
+    CHECK (field->value == L"Field300");
+    CHECK (field->subfields.empty());
+}
+
+TEST_CASE("MarcRecord_shift_3", "[record]")
+{
+    irbis::MarcRecord record;
+    record << 100 << 'a' && L"SubA";
+    record << 'b' && L"SubB";
+    record << 200 << 'c' && L"SubC";
+    record << 'd' && L"SubD";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'c');
+    CHECK (field->subfields[0].value == L"SubC");
+    CHECK (field->subfields[1].code == 'd');
+    CHECK (field->subfields[1].value == L"SubD");
+}
+
+TEST_CASE("MarcRecord_shift_4", "[record]")
+{
+    irbis::MarcRecord record;
+    record << 100 << 'a' << L"SubA";
+    record << 'b' << L"SubB";
+    record << 200 << 'c' << L"SubC";
+    record << 'd' << L"SubD";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'c');
+    CHECK (field->subfields[0].value == L"SubC");
+    CHECK (field->subfields[1].code == 'd');
+    CHECK (field->subfields[1].value == L"SubD");
+}
+
+TEST_CASE("MarcRecord_shift_5", "[record]")
+{
+    irbis::MarcRecord record;
+    record << 100
+        << 'a' << L"SubA"
+        << 'b' << L"SubB"
+        << 200
+        << 'c' << L"SubC"
+        << 'd' << L"SubD";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'c');
+    CHECK (field->subfields[0].value == L"SubC");
+    CHECK (field->subfields[1].code == 'd');
+    CHECK (field->subfields[1].value == L"SubD");
+}
+
+TEST_CASE("MarcRecord_shift_6", "[record]")
+{
+    irbis::MarcRecord record;
+    record << 100
+        << L"^aSubA^bSubB"
+        << 200
+        << L"^cSubC^dSubD";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'c');
+    CHECK (field->subfields[0].value == L"SubC");
+    CHECK (field->subfields[1].code == 'd');
+    CHECK (field->subfields[1].value == L"SubD");
+}
+
+TEST_CASE("MarcRecord_shift_7", "[record]")
+{
+    irbis::MarcRecord record;
+    record << 100
+        << L"Field100"
+        << 200
+        << L"Field200";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value == L"Field100");
+    CHECK (field->subfields.empty());
+    ++field;
+    CHECK (field->value == L"Field200");
+    CHECK (field->subfields.empty());
+}
+
+TEST_CASE("MarcRecord_shift_8", "[record]")
+{
+    irbis::MarcRecord record;
+    record << L"100#^aSubA^bSubB"
+           << L"200#^cSubC^dSubD";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'a');
+    CHECK (field->subfields[0].value == L"SubA");
+    CHECK (field->subfields[1].code == 'b');
+    CHECK (field->subfields[1].value == L"SubB");
+    ++field;
+    CHECK (field->value.empty());
+    CHECK (field->subfields.size() == 2);
+    CHECK (field->subfields[0].code == 'c');
+    CHECK (field->subfields[0].value == L"SubC");
+    CHECK (field->subfields[1].code == 'd');
+    CHECK (field->subfields[1].value == L"SubD");
+}
+
+TEST_CASE("MarcRecord_shift_9", "[record]")
+{
+    irbis::MarcRecord record;
+    record << L"100#Field100"
+           << L"200#Field200";
+
+    CHECK (record.fields.size() == 2);
+    auto field = std::begin (record.fields);
+    CHECK (field->value == L"Field100");
+    CHECK (field->subfields.empty());
+    ++field;
+    CHECK (field->value == L"Field200");
+    CHECK (field->subfields.empty());
 }

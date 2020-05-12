@@ -287,4 +287,100 @@ IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &
     return stream;
 }
 
+/// \brief Добавление подполя в конец поля.
+/// \param subfield Подполе для добавления.
+/// \return this.
+RecordField& RecordField::operator << (const SubField &subfield)
+{
+    this->subfields.push_back (subfield);
+    return *this;
+}
+
+/// \brief Добавление подполя в конец поля.
+/// \param subfield Подполе для добавления.
+/// \return this.
+RecordField& RecordField::operator << (SubField &&subfield)
+{
+    this->subfields.push_back (std::move (subfield));
+    return *this;
+}
+
+/// \brief Изменение значения поля. Если в записи присутствуют подполя, то изменяется значение последнего подполя.
+/// \param body Новое значение поля.
+/// \return this.
+RecordField& RecordField::operator << (const String &body)
+{
+    if (contains(body, '^')) {
+        this->decodeBody (body);
+    }
+    else {
+        if (this->subfields.empty()) {
+            this->value = body;
+        }
+        else {
+            this->subfields.back().value = body;
+        }
+    }
+    return *this;
+}
+
+/// \brief Изменение значения поля. Если в записи присутствуют подполя, то изменяется значение последнего подполя.
+/// \param body Новое значение поля.
+/// \return this.
+RecordField& RecordField::operator << (String &&body)
+{
+    if (contains(body, '^')) {
+        this->decodeBody (body);
+    }
+    else {
+        if (this->subfields.empty()) {
+            this->value = std::move (body);
+        }
+        else {
+            this->subfields.back().value = std::move (body);
+        }
+    }
+    return *this;
+}
+
+/// \brief Изменение значения поля.
+/// \param body Новое значение поля.
+/// \return this.
+RecordField& RecordField::operator << (const std::string &body)
+{
+    return *this << fromUtf (body);
+}
+
+/// \brief Изменение значения поля.
+/// \param body Новое значение поля.
+/// \return this.
+RecordField& RecordField::operator << (const Char *body)
+{
+    return *this << String (body);
+}
+
+/// \brief Изменение значения поля.
+/// \param body Новое значение поля.
+/// \return this.
+RecordField& RecordField::operator << (const char *text)
+{
+    return *this << fromUtf (text);
+}
+
+/// \brief Добавление подполя в конец поля.
+/// \param code Код подполя.
+/// \return this.
+RecordField& RecordField::operator << (char code)
+{
+    return *this << SubField (code);
+}
+
+/// \brief Добавление подполя в конец поля.
+/// \param code Код подполя.
+/// \return this.
+RecordField& RecordField::operator << (Char code)
+{
+    return *this << SubField (code);
+}
+
 }

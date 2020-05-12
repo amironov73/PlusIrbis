@@ -116,3 +116,28 @@ TEST_CASE("RecordField_udl_4", "[field]")
     CHECK (field.subfields[0].code == 'a');
     CHECK (field.subfields[0].value == L"Title");
 }
+
+using irbis::operator""_sub;
+
+TEST_CASE("RecordField_shift_1", "[field]")
+{
+    irbis::RecordField field (200);
+    field << ('a'_sub << "Hello") << ('b'_sub << "World");
+    CHECK (field.tag == 200);
+    CHECK (field.subfields.size() == 2);
+    CHECK (field.subfields[0].code == 'a');
+    CHECK (field.subfields[0].value == L"Hello");
+    CHECK (field.subfields[1].code == 'b');
+    CHECK (field.subfields[1].value == L"World");
+}
+
+TEST_CASE("RecordField_shift_2", "[field]")
+{
+    irbis::RecordField field = 200_field << ('a'_sub << "Hello") << ('b'_sub << "World");
+    CHECK (field.tag == 200);
+    CHECK (field.subfields.size() == 2);
+    CHECK (field.subfields[0].code == 'a');
+    CHECK (field.subfields[0].value == L"Hello");
+    CHECK (field.subfields[1].code == 'b');
+    CHECK (field.subfields[1].value == L"World");
+}

@@ -1201,8 +1201,8 @@ bool oneOf (const T1& first, const T1& second, const T2& ... others)
 }
 
 /// \brief Безопасное извлечение элемента из контейнера.
-template<typename T1, typename T2>
-typename T1::value_type safeAt (const T1& container, T2 index)
+template<typename T1>
+typename T1::value_type safeAt (const T1& container, std::size_t index)
 {
     if (index >= container.size()) {
         return typename T1::value_type();
@@ -1223,6 +1223,7 @@ IRBIS_API std::string IRBIS_CALL toUpper (std::string &text) noexcept;
 
 IRBIS_API bool contains (const String &text, const String &fragment);
 IRBIS_API bool contains (const String &text, Char c);
+IRBIS_API bool contains (const std::string &text, char c);
 
 IRBIS_API std::string replace (const std::string &text, const std::string &from, const std::string &to);
 IRBIS_API String      replace (const String &text, const String &from, const String &to);

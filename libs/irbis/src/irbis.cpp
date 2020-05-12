@@ -151,7 +151,7 @@ std::string IRBIS_CALL toUpper (std::string &text) noexcept
 /// \return Возвращает true, если подстрока найдена, иначе false.
 bool contains (const String &text, const String &fragment)
 {
-    return text.find(fragment) != std::string::npos;
+    return text.find (fragment) != std::string::npos;
 }
 
 /// \brief Содержит ли строка заданный символ?
@@ -160,7 +160,16 @@ bool contains (const String &text, const String &fragment)
 /// \return Возвращает true, если символ найден, иначе false.
 bool contains (const String &text, Char c)
 {
-    return text.find(c) != std::string::npos;
+    return text.find (c) != std::string::npos;
+}
+
+/// \brief Содержит ли строка заданный символ?
+/// \param text Текст для изучения.
+/// \param c Символ для поиска.
+/// \return Возвращает true, если символ найден, иначе false.
+bool contains (const std::string &text, char c)
+{
+    return text.find (c) != std::string::npos;
 }
 
 /// \brief Заменяет все вхождения одной подстроки на другую.

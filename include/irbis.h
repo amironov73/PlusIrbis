@@ -1870,7 +1870,7 @@ public:
     void           notModified     ();
     std::ptrdiff_t getIndex        (const String &name) const noexcept;
     IniSection*    getSection      (const String &name) const noexcept;
-    const String&  getValue        (const String &sectionName, const String &keyName, const String &defaultValue = L"") const noexcept;
+    String         getValue        (const String &sectionName, const String &keyName, const String &defaultValue = L"") const noexcept;
     void           parse           (const StringList &lines);
     IniFile&       removeSection   (const String &sectionName);
     IniFile&       removeValue     (const String &sectionName, const String &keyName);
@@ -1920,14 +1920,14 @@ public:
     bool           containsKey (const String &key) const noexcept;
     std::ptrdiff_t getIndex    (const String &key) const noexcept;
     IniLine*       getLine     (const String &key) const noexcept;
-    const String&  getValue    (const String &key, const String &defaultValue) const noexcept;
+    String         getValue    (const String &key, const String &defaultValue) const noexcept;
     bool           modified    ()                  const noexcept;
     void           notModified ();
     IniSection&    removeValue (const String &key);
     IniSection&    setValue    (const String &key, const String &value);
     String         toString    ()                  const;
 
-    const String& operator[] (const String &index) const noexcept;
+    String operator[] (const String &index) const noexcept;
 };
 
 //=========================================================
@@ -2811,6 +2811,16 @@ public:
     bool                      verify      (bool throwOnError)                         const;
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const MarcRecord &record);
+
+    MarcRecord& operator << (const RecordField &field);
+    MarcRecord& operator << (RecordField &&field);
+    MarcRecord& operator << (const String &text);
+    MarcRecord& operator << (const std::string &text);
+    MarcRecord& operator << (int tag);
+    MarcRecord& operator << (char code);
+    MarcRecord& operator << (Char code);
+    MarcRecord& operator && (const String &value);
+    MarcRecord& operator && (const Char *value);
 };
 
 //=========================================================
@@ -3158,6 +3168,15 @@ public:
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const RecordField &field);
 
+    RecordField& operator << (const SubField &subfield);
+    RecordField& operator << (SubField &&subfield);
+    RecordField& operator << (const String &body);
+    RecordField& operator << (String &&body);
+    RecordField& operator << (const Char *body);
+    RecordField& operator << (const std::string &body);
+    RecordField& operator << (const char *text);
+    RecordField& operator << (char code);
+    RecordField& operator << (Char code);
 };
 
 RecordField operator "" _field (unsigned long long int tag);
@@ -3298,8 +3317,6 @@ public:
              SubField& operator = (SubField &&) noexcept = default; ///< Оператор перемещения.
             ~SubField             ()                     = default; ///< Деструктор.
 
-    SubField& _        (const char *value);
-    SubField& _        (const wchar_t *value);
     SubField  clone    ()                    const;
     void      decode   (const String &line);
     bool      empty    ()                    const noexcept;
@@ -3308,6 +3325,11 @@ public:
 
     friend IRBIS_API std::wostream& operator << (std::wostream &stream, const SubField &subfield);
 
+    SubField& operator << (const String &value_);
+    SubField& operator << (String &&value_);
+    SubField& operator << (const Char *value_);
+    SubField& operator << (const std::string &value_);
+    SubField& operator << (const char *value_);
 };
 
 SubField operator "" _sub (char code);
