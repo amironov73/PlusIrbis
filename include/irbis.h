@@ -195,6 +195,14 @@
 
 #endif
 
+// из C++20: [[likely]], [[unlikely]]
+#ifndef IRBIS_LIKELY
+
+    #define IRBIS_LIKELY
+    #define IRBIS_UNLIKELY
+
+#endif
+
 //=========================================================
 
 #if defined(_MSC_VER)

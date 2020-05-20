@@ -378,7 +378,8 @@ MemoryRegion MemoryFile::view (std::size_t offset, std::size_t size)
 //////////////////////////////////////////////////////////////////////
 
 MemoryRegion::MemoryRegion (MemoryFile *file)
-    : m_file { file }, m_viewOffset { 0 }, m_viewSize { file->m_fileSize }
+    : m_file { file }, m_viewOffset { 0 },
+    m_viewSize { static_cast<std::size_t> (file->m_fileSize) }
 {
     this->_init();
 }

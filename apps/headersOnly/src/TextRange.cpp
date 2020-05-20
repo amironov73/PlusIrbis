@@ -72,6 +72,9 @@ struct TextRange final
     std::size_t  m_column;   ///< Номер колонки, нумерация с 1.
     std::size_t  m_line;     ///< Номер строки, нумерация с 1.
 
+    /// \brief Конструктор.
+    /// \param begin Начало диапазона.
+    /// \param end Конец диапазона.
     constexpr TextRange (IteratorType begin, IteratorType end) noexcept
         : m_begin { begin }, m_current { begin }, m_end { end },
           m_column { 1 }, m_line { 1 } {}
@@ -99,7 +102,7 @@ struct TextRange final
     }
 
     /// \brief Последний символ в тексте.
-    /// \return Символ либо EOT (для пустого текста).
+    /// \return Символ либо EOT (для пустого диапазона).
     IRBIS_NODISCARD
     CharType back() const noexcept { return at (this->size() - 1); }
 
@@ -117,7 +120,7 @@ struct TextRange final
     /// \brief Сравнение двух символов.
     /// \param left Первый символ.
     /// \param right Второй символ.
-    /// \return Результат сравнения
+    /// \return Результат сравнения.
     IRBIS_NODISCARD
     static int compare (const CharType left, const CharType right) noexcept
     {
@@ -334,15 +337,6 @@ struct TextRange final
         return this->readInteger();
     }
 
-    /// \brief Поиск указанного символа (начиная с текущей позиции).
-    /// \param value Символ для поиска.
-    /// \return Итератор на указанный символ либо итератор за концом текста.
-    IRBIS_NODISCARD
-    IteratorType find (const CharType value) const noexcept
-    {
-        return CharTraits::find (m_current, m_end, value);
-    }
-
     /// \brief Заполнение диапазона указанным символом (начиная с текущей позиции).
     /// \param value Символ для заполнения.
     /// \return this.
@@ -353,6 +347,21 @@ struct TextRange final
             *ptr = value;
         }
         return *this;
+    }
+
+    /// \brief Поиск указанного символа (начиная с текущей позиции).
+    /// \param value Символ для поиска.
+    /// \return Итератор на найденный символ либо итератор за концом текста.
+    IRBIS_NODISCARD
+    IteratorType find (const CharType value) const noexcept
+    {
+        for (auto ptr = m_current; ptr != m_end; ++ptr) {
+            const auto c = static_cast <CharType> (*ptr);
+            if (equals (c, value)) {
+                return ptr;
+            }
+        }
+        return m_end;
     }
 
     /// \brief Поиск первого вхождения любого из указанных символов (начиная с текущей позиции).
@@ -373,8 +382,29 @@ struct TextRange final
         return m_end;
     }
 
+    /// \brief Поиск указанного символа (начиная с текущей позиции).
+    /// \param value Символ для поиска.
+    /// \return Итератор на найденный символ либо итератор за концом текста.
+    IRBIS_NODISCARD
+    IteratorType findLast (const CharType value) const noexcept
+    {
+        if (m_current != m_end) {
+            for (auto ptr = m_end - 1; ptr != m_current; --ptr) {
+                const auto c = static_cast <CharType> (*ptr);
+                if (equals (c, value)) {
+                    return ptr;
+                }
+            }
+            const auto c = static_cast <CharType> (*m_current);
+            if (equlas (c, value)) {
+                return m_current;
+            }
+        }
+        return m_end;
+    }
+
     /// \brief Поиск последнего вхождения любого из указанных символов (начиная с текущей позиции).
-    /// \tparam Args Тип символы.
+    /// \tparam Args Тип символов.
     /// \param args Искомые символы.
     /// \return Итератор на найденный символ либо итератор за концом текста.
     template <class ... Args>
@@ -384,7 +414,7 @@ struct TextRange final
         const auto list = { args... };
         if (m_current != m_end) {
             for (auto ptr = m_end - 1; ptr != m_current; --ptr) {
-                const char c = static_cast <CharType> (*ptr);
+                const auto c = static_cast <CharType> (*ptr);
                 if (CharTraits::find (std::begin (list), std::end (list), c) != std::end (list)) {
                     return ptr;
                 }
@@ -645,7 +675,7 @@ struct TextRange final
 
     /// \brief Подглядывание вплоть до любого из указанных стоп-символов (не включая его).
     /// \tparam Тип символов.
-    /// \param args Стоп-спимволы.
+    /// \param args Стоп-символы.
     /// \return Подсмотренная строка (возможно, пустая).
     template <class ... Args>
     IRBIS_NODISCARD
@@ -857,7 +887,6 @@ struct TextRange final
         result.m_end = m_current;
         return result;
     }
-
 
     /// \brief Считывание вплоть до указанного ограничителя (разделитель не помещается в возвращаемое значение, однако, считывается).
     /// \tparam Iter Тип итератора.
@@ -1426,7 +1455,7 @@ struct TextRange final
         while ((nelem != 0) && (start != m_end)) {
             auto current = start;
             while (current != m_end) {
-                if (CharTraits::equal (*current, delimiter)) {
+                if (equals (*current, delimiter)) {
                     break;
                 }
                 ++current;
@@ -1787,6 +1816,18 @@ struct TextRange final
     TextRange trim (const Args ... args) const noexcept
     {
         return this->trimStart (args...).trimEnd (args...);
+    }
+
+    /// \brief Удаление указанных символов с начала и с конца строки.
+    /// \tparam Iter Тип итератора.
+    /// \param begin Начало символов, подлежащих удалению.
+    /// \param end Конец.
+    /// \return Диапазон с удаленными символами.
+    template <class Iter>
+    IRBIS_NODISCARD
+    TextRange trim (const Iter begin, const Iter end) const noexcept
+    {
+        return trim->trimStart (begin, end).trimEnd (begin, end);
     }
 
     /// \brief Удаление указанных символов с начала и с конца строки.
