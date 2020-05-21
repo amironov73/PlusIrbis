@@ -1488,7 +1488,7 @@ struct ByteRange final
     IRBIS_NODISCARD
     ByteRange trim (const Iter begin, const Iter end) const noexcept
     {
-        return trim->trimStart (begin, end).trimEnd (begin, end);
+        return this->trimStart (begin, end).trimEnd (begin, end);
     }
 
     /// \brief Байт в текущей позиции. Для пустого диапазона или по достижении конца UB!

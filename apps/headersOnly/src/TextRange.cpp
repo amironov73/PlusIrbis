@@ -1827,7 +1827,7 @@ struct TextRange final
     IRBIS_NODISCARD
     TextRange trim (const Iter begin, const Iter end) const noexcept
     {
-        return trim->trimStart (begin, end).trimEnd (begin, end);
+        return this->trimStart (begin, end).trimEnd (begin, end);
     }
 
     /// \brief Удаление указанных символов с начала и с конца строки.
