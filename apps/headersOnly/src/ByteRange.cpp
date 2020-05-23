@@ -870,6 +870,72 @@ struct ByteRange final
         return result;
     }
 
+    /// \brief Считывание одного символа в кодировке UTF-8.
+    /// \return Прочитанный символ либо EOT.
+    int readUtf() noexcept
+    {
+        if (this->eot()) {
+            return EOT();
+        }
+
+        unsigned int c = *m_current;
+        ++m_current;
+        if ((c & 0x80u) == 0u) {
+            // 1-Byte sequence: 000000000xxxxxxx = 0xxxxxxx
+            // do nothing
+        }
+        else if ((c & 0xE0u) == 0xC0u) {
+            // 2-Byte sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c = (c & 0x1Fu) << 6u;
+            c |= (*m_current & 0x3Fu);
+            ++m_current;
+        }
+        else if ((c & 0xF0u) == 0xE0u)
+        {
+            // 3-Byte sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c = (c & 0x0Fu) << 12u;
+            c |= (*m_current & 0x3Fu) << 6u;
+            ++m_current;
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c |= (*m_current & 0x3Fu);
+            ++m_current;
+        }
+        else if ((c & 0xF8u) == 0xF0u)
+        {
+            // 4-Byte sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c = (c & 0x07u) << 18u;
+            c |= (*m_current & 0x3Fu) << 12u;
+            ++m_current;
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c |= (*m_current & 0x3Fu) << 6u;
+            ++m_current;
+            if (m_current == m_end) {
+                return EOT();
+            }
+            c |= (*m_current & 0x3Fu);
+            ++m_current;
+        }
+        else {
+            // Какая-то фигня
+            return EOT();
+        }
+
+        return static_cast <int> (c);
+    }
+
     /// \brief Считывание байтов до тех пор, пока он состоит из указанных разрешенных байтов. Происходит движение по диапазону.
     /// \tparam Args Тип байтов.
     /// \param args Разрешенные байты.

@@ -136,7 +136,7 @@ File File::create (const String &fileName)
     const ::mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
     const auto utfName = toUtf (fileName);
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (utfName.c_str(), flags, mode);
 #else
     result._handle = open64 (utfName.c_str(), flags, mode);
@@ -181,7 +181,7 @@ File File::create (const std::string &fileName)
     const int flags = O_RDWR | O_CREAT | O_TRUNC;
     const ::mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (fileName.c_str(), flags, mode);
 #else
     result._handle = open64 (fileName.c_str(), flags, mode);
@@ -294,7 +294,7 @@ File File::openRead (const String &fileName)
     const int flags = O_RDONLY;
     const auto utfName = toUtf (fileName);
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (utfName.c_str(), flags);
 #else
     result._handle = open64 (utfName.c_str(), flags);
@@ -338,7 +338,7 @@ File File::openRead (const std::string &fileName)
     File result;
     const int flags = O_RDONLY;
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (fileName.c_str(), flags);
 #else
     result._handle = open64 (fileName.c_str(), flags);
@@ -383,7 +383,7 @@ File File::openWrite (const String &fileName)
     const int flags = O_RDWR;
     const auto utfName = toUtf (fileName);
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (utfName.c_str(), flags);
 #else
     result._handle = open64 (utfName.c_str(), flags);
@@ -427,7 +427,7 @@ File File::openWrite (const std::string &fileName)
     File result;
     const int flags = O_RDWR;
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
     result._handle = open (fileName.c_str(), flags);
 #else
     result._handle = open64 (fileName.c_str(), flags);
@@ -612,7 +612,7 @@ std::size_t File::size ()
 
 #else
 
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push

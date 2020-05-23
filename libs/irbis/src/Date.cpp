@@ -10,7 +10,7 @@ namespace irbis {
 /// \param year Год.
 /// \param month Месяц (1-12).
 /// \param day День (1-31).
-Date::Date(int year, int month, int day)
+Date::Date (int year, int month, int day)
 {
     this->date.tm_sec = 0;
     this->date.tm_min = 0;
@@ -21,7 +21,7 @@ Date::Date(int year, int month, int day)
     this->date.tm_wday = 0;
     this->date.tm_yday = 0;
     this->date.tm_isdst = 0;
-    this->text = convert(&this->date);
+    this->text = convert (&this->date);
 }
 
 /// \brief Конструктор из даты.

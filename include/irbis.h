@@ -44,7 +44,13 @@
 
            #define IRBIS_FREEBSD
 
-	#endif
+	    #endif
+
+        #if defined(__ANDROID__)
+
+            #define IRBIS_ANDROID
+
+        #endif
 
         #if defined(__APPLE__) || defined(__APPLE_CC__) || defined (__OSX__)
 

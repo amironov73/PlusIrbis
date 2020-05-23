@@ -76,7 +76,7 @@ struct Directory::Impl
 
     std::string read() const
     {
-#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD)
+#if defined (IRBIS_APPLE) || defined (IRBIS_FREEBSD) || defined (IRBIS_ANDROID)
 
         struct dirent *entry;
 

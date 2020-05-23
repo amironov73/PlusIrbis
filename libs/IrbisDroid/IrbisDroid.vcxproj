@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x86">
+      <Configuration>Debug</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x86">
+      <Configuration>Release</Configuration>
+      <Platform>x86</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\irbis\src\Address.cpp" />
+    <ClCompile Include="..\irbis\src\AlphabetTable.cpp" />
+    <ClCompile Include="..\irbis\src\Author.cpp" />
+    <ClCompile Include="..\irbis\src\BookInfo.cpp" />
+    <ClCompile Include="..\irbis\src\ByteNavigator.cpp" />
+    <ClCompile Include="..\irbis\src\ChunkedBuffer.cpp" />
+    <ClCompile Include="..\irbis\src\ClientQuery.cpp" />
+    <ClCompile Include="..\irbis\src\ClientSocket.cpp" />
+    <ClCompile Include="..\irbis\src\Codes.cpp" />
+    <ClCompile Include="..\irbis\src\Connection.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionAdmin.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionBase.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionContext.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionFactory.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionFull.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionLite.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionPhantom.cpp" />
+    <ClCompile Include="..\irbis\src\ConnectionSearch.cpp" />
+    <ClCompile Include="..\irbis\src\DatabaseInfo.cpp" />
+    <ClCompile Include="..\irbis\src\Date.cpp" />
+    <ClCompile Include="..\irbis\src\DirectAccess.cpp" />
+    <ClCompile Include="..\irbis\src\Directory.cpp" />
+    <ClCompile Include="..\irbis\src\Ean.cpp" />
+    <ClCompile Include="..\irbis\src\EmbeddedField.cpp" />
+    <ClCompile Include="..\irbis\src\Encoding.cp1251.cpp" />
+    <ClCompile Include="..\irbis\src\Encoding.cp866.cpp" />
+    <ClCompile Include="..\irbis\src\Encoding.cpp" />
+    <ClCompile Include="..\irbis\src\Encoding.koi8r.cpp" />
+    <ClCompile Include="..\irbis\src\Encoding.utf8.cpp" />
+    <ClCompile Include="..\irbis\src\Exemplar.cpp" />
+    <ClCompile Include="..\irbis\src\File.cpp" />
+    <ClCompile Include="..\irbis\src\FileSpecification.cpp" />
+    <ClCompile Include="..\irbis\src\FoundLine.cpp" />
+    <ClCompile Include="..\irbis\src\Gbl.cpp" />
+    <ClCompile Include="..\irbis\src\IlfFile.cpp" />
+    <ClCompile Include="..\irbis\src\IniFile.cpp" />
+    <ClCompile Include="..\irbis\src\IO.cpp" />
+    <ClCompile Include="..\irbis\src\irbis.cpp" />
+    <ClCompile Include="..\irbis\src\Isbn.cpp" />
+    <ClCompile Include="..\irbis\src\Iso2709.cpp" />
+    <ClCompile Include="..\irbis\src\Lite.cpp" />
+    <ClCompile Include="..\irbis\src\Log.cpp" />
+    <ClCompile Include="..\irbis\src\MarcRecord.cpp" />
+    <ClCompile Include="..\irbis\src\MemoryPool.cpp" />
+    <ClCompile Include="..\irbis\src\Menu.cpp" />
+    <ClCompile Include="..\irbis\src\Mst.cpp" />
+    <ClCompile Include="..\irbis\src\NewEncoding.cpp" />
+    <ClCompile Include="..\irbis\src\NumberText.cpp" />
+    <ClCompile Include="..\irbis\src\OptFile.cpp" />
+    <ClCompile Include="..\irbis\src\ParFile.cpp" />
+    <ClCompile Include="..\irbis\src\Pft.cpp" />
+    <ClCompile Include="..\irbis\src\Phantom.cpp" />
+    <ClCompile Include="..\irbis\src\ProcessInfo.cpp" />
+    <ClCompile Include="..\irbis\src\RawRecord.cpp" />
+    <ClCompile Include="..\irbis\src\Reader.cpp" />
+    <ClCompile Include="..\irbis\src\RecordField.cpp" />
+    <ClCompile Include="..\irbis\src\RecordSerializer.cpp" />
+    <ClCompile Include="..\irbis\src\RecordStatus.cpp" />
+    <ClCompile Include="..\irbis\src\Registration.cpp" />
+    <ClCompile Include="..\irbis\src\Search.cpp" />
+    <ClCompile Include="..\irbis\src\ServerResponse.cpp" />
+    <ClCompile Include="..\irbis\src\ServerStat.cpp" />
+    <ClCompile Include="..\irbis\src\Span.cpp" />
+    <ClCompile Include="..\irbis\src\SubField.cpp" />
+    <ClCompile Include="..\irbis\src\Tcp4Socket.cpp" />
+    <ClCompile Include="..\irbis\src\TermInfo.cpp" />
+    <ClCompile Include="..\irbis\src\TermPosting.cpp" />
+    <ClCompile Include="..\irbis\src\Text.cpp" />
+    <ClCompile Include="..\irbis\src\TextNavigator.cpp" />
+    <ClCompile Include="..\irbis\src\Title.cpp" />
+    <ClCompile Include="..\irbis\src\TreeFile.cpp" />
+    <ClCompile Include="..\irbis\src\TreeNode.cpp" />
+    <ClCompile Include="..\irbis\src\Upc.cpp" />
+    <ClCompile Include="..\irbis\src\UserInfo.cpp" />
+    <ClCompile Include="..\irbis\src\Version.cpp" />
+    <ClCompile Include="..\irbis\src\Visit.cpp" />
+    <ClCompile Include="..\irbis\src\Xrf.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6720b7b0-8e4c-4200-a9eb-4a9d0181a32f}</ProjectGuid>
+    <Keyword>Android</Keyword>
+    <RootNamespace>IrbisDroid</RootNamespace>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <ApplicationType>Android</ApplicationType>
+    <ApplicationTypeRevision>3.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>Clang_5_0</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(SolutionDir)include;$(ProjectDir)..\irbis\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>Enabled</ExceptionHandling>
+      <AdditionalOptions>-Wno-unknown-pragmas %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>
