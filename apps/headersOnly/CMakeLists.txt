@@ -12,6 +12,8 @@ set(CppFiles
     src/ByteRange.cpp
     src/TextRange.cpp
     src/System.cpp
+    src/BusyState.cpp
+    src/Network.cpp
 )
 
 add_executable(${PROJECT_NAME}

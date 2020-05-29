@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 
 #ifdef IRBIS_WINDOWS
 
@@ -83,11 +84,16 @@ static bool initialize()
     return true;
 }
 
+static int getMin(int x, int y)
+{
+    return x > y ? y : x;
+}
+
 static bool receiveExact (int socket, irbis::ChunkedBuffer &buffer, int howMany)
 {
     char temp [1024];
     try {
-        int toRead = min ((int) sizeof (temp), howMany);
+        int toRead = getMin ((int) sizeof (temp), howMany);
         while (toRead > 0) {
             int received = ::recv (socket, temp, toRead, 0);
             if (received <= 0) {
@@ -96,7 +102,7 @@ static bool receiveExact (int socket, irbis::ChunkedBuffer &buffer, int howMany)
             }
             buffer.write ((irbis::Byte*) temp, 0, received);
             howMany -= received;
-            toRead = min ((int) sizeof (temp), howMany);
+            toRead = getMin ((int) sizeof (temp), howMany);
         }
     }
     catch (const std::exception &e) {
@@ -200,28 +206,14 @@ int32_t parseInt32 (const It begin, const It end)
 }
 
 /// \brief Обработка клиента.
-static void handleClient (int clientSocket)
+static void handleClient (int downSocket)
 {
-#ifndef IRBIS_WINDOWS
-    auto rc = ::fork();
-    if (rc == -1) {
-        std::cerr << "fork() failed" << std::endl;
-        ::closesocket (clientSocket);
-    }
-
-    if (rc != 0) {
-        // in parent process
-        ::closesocket (clientSocket);
-        return;
-    }
-#endif
-
     std::cout << "Client arrived" << std::endl;
 
-    auto downSocket = ::socket (AF_INET, SOCK_STREAM, 0);
-    if (downSocket == -1) {
+    auto upSocket = ::socket (AF_INET, SOCK_STREAM, 0);
+    if (upSocket == -1) {
         std::cerr << "socket() failed" << std::endl;
-        ::closesocket (clientSocket);
+        ::closesocket (downSocket);
         return;
     }
 
@@ -230,62 +222,62 @@ static void handleClient (int clientSocket)
     serverAddress.sin_port = htons (remotePort);
     serverAddress.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
 
-    auto returnCode = ::connect (downSocket,
-        (struct sockaddr *)& serverAddress,
-        sizeof(serverAddress));
+    auto returnCode = ::connect (upSocket,
+                                 (struct sockaddr *)& serverAddress,
+                                 sizeof(serverAddress));
     if (returnCode == -1) {
         std::cerr << "connect() failed" << std::endl;
-        ::closesocket (clientSocket);
         ::closesocket (downSocket);
+        ::closesocket (upSocket);
         return;
     }
 
     {
         // Фаза 0
-        irbis::ChunkedBuffer buffer;
-        if (!receiveExact (clientSocket, buffer, 10)) {
+        irbis::ChunkedBuffer requestBuffer;
+        if (!receiveExact (downSocket, requestBuffer, 10)) {
             std::cerr << "receiveExact() failed" << std::endl;
             return;
         }
-        int32_t received = buffer.size();
-        auto begin = std::begin (buffer);
-        auto end = std::end (buffer);
+        int32_t received = requestBuffer.size();
+        auto begin = std::begin (requestBuffer);
+        auto end = std::end (requestBuffer);
         auto found = std::find (begin, end, 0x0A);
         if (found == end) {
             std::cerr << "receiveExact() failed" << std::endl;
             return;
         }
         int32_t requestSize = parseInt32 (begin, found);
-        int32_t remaining = requestSize - received + (int)(found - begin);
+        int32_t remaining = requestSize - received + (int)(found - begin) + 1;
 
         // Фаза 1
-        if (!receiveExact (clientSocket, buffer, remaining)) {
-            std::cerr << "receiveExact() failed" << std::endl;
+        if (!receiveExact (downSocket, requestBuffer, remaining)) {
+            std::cout << "receiveExact() failed" << std::endl;
             return;
         }
 
-        std::cout << "Client request: " << buffer.size() << std::endl;
-        if (!sendAll (downSocket, buffer)) {
+        std::cout << "Client request: " << requestBuffer.size() << std::endl;
+        if (!sendAll (upSocket, requestBuffer)) {
             std::cerr << "sendAll() failed" << std::endl;
             return;
         }
-        //::shutdown (downSocket, SD_SEND);
+        ::shutdown (upSocket, 1);
     }
     {
         // Фаза 2
-        irbis::ChunkedBuffer buffer;
-        if (!receiveAll (downSocket, buffer)) {
+        irbis::ChunkedBuffer responseBuffer;
+        if (!receiveAll (upSocket, responseBuffer)) {
             std::cerr << "receiveAll() failed" << std::endl;
             return;
         }
-        std::cout << "Server response: " << buffer.size() << std::endl;
-        if (!sendAll (clientSocket, buffer)) {
+        std::cout << "Server response: " << responseBuffer.size() << std::endl;
+        if (!sendAll (downSocket, responseBuffer)) {
             std::cerr << "sendAll() failed" << std::endl;
             return;
         }
     }
 
-    ::closesocket (clientSocket);
+    ::closesocket (downSocket);
     std::cout << "Client handled" << std::endl;
 }
 
@@ -301,7 +293,8 @@ static bool serverLoop()
             return false;
         }
 
-        handleClient (clientSocket);
+        std::thread handler (handleClient, clientSocket);
+        handler.detach();
     }
 
     return true;

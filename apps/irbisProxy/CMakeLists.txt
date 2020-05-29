@@ -16,8 +16,13 @@ add_executable(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} irbis)
 
-if(MINGW)
-    target_link_libraries(${PROJECT_NAME} libws2_32.a)
-endif(MINGW)
+#if(MSVC)
+#else(MSVC)
+#if(MINGW)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -libws2_32")
+#else(MINGW)
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+#endif(MINGW)
+#endif(MSVC)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${ARTIFACTS})

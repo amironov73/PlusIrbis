@@ -13,7 +13,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstdint>
-// #include <future>
+#include <future>
 #include <ios>
 #include <list>
 #include <map>
@@ -2148,16 +2148,16 @@ public:
 
     bool actualizeDatabase (const String &databaseName);
     bool actualizeRecord (const String &databaseName, int mfn);
-    // std::future<bool> connectAsync();
-    // std::future<void> disconnectAsync();
-    // std::future<bool> executeAsync(ClientQuery &query);
+    std::future<bool> connectAsync();
+    std::future<void> disconnectAsync();
+    std::future<bool> executeAsync(ClientQuery &query);
     String formatRecord (const String &format, Mfn mfn);
     std::string formatRecordLite (const std::string &format, Mfn mfn);
     String formatRecord (const String &format, const MarcRecord &record);
     DatabaseInfo getDatabaseInfo (const String &databaseName);
     GblResult globalCorrection (const GblSettings &settings);
     std::vector<UserInfo> getUserList();
-    // std::future<bool> noOpAsync();
+    std::future<bool> noOpAsync();
     String printTable (const TableDefinition &definition);
     RawRecord readRawRecord (Mfn mfn);
     std::vector<SearchScenario> readSearchScenario (const FileSpecification &specification);
