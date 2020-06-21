@@ -14,6 +14,7 @@ set(CppFiles
     src/System.cpp
     src/BusyState.cpp
     src/Network.cpp
+    src/SecretString.cpp
 )
 
 add_executable(${PROJECT_NAME}

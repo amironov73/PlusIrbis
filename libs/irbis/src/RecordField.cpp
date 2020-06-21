@@ -5,7 +5,7 @@
 #include "irbis_internal.h"
 
 #include <algorithm>
-#include <iomanip>
+//#include <iomanip>
 #include <iostream>
 
 #if defined(_MSC_VER)

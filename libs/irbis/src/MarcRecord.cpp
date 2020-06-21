@@ -4,7 +4,7 @@
 #include "irbis.h"
 #include "irbis_internal.h"
 
-#include <iomanip>
+//#include <iomanip>
 #include <iostream>
 #include <algorithm>
 #include <utility>

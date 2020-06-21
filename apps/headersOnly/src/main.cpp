@@ -20,6 +20,7 @@ void testSystem();
 void testMmap();
 void testByteRange();
 void testTextRange();
+void testSecret();
 
 int main()
 {
@@ -28,7 +29,8 @@ int main()
     try
     {
         //testTextRange();
-        testMmap ();
+        //testMmap ();
+        testSecret();
     }
     catch (const std::exception &exception)
     {

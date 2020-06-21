@@ -611,6 +611,70 @@ struct ByteRange final
         return result;
     }
 
+    /// \brief Подглядывание одного символа в кодировке UTF-8.
+    /// \return Подсмотренный символ либо EOT.
+    int peekUtf() noexcept
+    {
+        if (this->eot()) {
+            return EOT();
+        }
+
+        auto ptr = m_current;
+        unsigned int c = *ptr;
+        ++ptr;
+        if ((c & 0x80u) == 0u) {
+            // 1-Byte sequence: 000000000xxxxxxx = 0xxxxxxx
+            // do nothing
+        }
+        else if ((c & 0xE0u) == 0xC0u) {
+            // 2-Byte sequence: 00000yyyyyxxxxxx = 110yyyyy 10xxxxxx
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c = (c & 0x1Fu) << 6u;
+            c |= (*ptr & 0x3Fu);
+        }
+        else if ((c & 0xF0u) == 0xE0u)
+        {
+            // 3-Byte sequence: zzzzyyyyyyxxxxxx = 1110zzzz 10yyyyyy 10xxxxxx
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c = (c & 0x0Fu) << 12u;
+            c |= (*m_current & 0x3Fu) << 6u;
+            ++ptr;
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c |= (*ptr & 0x3Fu);
+        }
+        else if ((c & 0xF8u) == 0xF0u)
+        {
+            // 4-Byte sequence: 11101110wwwwzzzzyy + 110111yyyyxxxxxx = 11110uuu 10uuzzzz 10yyyyyy 10xxxxxx
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c = (c & 0x07u) << 18u;
+            c |= (*ptr & 0x3Fu) << 12u;
+            ++ptr;
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c |= (*ptr & 0x3Fu) << 6u;
+            ++ptr;
+            if (ptr == m_end) {
+                return EOT();
+            }
+            c |= (*ptr & 0x3Fu);
+        }
+        else {
+            // Какая-то фигня
+            return EOT();
+        }
+
+        return static_cast <int> (c);
+    }
+
     /// \brief Подглядывание, пока встречаются перечисленные байты.
     /// \tparam Args Тип байтов.
     /// \param args Нужные байты.
