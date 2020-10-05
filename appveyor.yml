@@ -3,6 +3,10 @@ configuration: Release
 platform: x64
 image: Visual Studio 2017
 
+before_build:
+  - cmd: C:\Python36-x64\Scripts\pip install --upgrade pygount
+  - cmd: C:\Python36-x64\Scripts\pygount libs -f summary -s cpp
+
 build:
   project: PlusIrbis.2017.sln
 
