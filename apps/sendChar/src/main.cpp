@@ -23,8 +23,15 @@ static void sendText (HWND hwnd, const std::string &text)
         SendMessageA (hwnd, WM_CHAR, c, 0);
         Sleep (10);
     }
-    SendMessageA (hwnd, WM_CHAR, '\r', 0);
-    //SendMessageA (hwnd, WM_CHAR, '\n', 0);
+
+    // SendMessageA (hwnd, WM_CHAR, '\r', 0);
+    // SendMessageA (hwnd, WM_CHAR, '\n', 0);
+
+    // PostMessageA (hwnd, WM_CHAR, '\r', 0);
+
+    PostMessageA (hwnd, WM_KEYDOWN, VK_RETURN, 0);
+    Sleep (20);
+    PostMessageA (hwnd, WM_KEYUP, VK_RETURN, 0);
 }
 
 void sendText (const std::string &text)
