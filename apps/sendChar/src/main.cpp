@@ -29,8 +29,9 @@ static void sendText (HWND hwnd, const std::string &text)
 
     // PostMessageA (hwnd, WM_CHAR, '\r', 0);
 
-    PostMessageA (hwnd, WM_KEYDOWN, VK_RETURN, 0);
-    Sleep (20);
+    // PostMessageA (hwnd, WM_KEYDOWN, VK_RETURN, 0);
+    // Sleep (20);
+    // достаточно только отпускания клавиши
     PostMessageA (hwnd, WM_KEYUP, VK_RETURN, 0);
 }
 
