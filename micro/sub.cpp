@@ -50,7 +50,7 @@ namespace irbis
 
     std::ostream& operator<< (std::ostream &stream, const SubField &subfield)
     {
-        return stream << std::string ("^") << std::string (subfield.code, 1) << subfield.value;
+        return stream << std::string ("^") << subfield.code << subfield.value;
     }
 
     /// \brief Изменение значения подполя.

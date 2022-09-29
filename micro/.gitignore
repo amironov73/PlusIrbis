@@ -332,3 +332,6 @@ temp/
 # Coverity Scan
 /cov-int/
 cov-int.zip
+
+# PVS Studio
+.PVS-Studio/
