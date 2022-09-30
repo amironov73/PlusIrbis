@@ -32,6 +32,7 @@ namespace irbis
     class RecordField;
     class ServerResponse;
     class SubField;
+    class Version;
 
     using RecordFieldList = std::vector<RecordField>;
     using StringList      = std::vector<std::string>;
@@ -218,6 +219,14 @@ namespace irbis
         std::string pushDatabase          (const std::string &newDatabase);
         std::string toConnectionString    () const;
 
+        //bool                     deleteRecord (int mfn);
+        MarcRecord               readRecord   (int mfn);
+        //MarcRecord               readRecord   (const std::string &databaseName, int mfn);
+        //MarcRecord               readRecord   (const std::string &databaseName, int mfn, int version);
+        //std::vector <MarcRecord> readRecords  (const std::vector<int> &mfnList);
+        //int                      writeRecord  (MarcRecord &record, bool lockFlag = false, bool actualize = true, bool dontParseResponse = false);
+
+
 //        std::vector<DatabaseInfo> listDatabases  (const IniFile &iniFile, const String &defaultFileName);
 //        std::vector<DatabaseInfo> listDatabases  (const FileSpecification &specification);
 //        StringList                listFiles      (const FileSpecification &specification);
@@ -242,7 +251,7 @@ namespace irbis
 //        IRBIS_MAYBE_UNUSED bool                      createDictionary (const String &databaseName = L"");
 //        IRBIS_MAYBE_UNUSED bool                      deleteDatabase   (const String &databaseName = L"");
 //        ServerStat                getServerStat    ();
-//        Version                   getServerVersion ();
+        Version                   getServerVersion ();
 //        std::vector <ProcessInfo> listProcesses    ();
 //        IRBIS_MAYBE_UNUSED bool                      reloadDictionary (const String &databaseName = L"");
 //        IRBIS_MAYBE_UNUSED bool                      reloadMasterFile (const String &databaseName = L"");
@@ -252,6 +261,28 @@ namespace irbis
 //        IRBIS_MAYBE_UNUSED bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
 
     };
+
+    /// \brief Информация о версии ИРБИС-сервера.
+    class Version final
+    {
+        public:
+
+        std::string organization;      ///< На какое юридическое лицо приобретен сервер.
+        std::string version;           ///< Собственно версия сервера. Например, 64.2008.1.
+        int    maxClients       { 0 }; ///< Максимальное количество одновременных подключений.
+        int    connectedClients { 0 }; ///< Текущее количество подключений.
+
+        Version             ()                = default; ///< Конструктор по умолчанию.
+        Version             (const Version &) = default; ///< Конструктор копирования.
+        Version             (Version &&)      = default; ///< Конструктор перемещения.
+        ~Version            ()                = default; ///< Деструктор.
+        Version& operator = (const Version &) = default; ///< Оператор копирования.
+        Version& operator = (Version &&)      = default; ///< Оператор перемещения.
+
+        void parse (ServerResponse &response);
+        std::string toString() const;
+    };
+
 
 }
 

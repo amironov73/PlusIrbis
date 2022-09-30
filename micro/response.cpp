@@ -34,10 +34,10 @@ namespace irbis
         socket.port  = connection.port;
         socket.open();
 
-        //auto encoded    = query.encode();
-        //const auto data = encoded.data();
-        //const auto size = encoded.size();
-        //socket.send (data, size);
+        auto encoded    = query.encode();
+        const auto data = encoded.data();
+        const auto size = encoded.size();
+        socket.send (data, size);
 
         unsigned char buffer[2048];
         while(true) {
@@ -47,7 +47,7 @@ namespace irbis
             }
             _write (buffer, received);
         }
-        // socket.close();
+        socket.close();
 
         // decode the response
         this->command       = this->readAnsi();

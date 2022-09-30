@@ -23,9 +23,9 @@ namespace irbis
           queryId       { 0 },
           lastError     { 0 },
           serverVersion { },
-          interval      { 600 }//,
+          interval      { 600 },
           //stage         { RequestStage::None },
-          //socket        { new Tcp4Socket }
+          socket        { new ClientSocket }
     {
         // пустое тело конструктора
     }
@@ -253,6 +253,46 @@ namespace irbis
                + ";database"       + this->database
                + ";arm="           + this->workstation
                + ";";
+    }
+
+    /// \brief Получение версии сервера ИРБИС64.
+    /// \return Версия сервера.
+    Version Connection::getServerVersion()
+    {
+        Version result;
+        if (!this->_checkConnection()) {
+            return result;
+        }
+
+        ClientQuery query (*this, "1");
+        ServerResponse response (*this, query);
+        response.checkReturnCode();
+        result.parse (response);
+
+        return result;
+    }
+
+    /// \brief Чтение записи с сервера.
+    /// \param mfn MFN записи.
+    /// \return Запись.
+    MarcRecord Connection::readRecord (int mfn)
+    {
+        MarcRecord result;
+        if (!this->_checkConnection()) {
+            return result;
+        }
+
+        ClientQuery query (*this, "C");
+        query.addAnsi (this->database).newLine()
+            .add(mfn);
+
+        ServerResponse response (*this, query);
+        if (response.checkReturnCode (4, -201, -600, -602, -603)) {
+            const auto lines = response.readRemainingUtfLines();
+            result.decode (lines);
+            result.database = this->database;
+        }
+        return result;
     }
 
 }

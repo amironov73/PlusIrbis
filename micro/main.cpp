@@ -57,14 +57,17 @@ int main()
             return -1;
         }
 
-        //const auto version = connection.getServerVersion();
-        //std::cout << L"Server version: " << version.version << std::endl;
+        const auto version = connection.getServerVersion();
+        std::cout << "Server version: " << version.version << std::endl;
 
         const auto maxMfn = connection.getMaxMfn ("IBIS");
         std::cout << "max MFN: " << maxMfn << std::endl;
 
         connection.noOp();
-        std::cout << L"NOOP" << std::endl;
+        std::cout << "NOOP" << std::endl;
+
+        const auto record = connection.readRecord (1);
+        std::cout << "READ: " << record.fm (200, 'a') << std::endl;
 
         connection.disconnect();
         std::cout << "disconnected" << std::endl;

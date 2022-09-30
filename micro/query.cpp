@@ -106,8 +106,11 @@ namespace irbis
     void ClientQuery::dump (std::ostream &stream) const
     {
         for (const auto value : this->_content) {
-            stream << std::hex << std::setw(2) << value << " ";
+            // stream << std::hex << std::setw(2) << value << " ";
+            stream << value;
         }
+
+        stream.flush();
     }
 
     /// \brief Кодирование запроса.
@@ -121,7 +124,7 @@ namespace irbis
         for (std::size_t i = 0; i < prefix.length(); i++) {
             result.push_back (static_cast<unsigned char>(ptr[i]));
         }
-        result.push_back(0x0a);
+        result.push_back (0x0a);
         result.insert (result.end(), this->_content.begin(), this->_content.end());
 
         return result;

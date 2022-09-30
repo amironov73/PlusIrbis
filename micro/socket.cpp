@@ -1,6 +1,9 @@
 // This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "bugprone-reserved-identifier"
+
 #include "internal.h"
 
 #include <iostream>
@@ -135,3 +138,5 @@ namespace irbis
         return result;
     }
 }
+
+#pragma clang diagnostic pop
