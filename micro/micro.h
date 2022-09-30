@@ -25,8 +25,12 @@
 
 namespace irbis
 {
+    class ClientSocket;
+    class ClientQuery;
+    class Connection;
     class MarcRecord;
     class RecordField;
+    class ServerResponse;
     class SubField;
 
     using RecordFieldList = std::vector<RecordField>;
@@ -168,6 +172,85 @@ namespace irbis
         MarcRecord& operator << (char code);
         MarcRecord& operator && (const std::string &value);
         MarcRecord& operator && (const char *value);
+    };
+
+    class Connection final
+    {
+    private:
+        bool _connected;
+        StringList _databaseStack;
+        std::mutex _mutex;
+
+        friend class ServerResponse;
+
+        bool _checkConnection();
+
+    public:
+
+        std::string  host;                     ///< Адрес сервера в виде строки.
+        short        port;                     ///< Номер порта сервера.
+        std::string  username;                 ///< Логин пользователя.
+        std::string  password;                 ///< Пароль пользователя.
+        std::string  database;                 ///< Имя текущей базы данных.
+        std::string  workstation;              ///< Тип клиента.
+        int          clientId;                 ///< Уникальный идентификатор клиента.
+        int          queryId;                  ///< Порядковый номер команды, отсылаемой на сервер.
+        int          lastError;                ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
+        std::string  serverVersion;            ///< Версия сервера (получается при подключении).
+        // IniFile      iniFile;                  ///< Содержимое серверного INI-файла для данного клиента.
+        int          interval;                 ///< Интервал автоматического подтверждения, секунды.
+        // RequestStage stage;                    ///< Этап выполнения запроса
+        std::unique_ptr <ClientSocket> socket; ///< Клиентский сокет.
+
+        Connection  ();
+        ~Connection ();
+
+        /// \brief Подключено ли к серверу?
+        bool   connected() const noexcept { return this->_connected; }
+
+        bool        connect               ();
+        void        disconnect            ();
+        bool        execute               (ClientQuery &query);
+        int         getMaxMfn             (const std::string &databaseName);
+        bool        noOp                  ();
+        void        parseConnectionString (const std::string &connectionString);
+        std::string popDatabase           ();
+        std::string pushDatabase          (const std::string &newDatabase);
+        std::string toConnectionString    () const;
+
+//        std::vector<DatabaseInfo> listDatabases  (const IniFile &iniFile, const String &defaultFileName);
+//        std::vector<DatabaseInfo> listDatabases  (const FileSpecification &specification);
+//        StringList                listFiles      (const FileSpecification &specification);
+//        StringList                listFiles      (const std::vector<FileSpecification> &specifications);
+//        Bytes                     readBinaryFile (const FileSpecification &specification);
+//        IniFile                   readIniFile    (const FileSpecification &specification);
+//        MenuFile                  readMenuFile   (const FileSpecification &specification);
+//        String                    readTextFile   (const FileSpecification &specification);
+//        std::string               readAnsiFile   (const FileSpecification &specification);
+//        StringList                readTextFiles  (std::vector<FileSpecification> &specifications);
+//        StringList                readTextLines  (const FileSpecification &specification);
+
+//        StringList               listTerms    (const String &prefix);
+//        std::vector<TermPosting> readPostings (const PostingParameters &parameters);
+//        std::vector<TermInfo>    readTerms    (const String &startTerm, int numberOfTerms = 100);
+//        std::vector<TermInfo>    readTerms    (const TermParameters &parameters);
+//        MfnList                  search       (const Search &search);
+//        MfnList                  search       (const String &expression);
+//        MfnList                  search       (const SearchParameters &parameters);
+
+//        IRBIS_MAYBE_UNUSED bool                      createDatabase   (const String &databaseName, const String &description, bool readerAccess);
+//        IRBIS_MAYBE_UNUSED bool                      createDictionary (const String &databaseName = L"");
+//        IRBIS_MAYBE_UNUSED bool                      deleteDatabase   (const String &databaseName = L"");
+//        ServerStat                getServerStat    ();
+//        Version                   getServerVersion ();
+//        std::vector <ProcessInfo> listProcesses    ();
+//        IRBIS_MAYBE_UNUSED bool                      reloadDictionary (const String &databaseName = L"");
+//        IRBIS_MAYBE_UNUSED bool                      reloadMasterFile (const String &databaseName = L"");
+//        IRBIS_MAYBE_UNUSED bool                      restartServer    ();
+//        IRBIS_MAYBE_UNUSED bool                      truncateDatabase (const String &databaseName = L"");
+//        IRBIS_MAYBE_UNUSED bool                      unlockDatabase   (const String &databaseName = L"");
+//        IRBIS_MAYBE_UNUSED bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
+
     };
 
 }
