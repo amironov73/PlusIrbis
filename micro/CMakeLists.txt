@@ -1,6 +1,11 @@
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
+cmake_minimum_required(VERSION 2.8.12)
 project(micro)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(micro main.cpp micro.h sub.cpp field.cpp utils.cpp internal.h record.cpp status.cpp query.cpp connect.cpp response.cpp socket.cpp version.cpp)
+if(MSVC)
+    add_compile_options(/UTF-8 /permissive- /Gy)
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif(MSVC)
+
+add_executable(micro main.cpp micro.h micro.cpp)
