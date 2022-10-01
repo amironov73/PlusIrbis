@@ -104,19 +104,96 @@ namespace irbis
     template<typename T>
     bool isDigit(T c) { return (c >= '0') && (c <= '9'); }
 
+    //================================================================
+
+    /// \brief Строка INI-файла.
+    ///
+    /// Состоит из ключа и значения, разделённых символом '='.
+    class IniLine final
+    {
+        public:
+
+        std::string key;    ///< Ключ (не должен быть пустым).
+        std::string value;  ///< Значение (может быть пустым).
+
+        IniLine() = default;
+        IniLine (const std::string &key_, const std::string &value_)
+            : key (key_), value (value_) {}
+        IniLine (std::string &&key_, std::string &&value_)
+            : key (std::move (key_)), value (std::move (value_)) {}
+
+        bool        modified    ()                             const noexcept;
+        void        notModified ()                             noexcept;
+        void        setKey      (const std::string &newKey);
+        void        setKey      (std::string &&newKey)         noexcept;
+        void        setValue    (const std::string &newValue);
+        void        setValue    (std::string &&newValue)       noexcept;
+        std::string toString    ()                             const;
+
+        private:
+
+        bool _modified { false };
+    };
+
+    /// \brief Секция INI-файла.
+    class IniSection final
+    {
+        public:
+
+        std::string name;           ///< Имя секции.
+        std::vector<IniLine> lines; ///< Строки, входящие в секцию. \see IniLine
+
+        IniSection&    clear       ();
+        bool           containsKey (const std::string &key) const noexcept;
+        std::ptrdiff_t getIndex    (const std::string &key) const noexcept;
+        IniLine*       getLine     (const std::string &key) const noexcept;
+        std::string    getValue    (const std::string &key, const std::string &defaultValue) const noexcept;
+        bool           modified    ()                       const noexcept;
+        void           notModified ();
+        IniSection&    removeValue (const std::string &key);
+        IniSection&    setValue    (const std::string &key, const std::string &value);
+        std::string    toString    ()                       const;
+
+        std::string operator[]     (const std::string &index) const noexcept;
+    };
+
+    /// \brief INI-файл.
+    class IniFile final
+    {
+        public:
+
+        std::vector<IniSection> sections; ///< Секции INI-файла.
+
+        IniFile&       clear           ();
+        bool           containsSection (const std::string &name) const noexcept;
+        IniSection&    createSection   (const std::string &name);
+        bool           modified        () const noexcept;
+        void           notModified     ();
+        std::ptrdiff_t getIndex        (const std::string &name) const noexcept;
+        IniSection*    getSection      (const std::string &name) const noexcept;
+        std::string    getValue        (const std::string &sectionName, const std::string &keyName, const std::string &defaultValue = "") const noexcept;
+        void           parse           (const StringList &lines);
+        IniFile&       removeSection   (const std::string &sectionName);
+        IniFile&       removeValue     (const std::string &sectionName, const std::string &keyName);
+        IniFile&       setValue        (const std::string &sectionName, const std::string &keyName, const std::string &value);
+        std::string    toString        () const;
+    };
+
+    //================================================================
+
     /// \brief Клиентский запрос.
     ///
     /// Объекты данного класса неперемещаемые.
     class ClientQuery final
     {
-    private:
+        private:
 
         std::vector<unsigned char> _content;
 
         void _write (const unsigned char *bytes, std::size_t size);
         void _write (unsigned char byte);
 
-    public:
+        public:
 
         ClientQuery (const Connection &connection, const std::string &commandCode);
         ClientQuery (ClientQuery &) = delete;
@@ -138,7 +215,7 @@ namespace irbis
     /// \brief Ответ сервера на клиентский запрос.
     class ServerResponse final
     {
-    public:
+        public:
 
         std::string command;       ///< Код команды (дублирует клиентский запрос).
         int clientId;              ///< Идентификатор клиента (дублирует клиентский запрос).
@@ -402,7 +479,7 @@ namespace irbis
         int          queryId;                  ///< Порядковый номер команды, отсылаемой на сервер.
         int          lastError;                ///< Код ошибки, возвращённый сервером в ответ на последнюю команду.
         std::string  serverVersion;            ///< Версия сервера (получается при подключении).
-        // IniFile      iniFile;                  ///< Содержимое серверного INI-файла для данного клиента.
+        IniFile      iniFile;                  ///< Содержимое серверного INI-файла для данного клиента.
         int          interval;                 ///< Интервал автоматического подтверждения, секунды.
         RequestStage stage;                    ///< Этап выполнения запроса
         std::unique_ptr <ClientSocket> socket; ///< Клиентский сокет.

@@ -105,6 +105,7 @@ namespace irbis
         for (auto &i: text) {
             i = (char) std::tolower (i);
         }
+
         return text;
     }
 
@@ -112,10 +113,16 @@ namespace irbis
     /// \param text Текст, подлежащий трансформации.
     /// \return Возвращает преобразованную строку.
     /// \warning Трансформация осуществляется "по месту"!
-    std::string toUpper(std::string &text) noexcept {
+    std::string toUpper
+        (
+            std::string &text
+        )
+        noexcept
+    {
         for (auto &i: text) {
             i = (char) std::toupper(i);
         }
+
         return text;
     }
 
@@ -123,16 +130,26 @@ namespace irbis
     /// \param text Текст для изучения.
     /// \param fragment Подстрока для поиска.
     /// \return Возвращает true, если подстрока найдена, иначе false.
-    bool contains(const std::string &text, const std::string &fragment) {
-        return text.find(fragment) != std::string::npos;
+    bool contains
+        (
+            const std::string &text,
+            const std::string &fragment
+        )
+    {
+        return text.find (fragment) != std::string::npos;
     }
 
     /// \brief Содержит ли строка заданный символ?
     /// \param text Текст для изучения.
     /// \param c Символ для поиска.
     /// \return Возвращает true, если символ найден, иначе false.
-    bool contains(const std::string &text, char c) {
-        return text.find(c) != std::string::npos;
+    bool contains
+        (
+            const std::string &text,
+            char c
+        )
+    {
+        return text.find (c) != std::string::npos;
     }
 
     /// \brief Заменяет все вхождения одной подстроки на другую.
@@ -140,28 +157,40 @@ namespace irbis
     /// \param from Заменяемый текст.
     /// \param to Заменяющий текст.
     /// \return Обработанный текст.
-    std::string replace(const std::string &text, const std::string &from, const std::string &to) {
-        std::string result = text;
+    std::string replace
+        (
+            const std::string &text,
+            const std::string &from,
+            const std::string &to
+        )
+    {
+        auto result = text;
         std::size_t index = 0;
         while (true) {
-            index = result.find(from, index);
+            index = result.find (from, index);
             if (index == std::string::npos) {
                 break;
             }
-            result.replace(index, from.length(), to);
+
+            result.replace (index, from.length(), to);
             index += to.length();
         }
+
         return result;
     }
 
     /// \brief Удаление пробельных символов в начале строки.
     /// \param text Текст для обработки.
     /// \return Обработанный текст.
-    std::string trimStart(const std::string &text) {
+    std::string trimStart
+        (
+            const std::string &text
+        )
+    {
         auto length = text.length();
         std::size_t i = 0;
         for (; i < length; ++i) {
-            if (!std::isspace(text[i])) {
+            if (!std::isspace (text[i])) {
                 break;
             }
         }
@@ -174,22 +203,26 @@ namespace irbis
             return {};
         }
 
-        return text.substr(i);
+        return text.substr (i);
     }
 
     /// \brief Удаление пробельных символов в конце строки.
     /// \param text Текст для обработки.
     /// \return Обработанный текст.
-    std::string trimEnd(const std::string &text) {
+    std::string trimEnd
+        (
+            const std::string &text
+        )
+    {
         auto length = text.length();
-        auto i = static_cast<std::ptrdiff_t >(length - 1);
+        auto i = static_cast<std::ptrdiff_t > (length - 1);
         for (; i >= 0; --i) {
-            if (!std::isspace(text[i])) {
+            if (!std::isspace (text[i])) {
                 break;
             }
         }
 
-        if (i == static_cast<std::ptrdiff_t>(length - 1)) {
+        if (i == static_cast<std::ptrdiff_t> (length - 1)) {
             return text;
         }
 
@@ -197,23 +230,27 @@ namespace irbis
             return {};
         }
 
-        return text.substr(0, i + 1);
+        return text.substr (0, i + 1);
     }
 
     /// \brief Удаление пробельных символов в начале и в конце строки.
     /// \param text Текст для обработки.
     /// \return Обработанный текст.
-    std::string trim(const std::string &text) {
+    std::string trim
+        (
+            const std::string &text
+        )
+    {
         auto length = static_cast<std::ptrdiff_t> (text.length());
         std::ptrdiff_t start = 0, end = static_cast<std::ptrdiff_t> (length - 1);
         for (; start < length; ++start) {
-            if (!::iswspace(text[start])) {
+            if (!::isspace (text[start])) {
                 break;
             }
         }
 
         for (; end >= 0; --end) {
-            if (!::iswspace(text[end])) {
+            if (!::isspace (text[end])) {
                 break;
             }
         }
@@ -233,11 +270,16 @@ namespace irbis
     /// \brief Быстрый и грязный разбор строки как целого числа без знака.
     /// \param text Текст для разбора.
     /// \return Мусор на входе - мусор на выходе!
-    int fastParse32(const std::string &text) noexcept {
+    int fastParse32
+        (
+            const std::string &text
+        )
+        noexcept
+    {
         auto result = 0;
         const std::size_t length = text.length();
         for (std::size_t offset = 0; offset < length; offset++) {
-            result = result * 10 + text.at(offset) - '0';
+            result = result * 10 + text.at (offset) - '0';
         }
 
         return result;
@@ -246,11 +288,16 @@ namespace irbis
     /// \brief Быстрый и грязный разбор строки как целого числа без знака.
     /// \param text Текст для разбора.
     /// \return Мусор на входе - мусор на выходе!
-    unsigned int fastParseUnsigned32(const std::string &text) noexcept {
+    unsigned int fastParseUnsigned32
+        (
+            const std::string &text
+        )
+        noexcept
+    {
         auto result = 0u;
         const std::size_t length = text.length();
         for (std::size_t offset = 0; offset < length; offset++) {
-            result = result * 10 + text.at(offset) - '0';
+            result = result * 10 + text.at (offset) - '0';
         }
 
         return result;
@@ -369,6 +416,409 @@ namespace irbis
         if (start < text.length()) {
             token = text.substr(start, std::string::npos);
             result.push_back(token);
+        }
+
+        return result;
+    }
+
+    //================================================================
+
+    /// \brief Модифицирована ли данная строка?
+    /// \return `true` если строка модифицирована.
+    ///
+    /// Состояние "строка модифицирована" устанавливается
+    /// при вызове `setKey` и `setValue`.
+    /// \see IniLine::setKey(), IniLine::setValue()
+    bool IniLine::modified() const noexcept
+    {
+        return this->_modified;
+    }
+
+    /// \brief Установка состояния строки "не модифицирована".
+    void IniLine::notModified() noexcept
+    {
+        this->_modified = false;
+    }
+
+    /// \brief Смена ключа строки.
+    /// \param newKey Новый ключ строки.
+    ///
+    /// Устанавливает состояние "строка модифицирована".
+    void IniLine::setKey (const std::string &newKey)
+    {
+        this->key = newKey;
+        this->_modified = true;
+    }
+
+    /// \brief Смена ключа строки.
+    /// \param newKey Новый ключ строки.
+    ///
+    /// Устанавливает состояние "строка модифицирована".
+    void IniLine::setKey (std::string &&newKey) noexcept
+    {
+        this->key = newKey;
+        this->_modified = true;
+    }
+
+    /// \brief Смена значения строки.
+    /// \param newValue Новое значение строки.
+    ///
+    /// Устанавливает состояние "строка модифицирована".
+    void IniLine::setValue (const std::string &newValue)
+    {
+        this->value = newValue;
+        this->_modified = true;
+    }
+
+    /// \brief Смена значения строки.
+    /// \param newValue Новое значение строки.
+    ///
+    /// Устанавливает состояние "строка модифицирована".
+    void IniLine::setValue (std::string &&newValue) noexcept
+    {
+        this->value = newValue;
+        this->_modified = true;
+    }
+
+    /// \brief Формирует текстовое представление строки.
+    /// \return Ключ=значение.
+    std::string IniLine::toString() const
+    {
+        return this->key + "=" + this->value;
+    }
+
+    //=========================================================
+
+    /// \brief Очищает секцию (удаляет все строки).
+    /// \return `this`.
+    IniSection& IniSection::clear()
+    {
+        this->lines.clear();
+        this->notModified();
+
+        return *this;
+    }
+
+    /// \brief Содержит ли данная секция строку с указанным ключом?
+    /// \param key Искомый ключ.
+    /// \return `true` если содержит.
+    bool IniSection::containsKey (const std::string &key) const noexcept
+    {
+        return std::any_of
+            (
+                std::begin (this->lines),
+                std::end (this->lines),
+                [&key] (const IniLine &x) { return sameString (x.key, key); }
+            );
+    }
+
+    /// \brief Получение индекса строки с указанным ключом.
+    /// \param key Искомый ключ.
+    /// \return Индекс строки, либо отрицательное значение,
+    /// если строка не найдена.
+    std::ptrdiff_t IniSection::getIndex (const std::string &key) const noexcept
+    {
+        for (std::size_t i=0; i < this->lines.size(); i++) {
+            if (sameString (this->lines[i].key, key)) {
+                return static_cast<std::ptrdiff_t> (i);
+            }
+        }
+
+        return -1;
+    }
+
+    /// \brief Поиск строки с указанным ключом.
+    /// \param key Искомый ключ.
+    /// \return Указатель на найденную строку, либо `nullptr`.
+    IniLine* IniSection::getLine (const std::string &key) const noexcept
+    {
+        for (const auto &line : this->lines) {
+            if (sameString (line.key, key)) {
+                return const_cast<IniLine*> (&line);
+            }
+        }
+
+        return nullptr;
+    }
+
+    /// \brief Получение значения строки с указанным ключом.
+    /// \param key Искомый ключ.
+    /// \param defaultValue Значение, возвращаемое, если строка не найдена.
+    /// \return Найденное значение либо значение по умолчанию.
+    std::string IniSection::getValue (const std::string &key, const std::string &defaultValue) const noexcept
+    {
+        const auto line = this->getLine (key);
+
+        return line ? line->value : defaultValue;
+    }
+
+    /// \brief Есть ли модифицированные строки в данной секции?
+    /// \return `true`, если модифицированные строки есть.
+    bool IniSection::modified() const noexcept
+    {
+        return std::any_of
+            (
+                begin (this->lines),
+                end (this->lines),
+                [] (const IniLine &x) { return x.modified(); }
+            );
+    }
+
+    /// \brief Пометка всех строк в данной секции как немодифицированных.
+    void IniSection::notModified()
+    {
+        std::for_each
+            (
+                begin (this->lines),
+                end (this->lines),
+                [] (IniLine &x) { x.notModified(); }
+            );
+    }
+
+    /// \brief Удаление строки с указанным ключом.
+    /// \param key Искомый ключ.
+    /// \return `this`.
+    IniSection& IniSection::removeValue (const std::string &key)
+    {
+        auto index = this->getIndex (key);
+        if (index >= 0) {
+            this->lines.erase (std::begin(this->lines) + index);
+        }
+
+        return *this;
+    }
+
+    /// \brief Установка значения строки с указанным ключом.
+    /// \param key Искомый ключ.
+    /// \param value Новое значение строки.
+    /// \return `this`.
+    IniSection& IniSection::setValue (const std::string &key, const std::string &value)
+    {
+        auto *line = this->getLine (key);
+        if (line != nullptr) {
+            line->setValue (value);
+        }
+        else {
+            IniLine item;
+            item.setKey (key);
+            item.setValue (value);
+            this->lines.push_back (item);
+        }
+
+        return *this;
+    }
+
+    /// \brief Получение текстового представления секции.
+    /// \return Текстовое представление.
+    std::string IniSection::toString() const
+    {
+        std::string result;
+        if (!this->name.empty()) {
+            result = std::string ("[") + this->name + std::string ("]\n");
+        }
+
+        for(const auto &line : lines) {
+            result.append (line.toString());
+            result.append ("\n");
+        }
+
+        return result;
+    }
+
+    /// Получение значения строки с указанным ключом.
+    /// \param index Искомый ключ.
+    /// \return Значение найденной строки либо пустая строка.
+    std::string IniSection::operator[] (const std::string &index) const noexcept
+    {
+        return this->getValue (index, "");
+    }
+
+    //=========================================================
+
+    /// \brief Удаление всех секций из файла.
+    /// \return `this`.
+    IniFile& IniFile::clear()
+    {
+        this->sections.clear();
+
+        return *this;
+    }
+
+    /// \brief Есть ли секция с указанным именем?
+    /// \param name Искомое имя секции.
+    /// \return `true` если секция существует.
+    bool IniFile::containsSection (const std::string &name) const noexcept
+    {
+        return std::any_of
+            (
+                std::begin(this->sections),
+                std::end(this->sections),
+                [&name] (const IniSection &x) { return sameString(x.name, name); }
+            );
+    }
+
+    /// \brief Создание секции с указанным именем.
+    /// \param name Имя секции.
+    /// \return Созданная либо найденная секция.
+    ///
+    /// Если секция с указанным именем уже существует, возвращается именно она,
+    /// создания новой секции не происходит.
+    IniSection& IniFile::createSection (const std::string &name)
+    {
+        auto section = this->getSection (name);
+        if (section) {
+            return *section;
+        }
+
+        this->sections.emplace_back ();
+        auto &result = this->sections.back ();
+        result.name = name;
+
+        return result;
+    }
+
+    /// \brief Есть ли модифицированные секции?
+    /// \return `true`, если есть модифицированные секции.
+    bool IniFile::modified() const noexcept
+    {
+        return std::any_of
+            (
+                std::begin (this->sections),
+                std::end (this->sections),
+                [] (const IniSection &x) { return x.modified(); }
+            );
+    }
+
+    /// \brief Установка состояния "не модифицировано" для всех секций.
+    void IniFile::notModified()
+    {
+        std::for_each
+            (
+                std::begin (this->sections),
+                std::end (this->sections),
+                [] (IniSection &x) { x.notModified(); }
+            );
+    }
+
+    /// \brief Получение индекса секции с указанным именем.
+    /// \param name Искомое имя секции.
+    /// \return Индекс секции либо отрицательное число, если секция не найдена.
+    std::ptrdiff_t IniFile::getIndex (const std::string &name) const noexcept
+    {
+        for (std::size_t i = 0; i < this->sections.size(); i++) {
+            if (sameString (this->sections[i].name, name)) {
+                return static_cast <ptrdiff_t> (i);
+            }
+        }
+
+        return -1;
+    }
+
+    /// \brief Получение указателя на секцию с указанным именем.
+    /// \param name Искомое имя секции.
+    /// \return Указатель на найденную секцию, либо `nullptr`, если секция не найдена.
+    IniSection* IniFile::getSection (const std::string &name) const noexcept
+    {
+        for (const auto &section : this->sections) {
+            if (sameString (section.name, name)) {
+                return const_cast<IniSection*> (&section);
+            }
+        }
+
+        return nullptr;
+    }
+
+    /// \brief Получение значения строки с указанным ключом в указанной секции.
+    /// \param sectionName Имя секции.
+    /// \param keyName Ключ строки.
+    /// \param defaultValue Значение, возвращаемое, если строка не найдена.
+    /// \return Значение найденной строки либо значение по умолчанию.
+    std::string IniFile::getValue (const std::string &sectionName, const std::string &keyName, const std::string &defaultValue) const noexcept
+    {
+        const auto section = this->getSection (sectionName);
+
+        return section ? section->getValue (keyName, defaultValue) : defaultValue;
+    }
+
+    /// \brief Разбор текстового представления INI-файла.
+    /// \param lines Строки INI-файла.
+    void IniFile::parse (const StringList &lines)
+    {
+        IniSection *section = nullptr;
+
+        for (const auto &line : lines) {
+            auto trimmed = trim (line);
+            if (trimmed.empty()) {
+                continue;
+            }
+
+            if (trimmed[0] == L'[') {
+                auto name = trimmed.substr(1, trimmed.size()-2);
+                section = &this->createSection(name);
+            }
+            else if (section) {
+                const auto parts = maxSplit (trimmed, L'=', 2);
+                auto key = trim (parts[0]);
+                auto value = trim (safeAt (parts, 1));
+                IniLine item;
+                item.setKey (key);
+                item.setValue (value);
+                section->lines.push_back (item);
+            }
+        }
+    }
+
+    /// \brief Удаление секции с указанным именем.
+    /// \param sectionName Имя секции.
+    /// \return `this`.
+    IniFile& IniFile::removeSection (const std::string &sectionName)
+    {
+        const auto index = this->getIndex (sectionName);
+        if (index >= 0) {
+            sections.erase (begin (this->sections) + index);
+        }
+
+        return *this;
+    }
+
+    /// \brief Удаление строки с указанным ключом в указанной секции.
+    /// \param sectionName Имя секции.
+    /// \param keyName Ключ.
+    /// \return `this`.
+    IniFile& IniFile::removeValue (const std::string &sectionName, const std::string &keyName)
+    {
+        const auto section = this->getSection (sectionName);
+        if (section) {
+            section->removeValue (keyName);
+        }
+        return *this;
+    }
+
+    /// \brief Установка значения строки с указанным ключом в указанной секции.
+    /// \param sectionName Имя секции.
+    /// \param keyName Ключ.
+    /// \param value Значение.
+    /// \return `this`.
+    IniFile& IniFile::setValue (const std::string &sectionName, const std::string &keyName, const std::string &value)
+    {
+        auto section = this->createSection (sectionName);
+        section.setValue (keyName, value);
+        return *this;
+    }
+
+    /// \brief Конверсия в текстовое представление.
+    /// \return Текст.
+    std::string IniFile::toString() const
+    {
+        std::string result;
+        for (const auto &section : this->sections) {
+            if (!result.empty()) {
+                result += "\n";
+            }
+
+            if (!section.lines.empty()) {
+                result += section.toString();
+            }
         }
 
         return result;
@@ -1283,12 +1733,12 @@ namespace irbis
         std::string result;
         const auto size = this->_content.size();
         while (this->_position < size) {
-            auto c = this->_content.at(_position);
+            auto c = static_cast<char> (this->_content.at (_position));
             this->_position++;
 
             if (c == 13) {
                 if (this->_position < size) {
-                    c = this->_content.at(_position);
+                    c = static_cast<char> (this->_content.at (_position));
                     if (c == 10) {
                         this->_position++;
                     }
@@ -1653,8 +2103,8 @@ namespace irbis
 
         this->lastError = 0;
 
-        std::random_device rd;  //Will be used to obtain a seed for the random number engine
-        std::mt19937 gen (rd()); //Standard mersenne_twister_engine seeded with rd()
+        std::random_device rd;  // Will be used to obtain a seed for the random number engine
+        std::mt19937 gen (rd()); // Standard mersenne_twister_engine seeded with rd()
         std::uniform_int_distribution<> dis (100000, 900000);
 
         AGAIN: this->clientId = dis (gen);
@@ -1684,7 +2134,7 @@ namespace irbis
             this->serverVersion = response.serverVersion;
             this->interval = response.readInteger();
             const auto lines = response.readRemainingAnsiLines();
-            //this->iniFile.parse(lines);
+            this->iniFile.parse (lines);
         }
         catch (...) {
             this->lastError = -100002;
