@@ -36,6 +36,7 @@ namespace irbis
     class SubField;
     class Version;
 
+    using MfnList         = std::vector<int>;
     using RecordFieldList = std::vector<RecordField>;
     using StringList      = std::vector<std::string>;
     using SubFieldList    = std::vector<SubField>;
@@ -454,6 +455,26 @@ namespace irbis
         ParseHeader,    ///< Разбор заголовка ответа.
         ParseBody,      ///< Разбор тела ответа (если есть).
         Error           ///< Ошибка.
+    };
+
+    /// \brief Информация о базе данных ИРБИС.
+    class DatabaseInfo final
+    {
+        public:
+        std::string name;                 ///< Имя базы данных.
+        std::string description;          ///< Описание базы данных в произвольной форме (может быть пустым).
+        MfnList logicallyDeletedRecords;  ///< Список логически удалённых записей (может быть пустым).
+        MfnList physicallyDeletedRecords; ///< Список физически удалённых записей (может быть пустым).
+        MfnList nonActualizedRecords;     ///< Список неактуализированных записей (может быть пустым).
+        MfnList lockedRecords;            ///< Список заблокированных записей (может быть пустым).
+        int maxMfn { 0 };                 ///< Максимальный MFN для базы данных.
+        bool databaseLocked { false };    ///< Признак блокировки базы данных в целом.
+        bool readOnly { false };          ///< База данных доступна только для чтения.
+
+        void        parse   (ServerResponse &response);
+        std::string toString()                          const;
+
+        // static std::vector<DatabaseInfo> parse (const MenuFile &menu);
     };
 
     class Connection final

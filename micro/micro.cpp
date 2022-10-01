@@ -15,7 +15,7 @@
 #pragma warning(disable: 4068)
 #endif
 
-#ifdef WIN32
+#ifdef _MSC_VER
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
@@ -190,7 +190,8 @@ namespace irbis
         auto length = text.length();
         std::size_t i = 0;
         for (; i < length; ++i) {
-            if (!std::isspace (text[i])) {
+            const auto chr = static_cast<unsigned char> (text[i]);
+            if (!std::isspace (chr)) {
                 break;
             }
         }
@@ -217,7 +218,8 @@ namespace irbis
         auto length = text.length();
         auto i = static_cast<std::ptrdiff_t > (length - 1);
         for (; i >= 0; --i) {
-            if (!std::isspace (text[i])) {
+            const auto chr = static_cast<unsigned char> (text[i]);
+            if (!std::isspace (chr)) {
                 break;
             }
         }
@@ -241,16 +243,18 @@ namespace irbis
             const std::string &text
         )
     {
-        auto length = static_cast<std::ptrdiff_t> (text.length());
+        const auto length = static_cast<std::ptrdiff_t> (text.length());
         std::ptrdiff_t start = 0, end = static_cast<std::ptrdiff_t> (length - 1);
         for (; start < length; ++start) {
-            if (!::isspace (text[start])) {
+            const auto chr = static_cast<unsigned char> (text[end]);
+            if (!std::isspace (chr)) {
                 break;
             }
         }
 
         for (; end >= 0; --end) {
-            if (!::isspace (text[end])) {
+            const auto chr = static_cast<unsigned char> (text[end]);
+            if (!std::isspace (chr)) {
                 break;
             }
         }
@@ -263,7 +267,7 @@ namespace irbis
             return text;
         }
 
-        return text.substr(start, end - start + 1);
+        return text.substr (start, end - start + 1);
     }
 
 
@@ -276,6 +280,8 @@ namespace irbis
         )
         noexcept
     {
+        // TODO обрабатывать знак числа
+
         auto result = 0;
         const std::size_t length = text.length();
         for (std::size_t offset = 0; offset < length; offset++) {
@@ -306,10 +312,18 @@ namespace irbis
     /// \brief Быстрый и грязный разбор строки как целого числа без знака.
     /// \param text Текст для разбора.
     /// \return Мусор на входе - мусор на выходе!
-    int fastParse32(const char *text) noexcept {
+    int fastParse32
+        (
+            const char *text
+        )
+        noexcept
+    {
+        // TODO обрабатывать знак числа
+
         auto result = 0;
         while (*text != 0) {
-            result = result * 10 + *text - '0';
+            const auto chr = static_cast<unsigned char> (*text);
+            result = result * 10 + chr - '0';
             text++;
         }
 
@@ -319,10 +333,16 @@ namespace irbis
     /// \brief Быстрый и грязный разбор строки как целого числа без знака.
     /// \param text Текст для разбора.
     /// \return Мусор на входе - мусор на выходе!
-    unsigned int fastParseUnsigned32(const char *text) noexcept {
+    unsigned int fastParseUnsigned32
+        (
+            const char *text
+        )
+        noexcept
+    {
         auto result = 0u;
         while (*text != 0) {
-            result = result * 10 + *text - '0';
+            const auto chr = static_cast<unsigned char> (*text);
+            result = result * 10 + chr - '0';
             text++;
         }
 
@@ -388,7 +408,7 @@ namespace irbis
     /// \param text Текст для разбора.
     /// \param delimiter Разделитель.
     /// \return Вектор подстрок.
-    std::vector<std::string> split(const std::string &text, char delimiter) {
+    StringList split(const std::string &text, char delimiter) {
         std::vector<std::string> result;
         std::string token;
         std::istringstream stream(text);
@@ -752,12 +772,12 @@ namespace irbis
                 continue;
             }
 
-            if (trimmed[0] == L'[') {
+            if (trimmed[0] == '[') {
                 auto name = trimmed.substr(1, trimmed.size()-2);
                 section = &this->createSection(name);
             }
             else if (section) {
-                const auto parts = maxSplit (trimmed, L'=', 2);
+                const auto parts = maxSplit (trimmed, '=', 2);
                 auto key = trim (parts[0]);
                 auto value = trim (safeAt (parts, 1));
                 IniLine item;
@@ -941,9 +961,9 @@ namespace irbis
         if (body[0] == '^') {
             all = split (body, '^');
         } else {
-            const auto parts2 = maxSplit (body, L'#', 2);
+            const auto parts2 = maxSplit (body, '#', 2);
             this->value = parts2[0];
-            all = parts2.size() == 1 ? StringList () : split (parts2[1], L'^');
+            all = parts2.size() == 1 ? StringList () : split (parts2[1], '^');
         }
         for (const auto &one : all) {
             if (!one.empty()) {
@@ -958,7 +978,7 @@ namespace irbis
     /// \param line Текст для декодирования.
     void RecordField::decode (const std::string &line)
     {
-        const auto parts = maxSplit (line, L'#', 2);
+        const auto parts = maxSplit (line, '#', 2);
         this->tag = fastParse32 (parts[0]);
         if (parts.size() == 1 || parts[1].empty()) {
             return;
@@ -1205,12 +1225,12 @@ namespace irbis
         }
 
         // mfn and status of the record
-        const auto firstLine = split (lines[0], L'#');
+        const auto firstLine = split (lines[0], '#');
         this->mfn = fastParseUnsigned32 (firstLine[0]);
         this->status = static_cast<RecordStatus> (fastParseUnsigned32 (safeAt (firstLine, 1)));
 
         // version of the record
-        const auto secondLine = split (lines[1], L'#');
+        const auto secondLine = split (lines[1], '#');
         this->version = fastParseUnsigned32 (safeAt (secondLine, 1));
 
         // fields
@@ -2041,6 +2061,48 @@ namespace irbis
         const auto size2 = static_cast <int> (size);
         const std::size_t result = ::recv (this->_impl->socket, ptr, size2, 0);
         return result;
+    }
+
+    //================================================================
+
+    static MfnList parseLine (const std::string &line)
+    {
+        MfnList result;
+
+        if (line.empty()) {
+            return result;
+        }
+
+        auto items = split (line, '\u001E');
+        for (const auto &item : items) {
+            auto mfn = fastParse32 (item);
+            result.push_back (mfn);
+        }
+
+        return result;
+    }
+
+    /// \brief Разбор ответа сервера.
+    /// \param response Ответ сервера.
+    void DatabaseInfo::parse (ServerResponse &response)
+    {
+        this->logicallyDeletedRecords = parseLine (response.readAnsi());
+        this->physicallyDeletedRecords = parseLine (response.readAnsi());
+        this->nonActualizedRecords = parseLine (response.readAnsi());
+        this->lockedRecords = parseLine (response.readAnsi());
+        this->maxMfn = fastParse32 (response.readAnsi());
+        this->databaseLocked = fastParse32 (response.readAnsi()) != 0;
+    }
+
+    /// \brief Получение текстового представления.
+    /// \return Текстовое представление информации о базе данных.
+    std::string DatabaseInfo::toString() const
+    {
+        if (this->description.empty()) {
+            return name;
+        }
+
+        return this->name + " - " + this->description;
     }
 
     //================================================================

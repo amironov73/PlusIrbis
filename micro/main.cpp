@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #include <windows.h>
 #endif
 
@@ -12,7 +12,7 @@ using SF = irbis::SubField;
 
 int main()
 {
-    #ifdef WIN32
+    #ifdef _MSC_VER
     // нужно только в Windows
     SetConsoleOutputCP (65001);
     #endif
