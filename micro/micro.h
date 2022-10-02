@@ -29,6 +29,7 @@ namespace irbis
     class ClientSocketImpl;
     class ClientQuery;
     class Connection;
+    class Encoding;
     class FileSpecification;
     class MarcRecord;
     class RecordField;
@@ -36,7 +37,10 @@ namespace irbis
     class SubField;
     class Version;
 
-    using MfnList         = std::vector<int>;
+    using Byte            = std::uint8_t;
+    using Bytes           = std::vector<Byte>;
+    using Mfn             = std::uint32_t;
+    using MfnList         = std::vector<Mfn>;
     using RecordFieldList = std::vector<RecordField>;
     using StringList      = std::vector<std::string>;
     using SubFieldList    = std::vector<SubField>;
@@ -477,6 +481,50 @@ namespace irbis
         // static std::vector<DatabaseInfo> parse (const MenuFile &menu);
     };
 
+    /// \brief Простая абстракция кодировки символов.
+    class Encoding // abstract
+    {
+        static Encoding *_ansi;
+        static Encoding *_utf;
+
+        public:
+
+        Encoding() = default;
+        virtual ~Encoding() = default;
+
+        virtual Bytes        fromUnicode   (const std::wstring &text)             const = 0; ///< Преобразование в UNICODE.
+        virtual std::size_t  getSize       (const std::wstring &text)             const = 0; ///< Подсчет размера текста в данной кодировке.
+        virtual std::wstring toUnicode     (const Byte *bytes, std::size_t count) const = 0; ///< Преобразование из UNICODE.
+
+        static Encoding*   ansi     ();
+        static std::string fromAnsi (const Byte *bytes, std::size_t count);
+        static std::string fromUtf  (const Byte *bytes, std::size_t count);
+        static Bytes       toAnsi   (const std::string &text);
+        static Bytes       toUtf    (const std::string &text);
+        static Encoding*   utf      ();
+    };
+
+    /// \brief Информация о версии ИРБИС-сервера.
+    class Version final
+    {
+        public:
+
+        std::string organization;      ///< На какое юридическое лицо приобретен сервер.
+        std::string version;           ///< Собственно версия сервера. Например, 64.2008.1.
+        int    maxClients       { 0 }; ///< Максимальное количество одновременных подключений.
+        int    connectedClients { 0 }; ///< Текущее количество подключений.
+
+        Version             ()                = default; ///< Конструктор по умолчанию.
+        Version             (const Version &) = default; ///< Конструктор копирования.
+        Version             (Version &&)      = default; ///< Конструктор перемещения.
+        ~Version            ()                = default; ///< Деструктор.
+        Version& operator = (const Version &) = default; ///< Оператор копирования.
+        Version& operator = (Version &&)      = default; ///< Оператор перемещения.
+
+        void parse (ServerResponse &response);
+        std::string toString() const;
+    };
+
     class Connection final
     {
     private:
@@ -562,27 +610,6 @@ namespace irbis
 //        IRBIS_MAYBE_UNUSED bool                      unlockDatabase   (const String &databaseName = L"");
 //        IRBIS_MAYBE_UNUSED bool                      unlockRecords    (const String &databaseName, const MfnList &mfnList);
 
-    };
-
-    /// \brief Информация о версии ИРБИС-сервера.
-    class Version final
-    {
-        public:
-
-        std::string organization;      ///< На какое юридическое лицо приобретен сервер.
-        std::string version;           ///< Собственно версия сервера. Например, 64.2008.1.
-        int    maxClients       { 0 }; ///< Максимальное количество одновременных подключений.
-        int    connectedClients { 0 }; ///< Текущее количество подключений.
-
-        Version             ()                = default; ///< Конструктор по умолчанию.
-        Version             (const Version &) = default; ///< Конструктор копирования.
-        Version             (Version &&)      = default; ///< Конструктор перемещения.
-        ~Version            ()                = default; ///< Деструктор.
-        Version& operator = (const Version &) = default; ///< Оператор копирования.
-        Version& operator = (Version &&)      = default; ///< Оператор перемещения.
-
-        void parse (ServerResponse &response);
-        std::string toString() const;
     };
 
 
