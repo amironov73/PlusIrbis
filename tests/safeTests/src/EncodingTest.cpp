@@ -95,3 +95,21 @@ TEST_CASE("Encoding_fromUtf_2", "[encoding]")
     irbis::fromUtf(end, size, 0x10, result);
     CHECK(irbis::String (L"\u0423 \u043F\u043E\u043F\u0430 \u0431\u044B\u043B\u0430 \u0441\u043E\u0431\u0430\u043A\u0430") == result);
 }
+
+TEST_CASE("Encoding_ansiToUtf_1", "[encoding]")
+{
+    auto result = irbis::ansiToUtf ("Hello");
+    CHECK (result == "Hello");
+
+    result = irbis::ansiToUtf ("\xCF\xF0\xE8\xE2\xE5\xF2");
+    CHECK (result == "\xD0\x9F\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82");
+}
+
+TEST_CASE("Encoding_utfToAnsi_1", "[encoding]")
+{
+    auto result = irbis::utfToAnsi ("Hello");
+    CHECK (result == "Hello");
+
+    result = irbis::utfToAnsi ("\xD0\x9F\xD1\x80\xD0\xB8\xD0\xB2\xD0\xB5\xD1\x82");
+    CHECK (result == "\xCF\xF0\xE8\xE2\xE5\xF2");
+}

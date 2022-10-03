@@ -2273,6 +2273,12 @@ public:
     std::size_t getSize     (const String &text)                   const override;
 };
 
+/// \brief Прямое преобразование текста из кодировки CP1251 в UTF-8.
+std::string IRBIS_CALL ansiToUtf (const std::string &text);
+
+/// \brief Прямое преобразование текста из кодировки UTF-8 в CP1251.
+std::string IRBIS_CALL utfToAnsi (const std::string &text);
+
 //=========================================================
 
 /// \brief Коды (поле 900).
